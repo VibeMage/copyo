@@ -5,7 +5,7 @@
 #   ./scripts/build-release.sh                        # 本地签名（Sign to Run Locally）
 #   SIGN_IDENTITY="Developer ID Application: 你的名字 (TEAMID)" ./scripts/build-release.sh
 #
-# 公司有 Apple Developer 账号时，签名后可继续公证（同事安装零障碍）:
+# 如有 Apple Developer 账号，签名后可继续公证（使用者安装零障碍）:
 #   xcrun notarytool submit dist/Paster-<版本>.zip --keychain-profile <配置名> --wait
 #   xcrun stapler staple <Paster.app 路径>   # 然后重新打 DMG
 set -euo pipefail
@@ -62,11 +62,11 @@ ls -lh dist/
 echo ""
 if [[ -n "${SIGN_IDENTITY:-}" ]]; then
   echo "完成。已用 Developer ID 签名；建议继续公证（见脚本顶部注释），"
-  echo "未公证时同事首次打开需在 系统设置 → 隐私与安全性 底部点「仍要打开」。"
+  echo "未公证时首次打开需在 系统设置 → 隐私与安全性 底部点「仍要打开」。"
 else
-  echo "完成。注意：ad-hoc 签名的包在同事机器上双击会提示「已损坏，无法打开」，"
+  echo "完成。注意：ad-hoc 签名的包在其他机器上双击会提示「已损坏，无法打开」，"
   echo "这是 Gatekeeper 对无开发者身份应用的固定提示，不是包真的坏了。"
-  echo "同事安装后需在终端执行一次："
+  echo "安装后需在终端执行一次："
   echo "  xattr -cr /Applications/Paster.app"
   echo "之后即可正常打开。"
 fi
