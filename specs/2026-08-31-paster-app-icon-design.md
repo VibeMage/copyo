@@ -56,3 +56,13 @@ Following the first-round review, generate two more independent six-image rounds
 - Round 3: bolder, higher-contrast treatments optimized for memorability at small Dock sizes.
 
 Each round contains `A1`/`A2` Card Sprite, `B1`/`B2` Hamster, and `C1`/`C2` Pigeon variants. Odd variants emerge from the lower-left and even variants emerge from the lower-right. Prefix saved files and report labels with `R2-` or `R3-` to keep all 18 candidates unambiguous.
+
+## Round 4 — Non-Mascot macOS Icons
+
+Generate one six-image round without using the `ip-as-logo` skill or its mascot, corner-emergence, and three-semantic-color rules. Use the built-in general image-generation workflow to explore professional, centered macOS utility icons:
+
+- `R4-D1` and `R4-D2` — Card Stack: centered layered clipboard cards, respectively using a direct frontal stack and a slightly fanned stack. This is the recommended direction because it communicates clipboard history immediately and preserves continuity with the existing icon.
+- `R4-E1` and `R4-E2` — Fast Paste: a card moving through a short rounded flow path or slot. Keep the motion symbol compact so it does not resemble a generic file-transfer app.
+- `R4-F1` and `R4-F2` — Local Vault: clipboard cards combined with a broad shield or vault silhouette. Keep the protection cue secondary so the icon does not read primarily as a password manager.
+
+All six candidates use a centered subject on a polished macOS rounded-square base, restrained dimensional lighting, broad geometry, and strong small-size contrast. Use no mascot, face, eyes, text, letters, keyboard glyphs, watermark, thin detail, photorealism, or presentation frame. Generate each candidate independently as a full-resolution square image, save every returned result without automatic retries, and do not replace the current app icon during exploration.
