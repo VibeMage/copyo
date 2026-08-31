@@ -66,3 +66,31 @@ Generate one six-image round without using the `ip-as-logo` skill or its mascot,
 - `R4-F1` and `R4-F2` — Local Vault: clipboard cards combined with a broad shield or vault silhouette. Keep the protection cue secondary so the icon does not read primarily as a password manager.
 
 All six candidates use a centered subject on a polished macOS rounded-square base, restrained dimensional lighting, broad geometry, and strong small-size contrast. Use no mascot, face, eyes, text, letters, keyboard glyphs, watermark, thin detail, photorealism, or presentation frame. Generate each candidate independently as a full-resolution square image, save every returned result without automatic retries, and do not replace the current app icon during exploration.
+
+## Round 5 — D1/D2 Refinement
+
+Refine the two Card Stack candidates from Round 4 as image-based edits, preserving their established compositions while aligning them to one calmer professional palette. Produce exactly one refinement for each source image and label the results `R5-D1` and `R5-D2`.
+
+### R5-D1 — Frontal Stack
+
+- Preserve the direct frontal stack and the clear three-record history metaphor from `R4-D1`.
+- Replace the electric blue base with a deep graphite-indigo rounded-square background close in character to the calmer `R4-D2` base.
+- Use warm ivory for the front card, cobalt blue and teal for the rear cards, and reserve amber for the front clip only.
+- Reduce the front card to two broad content bars and remove nonessential surface detail.
+- Lower the plastic gloss and soften highlights while retaining enough shallow depth for a native macOS icon.
+
+### R5-D2 — Fanned Stack
+
+- Preserve the compact fanned three-card arrangement and slight perspective from `R4-D2`.
+- Keep a deep graphite-indigo base, slightly richer and cleaner than the existing gray-blue background.
+- Use the same warm ivory, cobalt blue, teal, and restrained amber palette as `R5-D1`.
+- Replace the photo panel, dots, and form-like micro-content with two or three broad clipboard-history bars.
+- Enlarge the central silhouette slightly, simplify overlaps, and reduce photorealistic texture and highlight intensity.
+
+### Shared Acceptance Criteria
+
+- Both refinements must look like members of the same icon family, differing primarily by frontal versus fanned composition.
+- The clipboard-history meaning must remain readable at 32 × 32 without relying on small content details.
+- Retain the macOS rounded-square base with genuinely transparent outer corners.
+- Use no text, letters, numbers, keyboard glyphs, mascot features, arrows, cloud or sync badges, watermark, presentation frame, external scene, thin detail, or harsh reflections.
+- Save the full-resolution outputs beside the Round 4 assets, preserve the original Round 4 files, and update the visual comparison page without replacing `art/icon-master.png` or the Xcode AppIcon asset catalog.
