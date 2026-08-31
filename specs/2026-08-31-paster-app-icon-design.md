@@ -47,3 +47,12 @@ Represents fast delivery and automatic paste. Use a plump bird silhouette and on
 Save the six original candidates in a new project-local exploration directory and present all six together in the visual companion, labeled `A1`, `A2`, `B1`, `B2`, `C1`, and `C2`. Report each candidate's direction, corner, dimensions, saved path, prompt, color mapping, generation provider, and constraint-delivery mode.
 
 No selected candidate is installed into `art/icon-master.png` or `Paster/Assets.xcassets/AppIcon.appiconset` during this exploration.
+
+## Additional Comparison Rounds
+
+Following the first-round review, generate two more independent six-image rounds without using earlier results as image references. Preserve the same three subjects and corner split so the comparison isolates new color and personality treatments:
+
+- Round 2: calmer, more restrained treatments suitable for a professional desktop utility.
+- Round 3: bolder, higher-contrast treatments optimized for memorability at small Dock sizes.
+
+Each round contains `A1`/`A2` Card Sprite, `B1`/`B2` Hamster, and `C1`/`C2` Pigeon variants. Odd variants emerge from the lower-left and even variants emerge from the lower-right. Prefix saved files and report labels with `R2-` or `R3-` to keep all 18 candidates unambiguous.
