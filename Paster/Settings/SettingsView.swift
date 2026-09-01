@@ -8,15 +8,15 @@ struct SettingsView: View {
     var body: some View {
         TabView {
             GeneralSettingsView()
-                .tabItem { Label("通用", systemImage: "gearshape") }
+                .tabItem { Label("General", systemImage: "gearshape") }
             HistorySettingsView()
-                .tabItem { Label("历史", systemImage: "clock.arrow.circlepath") }
+                .tabItem { Label("Clipboard", systemImage: "clock.arrow.circlepath") }
             SyncSettingsView()
-                .tabItem { Label("同步", systemImage: "arrow.triangle.2.circlepath.icloud") }
+                .tabItem { Label("Sync", systemImage: "arrow.triangle.2.circlepath.icloud") }
             ShortcutsSettingsView()
-                .tabItem { Label("快捷键", systemImage: "keyboard") }
+                .tabItem { Label("Shortcuts", systemImage: "keyboard") }
             AboutView()
-                .tabItem { Label("关于", systemImage: "info.circle") }
+                .tabItem { Label("About", systemImage: "info.circle") }
         }
         .frame(width: 540, height: 400)
     }
@@ -34,7 +34,7 @@ struct GeneralSettingsView: View {
     var body: some View {
         Form {
             Section {
-                Toggle("开机时自动启动", isOn: $launchAtLogin)
+                Toggle("Launch at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, enabled in
                         do {
                             if enabled {
@@ -48,16 +48,16 @@ struct GeneralSettingsView: View {
                     }
             }
             Section {
-                Toggle("选中后自动粘贴到当前应用", isOn: $autoPaste)
-                Toggle("始终以纯文本粘贴", isOn: $plainTextPaste)
-                Toggle("粘贴音效", isOn: $pasteSound)
+                Toggle("Paste into the previous app on selection", isOn: $autoPaste)
+                Toggle("Always paste as plain text", isOn: $plainTextPaste)
+                Toggle("Paste sound", isOn: $pasteSound)
             } footer: {
                 if autoPaste && !accessibilityTrusted {
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundStyle(.orange)
-                        Text("自动粘贴需要「辅助功能」权限")
-                        Button("打开系统设置") {
+                        Text("Auto-paste requires Accessibility permission")
+                        Button("Open System Settings") {
                             openAccessibilitySettings()
                         }
                     }
@@ -89,36 +89,38 @@ struct HistorySettingsView: View {
     var body: some View {
         Form {
             Section {
-                Picker("历史记录上限", selection: $historyLimit) {
-                    Text("100 条").tag(100)
-                    Text("300 条").tag(300)
-                    Text("500 条").tag(500)
-                    Text("1000 条").tag(1000)
-                    Text("无限制").tag(0)
+                Picker("History Limit", selection: $historyLimit) {
+                    Text("100 items").tag(100)
+                    Text("300 items").tag(300)
+                    Text("500 items").tag(500)
+                    Text("1000 items").tag(1000)
+                    Text("Unlimited").tag(0)
                 }
             } footer: {
-                Text("超出上限时最旧的未固定记录会被自动清理，固定到 Pinboard 的内容不受影响。")
+                Text("When the limit is exceeded, the oldest unpinned entries are removed automatically. Anything pinned to a Pinboard is unaffected.")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
             }
-            Section("忽略的应用") {
+            Section("Ignored Apps") {
                 TextEditor(text: $ignoredApps)
                     .font(.system(size: 12, design: .monospaced))
                     .frame(height: 80)
-                Text("每行一个 Bundle ID（如 com.1password.1password），来自这些应用的复制不会被记录。密码管理器标记为隐藏的内容始终自动跳过。")
+                Text("One bundle ID per line (for example com.1password.1password). Copies made in these apps are never recorded. Content that password managers mark as concealed is always skipped.")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
             }
             Section {
-                Button("清空历史记录…", role: .destructive) {
+                Button("Clear History…", role: .destructive) {
                     showClearConfirm = true
                 }
             }
         }
         .formStyle(.grouped)
-        .confirmationDialog("确定要清空所有未固定的历史记录吗？", isPresented: $showClearConfirm) {
-            Button("清空", role: .destructive) { clearHistory() }
-            Button("取消", role: .cancel) {}
+        .confirmationDialog("Clear History?", isPresented: $showClearConfirm) {
+            Button("Clear", role: .destructive) { clearHistory() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This deletes every clipboard entry that isn’t pinned to a Pinboard. This action cannot be undone.")
         }
     }
 
@@ -142,36 +144,36 @@ struct SyncSettingsView: View {
     var body: some View {
         Form {
             Section {
-                Toggle("同步历史记录", isOn: $icloudSync)
+                Toggle("Sync clipboard history", isOn: $icloudSync)
                     .disabled(!SyncService.isAvailable)
                     .onChange(of: icloudSync) { _, _ in
                         AppDelegate.shared?.syncService.updateActivation()
                     }
                 if icloudSync && SyncService.isAvailable {
-                    Button("立即同步") {
+                    Button("Sync Now") {
                         AppDelegate.shared?.syncService.syncNow()
                     }
                 }
             } footer: {
                 Group {
                     if SyncService.isAvailable {
-                        Text("默认经由 iCloud Drive（iCloud Drive/Paster/）在你的多台 Mac 之间同步剪贴板历史与 Pinboard。数据只经过你自己的 iCloud，Paster 不接触任何第三方服务器。删除操作不跨设备传播。")
+                        Text("By default your clipboard history and Pinboards sync between your Macs through iCloud Drive (iCloud Drive/Paster/). The data only ever passes through your own iCloud — Paster never touches a third-party server. Deletions are not propagated across devices.")
                     } else if syncFolderOverride.isEmpty {
-                        Text("此 Mac 未启用 iCloud Drive。可在 系统设置 → Apple ID → iCloud 中打开 iCloud Drive，或在下方指定一个自定义同步文件夹。")
+                        Text("iCloud Drive is not enabled on this Mac. Turn it on in System Settings → click your name → iCloud, or point Paster at a custom sync folder below.")
                     } else {
-                        Text("自定义同步文件夹的上级目录不存在，请检查路径。")
+                        Text("The parent directory of the custom sync folder does not exist. Please check the path.")
                     }
                 }
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
             }
-            Section("自定义同步文件夹（可选）") {
-                TextField("留空使用 iCloud Drive，如 ~/Shared/Paster", text: $syncFolderOverride)
+            Section("Custom Sync Folder (Optional)") {
+                TextField("Leave empty to use iCloud Drive, e.g. ~/Shared/Paster", text: $syncFolderOverride)
                     .font(.system(size: 12, design: .monospaced))
                     .onSubmit {
                         AppDelegate.shared?.syncService.updateActivation()
                     }
-                Text("填入任意多台设备都能读写的目录（公司 NAS、网盘同步文件夹等）即可代替 iCloud Drive。")
+                Text("Enter any directory all of your devices can read and write (a company NAS, another cloud-sync folder, and so on) to use it instead of iCloud Drive.")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
             }
@@ -188,30 +190,30 @@ struct ShortcutsSettingsView: View {
     @State private var recordingMonitor: Any?
 
     private let fixedShortcuts: [(String, String)] = [
-        ("在卡片间导航", "← →"),
-        ("粘贴选中内容", "↩"),
-        ("以纯文本粘贴", "⌥↩"),
-        ("预览选中内容（搜索框为空时）", "空格"),
-        ("搜索", "直接输入"),
-        ("删除选中内容", "⌘⌫"),
-        ("清除搜索 / 关闭面板", "Esc"),
+        (String(localized: "Move between cards"), "← →"),
+        (String(localized: "Paste selected item"), "↩"),
+        (String(localized: "Paste selected item as plain text"), "⌥↩"),
+        (String(localized: "Preview selected item (when search is empty)"), String(localized: "Space")),
+        (String(localized: "Search"), String(localized: "Just type")),
+        (String(localized: "Delete selected item"), "⌘⌫"),
+        (String(localized: "Clear search / Close panel"), "Esc"),
     ]
 
     var body: some View {
         Form {
             Section {
                 HStack {
-                    Text("打开 / 关闭面板")
+                    Text("Open / Close panel")
                     Spacer()
                     Button {
                         isRecording ? cancelRecording() : startRecording()
                     } label: {
-                        Text(isRecording ? "请按下新快捷键…" : hotkeyDisplay)
+                        Text(isRecording ? String(localized: "Press the new shortcut…") : hotkeyDisplay)
                             .font(.system(size: 12, weight: .medium, design: .monospaced))
                             .frame(minWidth: 90)
                     }
                     if HotkeyConfig.load() != .default {
-                        Button("重置") {
+                        Button("Reset") {
                             cancelRecording()
                             HotkeyConfig.resetToDefault()
                             AppDelegate.shared?.reloadHotkey()
@@ -221,8 +223,8 @@ struct ShortcutsSettingsView: View {
                 }
             } footer: {
                 Text(isRecording
-                     ? "组合键需要至少包含 ⌘、⌥ 或 ⌃ 其中之一，按 Esc 取消。"
-                     : "点击快捷键可以自定义，默认 ⇧⌘V。")
+                     ? "The combination must include at least one of ⌘, ⌥ or ⌃. Press Esc to cancel."
+                     : "Click the shortcut to customize it. The default is ⇧⌘V.")
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
             }
@@ -289,12 +291,12 @@ struct AboutView: View {
             Image(systemName: "doc.on.clipboard.fill")
                 .font(.system(size: 48))
                 .foregroundStyle(.tint)
-            Text("Paster")
+            Text(verbatim: "Paster")
                 .font(.system(size: 22, weight: .bold))
-            Text("版本 \(version)")
+            Text("Version \(version)")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
-            Text("开源的 macOS 剪贴板管理工具。\n所有数据仅保存在本机，不进行任何网络传输。")
+            Text("An open-source clipboard manager for macOS.\nAll data stays on this Mac and is never sent to a third-party server.")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

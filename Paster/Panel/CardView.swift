@@ -51,7 +51,7 @@ struct CardView: View {
         ZStack {
             headerColor
             HStack(alignment: .center, spacing: 8) {
-                Text(item.sourceAppName ?? "未知来源")
+                Text(item.sourceAppName ?? String(localized: "Unknown Source"))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -162,7 +162,7 @@ struct CardView: View {
                         .lineLimit(2)
                         .multilineTextAlignment(.center)
                 } else {
-                    Text("\(item.filePaths.count) 个文件")
+                    Text("\(item.filePaths.count) files")
                         .font(.system(size: 12, weight: .medium))
                 }
             }
@@ -178,9 +178,9 @@ struct CardView: View {
         case .image:
             return item.kind.label
         case .file:
-            return "\(item.kind.label) · \(item.filePaths.count) 项"
+            return String(localized: "\(item.kind.label) · \(item.filePaths.count) files")
         default:
-            return "\(item.kind.label) · \(item.charCount) 字符"
+            return String(localized: "\(item.kind.label) · \(item.charCount) characters")
         }
     }
 

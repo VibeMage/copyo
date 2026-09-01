@@ -69,16 +69,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showWelcome() {
         let alert = NSAlert()
-        alert.messageText = "欢迎使用 Paster"
-        alert.informativeText = """
-        Paster 已在菜单栏常驻运行（右上角剪贴板图标）。
+        alert.messageText = String(localized: "Welcome to Paster")
+        alert.informativeText = String(localized: """
+        Paster lives in the menu bar (the clipboard icon in the top-right corner).
 
-        • 按 \(HotkeyConfig.load().displayString) 随时呼出剪贴板面板
-        • 复制过的内容会自动记录，输入即可搜索
-        • 选中条目回车即可粘贴到之前的应用（需要辅助功能权限，首次使用时会引导授权）
-        """
-        alert.addButton(withTitle: "立即试试")
-        alert.addButton(withTitle: "知道了")
+        • Press \(HotkeyConfig.load().displayString) anytime to bring up the clipboard panel
+        • Everything you copy is saved automatically — type to search
+        • Select an item and press Return to paste it into the previous app (requires Accessibility permission; you’ll be guided through granting it the first time)
+        """)
+        alert.addButton(withTitle: String(localized: "Try It Now"))
+        alert.addButton(withTitle: String(localized: "Got It"))
         NSApp.activate(ignoringOtherApps: true)
         if alert.runModal() == .alertFirstButtonReturn {
             panelController.show()
@@ -116,7 +116,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
 
         let config = HotkeyConfig.load()
-        let openItem = NSMenuItem(title: "打开 Paster",
+        let openItem = NSMenuItem(title: String(localized: "Open Paster"),
                                   action: #selector(openPanel),
                                   keyEquivalent: config.keyEquivalentCharacter ?? "")
         openItem.keyEquivalentModifierMask = config.cocoaModifiers
@@ -125,17 +125,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
-        let clearItem = NSMenuItem(title: "清空历史记录…", action: #selector(clearHistory), keyEquivalent: "")
+        let clearItem = NSMenuItem(title: String(localized: "Clear History…"), action: #selector(clearHistory), keyEquivalent: "")
         clearItem.target = self
         menu.addItem(clearItem)
 
-        let settingsItem = NSMenuItem(title: "设置…", action: #selector(openSettings), keyEquivalent: ",")
+        let settingsItem = NSMenuItem(title: String(localized: "Settings…"), action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
 
         menu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: "退出 Paster", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: String(localized: "Quit Paster"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitItem)
 
         // 临时挂载菜单以支持右键弹出，弹出后立即移除，保持左键点击直接开面板
@@ -157,10 +157,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func clearHistory() {
         let alert = NSAlert()
-        alert.messageText = "清空历史记录？"
-        alert.informativeText = "将删除所有未固定到 Pinboard 的剪贴板记录，此操作不可撤销。"
-        alert.addButton(withTitle: "清空")
-        alert.addButton(withTitle: "取消")
+        alert.messageText = String(localized: "Clear History?")
+        alert.informativeText = String(localized: "This deletes every clipboard entry that isn’t pinned to a Pinboard. This action cannot be undone.")
+        alert.addButton(withTitle: String(localized: "Clear"))
+        alert.addButton(withTitle: String(localized: "Cancel"))
         alert.alertStyle = .warning
         NSApp.activate(ignoringOtherApps: true)
         guard alert.runModal() == .alertFirstButtonReturn else { return }

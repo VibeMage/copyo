@@ -64,7 +64,7 @@ struct HotkeyConfig: Equatable {
     }
 
     private static let specialKeyNames: [UInt32: String] = [
-        UInt32(kVK_Space): "空格", UInt32(kVK_Return): "↩", UInt32(kVK_Tab): "⇥",
+        UInt32(kVK_Space): String(localized: "Space"), UInt32(kVK_Return): "↩", UInt32(kVK_Tab): "⇥",
         UInt32(kVK_Escape): "⎋", UInt32(kVK_Delete): "⌫", UInt32(kVK_ForwardDelete): "⌦",
         UInt32(kVK_LeftArrow): "←", UInt32(kVK_RightArrow): "→",
         UInt32(kVK_UpArrow): "↑", UInt32(kVK_DownArrow): "↓",
@@ -77,7 +77,7 @@ struct HotkeyConfig: Equatable {
 
     static func keyName(for keyCode: UInt32) -> String {
         if let special = specialKeyNames[keyCode] { return special }
-        return characterName(for: keyCode)?.uppercased() ?? "键码\(keyCode)"
+        return characterName(for: keyCode)?.uppercased() ?? String(localized: "Key \(Int(keyCode))")
     }
 
     /// 通过当前键盘布局把 keyCode 翻译为字符

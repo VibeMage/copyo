@@ -88,15 +88,15 @@ struct PanelRootView: View {
                 Task { @MainActor in searchFocused = true }
             }
         }
-        .alert("新建 Pinboard", isPresented: $showNewPinboardAlert) {
-            TextField("名称", text: $newPinboardName)
-            Button("创建") { createPinboard() }
-            Button("取消", role: .cancel) {
+        .alert("New Pinboard", isPresented: $showNewPinboardAlert) {
+            TextField("Name", text: $newPinboardName)
+            Button("Create") { createPinboard() }
+            Button("Cancel", role: .cancel) {
                 newPinboardName = ""
                 pendingPinItem = nil
             }
         } message: {
-            Text("Pinboard 用来固定常用的剪贴板内容")
+            Text("Pinboards keep the clips you use most within reach")
         }
     }
 
@@ -104,11 +104,11 @@ struct PanelRootView: View {
 
     private var headerBar: some View {
         HStack(spacing: 8) {
-            tabButton(title: "历史记录", id: nil)
+            tabButton(title: String(localized: "History"), id: nil)
             ForEach(pinboards) { pinboard in
                 tabButton(title: pinboard.name, id: pinboard.persistentModelID)
                     .contextMenu {
-                        Button("删除 Pinboard", role: .destructive) {
+                        Button("Delete Pinboard", role: .destructive) {
                             deletePinboard(pinboard)
                         }
                     }
@@ -122,7 +122,7 @@ struct PanelRootView: View {
                     .background(Color.primary.opacity(0.08), in: Circle())
             }
             .buttonStyle(.plain)
-            .help("新建 Pinboard")
+            .help("New Pinboard")
 
             Spacer()
 
@@ -152,7 +152,7 @@ struct PanelRootView: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
-            TextField("输入即可搜索", text: $search)
+            TextField("Type to search", text: $search)
                 .textFieldStyle(.plain)
                 .font(.system(size: 13))
                 .focused($searchFocused)
@@ -218,16 +218,16 @@ struct PanelRootView: View {
             }
             .onDrag { dragProvider(for: item) }
             .contextMenu {
-                Button("粘贴") { onPaste(item, false) }
-                Button("以纯文本粘贴") { onPaste(item, true) }
-                Button("仅复制") { copyOnly(item) }
+                Button("Paste") { onPaste(item, false) }
+                Button("Paste as Plain Text") { onPaste(item, true) }
+                Button("Copy Only") { copyOnly(item) }
                 Divider()
                 if pinboards.isEmpty {
-                    Button("固定到 Pinboard…") {
+                    Button("Pin to Pinboard…") {
                         openNewPinboardAlert(pinning: item)
                     }
                 } else {
-                    Menu("固定到") {
+                    Menu("Pin to") {
                         ForEach(pinboards) { pinboard in
                             Button(pinboard.name) {
                                 item.pinboard = pinboard
@@ -235,19 +235,19 @@ struct PanelRootView: View {
                             }
                         }
                         Divider()
-                        Button("新建 Pinboard…") {
+                        Button("New Pinboard…") {
                             openNewPinboardAlert(pinning: item)
                         }
                     }
                 }
                 if item.pinboard != nil {
-                    Button("取消固定") {
+                    Button("Unpin") {
                         item.pinboard = nil
                         saveContext()
                     }
                 }
                 Divider()
-                Button("删除", role: .destructive) {
+                Button("Delete", role: .destructive) {
                     delete(item)
                 }
             }
@@ -258,11 +258,11 @@ struct PanelRootView: View {
             Image(systemName: "doc.on.clipboard")
                 .font(.system(size: 36))
                 .foregroundStyle(.tertiary)
-            Text(search.isEmpty ? "还没有剪贴板记录" : "没有匹配「\(search)」的内容")
+            Text(search.isEmpty ? "No clipboard history yet" : "Nothing matches “\(search)”")
                 .font(.system(size: 13))
                 .foregroundStyle(.secondary)
             if search.isEmpty {
-                Text("复制任何内容后会自动出现在这里")
+                Text("Anything you copy shows up here automatically")
                     .font(.system(size: 11))
                     .foregroundStyle(.tertiary)
             }

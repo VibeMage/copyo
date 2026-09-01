@@ -11,12 +11,12 @@ enum ClipKind: String, Codable, CaseIterable {
 
     var label: String {
         switch self {
-        case .text: "文本"
-        case .richText: "富文本"
-        case .link: "链接"
-        case .color: "颜色"
-        case .image: "图片"
-        case .file: "文件"
+        case .text: String(localized: "Text")
+        case .richText: String(localized: "Rich Text")
+        case .link: String(localized: "Link")
+        case .color: String(localized: "Color")
+        case .image: String(localized: "Image")
+        case .file: String(localized: "File")
         }
     }
 }

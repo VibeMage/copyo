@@ -76,11 +76,19 @@ struct PreviewOverlay: View {
         }
     }
 
+    /// 图片与文件只显示类型名，其余类型补上字符数
+    private var detailText: String {
+        if item.kind == .image || item.kind == .file {
+            return item.kind.label
+        }
+        return String(localized: "\(item.kind.label) · \(item.charCount) characters")
+    }
+
     private var footerBar: some View {
         HStack {
-            Text(item.sourceAppName ?? "未知来源")
+            Text(item.sourceAppName ?? String(localized: "Unknown Source"))
             Spacer()
-            Text("\(item.kind.label)\(item.kind == .image || item.kind == .file ? "" : " · \(item.charCount) 字符")")
+            Text(detailText)
             Spacer()
             Text(item.createdAt.formatted(date: .abbreviated, time: .shortened))
         }

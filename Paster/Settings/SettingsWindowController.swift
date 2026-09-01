@@ -9,7 +9,7 @@ final class SettingsWindowController: NSWindowController {
                               styleMask: [.titled, .closable],
                               backing: .buffered,
                               defer: false)
-        window.title = "Paster 设置"
+        window.title = String(localized: "Paster Settings")
         window.isReleasedWhenClosed = false
         window.contentView = NSHostingView(rootView: SettingsView().modelContainer(container))
         self.init(window: window)

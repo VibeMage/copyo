@@ -78,15 +78,15 @@ final class PasteService {
         guard !didWarnAccessibility else { return }
         didWarnAccessibility = true
         let alert = NSAlert()
-        alert.messageText = "自动粘贴需要「辅助功能」权限"
-        alert.informativeText = """
-        内容已复制到剪贴板，当前可手动 ⌘V 粘贴。
+        alert.messageText = String(localized: "Auto-paste requires Accessibility permission")
+        alert.informativeText = String(localized: """
+        The content is already on the clipboard, so you can paste it manually with ⌘V.
 
-        请在 系统设置 → 隐私与安全性 → 辅助功能 中勾选 Paster。
-        如果之前授权过但更新应用后失效，需要先把 Paster 从列表中移除再重新添加。
-        """
-        alert.addButton(withTitle: "打开系统设置")
-        alert.addButton(withTitle: "以后再说")
+        Enable Paster in System Settings → Privacy & Security → Accessibility.
+        If you granted access before and it stopped working after an update, remove Paster from the list and add it again.
+        """)
+        alert.addButton(withTitle: String(localized: "Open System Settings"))
+        alert.addButton(withTitle: String(localized: "Later"))
         NSApp.activate(ignoringOtherApps: true)
         if alert.runModal() == .alertFirstButtonReturn {
             let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
