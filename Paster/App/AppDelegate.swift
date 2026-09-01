@@ -53,6 +53,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         monitor.start()
         syncService.updateActivation()
 
+        // 自动化/截图辅助：-forceDark 强制深色外观；-showSettings 直接打开设置窗口
+        if ProcessInfo.processInfo.arguments.contains("-forceDark") {
+            NSApp.appearance = NSAppearance(named: .darkAqua)
+        }
+        if ProcessInfo.processInfo.arguments.contains("-showSettings") {
+            openSettings()
+        }
+
         // 首次启动：LSUIElement 应用没有窗口也没有 Dock 图标，
         // 不主动引导的话用户根本不知道快捷键的存在
         if !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {

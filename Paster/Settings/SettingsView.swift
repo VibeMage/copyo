@@ -5,18 +5,34 @@ import SwiftData
 import SwiftUI
 
 struct SettingsView: View {
+    // 截图辅助：-settingsTab <0-4> 指定初始标签页
+    @State private var selectedTab: Int = {
+        let args = ProcessInfo.processInfo.arguments
+        if let flagIndex = args.firstIndex(of: "-settingsTab"),
+           args.indices.contains(flagIndex + 1),
+           let tab = Int(args[flagIndex + 1]), (0...4).contains(tab) {
+            return tab
+        }
+        return 0
+    }()
+
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             GeneralSettingsView()
                 .tabItem { Label("General", systemImage: "gearshape") }
+                .tag(0)
             HistorySettingsView()
                 .tabItem { Label("Clipboard", systemImage: "clock.arrow.circlepath") }
+                .tag(1)
             SyncSettingsView()
                 .tabItem { Label("Sync", systemImage: "arrow.triangle.2.circlepath.icloud") }
+                .tag(2)
             ShortcutsSettingsView()
                 .tabItem { Label("Shortcuts", systemImage: "keyboard") }
+                .tag(3)
             AboutView()
                 .tabItem { Label("About", systemImage: "info.circle") }
+                .tag(4)
         }
         .frame(width: 540, height: 400)
     }

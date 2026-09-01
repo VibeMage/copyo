@@ -43,8 +43,14 @@ struct PanelRootView: View {
     var body: some View {
         let items = visibleItems
         return ZStack {
-            VisualEffectView(material: .hudWindow)
-                .ignoresSafeArea()
+            // 截图辅助：-opaquePanel 用纯色底替代毛玻璃（无背景捕获时毛玻璃会渲染成灰条）
+            if ProcessInfo.processInfo.arguments.contains("-opaquePanel") {
+                Color(red: 0.078, green: 0.066, blue: 0.098)
+                    .ignoresSafeArea()
+            } else {
+                VisualEffectView(material: .hudWindow)
+                    .ignoresSafeArea()
+            }
             VStack(spacing: 0) {
                 Rectangle()
                     .fill(Color.primary.opacity(0.12))
