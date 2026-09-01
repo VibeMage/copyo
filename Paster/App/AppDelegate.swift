@@ -70,6 +70,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func showWelcome() {
         let alert = NSAlert()
         alert.messageText = String(localized: "Welcome to Paster")
+#if APPSTORE
+        // 沙盒版拿不到系统授权弹窗（PasteService.ensureAccessibility 里已说明），
+        // 也就不能承诺「会引导授权」；同时这里是唯一能告诉用户设置在哪的地方。
+        alert.informativeText = String(localized: """
+        Paster lives in the menu bar (the clipboard icon in the top-right corner).
+
+        • Press \(HotkeyConfig.load().displayString) anytime to bring up the clipboard panel
+        • Everything you copy is saved automatically — type to search
+        • Select an item and press Return to paste it into the previous app. Turn Paster on in System Settings → Privacy & Security → Accessibility to allow this
+        • Open Settings from the gear in the panel, or by right-clicking the menu bar icon
+        """)
+#else
         alert.informativeText = String(localized: """
         Paster lives in the menu bar (the clipboard icon in the top-right corner).
 
@@ -77,6 +89,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         • Everything you copy is saved automatically — type to search
         • Select an item and press Return to paste it into the previous app (requires Accessibility permission; you’ll be guided through granting it the first time)
         """)
+#endif
         alert.addButton(withTitle: String(localized: "Try It Now"))
         alert.addButton(withTitle: String(localized: "Got It"))
         NSApp.activate(ignoringOtherApps: true)

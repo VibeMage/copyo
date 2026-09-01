@@ -127,6 +127,22 @@ struct PanelRootView: View {
             Spacer()
 
             searchField
+
+#if APPSTORE
+            // 沙盒版的同步目录必须在设置里手动选，而设置此前只能靠右键菜单栏图标
+            // 才能打开——LSUIElement 应用没有应用菜单，⌘, 也不生效。
+            Button {
+                onClose()
+                AppDelegate.shared?.openSettings()
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 12, weight: .semibold))
+                    .frame(width: 24, height: 24)
+                    .background(Color.primary.opacity(0.08), in: Circle())
+            }
+            .buttonStyle(.plain)
+            .help("Settings")
+#endif
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -378,9 +394,20 @@ struct PanelRootView: View {
                 return NSItemProvider(object: image)
             }
         case .file:
-            if let path = item.filePaths.first,
-               let provider = NSItemProvider(contentsOf: URL(fileURLWithPath: path)) {
-                return provider
+            if let path = item.filePaths.first {
+                let url = URL(fileURLWithPath: path)
+#if APPSTORE
+                // 沙盒里这些路径通常读不了。NSItemProvider(contentsOf:) 是惰性的，
+                // 照样会声称能提供 public.data，接收方真去取字节时才拿到 nil ——
+                // 拖拽看起来成功了，落地却是空的。读不了就只登记 file-url，
+                // 让需要字节的目标当场拒绝，而不是静默吞掉内容。
+                guard FileManager.default.isReadableFile(atPath: path) else {
+                    return NSItemProvider(object: url as NSURL)
+                }
+#endif
+                if let provider = NSItemProvider(contentsOf: url) {
+                    return provider
+                }
             }
         default:
             return NSItemProvider(object: (item.plainText ?? "") as NSString)

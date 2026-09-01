@@ -14,6 +14,11 @@ final class SyncService {
     private static let deviceIDKey = "syncDeviceID"
     private static let cursorsKey = "syncCursors"
 
+#if APPSTORE
+    /// 当前计时器正在同步的目录，用于识别「用户中途换了文件夹」
+    private var activeRoot: URL?
+#endif
+
     init(context: ModelContext) {
         self.context = context
     }
@@ -28,6 +33,58 @@ final class SyncService {
         return fresh
     }
 
+#if APPSTORE
+    /// 沙盒里进程只能访问用户亲自选过的目录，路径字符串一律无效。
+    /// 设置页用 NSOpenPanel 取得授权后存下安全作用域书签，这里再解析回 URL。
+    static let bookmarkKey = "syncFolderBookmark"
+    /// 上次同步成功的时间（timeIntervalSince1970），设置页用 @AppStorage 直接读
+    static let lastSyncedAtKey = "syncLastSyncedAt"
+    /// 上次同步失败的原因，空串表示没有失败
+    static let lastErrorKey = "syncLastError"
+
+    /// 沙盒同步的失败几乎只有一种：目录访问权没了（文件夹被删、外置卷未挂载、
+    /// iCloud 条目被清理、书签彻底失效）。这类失败完全静默，不记下来的话
+    /// 设置页会一直显示「同步正常」，而实际上一个字节都没写出去。
+    enum SyncFailure: String {
+        case noAccess
+    }
+
+    static var syncRoot: URL? {
+        guard let data = UserDefaults.standard.data(forKey: bookmarkKey) else { return nil }
+        var isStale = false
+        guard let url = try? URL(resolvingBookmarkData: data,
+                                 options: [.withSecurityScope],
+                                 relativeTo: nil,
+                                 bookmarkDataIsStale: &isStale) else { return nil }
+        // 书签能解析不代表还能访问：拿不到安全作用域时必须报告「没有同步目录」，
+        // 否则设置页会永远显示旧路径 + 开着的开关，而每一轮同步都在这里静默退出。
+        guard url.startAccessingSecurityScopedResource() else { return nil }
+        defer { url.stopAccessingSecurityScopedResource() }
+        // 目录被改名或移动后书签会变「陈旧」：趁现在还能解析，立刻换成新书签，
+        // 否则下次启动就彻底失去访问权，用户得重新选一遍文件夹。
+        if isStale, let refreshed = try? url.bookmarkData(options: .withSecurityScope,
+                                                          includingResourceValuesForKeys: nil,
+                                                          relativeTo: nil) {
+            UserDefaults.standard.set(refreshed, forKey: bookmarkKey)
+        }
+        return url
+    }
+
+    private static func recordSuccess() {
+        let defaults = UserDefaults.standard
+        defaults.set(Date().timeIntervalSince1970, forKey: lastSyncedAtKey)
+        // 30 秒一轮，稳态下不做无谓的写入
+        if defaults.string(forKey: lastErrorKey)?.isEmpty == false {
+            defaults.set("", forKey: lastErrorKey)
+        }
+    }
+
+    private static func recordFailure(_ failure: SyncFailure) {
+        let defaults = UserDefaults.standard
+        guard defaults.string(forKey: lastErrorKey) != failure.rawValue else { return }
+        defaults.set(failure.rawValue, forKey: lastErrorKey)
+    }
+#else
     /// 同步目录：默认 iCloud Drive/Paster；也可在设置中改为任意共享文件夹
     /// （公司 NAS、Dropbox 等——只要多台设备都能读写同一目录即可同步）
     static var syncRoot: URL? {
@@ -42,6 +99,7 @@ final class SyncService {
         guard FileManager.default.fileExists(atPath: icloudDrive.path) else { return nil }
         return icloudDrive.appendingPathComponent("Paster", isDirectory: true)
     }
+#endif
 
     static var isAvailable: Bool { syncRoot != nil }
 
@@ -50,7 +108,19 @@ final class SyncService {
     // MARK: - 生命周期
 
     func updateActivation() {
-        if isEnabled && Self.isAvailable {
+#if APPSTORE
+        let root = Self.syncRoot
+        // 用户换了同步文件夹时必须重启计时器：start() 在计时器已存在时直接返回，
+        // 否则新目录要等到下一个 30s 周期才生效。
+        if timer != nil, root != activeRoot {
+            stop()
+        }
+        activeRoot = root
+        let available = root != nil
+#else
+        let available = Self.isAvailable
+#endif
+        if isEnabled && available {
             start()
         } else {
             stop()
@@ -75,11 +145,33 @@ final class SyncService {
     }
 
     func syncNow() {
-        guard isEnabled, let root = Self.syncRoot else { return }
+        guard isEnabled else { return }
+#if APPSTORE
+        guard let picked = Self.syncRoot else {
+            Self.recordFailure(.noAccess)
+            return
+        }
+        // 安全作用域必须成对开关：每轮同步开始前申请，结束后立即归还，
+        // 否则句柄会一直累积，最终连自己都拿不到访问权。
+        guard picked.startAccessingSecurityScopedResource() else {
+            Self.recordFailure(.noAccess)
+            return
+        }
+        defer { picked.stopAccessingSecurityScopedResource() }
+        // 用户可能选的是 iCloud Drive 根目录或公司共享盘，绝不能把 device-*.json
+        // 和 assets/ 直接摊在别人的目录里。安全作用域覆盖子路径，无需第二个书签。
+        let root = picked.appendingPathComponent("Paster", isDirectory: true)
+        try? FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+#else
+        guard let root = Self.syncRoot else { return }
+#endif
         let assets = root.appendingPathComponent("assets", isDirectory: true)
         try? FileManager.default.createDirectory(at: assets, withIntermediateDirectories: true)
         exportSnapshot(to: root, assets: assets)
         importSnapshots(from: root, assets: assets)
+#if APPSTORE
+        Self.recordSuccess()
+#endif
     }
 
     // MARK: - 快照格式

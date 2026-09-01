@@ -97,10 +97,17 @@ final class PasteService {
     /// 检查辅助功能权限；没有则弹出系统授权提示
     @discardableResult
     static func ensureAccessibility() -> Bool {
+#if APPSTORE
+        // 沙盒应用调用系统授权弹窗不会真的把自己加进辅助功能列表，
+        // 弹一个点了没用的框只会误导用户。这里只回报状态，
+        // 由 warnAccessibilityOnce 的「打开系统设置」引导用户手动授权。
+        return AXIsProcessTrusted()
+#else
         if AXIsProcessTrusted() { return true }
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
         AXIsProcessTrustedWithOptions(options)
         return false
+#endif
     }
 
     static var isAccessibilityTrusted: Bool {
