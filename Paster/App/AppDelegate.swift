@@ -95,8 +95,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "doc.on.clipboard.fill",
-                                   accessibilityDescription: "Paster")
+            // 自定义模板图标（纯黑+透明），系统按明暗模式自动反色
+            let icon = NSImage(named: "MenuBarIcon")
+            icon?.isTemplate = true
+            icon?.accessibilityDescription = "Paster"
+            button.image = icon ?? NSImage(systemSymbolName: "doc.on.clipboard.fill",
+                                           accessibilityDescription: "Paster")
             button.action = #selector(statusItemClicked)
             button.target = self
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
