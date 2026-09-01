@@ -2,6 +2,9 @@
 
 ## 计划中
 
+- [ ] Mac App Store 上架（沙盒构建已就绪，材料见 docs/appstore-submission.md）
+- [ ] CloudKit iCloud 同步（SwiftData 原生支持；替代/补充现有的文件夹快照同步）
+- [ ] iOS 版（与 Mac 版同一应用记录组成 Universal Purchase；键盘扩展 + 分享扩展形态，经 CloudKit 与 Mac 互通）
 - [ ] 法语本地化（英文/中文已完成，String Catalog 就绪，添加语言即可）
 - [ ] 应用内更新检查：比对 GitHub Releases，有新版时提示下载
 - [ ] GitHub Actions CI：推送 tag 自动构建并附加 DMG 到 Release
