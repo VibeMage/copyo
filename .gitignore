@@ -16,3 +16,6 @@ xcuserdata/
 
 # macOS
 .DS_Store
+
+# 工具会话工作目录（设计探索稿等，定稿才手动入库）
+.superpowers/
