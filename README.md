@@ -19,7 +19,13 @@
 - **历史上限**：100/300/500/1000/无限制，超限自动清理最旧的未固定记录
 - **开机自启**、粘贴音效、纯文本模式等设置
 
-## 安装 / 构建
+## 安装
+
+从 [Releases](https://github.com/VibeMage/Paster/releases) 下载最新 DMG，打开后把 Paster
+拖进 Applications 即可。官方发布均已使用 Developer ID 签名并通过 Apple 公证——双击即可打开，
+仅首次有一次「从互联网下载的 App」标准确认弹窗。
+
+## 从源码构建
 
 需要 Xcode 16+、macOS 14+。
 
@@ -34,46 +40,32 @@ open build/Build/Products/Release/Paster.app   # 或拷贝到 /Applications
 首次使用「自动粘贴」时，系统会引导授予**辅助功能**权限
 （系统设置 → 隐私与安全性 → 辅助功能，勾选 Paster）。
 
-## 打包分发
+## 打包分发（维护者）
 
 ```bash
-./scripts/build-release.sh   # 产出 dist/Paster-<版本>.dmg 和 .zip
+NOTARY_PROFILE=paster-notary ./scripts/build-release.sh
+# 自动检测 Developer ID 证书 → 签名 → Apple 公证 → staple → 产出 dist/Paster-<版本>.dmg + .zip
 ```
 
-安装：打开 DMG，把 Paster 拖进 Applications。
+首次需要一次性配置公证凭据（App 专用密码在 account.apple.com 生成）：
 
-- **无 Apple Developer 账号**（默认，ad-hoc 签名）：使用者双击会看到
-  **「"Paster" 已损坏，无法打开」**——这是 Gatekeeper 对无开发者身份、带隔离属性应用的
-  固定提示，不是包坏了（此时「隐私与安全性」里也不会出现「仍要打开」按钮）。
-  解决办法只有一个，终端执行一次：
-  ```bash
-  xattr -cr /Applications/Paster.app
-  ```
-  之后即可正常打开。分发时建议把这行命令连同 DMG 一起提供。
-- **有 Apple Developer 账号**（个人或公司，$99/年）：
-  ```bash
-  # 一次性配置公证凭据（App 专用密码在 account.apple.com 生成）
-  xcrun notarytool store-credentials paster-notary \
-    --apple-id <AppleID邮箱> --team-id <TEAMID> --password <App专用密码>
+```bash
+xcrun notarytool store-credentials paster-notary \
+  --apple-id <AppleID邮箱> --team-id <TEAMID> --password <App专用密码>
+```
 
-  # 之后每次发版一条命令：自动检测证书 → 签名 → 公证 → staple → 打包
-  NOTARY_PROFILE=paster-notary ./scripts/build-release.sh
-  ```
-  仅签名未公证：首次打开可走 系统设置 → 隐私与安全性 → 「仍要打开」。
-  签名并公证后：双击即可打开，仅首次有一次「从互联网下载的 App」标准确认弹窗。
-- 企业环境若有 MDM（Jamf 等），也可以直接白名单分发，绕过 Gatekeeper。
+- **没有开发者证书时**（比如自行从源码构建）：脚本自动退回 ad-hoc 签名，产物只适合
+  本机使用。拿到其他机器会提示「已损坏，无法打开」（Gatekeeper 对无开发者身份应用的
+  固定提示），需执行一次 `xattr -cr /Applications/Paster.app`；且 ad-hoc 签名每次构建
+  都变化，覆盖安装后需要在辅助功能列表中移除再重新添加 Paster。
+- 企业环境若有 MDM（Jamf 等），也可以白名单分发。
 
-### 后续更新怎么发
+### 更新
 
-- 分发新版 DMG 覆盖安装（拖进 Applications 替换）即可，历史数据在
-  `~/Library/Application Support/Paster/`，不会丢失。
-- **未签名（ad-hoc）的坑**：每次构建签名都会变化——覆盖安装后需要重新执行一次
-  `xattr -cr`，且之前授予的**辅助功能权限会静默失效**（系统设置里开关看着还开着，
-  实际已不生效）。需要在 辅助功能 列表中先移除 Paster 再重新添加。应用检测到这种
-  情况会弹窗提示。使用固定的 Developer ID 签名后此问题消失——这是值得花 $99 的
-  最主要理由。
+官方发布签名身份固定：新版 DMG 覆盖安装（拖进 Applications 替换）即可，历史数据在
+`~/Library/Application Support/Paster/`，辅助功能等已授予的权限均不受影响。
 
-每台新机器首次使用「自动粘贴」仍需授予辅助功能权限（系统会自动引导）。
+每台新机器首次使用「自动粘贴」需授予辅助功能权限（系统会自动引导）。
 
 ## 图标
 
