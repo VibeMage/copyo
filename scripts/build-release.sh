@@ -2,12 +2,14 @@
 # 构建 Release 版本并打包为 DMG + ZIP，输出到 dist/
 #
 # 用法:
-#   ./scripts/build-release.sh                        # 本地签名（Sign to Run Locally）
-#   SIGN_IDENTITY="Developer ID Application: 你的名字 (TEAMID)" ./scripts/build-release.sh
-#
-# 如有 Apple Developer 账号，签名后可继续公证（使用者安装零障碍）:
-#   xcrun notarytool submit dist/Paster-<版本>.zip --keychain-profile <配置名> --wait
-#   xcrun stapler staple <Paster.app 路径>   # 然后重新打 DMG
+#   ./scripts/build-release.sh
+#     - 钥匙串里有 Developer ID Application 证书时自动用它签名，否则退回本地 ad-hoc 签名
+#   SIGN_IDENTITY="Developer ID Application: Name (TEAMID)" ./scripts/build-release.sh
+#     - 显式指定签名身份
+#   NOTARY_PROFILE=paster-notary ./scripts/build-release.sh
+#     - 签名后提交 Apple 公证并 staple。需先做一次性配置:
+#       xcrun notarytool store-credentials paster-notary \
+#         --apple-id <AppleID邮箱> --team-id <TEAMID> --password <App专用密码>
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -37,10 +39,34 @@ if [[ ! -d "$APP" ]]; then
   exit 1
 fi
 
-if [[ -n "${SIGN_IDENTITY:-}" ]]; then
-  echo "==> 使用 Developer ID 重新签名"
+# 签名身份：优先 SIGN_IDENTITY 环境变量，否则自动探测钥匙串中的 Developer ID 证书
+if [[ -z "${SIGN_IDENTITY:-}" ]]; then
+  SIGN_IDENTITY=$(security find-identity -v -p codesigning 2>/dev/null \
+    | sed -n 's/.*"\(Developer ID Application: [^"]*\)".*/\1/p' | head -1)
+  if [[ -n "$SIGN_IDENTITY" ]]; then
+    echo "==> 自动检测到签名身份: $SIGN_IDENTITY"
+  fi
+fi
+
+if [[ -n "$SIGN_IDENTITY" ]]; then
+  echo "==> 使用 Developer ID 签名"
   codesign --force --options runtime --timestamp --sign "$SIGN_IDENTITY" "$APP"
   codesign --verify --strict "$APP"
+fi
+
+# 公证：设置 NOTARY_PROFILE（notarytool 钥匙串配置名）时执行
+if [[ -n "${NOTARY_PROFILE:-}" ]]; then
+  if [[ -z "$SIGN_IDENTITY" ]]; then
+    echo "公证需要 Developer ID 签名，但未找到签名身份" >&2
+    exit 1
+  fi
+  echo "==> 提交 Apple 公证（通常 1-5 分钟）"
+  NOTARY_TMP=$(mktemp -d)
+  ditto -c -k --keepParent "$APP" "$NOTARY_TMP/Paster.zip"
+  xcrun notarytool submit "$NOTARY_TMP/Paster.zip" --keychain-profile "$NOTARY_PROFILE" --wait
+  rm -rf "$NOTARY_TMP"
+  echo "==> Staple 公证票据"
+  xcrun stapler staple "$APP"
 fi
 
 rm -rf dist
@@ -60,8 +86,10 @@ ditto -c -k --keepParent "$APP" "dist/Paster-$VERSION.zip"
 echo ""
 ls -lh dist/
 echo ""
-if [[ -n "${SIGN_IDENTITY:-}" ]]; then
-  echo "完成。已用 Developer ID 签名；建议继续公证（见脚本顶部注释），"
+if [[ -n "${NOTARY_PROFILE:-}" ]]; then
+  echo "完成。已签名并通过 Apple 公证：双击即装，仅首次有一次「从互联网下载」的标准确认。"
+elif [[ -n "$SIGN_IDENTITY" ]]; then
+  echo "完成。已用 Developer ID 签名；建议加 NOTARY_PROFILE=<配置名> 继续公证。"
   echo "未公证时首次打开需在 系统设置 → 隐私与安全性 底部点「仍要打开」。"
 else
   echo "完成。注意：ad-hoc 签名的包在其他机器上双击会提示「已损坏，无法打开」，"

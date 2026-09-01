@@ -52,9 +52,12 @@ open build/Build/Products/Release/Paster.app   # 或拷贝到 /Applications
   之后即可正常打开。分发时建议把这行命令连同 DMG 一起提供。
 - **有 Apple Developer 账号**（个人或公司，$99/年）：
   ```bash
-  SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" ./scripts/build-release.sh
-  xcrun notarytool submit dist/Paster-<版本>.zip --keychain-profile <profile> --wait
-  xcrun stapler staple build/Build/Products/Release/Paster.app  # 之后重新执行打包脚本生成含公证的 DMG
+  # 一次性配置公证凭据（App 专用密码在 account.apple.com 生成）
+  xcrun notarytool store-credentials paster-notary \
+    --apple-id <AppleID邮箱> --team-id <TEAMID> --password <App专用密码>
+
+  # 之后每次发版一条命令：自动检测证书 → 签名 → 公证 → staple → 打包
+  NOTARY_PROFILE=paster-notary ./scripts/build-release.sh
   ```
   仅签名未公证：首次打开可走 系统设置 → 隐私与安全性 → 「仍要打开」。
   签名并公证后：双击即可打开，仅首次有一次「从互联网下载的 App」标准确认弹窗。
