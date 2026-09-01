@@ -94,3 +94,28 @@ Refine the two Card Stack candidates from Round 4 as image-based edits, preservi
 - Retain the macOS rounded-square base with genuinely transparent outer corners.
 - Use no text, letters, numbers, keyboard glyphs, mascot features, arrows, cloud or sync badges, watermark, presentation frame, external scene, thin detail, or harsh reflections.
 - Save the full-resolution outputs beside the Round 4 assets, preserve the original Round 4 files, and update the visual comparison page without replacing `art/icon-master.png` or the Xcode AppIcon asset catalog.
+
+## Round 6 — D2 Multi-Content Refinement
+
+Round 6 supersedes only the content-simplification decision for the D2 direction. The important product signal in `R4-D2` is that Paster retains more than plain text: the front clipboard visibly contains different kinds of cached content, including a recognizable image preview. Generate one candidate labeled `R6-D2`, using `R4-D2` directly as the image-edit target rather than deriving it from `R5-D2`.
+
+### Content Hierarchy
+
+- Preserve the compact three-card fan, slight perspective, and large warm-ivory front clipboard from `R4-D2`.
+- Preserve three visibly different content regions on the front card: one broad teal preview band, one amber text-summary panel containing exactly two broad cream lines, and one large cobalt-blue image thumbnail.
+- Keep the image thumbnail recognizable at small sizes with exactly two simplified mountain shapes and one circular sun. Do not replace it with generic lines or a photo glyph.
+- Simplify the rear cards by removing tiny circular bullets and thin form details; use only one or two broad content bars so they support rather than compete with the front card.
+
+### Palette and Finish
+
+- Change the base to the calm deep graphite-indigo used by the Round 5 direction, avoiding both the electric blue of `R4-D1` and a dull gray cast.
+- Retain the teal, amber, cobalt blue, and warm ivory content palette because the color separation helps communicate multiple cached content types.
+- Reduce harsh plastic highlights and photorealistic micro-texture without flattening the softly dimensional native macOS character of `R4-D2`.
+- Preserve the large centered silhouette, safe margins, rounded geometry, and 32 × 32 readability.
+
+### Generation and Delivery
+
+- Produce exactly one `R6-D2` visual-comparison candidate and preserve the returned result without a concept retry.
+- Do not ask the image generator to draw, display, or simulate a transparency checkerboard. For this comparison draft, prefer a clean full-square dark backdrop if real alpha transparency is not returned naturally; production alpha cleanup is deferred until a final direction is selected.
+- Use no text, letters, numbers, keyboard glyphs, mascot features, arrows, cloud or sync badges, watermark, presentation frame, external scene, thin detail, or additional content panels.
+- Save the full-resolution output beside the previous round assets and compare `R4-D2`, `R5-D2`, and `R6-D2` together. Do not replace `art/icon-master.png` or the Xcode AppIcon asset catalog during this round.
