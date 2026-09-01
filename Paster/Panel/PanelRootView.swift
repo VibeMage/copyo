@@ -8,10 +8,20 @@ struct PanelRootView: View {
     @Query(sort: \ClipItem.createdAt, order: .reverse) private var allItems: [ClipItem]
     @Query(sort: \Pinboard.sortIndex) private var pinboards: [Pinboard]
 
-    @State private var search = ""
+    // 截图辅助：-demoSearch <词> 预置搜索词；-demoPreview 启动即打开预览
+    static let initialSearch: String = {
+        let args = ProcessInfo.processInfo.arguments
+        if let i = args.firstIndex(of: "-demoSearch"), args.indices.contains(i + 1) {
+            return args[i + 1]
+        }
+        return ""
+    }()
+    static let initialPreview = ProcessInfo.processInfo.arguments.contains("-demoPreview")
+
+    @State private var search = Self.initialSearch
     @State private var selectedPinboardID: PersistentIdentifier?
     @State private var selectedIndex = 0
-    @State private var showPreview = false
+    @State private var showPreview = Self.initialPreview
     @State private var showNewPinboardAlert = false
     @State private var newPinboardName = ""
     /// 从卡片右键菜单发起「新建 Pinboard」时要顺带固定的条目
@@ -66,10 +76,10 @@ struct PanelRootView: View {
         }
         .onAppear { searchFocused = true }
         .onReceive(NotificationCenter.default.publisher(for: .pasterPanelDidShow)) { _ in
-            // 面板每次呼出时重置状态
-            search = ""
+            // 面板每次呼出时重置状态（截图模式下重置到注入的演示状态）
+            search = Self.initialSearch
             selectedIndex = 0
-            showPreview = false
+            showPreview = Self.initialPreview
             searchFocused = true
         }
         .onChange(of: search) { _, _ in
