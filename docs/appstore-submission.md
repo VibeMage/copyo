@@ -11,7 +11,7 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 | 平台 | macOS |
 | 名称 | Paster |
 | 主要语言 | 简体中文（或 English，主语言决定默认展示） |
-| 套装 ID | dev.paster.Paster |
+| 套装 ID | dev.vibemage.Paster |
 | SKU | paster-mac |
 
 ## 二、App 信息

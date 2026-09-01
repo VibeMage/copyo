@@ -11,7 +11,7 @@
 #   2. 该团队下创建两张证书:
 #        Apple Distribution         —— 给 Paster.app 签名
 #        Mac Installer Distribution —— 给导出的 .pkg 签名
-#   3. App Store Connect 里建好 bundle id 为 dev.paster.Paster 的 App 记录
+#   3. App Store Connect 里建好 bundle id 为 dev.vibemage.Paster 的 App 记录
 # 描述文件由 -allowProvisioningUpdates 自动申请，无需手动下载。
 #
 # 注意：不要用 Xcode 的 Product → Archive 归档上架包。
@@ -24,7 +24,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 TEAM_ID=9A94W79V84
-BUNDLE_ID=dev.paster.Paster
+BUNDLE_ID=dev.vibemage.Paster
 ARCHIVE=build/Paster.xcarchive
 
 # 版本号必须取自真正被归档的那份配置。project.pbxproj 里三个 target 配置各有一行
