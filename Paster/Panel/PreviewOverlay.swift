@@ -1,4 +1,5 @@
 import AppKit
+import PasterCore
 import SwiftUI
 
 /// 按空格键弹出的大图预览（类似 Quick Look）。

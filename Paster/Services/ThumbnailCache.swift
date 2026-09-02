@@ -1,5 +1,6 @@
 import AppKit
 import ImageIO
+import PasterCore
 
 /// 图片卡片缩略图缓存：避免每次渲染都从 externalStorage 读取并解码全分辨率图片。
 @MainActor

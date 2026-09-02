@@ -1,5 +1,5 @@
 import AppKit
-import CryptoKit
+import PasterCore
 import SwiftData
 
 /// 轮询 NSPasteboard.changeCount 监听剪贴板变化（macOS 没有剪贴板变化通知 API）。
@@ -87,7 +87,7 @@ final class ClipboardMonitor {
         // 若先按图片处理，文本表示会永久丢失
         if let text = pb.string(forType: .string), !text.isEmpty {
             let rtf = pb.data(forType: .rtf)
-            let kind = Self.classify(text: text, hasRTF: rtf != nil)
+            let kind = ClipClassifier.classify(text: text, hasRTF: rtf != nil)
             insertDeduplicated(ClipItem(kind: kind,
                                         plainText: text,
                                         rtfData: rtf,
@@ -116,26 +116,8 @@ final class ClipboardMonitor {
                             imageData: png,
                             sourceAppBundleID: bundleID,
                             sourceAppName: appName)
-        item.imageHash = Self.sha256(png)
+        item.imageHash = ContentHash.sha256(png)
         insertDeduplicated(item)
-    }
-
-    static func sha256(_ data: Data) -> String {
-        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
-    }
-
-    static func classify(text: String, hasRTF: Bool) -> ClipKind {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.range(of: "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$", options: .regularExpression) != nil {
-            return .color
-        }
-        if !trimmed.contains(where: \.isWhitespace),
-           let url = URL(string: trimmed),
-           let scheme = url.scheme?.lowercased(),
-           scheme == "http" || scheme == "https" {
-            return .link
-        }
-        return hasRTF ? .richText : .text
     }
 
     /// 与最近记录去重：内容相同则把旧条目提到最前，而不是重复插入

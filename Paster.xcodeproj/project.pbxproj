@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AB0000000000000000000012 /* PasterCore in Frameworks */ = {isa = PBXBuildFile; productRef = AB0000000000000000000013 /* PasterCore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		AB0000000000000000000005 /* Paster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Paster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB0000000000000000000012 /* PasterCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,6 +69,9 @@
 				AB0000000000000000000001 /* Paster */,
 			);
 			name = Paster;
+			packageProductDependencies = (
+				AB0000000000000000000013 /* PasterCore */,
+			);
 			productName = Paster;
 			productReference = AB0000000000000000000005 /* Paster.app */;
 			productType = "com.apple.product-type.application";
@@ -88,6 +96,9 @@
 			);
 			mainGroup = AB0000000000000000000003;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AB0000000000000000000014 /* XCLocalSwiftPackageReference "PasterCore" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AB0000000000000000000004 /* Products */;
 			projectDirPath = "";
@@ -272,6 +283,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		AB0000000000000000000014 /* XCLocalSwiftPackageReference "PasterCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = PasterCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AB0000000000000000000013 /* PasterCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PasterCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AB000000000000000000000A /* Project object */;
 }

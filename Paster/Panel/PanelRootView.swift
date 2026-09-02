@@ -1,4 +1,5 @@
 import AppKit
+import PasterCore
 import SwiftData
 import SwiftUI
 

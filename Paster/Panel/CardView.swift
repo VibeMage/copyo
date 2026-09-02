@@ -1,4 +1,5 @@
 import AppKit
+import PasterCore
 import SwiftUI
 
 /// 单张剪贴板卡片：彩色头部（来源应用）+ 内容预览 + 底部信息。
@@ -195,29 +196,5 @@ struct CardView: View {
         .padding(.horizontal, 10)
         .frame(height: 26)
         .background(Color(nsColor: .windowBackgroundColor))
-    }
-}
-
-extension Color {
-    /// 解析 "#RRGGBB" / "#RRGGBBAA"
-    init?(hexString: String) {
-        let trimmed = hexString.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.hasPrefix("#") else { return nil }
-        let hex = String(trimmed.dropFirst())
-        guard hex.count == 6 || hex.count == 8,
-              let value = UInt64(hex, radix: 16) else { return nil }
-        let r, g, b, a: Double
-        if hex.count == 6 {
-            r = Double((value >> 16) & 0xFF) / 255
-            g = Double((value >> 8) & 0xFF) / 255
-            b = Double(value & 0xFF) / 255
-            a = 1
-        } else {
-            r = Double((value >> 24) & 0xFF) / 255
-            g = Double((value >> 16) & 0xFF) / 255
-            b = Double((value >> 8) & 0xFF) / 255
-            a = Double(value & 0xFF) / 255
-        }
-        self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
     }
 }
