@@ -36,8 +36,10 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
 ### 推广文本（170 字符内，可随时改无需审核）
 
-- zh：`⇧⌘V 一按，复制过的文本、链接、图片、文件全部回来。开源、本地存储、零网络请求。`
-- en：`Press ⇧⌘V and everything you've copied comes back — text, links, images, files. Open source, local-only, zero network requests.`
+- zh：`按下 Shift+Command+V，复制过的文本、链接、图片、文件全部回来。开源、本地存储、零网络请求。`
+- en：`Press Shift+Command+V and everything you've copied comes back — text, links, images, files. Open source, local-only, zero network requests.`
+
+⚠️ ASC 的推广文本/关键词字段不接受 ⇧⌘ 等按键符号（报「无效字符」）；描述字段若同样报错，把 ⇧⌘V 改写为 Shift+Command+V。
 
 ### 副标题（30 字符内）
 
