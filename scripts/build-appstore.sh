@@ -81,7 +81,7 @@ if ! xcodebuild -project Paster.xcodeproj -scheme Paster -configuration Release-
      -allowProvisioningUpdates \
      CODE_SIGN_STYLE=Automatic \
      DEVELOPMENT_TEAM="$TEAM_ID" \
-     CODE_SIGN_IDENTITY="Apple Distribution" \
+     CODE_SIGN_IDENTITY="Apple Development" \
      archive > "$ARCHIVE_LOG" 2>&1; then
   echo "归档失败" >&2
   grep -E "error:" "$ARCHIVE_LOG" >&2 || tail -20 "$ARCHIVE_LOG" >&2
