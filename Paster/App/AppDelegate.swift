@@ -53,6 +53,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         monitor.start()
         syncService.updateActivation()
 
+        // 用户在系统设置里改动辅助功能授权后，让粘贴路径重新评估并允许再次提示
+        DistributedNotificationCenter.default().addObserver(
+            forName: NSNotification.Name("com.apple.accessibility.api"),
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.pasteService.resetAccessibilityWarning()
+            }
+        }
+
         // 自动化/截图辅助：-forceDark 强制深色外观；-showSettings 直接打开设置窗口
         if ProcessInfo.processInfo.arguments.contains("-forceDark") {
             NSApp.appearance = NSAppearance(named: .darkAqua)

@@ -72,6 +72,11 @@ final class PasteService {
         }
     }
 
+    /// 授权状态变化后允许重新提示（配合 AppDelegate 里的辅助功能变更通知）
+    func resetAccessibilityWarning() {
+        didWarnAccessibility = false
+    }
+
     /// 未授权时给出可见反馈。系统的授权弹窗对「已在列表里但因签名变化而失效」的
     /// 情况不会再次出现（TCC 只按条目弹一次），没有这个提示自动粘贴会静默失败。
     private func warnAccessibilityOnce() {
@@ -83,15 +88,31 @@ final class PasteService {
         The content is already on the clipboard, so you can paste it manually with ⌘V.
 
         Enable Paster in System Settings → Privacy & Security → Accessibility.
-        If you granted access before and it stopped working after an update, remove Paster from the list and add it again.
+        If auto-paste still doesn't work after granting access, restart Paster — macOS sometimes applies the permission only after a relaunch.
         """)
         alert.addButton(withTitle: String(localized: "Open System Settings"))
+        alert.addButton(withTitle: String(localized: "Restart Paster"))
         alert.addButton(withTitle: String(localized: "Later"))
         NSApp.activate(ignoringOtherApps: true)
-        if alert.runModal() == .alertFirstButtonReturn {
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
             let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
             NSWorkspace.shared.open(url)
+        case .alertSecondButtonReturn:
+            Self.relaunch()
+        default:
+            break
         }
+    }
+
+    /// 重启自身：先派生一个延迟 open 的子进程，再退出当前实例
+    static func relaunch() {
+        let path = Bundle.main.bundlePath
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/bin/sh")
+        task.arguments = ["-c", "sleep 0.5; /usr/bin/open \"\(path)\""]
+        try? task.run()
+        NSApp.terminate(nil)
     }
 
     /// 检查辅助功能权限；没有则弹出系统授权提示

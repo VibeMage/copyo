@@ -251,6 +251,17 @@
         }
       }
     },
+    "Choose Sync Folder…": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择同步文件夹…"
+          }
+        }
+      }
+    },
     "Choose a folder that all of your Macs can read and write.": {
       "extractionState": "manual",
       "localizations": {
@@ -269,17 +280,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "在下方选择同步文件夹后即可开启同步。"
-          }
-        }
-      }
-    },
-    "Choose Sync Folder…": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选择同步文件夹…"
           }
         }
       }
@@ -489,17 +489,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "历史记录上限"
-          }
-        }
-      }
-    },
-    "iCloud Drive is not enabled on this Mac. Turn it on in System Settings → click your name → iCloud, or point Paster at a custom sync folder below.": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此 Mac 未启用 iCloud Drive。可在 系统设置 → 点按你的姓名 → iCloud 中打开 iCloud Drive，或在下方指定一个自定义同步文件夹。"
           }
         }
       }
@@ -790,6 +779,17 @@
         }
       }
     },
+    "Paster Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paster 设置"
+          }
+        }
+      }
+    },
     "Paster lives in the menu bar (the clipboard icon in the top-right corner).\n\n• Press %@ anytime to bring up the clipboard panel\n• Everything you copy is saved automatically — type to search\n• Select an item and press Return to paste it into the previous app (requires Accessibility permission; you’ll be guided through granting it the first time)": {
       "extractionState": "manual",
       "localizations": {
@@ -819,17 +819,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Paster 已失去对同步文件夹的访问权限。请在下方重新选择该文件夹以恢复同步。"
-          }
-        }
-      }
-    },
-    "Paster Settings": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster 设置"
           }
         }
       }
@@ -911,6 +900,17 @@
         }
       }
     },
+    "Restart Paster": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重启 Paster"
+          }
+        }
+      }
+    },
     "Rich Text": {
       "extractionState": "manual",
       "localizations": {
@@ -988,17 +988,6 @@
         }
       }
     },
-    "Sync clipboard history": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "同步历史记录"
-          }
-        }
-      }
-    },
     "Sync Folder": {
       "extractionState": "manual",
       "localizations": {
@@ -1017,6 +1006,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "立即同步"
+          }
+        }
+      }
+    },
+    "Sync clipboard history": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同步历史记录"
           }
         }
       }
@@ -1043,13 +1043,13 @@
         }
       }
     },
-    "The content is already on the clipboard, so you can paste it manually with ⌘V.\n\nEnable Paster in System Settings → Privacy & Security → Accessibility.\nIf you granted access before and it stopped working after an update, remove Paster from the list and add it again.": {
+    "The content is already on the clipboard, so you can paste it manually with ⌘V.\n\nEnable Paster in System Settings → Privacy & Security → Accessibility.\nIf auto-paste still doesn't work after granting access, restart Paster — macOS sometimes applies the permission only after a relaunch.": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "内容已复制到剪贴板，当前可手动 ⌘V 粘贴。\n\n请在 系统设置 → 隐私与安全性 → 辅助功能 中勾选 Paster。\n如果之前授权过但更新应用后失效，需要先把 Paster 从列表中移除再重新添加。"
+            "value": "内容已复制到剪贴板，当前可手动 ⌘V 粘贴。\n\n请在 系统设置 → 隐私与安全性 → 辅助功能 中勾选 Paster。\n如果授权后自动粘贴仍无效，请重启 Paster——macOS 有时需要重启应用后权限才会生效。"
           }
         }
       }
@@ -1171,6 +1171,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "经由你选定的文件夹在你的多台 Mac 之间同步剪贴板历史与 Pinboard。数据只经过你自己的存储，Paster 不接触任何第三方服务器。删除操作不跨设备传播。"
+          }
+        }
+      }
+    },
+    "iCloud Drive is not enabled on this Mac. Turn it on in System Settings → click your name → iCloud, or point Paster at a custom sync folder below.": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 Mac 未启用 iCloud Drive。可在 系统设置 → 点按你的姓名 → iCloud 中打开 iCloud Drive，或在下方指定一个自定义同步文件夹。"
           }
         }
       }
