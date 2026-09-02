@@ -3,7 +3,7 @@
 ## 计划中
 
 - [ ] Mac App Store 上架（1.0 已提交审核，材料见 docs/appstore-submission.md）
-- [ ] CloudKit iCloud 同步（Mac 1.1；与文件夹快照同步并存、二选一，模型无需改动）
+- [ ] CloudKit iCloud 同步（Mac 1.1 已实现，待发布；与文件夹快照同步并存、二选一，模型无需改动）
 - [ ] iOS / iPadOS 版（详见 docs/ios-plan.md）
   - 定位：Mac 剪贴板历史的口袋入口 + 手机侧收集器，同一应用记录组成 Universal Purchase
   - Phase 0：抽出共享 `PasterCore` 包，Mac 先接入 CloudKit

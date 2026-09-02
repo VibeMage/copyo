@@ -14,7 +14,10 @@
 - **来源应用标识**：卡片头部显示来源应用的图标与主题色（取应用图标平均色）
 - **拖拽**：卡片可直接拖出到任何应用
 - **隐私保护**：自动跳过密码管理器等标记为 Concealed/Transient 的内容；可按 Bundle ID 忽略指定应用
-- **iCloud 同步**：可选开启，经由 iCloud Drive 在多台 Mac 间同步历史与 Pinboard；数据只经过你自己的 iCloud，默认关闭（公司环境可保持完全离线）
+- **同步（可选，三选一）**：关闭 / 文件夹 / iCloud。文件夹方式把历史与 Pinboard 写成快照放进 iCloud Drive
+  或任意多设备都能读写的目录（公司 NAS、网盘同步目录等），**不传播删除**——一台 Mac 上删掉的条目在其他 Mac
+  上依然保留；iCloud 方式经你自己的 iCloud 私有数据库同步，增删改全量生效，**删除会在所有设备上同时消失**。
+  两种方式的数据都只经过你自己的存储，默认关闭（公司环境可保持完全离线）
 - **自定义快捷键**：默认 `⇧⌘V`，可在设置中录制任意组合键
 - **历史上限**：100/300/500/1000/无限制，超限自动清理最旧的未固定记录
 - **开机自启**、粘贴音效、纯文本模式等设置
@@ -38,6 +41,19 @@ open build/Build/Products/Release/Paster.app   # 或拷贝到 /Applications
 
 也可以直接用 Xcode 打开 `Paster.xcodeproj` 运行（⌘R）。
 
+工程使用 Xcode 的自动签名，Team 填的是维护者的。贡献者请在 Xcode 的 Signing & Capabilities
+里把 Team 换成自己的，或者构建时传入：
+
+```bash
+xcodebuild -project Paster.xcodeproj -scheme Paster -configuration Release \
+  -derivedDataPath build DEVELOPMENT_TEAM=<你的 Team ID> build
+```
+
+只想编译看看、不打算安装到别的机器，也可以加 `CODE_SIGNING_ALLOWED=NO` 直接跳过签名。
+注意 iCloud 同步依赖 App ID 上的 iCloud 容器与推送能力，换成自己的 Team 构建时这一项不可用
+（需要在自己的开发者账号里建一个 iCloud 容器并改掉 `PasterStore.cloudKitContainerIdentifier`），
+其余功能不受影响。
+
 首次使用「自动粘贴」时，系统会引导授予**辅助功能**权限
 （系统设置 → 隐私与安全性 → 辅助功能，勾选 Paster）。
 
@@ -45,7 +61,8 @@ open build/Build/Products/Release/Paster.app   # 或拷贝到 /Applications
 
 ```bash
 NOTARY_PROFILE=paster-notary ./scripts/build-release.sh
-# 自动检测 Developer ID 证书 → 签名 → Apple 公证 → staple → 产出 dist/Paster-<版本>.dmg + .zip
+# 归档 → 以 Developer ID 导出（签名、entitlements、描述文件由 Xcode 处理）
+# → Apple 公证 → staple → 产出 dist/Paster-<版本>.dmg + .zip
 ```
 
 首次需要一次性配置公证凭据（App 专用密码在 account.apple.com 生成）：
@@ -55,10 +72,11 @@ xcrun notarytool store-credentials paster-notary \
   --apple-id <AppleID邮箱> --team-id <TEAMID> --password <App专用密码>
 ```
 
-- **没有开发者证书时**（比如自行从源码构建）：脚本自动退回 ad-hoc 签名，产物只适合
-  本机使用。拿到其他机器会提示「已损坏，无法打开」（Gatekeeper 对无开发者身份应用的
-  固定提示），需执行一次 `xattr -cr /Applications/Paster.app`；且 ad-hoc 签名每次构建
-  都变化，覆盖安装后需要在辅助功能列表中移除再重新添加 Paster。
+- 脚本需要一份 Developer ID 证书与对应的描述文件（含 iCloud 容器与推送能力）。
+  **没有开发者证书时**（比如自行从源码构建）：直接用上一节的 `CODE_SIGNING_ALLOWED=NO`
+  构建即可，产物只适合本机使用；拿到其他机器会提示「已损坏，无法打开」（Gatekeeper 对
+  无开发者身份应用的固定提示），需执行一次 `xattr -cr /Applications/Paster.app`，且签名
+  每次构建都变化，覆盖安装后需要在辅助功能列表中移除再重新添加 Paster。
 - 企业环境若有 MDM（Jamf 等），也可以白名单分发。
 
 ### 更新
@@ -108,8 +126,9 @@ Paster/
 - 文本优先于图片抓取：Excel/Numbers 等复制文本时会同时放一份图像渲染，必须按文本记录
 - 全局快捷键使用 Carbon `RegisterEventHotKey`，零第三方依赖；模拟 `⌘V` 前会确认目标应用已回到前台
 - 存储使用 SwiftData（SQLite），图片走 `externalStorage` + SHA-256 去重 + 缩略图缓存
-- 同步经由 iCloud Drive 文件夹快照合并实现（iCloud Drive 是无需付费开发者账号
-  即可使用的 iCloud 通道）；快照式同步不传播删除
+- 同步有两条互斥的通道：文件夹方式是快照合并（iCloud Drive 或任意共享目录皆可，
+  无需付费开发者账号，但不传播删除）；iCloud 方式由 SwiftData 直接镜像到 CloudKit
+  私有数据库，增删改全量同步。两者共用同一份 `Paster.store`，同一时刻只有一种生效
 
 ## License
 

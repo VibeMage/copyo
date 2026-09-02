@@ -43,7 +43,7 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 - 与现有文件夹快照同步的关系：**并存，二选一**。公司 Mac 常被 MDM 禁用 iCloud，文件夹同步（含自定义目录）仍是这类环境的唯一出路；CloudKit 是个人设备之间的默认选项。iOS 只做 CloudKit。
 - 行为差异要写进设置页说明：快照同步不传播删除，CloudKit 会——一台设备删了，处处都删；Mac 的「历史上限」清理也会同步生效。
 - 部署纪律：CloudKit schema 必须在 CloudKit Console 从 Development **部署到 Production** 之后才能发正式版；上线后字段只能加不能删/改类型。
-- 直发版（Developer ID）也能用 CloudKit，但 `build-release.sh` 里的 `codesign --force` 重签会丢掉 entitlements，届时必须补 `--entitlements` 参数并嵌入 Developer ID 描述文件。
+- 直发版（Developer ID）也能用 CloudKit：`build-release.sh` 已改为归档 + `-exportArchive`，entitlements 展开与 Developer ID 描述文件嵌入由 Xcode 完成；前提是后台有一份包含该 iCloud 容器与推送的 Developer ID 描述文件。
 
 ### 2.2 代码共享：抽出 `PasterCore` 本地 Swift Package
 
@@ -66,10 +66,10 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 
 ### Phase 0 · 地基（Mac 侧，与设计稿并行，iOS 一行 UI 都不写）
 
-- [ ] 抽出 `PasterCore` 包，Mac 版接入，构建产物无回归
-- [ ] Mac 版接入 CloudKit 同步：设置页「同步方式：iCloud / 文件夹 / 关闭」，两台 Mac 之间验证增删改与图片
+- [x] 抽出 `PasterCore` 包，Mac 版接入，构建产物无回归
+- [x] Mac 版接入 CloudKit 同步：设置页「同步方式：iCloud / 文件夹 / 关闭」（两台 Mac 之间增删改与图片的实机验证，要等下一条的开发者后台配置就绪后再补）
 - [ ] 开发者后台：App ID 开启 iCloud，创建容器 `iCloud.dev.vibemage.Paster`；ASC 应用记录添加 iOS 平台
-- [ ] `build-release.sh` 补 entitlements 重签；`build-appstore.sh` 适配 iCloud 描述文件
+- [x] `build-release.sh` 改为归档 + 导出，签名与 entitlements 交给 Xcode；`build-appstore.sh` 适配 iCloud 描述文件
 - [ ] 随 Mac **1.1** 发布 CloudKit 同步（先于 iOS 上线，让 Mac 用户历史先上云）
 - [ ] 设计：Claude Design 出移动端设计稿（见第四节），产出到 `art/ios-design/`
 
