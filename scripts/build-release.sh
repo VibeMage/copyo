@@ -83,6 +83,9 @@ rm -rf "$STAGING"
 echo "==> 生成 ZIP"
 ditto -c -k --keepParent "$APP" "dist/Paster-$VERSION.zip"
 
+# 构建产物不进启动台/Spotlight（xcodebuild 每次都会自动注册）
+/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -u "$APP" 2>/dev/null || true
+
 echo ""
 ls -lh dist/
 echo ""

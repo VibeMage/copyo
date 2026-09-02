@@ -182,6 +182,10 @@ echo ""
 ls -lh "$PKG"
 echo ""
 echo "完成。归档：${ARCHIVE}"
+# 归档产物不进启动台/Spotlight
+for _p in build/Paster.xcarchive/Products/Applications/Paster.app build/Build/Products/Release-AppStore/Paster.app; do
+  [ -d "$_p" ] && /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -u "$_p" 2>/dev/null || true
+done
 echo "安装包：${PKG}"
 echo ""
 echo "下一步，上传到 App Store Connect："
