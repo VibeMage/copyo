@@ -1,0 +1,154 @@
+# iOS / iPadOS 版规划
+
+创建日期：2026-09-03 · 最后更新：2026-09-03
+
+## 一、先说结论：移动端能做什么、不能做什么
+
+iOS 对剪贴板的限制远多于 macOS。Mac 版的核心循环是「后台静默抓取 → 全局快捷键呼出 → 模拟 ⌘V 粘贴回去」，这三步在 iOS 上**一步都不能原样照搬**：
+
+| Mac 版能力 | iOS / iPadOS 现状 | 替代方案 |
+| --- | --- | --- |
+| 后台每 0.3s 轮询剪贴板，静默抓取一切 | **不可能**。应用只有在前台时才能读剪贴板，后台任务读不到 | 回到前台时自动读一次；分享扩展；快捷指令/操作按钮 |
+| 读剪贴板无感 | iOS 16+ 程序化读取会弹「允许 Paster 粘贴来自 X 的内容？」 | 引导用户在 设置 → Paster → 从其他 App 粘贴 → 选「允许」，之后不再弹；或用系统 UIPasteControl 按钮（用户主动点则免弹） |
+| ⇧⌘V 全局快捷键 | **没有全局快捷键**。硬件键盘快捷键仅在 Paster 处于前台时有效 | 操作按钮 / 背面轻点 / 控制中心按钮 / 小组件 / 键盘扩展 |
+| 模拟 ⌘V 粘贴到前台应用 | **不可能**。没有 CGEvent，没有辅助功能 API | 复制后用户手动粘贴；键盘扩展直接输入文本；iPad 拖放到旁边的 App |
+| 文件类型条目（路径） | 路径在 iOS 上无意义 | 文件条目不同步到 iOS（或只显示文件名） |
+| 来源应用图标与颜色 | 沙盒里拿不到其他 App 的图标 | 只显示来源应用名（Mac 同步来的条目自带名字）；iOS 本机保存的条目来源为空 |
+| 忽略指定应用 | 无法得知内容来自哪个 App | 该设置 iOS 不提供 |
+
+**因此 iOS 版的定位不是「手机上的剪贴板管理器」，而是「Mac 剪贴板历史的口袋入口 + 手机侧的收集器」**：
+1. 在 Mac 上复制过的一切，手机上随时搜、随时复制出来（靠 CloudKit 同步，这是最大的价值）；
+2. 手机上想留住的内容，通过分享面板 / 操作按钮 / 打开 App 存进同一份历史，Mac 上也能看到；
+3. 把内容送进其他 App：iPhone 靠键盘扩展和「复制→粘贴」两步，iPad 额外有拖放。
+
+顺带一提：Universal Clipboard（通用剪贴板）本身就能把 iPhone 复制的内容送到附近 Mac 的剪贴板，Mac 版 Paster 会照常抓到——这是免费获得的「手机采集」通道，文档里要提醒用户。
+
+## 二、架构决策
+
+### 2.1 同步：CloudKit 私有数据库（SwiftData 原生）
+
+- `ModelConfiguration(cloudKitDatabase: .private("iCloud.dev.vibemage.Paster"))`，Mac 与 iOS 共用同一容器。
+- 现有 `ClipItem` / `Pinboard` 模型已满足 CloudKit 要求（全部属性有默认值或可选、关系可选、无 unique 约束），**不需要改模型**。`externalStorage` 的图片会自动作为 CKAsset 上传。
+- 与现有文件夹快照同步的关系：**并存，二选一**。公司 Mac 常被 MDM 禁用 iCloud，文件夹同步（含自定义目录）仍是这类环境的唯一出路；CloudKit 是个人设备之间的默认选项。iOS 只做 CloudKit。
+- 行为差异要写进设置页说明：快照同步不传播删除，CloudKit 会——一台设备删了，处处都删；Mac 的「历史上限」清理也会同步生效。
+- 部署纪律：CloudKit schema 必须在 CloudKit Console 从 Development **部署到 Production** 之后才能发正式版；上线后字段只能加不能删/改类型。
+- 直发版（Developer ID）也能用 CloudKit，但 `build-release.sh` 里的 `codesign --force` 重签会丢掉 entitlements，届时必须补 `--entitlements` 参数并嵌入 Developer ID 描述文件。
+
+### 2.2 代码共享：抽出 `PasterCore` 本地 Swift Package
+
+| 归属 | 内容 |
+| --- | --- |
+| **PasterCore（共享）** | 模型、`ClipKind` 分类逻辑（链接/颜色识别）、SHA-256 去重、缩略图生成（改用 ImageIO/CGImage 消除 NSImage/UIImage 差异）、CloudKit 容器配置、通用格式化 |
+| Mac 独有 | `ClipboardMonitor`、`HotkeyManager`、`PasteService`、`AppIconProvider`、面板（NSPanel）、文件夹快照同步 |
+| iOS 独有 | 前台采集、分享扩展、键盘扩展、小组件、控制中心控件、App Intents |
+
+粗略估计现有 2600 行里约四成可下沉到 PasterCore。先抽包、再加 iOS target，Mac 版必须逐字节无回归。
+
+### 2.3 工程与商店
+
+- 同一 `Paster.xcodeproj` 增加 `Paster iOS` target（Bundle ID **同为** `dev.vibemage.Paster`，这是通用购买的硬性要求），扩展用 `dev.vibemage.Paster.ShareExtension` 等后缀。
+- App Store Connect：在现有应用记录里「添加平台 → iOS」，自动成为 Universal Purchase，SKU `paster` 不变。Mac 1.0 审核期间做这件事不影响审核。
+- 隐私问卷维持「不收集数据」：私有 iCloud 数据库里的内容开发者无法访问，按 Apple 的定义不算收集。
+- 最低系统：**iOS 18 / iPadOS 18**（控制中心控件、SwiftData 成熟度），用 Xcode 26 编译自动获得 iOS 26 的 Liquid Glass 外观。Mac 版维持 macOS 14。
+
+## 三、路线图
+
+### Phase 0 · 地基（Mac 侧，与设计稿并行，iOS 一行 UI 都不写）
+
+- [ ] 抽出 `PasterCore` 包，Mac 版接入，构建产物无回归
+- [ ] Mac 版接入 CloudKit 同步：设置页「同步方式：iCloud / 文件夹 / 关闭」，两台 Mac 之间验证增删改与图片
+- [ ] 开发者后台：App ID 开启 iCloud，创建容器 `iCloud.dev.vibemage.Paster`；ASC 应用记录添加 iOS 平台
+- [ ] `build-release.sh` 补 entitlements 重签；`build-appstore.sh` 适配 iCloud 描述文件
+- [ ] 随 Mac **1.1** 发布 CloudKit 同步（先于 iOS 上线，让 Mac 用户历史先上云）
+- [ ] 设计：Claude Design 出移动端设计稿（见第四节），产出到 `art/ios-design/`
+
+### Phase 1 · iOS / iPadOS 1.0 —— 看得见、搜得到、复制得出
+
+- [ ] 历史列表 / 卡片、类型筛选、搜索、详情预览、Pinboard
+- [ ] 轻点复制（含纯文本复制）、分享、固定、删除、批量清理
+- [ ] 采集通道 A：回到前台自动读剪贴板并入库（引导用户把「从其他 App 粘贴」设为允许；未允许时用 UIPasteControl 按钮兜底）
+- [ ] 采集通道 B：分享扩展「保存到 Paster」（文本 / 链接 / 图片，可选 Pinboard）
+- [ ] 采集通道 C：App Intent「保存剪贴板」→ 快捷指令，引导绑定操作按钮 / 背面轻点
+- [ ] iPad：`NavigationSplitView` 侧栏 + 网格，卡片可拖放到 Split View / Slide Over 里的其他 App，硬件键盘快捷键（⌘F 搜索、方向键、回车复制、空格预览）
+- [ ] 首次启动引导（三页：Mac 互通 / 怎么保存 / 开启 iCloud）
+- [ ] 中英本地化（复用 String Catalog）、截图、提审
+
+### Phase 2 · 1.1 —— 把内容送进别的 App
+
+- [ ] 键盘扩展：横向卡片条 + 搜索 + 地球键 + 最小打字行（审核指南 4.4.1 要求键盘必须能输入字符）。需要「允许完全访问」才能读共享容器，引导文案要解释清楚
+- [ ] 小组件（小 / 中）：最近条目，点按即复制（交互式小组件 + App Intent）
+- [ ] 控制中心按钮「保存剪贴板」（打开 App 完成读取，避开扩展进程的权限问题）
+- [ ] Core Spotlight 索引：系统搜索直达条目
+
+### Phase 3 · 1.2 —— 打磨
+
+- [ ] 法语本地化（三平台一起）
+- [ ] 富文本 / 代码高亮预览
+- [ ] 同步冲突与离线体验打磨、历史上限跨设备策略
+- [ ] 视需要：文本片段模板（带占位符）
+
+## 四、给 Claude Design 的设计输入
+
+### 4.1 参考资料（一并上传）
+
+- `art/store/01-panel-zh.png`、`02-search-zh.png`、`03-preview-zh.png`：Mac 版卡片面板的现状，卡片结构（顶部来源色条、类型角标、来源应用 + 时间、内容预览、圆角 12）是品牌识别的一部分，移动端要延续
+- `art/icon/icon-master-1024.png` + `art/icon/paster-icon-spec.md`：图标与配色语言
+- 本文第一节的能力对照表：设计不能出现 iOS 做不到的交互（比如「自动粘贴」按钮）
+
+### 4.2 设计 brief（可直接粘贴）
+
+```
+为开源剪贴板工具 Paster 设计 iOS 与 iPadOS 版本。Mac 版已上架，是一个从屏幕底部滑出的深色卡片面板；
+移动端定位是「Mac 剪贴板历史的口袋入口 + 手机侧收集器」，通过 iCloud 与 Mac 同步。
+
+平台约束（设计必须遵守）：
+- iOS 无法在后台读剪贴板、没有全局快捷键、不能自动粘贴到其他 App。
+  内容进入其他 App 只有三条路：轻点复制后手动粘贴、键盘扩展直接输入、iPad 拖放。
+- 应用回到前台时可以自动保存当前剪贴板；另有分享扩展、快捷指令两条保存通道。
+- 手机本机保存的条目没有来源 App 信息；Mac 同步来的条目有来源名但没有图标。
+
+风格：
+- 遵循 iOS 26 原生设计语言（Liquid Glass 的标签栏、工具栏、搜索），系统控件优先，支持浅色与深色。
+- 延续 Mac 版卡片：顶部来源色条、类型角标、来源 + 相对时间、内容预览；图片卡片显示缩略图，颜色卡片显示色块 + 色值，链接卡片显示域名。
+- 内容优先，克制，无插画堆砌；空态可以用图标语言。
+- 字体：SF Pro / 苹方；图标：SF Symbols（请标注符号名）。
+
+需要的界面（iPhone）：
+1. 历史主屏：搜索、类型筛选（全部 / 文本 / 链接 / 图片 / 颜色）、卡片流；轻点 = 复制并有「已复制」反馈；长按 = 上下文菜单（复制、纯文本复制、分享、固定到 Pinboard、删除）；左右滑动手势。
+   顶部有一个「剪贴板里有新内容，保存？」的轻量横幅（应用回到前台但未获准自动读取时出现）。
+2. 详情：全文 / 大图 / 色块，字数、来源、时间；复制、分享、固定按钮。
+3. Pinboard：列表与内容，新建、重命名、排序。
+4. 设置：iCloud 同步状态与开关、历史上限、「怎样保存剪贴板」引导（三条通道各一个入口，含系统设置深链）、启用键盘扩展指引、关于。
+5. 首次启动引导（三页）：与 Mac 互通 / 怎么保存 / 开启 iCloud。
+6. 分享扩展面板：紧凑 sheet，内容预览 + Pinboard 选择 + 保存。
+7. 键盘扩展：横向卡片条 + 搜索 + 地球键 + 最小打字行（删除、空格、回车）。
+8. 小组件：小尺寸（最近 1 条）与中尺寸（最近 4 条），点按复制。
+
+需要的界面（iPad）：
+9. 侧栏 + 网格布局（侧栏：历史、各类型、Pinboard；内容区：卡片网格），展示卡片拖放到旁边 App 的状态。
+10. Slide Over / 紧凑宽度下退化为 iPhone 布局。
+
+交付：每个界面的浅色 + 深色稿；设计 token（颜色、圆角、间距、字号）；交互说明；SF Symbols 名称清单。
+```
+
+### 4.3 设计稿落地约定
+
+- 导出 PNG 到 `art/ios-design/<日期>/`，命名 `01-history-light.png` 之类，随仓库管理
+- token 与交互说明整理成 `art/ios-design/design-spec.md`，实现时作为唯一依据
+
+## 五、待验证的技术点
+
+开工前用 10 分钟 demo 各验一次，避免设计建立在错误假设上：
+
+1. 「从其他 App 粘贴 → 允许」设置后，`UIPasteboard.general.string` 在前台是否完全免弹窗
+2. 快捷指令「获取剪贴板」→ App Intent 全程是否免弹窗（Shortcuts 自身也有同名设置）
+3. 交互式小组件的 App Intent 在扩展进程里写 `UIPasteboard.general` 是否成功
+4. 分享扩展处理大图时的内存上限（约 120MB）是否需要先降采样
+5. SwiftData + CloudKit 对已有本地库开启同步时，历史数据是否完整上传（预期是）
+6. 键盘扩展不开「完全访问」时的可用性边界（预期读不到共享容器，必须开）
+
+## 六、审核风险
+
+- 键盘扩展：4.4.1 要求提供输入功能与切换键盘的途径；申请完全访问必须有隐私政策链接（已有）
+- 剪贴板读取：审核员可能质疑自动读取，引导页与审核备注要说明「仅前台、用户可关」
+- 分享扩展与 App Intent 的名称含 "Paster" 即可，不要出现任何商业剪贴板产品名
