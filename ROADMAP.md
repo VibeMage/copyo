@@ -7,8 +7,8 @@
 - [ ] iOS / iPadOS 版（详见 docs/ios-plan.md）
   - 定位：Mac 剪贴板历史的口袋入口 + 手机侧收集器，同一应用记录组成 Universal Purchase
   - Phase 0：抽出共享 `PasterCore` 包，Mac 先接入 CloudKit
-  - Phase 1：历史 / 搜索 / Pinboard / 复制，三条保存通道（前台自动读取、分享扩展、快捷指令），iPad 侧栏与拖放
-  - Phase 2：键盘扩展、小组件、控制中心按钮、Spotlight 索引
+  - Phase 1：历史 / 搜索 / Pinboard / 复制，三条保存通道（前台自动读取、分享扩展、一键保存：操作按钮 / 敲击背面 / 控制中心），iPad 侧栏与拖放
+  - Phase 2：键盘扩展、小组件、Spotlight 索引
 - [ ] 法语本地化（英文/中文已完成，String Catalog 就绪，添加语言即可）
 - [ ] 应用内更新检查：比对 GitHub Releases，有新版时提示下载
 - [ ] GitHub Actions CI：推送 tag 自动构建并附加 DMG 到 Release
