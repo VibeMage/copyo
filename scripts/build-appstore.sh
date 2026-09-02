@@ -182,6 +182,32 @@ echo ""
 ls -lh "$PKG"
 echo ""
 echo "完成。归档：${ARCHIVE}"
+# UPLOAD=1 时直接上传到 App Store Connect（复用 Xcode 登录的账号，无需 Transporter）
+if [[ "${UPLOAD:-0}" == "1" ]]; then
+  echo "==> 上传到 App Store Connect"
+  UPLOAD_OPTS=$(mktemp).plist
+  cat > "$UPLOAD_OPTS" <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>method</key><string>app-store-connect</string>
+    <key>destination</key><string>upload</string>
+    <key>teamID</key><string>9A94W79V84</string>
+    <key>signingStyle</key><string>automatic</string>
+    <key>uploadSymbols</key><true/>
+</dict>
+</plist>
+PLIST
+  if xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportOptionsPlist "$UPLOAD_OPTS" \
+       -exportPath build/appstore-upload -allowProvisioningUpdates 2>&1 | grep -E "Uploaded|error:|EXPORT"; then
+    echo "上传完成：几分钟后在 App Store Connect 的「构建版本」中可选"
+  else
+    echo "上传失败，可改用 Transporter 手动拖入 ${PKG}" >&2
+  fi
+  rm -f "$UPLOAD_OPTS"
+fi
+
 # 归档产物不进启动台/Spotlight
 for _p in build/Paster.xcarchive/Products/Applications/Paster.app build/Build/Products/Release-AppStore/Paster.app; do
   [ -d "$_p" ] && /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -u "$_p" 2>/dev/null || true

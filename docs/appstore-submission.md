@@ -125,17 +125,17 @@ No account, no login, no network. All data is stored locally.
 ## 六、构建与上传
 
 ```bash
-./scripts/build-appstore.sh   # 归档并导出 .pkg 到 build/appstore/
+UPLOAD=1 ./scripts/build-appstore.sh   # 归档 → 导出 .pkg → 直接上传 App Store Connect
 ```
+
+（不加 `UPLOAD=1` 只出包不上传；上传复用 Xcode 已登录的账号，无需 Transporter。
+每次上传前把 project.pbxproj 里 Release-AppStore 配置的 `CURRENT_PROJECT_VERSION` +1。）
 
 前置（一次性，Xcode 里点）：
 - Xcode → Settings → Accounts → Manage Certificates → ➕ →
   「Apple Distribution」和「Mac Installer Distribution」各建一张
 
-上传方式二选一：
-- Xcode → Window → Organizer → 选中归档 → Distribute App → App Store Connect
-- 或从 App Store 装 **Transporter**，拖入 build/appstore/ 里的 .pkg（推荐——
-  避免误选到 GUI 归档出的非沙盒包）
+备用上传方式（脚本上传失败时）：从 App Store 装 **Transporter**，拖入 build/appstore/ 里的 .pkg。
 
 ## 七、提审前自查
 
