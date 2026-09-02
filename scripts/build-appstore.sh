@@ -12,6 +12,14 @@
 #        Apple Distribution         —— 给 Paster.app 签名
 #        Mac Installer Distribution —— 给导出的 .pkg 签名
 #   3. App Store Connect 里建好 bundle id 为 dev.vibemage.Paster 的 App 记录
+#   4. 开发者后台 → Identifiers → dev.vibemage.Paster 勾选 iCloud (CloudKit)
+#      与 Push Notifications，容器选 iCloud.dev.vibemage.Paster
+#      （sandbox 版的 entitlements 里带这两项，App ID 上没开就申请不到描述文件）
+#   5. 在 Xcode 里打开本工程 → target Paster → Signing & Capabilities，
+#      勾上 Automatically manage signing 并选团队 9A94W79V84，
+#      让 Xcode 把本机注册进账号：归档用的 Apple Development 身份需要一张
+#      Mac App Development 描述文件，而这类描述文件要求账号里至少有一台
+#      已注册的 Mac，xcodebuild 自己不会注册设备
 # 描述文件由 -allowProvisioningUpdates 自动申请，无需手动下载。
 #
 # 注意：不要用 Xcode 的 Product → Archive 归档上架包。
@@ -66,11 +74,23 @@ print_signing_help() {
        Mac Installer Distribution （给导出的 .pkg 签名）
   3. 确认 App Store Connect 里已存在 bundle id 为 ${BUNDLE_ID} 的 App 记录，
      否则自动申请描述文件会失败
+  4. 开发者后台 → Identifiers → ${BUNDLE_ID}，勾选 iCloud（CloudKit）与
+     Push Notifications，并创建 / 勾选容器 iCloud.${BUNDLE_ID}；
+     entitlements 里有这两项而 App ID 没开，描述文件同样申请不下来。
+     报「doesn't support the iCloud and Push Notifications capability」
+     就是卡在这一步
+  5. 若报「no devices from which to generate a provisioning profile」：
+     归档用的是 Apple Development 身份，要一张 Mac App Development
+     描述文件，而这类描述文件必须账号里至少注册过一台 Mac。用 Xcode 打开
+     Paster.xcodeproj → target Paster → Signing & Capabilities，勾上
+     Automatically manage signing 并选团队 ${TEAM_ID}，Xcode 会把本机注册
+     进账号；也可以在开发者后台 Devices 里手工添加本机的 Provisioning UDID
+     （系统信息 → 硬件 → 预置 UDID）。xcodebuild 自己不会注册设备
 HELP
 }
 
 matches_signing_error() {
-  grep -qE "No signing certificate|no valid signing identity|doesn't include signing certificate|No profiles for|requires a provisioning profile|No account for team|No Accounts|valid signing identity|Distribution certificate" "$1"
+  grep -qE "No signing certificate|no valid signing identity|doesn't include signing certificate|No profiles for|requires a provisioning profile|No account for team|No Accounts|valid signing identity|Distribution certificate|no devices from which|doesn't support the|conflicting provisioning settings" "$1"
 }
 
 echo "==> 归档 Paster ${VERSION} (build ${BUILD_NUMBER}, Release-AppStore)"
