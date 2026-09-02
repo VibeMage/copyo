@@ -25,6 +25,20 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
 ## 三、商店文案（可直接粘贴）
 
+### 版本页固定字段
+
+| 字段 | 填写 |
+| --- | --- |
+| 技术支持网址 | `https://gist.github.com/VibeMage/d787b8025a61e125eacd504313ee8a8f` |
+| 营销网址 | 留空 |
+| 版本 | 1.0（与构建的 MARKETING_VERSION 一致） |
+| 版权 | `© 2026 Paster Contributors` |
+
+### 推广文本（170 字符内，可随时改无需审核）
+
+- zh：`⇧⌘V 一按，复制过的文本、链接、图片、文件全部回来。开源、本地存储、零网络请求。`
+- en：`Press ⇧⌘V and everything you've copied comes back — text, links, images, files. Open source, local-only, zero network requests.`
+
 ### 副标题（30 字符内）
 
 - zh：剪贴板历史，一按即达
