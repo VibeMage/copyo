@@ -1,4 +1,5 @@
 import AppKit
+import PasterCore
 import SwiftData
 
 /// 通过 iCloud Drive 文件夹在多台 Mac 之间同步剪贴板历史。
@@ -103,7 +104,9 @@ final class SyncService {
 
     static var isAvailable: Bool { syncRoot != nil }
 
-    var isEnabled: Bool { UserDefaults.standard.bool(forKey: "icloudSync") }
+    /// 只有「文件夹」这一种同步方式会用到本服务；关闭与 iCloud 方式下计时器必须停住，
+    /// 否则 iCloud 同步的删除刚生效就会被快照重新导入回来。
+    var isEnabled: Bool { SyncMode.current == .folder }
 
     // MARK: - 生命周期
 
@@ -202,9 +205,9 @@ final class SyncService {
         case .image:
             return "i:" + (item.imageHash ?? "")
         case .file:
-            return "f:" + ClipboardMonitor.sha256(Data(item.filePaths.joined(separator: "\n").utf8))
+            return "f:" + ContentHash.sha256(Data(item.filePaths.joined(separator: "\n").utf8))
         default:
-            return "t:" + ClipboardMonitor.sha256(Data((item.plainText ?? "").utf8))
+            return "t:" + ContentHash.sha256(Data((item.plainText ?? "").utf8))
         }
     }
 

@@ -1,5 +1,6 @@
 import AppKit
 import ApplicationServices
+import PasterCore
 
 /// 负责把历史条目写回剪贴板，并模拟 ⌘V 粘贴到目标应用。
 @MainActor

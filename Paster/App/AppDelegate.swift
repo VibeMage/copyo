@@ -1,4 +1,5 @@
 import AppKit
+import PasterCore
 import SwiftData
 import SwiftUI
 
@@ -11,6 +12,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var pasteService: PasteService!
     private(set) var panelController: PanelController!
     private(set) var syncService: SyncService!
+    /// 本次启动的容器是不是真的挂上了 CloudKit 镜像。
+    /// 设置页据此判断「改完同步方式还需不需要重启」——尤其是从 iCloud 切走的时候，
+    /// 不重启的话这次会话仍然在往 iCloud 上传。
+    private(set) var cloudKitActive = false
     private let hotkey = HotkeyManager()
     private var statusItem: NSStatusItem!
     private var settingsController: SettingsWindowController?
@@ -25,16 +30,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             "plainTextPaste": false,
         ])
 
+        // 同步方式决定容器怎么建，必须在建库之前定下来（老配置的迁移也在这里发生）
+        let syncMode = SyncMode.migrateIfNeeded()
+        // 上一次启动留下的 iCloud 错误到此为止，这一轮的真实结果在下面重新记录；
+        // 不清的话用户换回 iCloud 时会看到一条早就修好的旧错误
+        CloudSyncStatus.clearErrors()
+
         do {
-            let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-            let storeDirectory = appSupport.appendingPathComponent("Paster", isDirectory: true)
-            try FileManager.default.createDirectory(at: storeDirectory, withIntermediateDirectories: true)
-            let config = ModelConfiguration(url: storeDirectory.appendingPathComponent("Paster.store"))
-            container = try ModelContainer(for: ClipItem.self, Pinboard.self, configurations: config)
+            let storeURL = try PasterStore.defaultStoreURL()
+            // 没有 iCloud entitlement 时 SwiftData 照样能建出 CloudKit 容器，只是一个字节都传不出去，
+            // 下面的 catch 永远抓不到，所以必须自己先判一次并把原因写给设置页。
+            let wantsCloudKit = syncMode == .icloud && CloudSyncStatus.hasCloudKitEntitlement
+            if syncMode == .icloud && !wantsCloudKit {
+                CloudSyncStatus.record(containerError: String(localized: "This copy of Paster is not signed for iCloud sync."))
+            }
+            do {
+                container = try PasterStore.makeContainer(url: storeURL, cloudKit: wantsCloudKit)
+                cloudKitActive = wantsCloudKit
+            } catch where wantsCloudKit {
+                // CloudKit 镜像建不起来（数据库结构不满足 CloudKit 要求、容器不可用等）：
+                // 退回同一个文件的本地容器，历史一条不少，只是这次启动不同步；
+                // 原因记下来给设置页显示，绝不能因此崩溃或落到内存库。
+                CloudSyncStatus.record(containerError: error.localizedDescription)
+                container = try PasterStore.makeContainer(url: storeURL, cloudKit: false)
+            }
         } catch {
             // 数据库损坏等极端情况：退化为内存存储，保证应用可用
-            let config = ModelConfiguration(isStoredInMemoryOnly: true)
-            container = try! ModelContainer(for: ClipItem.self, Pinboard.self, configurations: config)
+            let schema = Schema(PasterSchema.models)
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            container = try! ModelContainer(for: schema, configurations: config)
         }
 
         monitor = ClipboardMonitor(context: container.mainContext)
@@ -52,6 +76,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         hotkey.register(HotkeyConfig.load())
         monitor.start()
         syncService.updateActivation()
+
+        if cloudKitActive {
+            // CloudKit 的远程变更靠静默推送下发。Paster 是常驻菜单栏的应用，
+            // 一开就是好几天，不注册推送的话别的设备改了什么只有下次启动才看得到。
+            // 按 Apple 文档（Syncing a Core Data store with CloudKit），下行数据由系统
+            // 在后台完成，应用不需要把 didReceiveRemoteNotification 转发给容器。
+            NSApplication.shared.registerForRemoteNotifications()
+        }
 
         // 用户在系统设置里改动辅助功能授权后，让粘贴路径重新评估并允许再次提示
         DistributedNotificationCenter.default().addObserver(
@@ -77,6 +109,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
             showWelcome()
         }
+    }
+
+    /// 推送注册失败：iCloud 同步本身还能用，只是变更要等下次启动才拉得下来，
+    /// 记下来让设置页把这个降级说清楚。
+    func application(_ application: NSApplication,
+                     didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        CloudSyncStatus.record(pushError: error.localizedDescription)
+    }
+
+    func application(_ application: NSApplication,
+                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        CloudSyncStatus.record(pushError: "")
     }
 
     /// 用户在 Applications 里再次双击 Paster 时呼出面板（否则毫无反应，会以为应用坏了）
