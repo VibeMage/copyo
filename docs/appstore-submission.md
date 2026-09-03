@@ -1,6 +1,6 @@
 # Mac App Store 提审材料与操作清单
 
-创建日期：2026-09-01 · 最后更新：2026-09-01
+创建日期：2026-09-01 · 最后更新：2026-09-03
 
 ## 一、App Store Connect 建应用（你来操作）
 
@@ -149,3 +149,49 @@ UPLOAD=1 ./scripts/build-appstore.sh   # 归档 → 导出 .pkg → 直接上传
 提交后通常 1–3 天出结果。被拒不用慌——菜单栏工具常见拒因就是
 审核员找不到 UI（备注已覆盖）和权限用途不明（备注已覆盖）。
 把拒审信息发给 Claude 分析即可。
+
+## 八、2.1「需要补充信息」的回复（2026-09-03 首次提审收到）
+
+新开发者账号首次提审几乎必收这封信：要一段真机录屏 + 六项说明。回复贴在 App 审核 → 消息里（录屏作附件），同一段文字再粘到「App 审核信息 → 备注」供后续版本复用。
+
+### 回复正文（英文，可直接粘贴）
+
+```
+Thank you for reviewing Paster. Here is the requested information. A screen recording is attached to this message.
+
+1. Screen recording
+Recorded on a physical MacBook running macOS 26.6.1. It starts with launching Paster from the Finder and shows the typical flow: the welcome dialog, the menu bar icon, copying text, a link and an image in other apps, opening the clipboard panel with Shift+Command+V, searching, previewing with Space, pasting an item back into TextEdit with Return, pinning an item to a Pinboard, and the Settings window. Paster has no accounts, no login and no user-generated content shared with other people, so there are no registration, account deletion, content reporting or blocking flows.
+
+2. Purpose and target audience
+Paster is a clipboard history manager for macOS. Every time the user copies something (text, rich text, a link, a color value, an image or a file) Paster keeps it, and the user can bring any earlier item back with one keyboard shortcut. It solves the problem that the system clipboard only holds the most recent item, which forces people to re-copy content or lose it. Target audience: Mac users who copy and paste a lot, such as developers, writers, designers, students and office workers. The app is free with no in-app purchases.
+
+3. Setup and access
+No account, login credentials or sample files are required.
+- Launch Paster. A welcome dialog explains the basics. Paster then lives in the menu bar (the clipboard icon in the top-right corner); it has no Dock icon and no main window.
+- Copy anything in any app. It appears in Paster automatically.
+- Press Shift+Command+V, or click the menu bar icon, to open the clipboard panel. It slides up from the bottom of the screen. Type to search, use the arrow keys to move, press Space to preview.
+- Select an item and press Return to paste it into the app you were using. This uses macOS Accessibility: enable Paster in System Settings > Privacy & Security > Accessibility. Without this permission, Return still copies the item to the clipboard for manual pasting. If pasting does not work right after granting the permission, quit and reopen Paster.
+- Right-click a card to pin it to a Pinboard, copy it as plain text, or delete it.
+- Settings: click the gear button in the panel header, or right-click the menu bar icon and choose Settings.
+
+4. External services
+None. Paster makes no network requests and uses no third-party SDKs, analytics, authentication services, payment processors or AI services. All data is stored locally in the user's Application Support folder. The optional sync feature only writes files to a folder the user explicitly selects (for example a folder inside iCloud Drive) through the standard file APIs; no server operated by us is involved.
+
+5. Regional differences
+None. The app functions identically in all regions. The interface is localized in English and Simplified Chinese.
+
+6. Regulated industries and third-party material
+Not applicable. Paster does not operate in a regulated industry and contains no protected third-party material. It only stores content the user copies on their own device.
+
+This build was tested on a physical MacBook running macOS 26.6.1 before submission.
+```
+
+粘到「备注」时把第一段末尾的 "A screen recording is attached to this message." 换成 "A screen recording was provided as an attachment in App Review messages on 2026-09-03."。
+
+### 录屏方案（不暴露本机内容）
+
+- 新建一个 macOS 标准用户「Demo」录制，桌面干净、无公司应用。语言设为 English。
+- 录屏用的沙盒版从提审的 commit（c7dd41f）构建，放在 /Users/Shared/PasterDemo/Paster.app，演示文件在同目录。
+- 录前在 Demo 账号里先给 Paster 辅助功能权限（系统设置 → 隐私与安全性 → 辅助功能 → + 选中该 app），开勿扰。
+- ⇧⌘5 录整个屏幕，90 秒内：Finder 双击启动 → 欢迎对话框点 Try It Now → 面板出现后关掉 → 在 TextEdit 复制一句话、Safari 复制一个链接、预览里复制一张图 → ⇧⌘V 呼出面板 → 输入关键词搜索 → 空格预览 → 回车粘贴进 TextEdit → 右键卡片固定到 Pinboard → 点齿轮打开设置扫一眼各标签 → 停止录制。
+- 录完的 .mov 放到 /Users/Shared/PasterDemo/，用 avconvert 压成 1080p H.264 再上传（附件尽量控制在 50MB 内）。
