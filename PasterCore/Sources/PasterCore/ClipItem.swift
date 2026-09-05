@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-public enum ClipKind: String, Codable, CaseIterable {
+public enum ClipKind: String, Codable, CaseIterable, Sendable {
     case text
     case richText
     case link
