@@ -8,12 +8,16 @@ import SwiftUI
 ///   `-skipOnboarding`      跳过首启动引导
 ///   `-localOnly`           本次启动不挂 CloudKit（离线截图、无账号的 CI）
 ///   `-demoScreen <route>`  直接落到某个界面状态，取值见 `DemoRoute`
+///   `-demoSidebar <item>`  iPad 分栏时选中某个侧栏项，取值见 `DemoSidebarItem`
 ///   `-demoTheme light|dark` 强制配色
+///   `-simulateQuickSave`  启动时预置一次「一键保存」请求（模拟器里按不到控制中心的按钮）
 struct LaunchOptions {
     var useDemoData = false
     var skipOnboarding = false
     var localOnly = false
+    var simulateQuickSave = false
     var demoRoute: DemoRoute?
+    var demoSidebar: DemoSidebarItem?
     var demoColorScheme: ColorScheme?
 
     static let current = LaunchOptions(arguments: ProcessInfo.processInfo.arguments)
@@ -24,8 +28,12 @@ struct LaunchOptions {
         useDemoData = arguments.contains("-demoData")
         skipOnboarding = arguments.contains("-skipOnboarding")
         localOnly = arguments.contains("-localOnly")
+        simulateQuickSave = arguments.contains("-simulateQuickSave")
         if let value = Self.value(of: "-demoScreen", in: arguments) {
             demoRoute = DemoRoute(rawValue: value)
+        }
+        if let value = Self.value(of: "-demoSidebar", in: arguments) {
+            demoSidebar = DemoSidebarItem(rawValue: value)
         }
         switch Self.value(of: "-demoTheme", in: arguments) {
         case "light": demoColorScheme = .light

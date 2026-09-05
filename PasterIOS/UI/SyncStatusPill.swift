@@ -7,6 +7,8 @@ struct SyncStatusPill: View {
     var onTapWhenOff: (() -> Void)?
 
     @State private var spinning = false
+    /// iPad 分栏时同步胶囊由 detail 列容器统一提供，界面自己那份要让位（见 `pasterHidesSyncStatusPill`）
+    @Environment(\.pasterHidesSyncStatusPill) private var hidden
 
     private var symbol: String {
         switch status {
@@ -25,6 +27,10 @@ struct SyncStatusPill: View {
     }
 
     var body: some View {
+        if !hidden { pill }
+    }
+
+    private var pill: some View {
         Button {
             if status.isOff { onTapWhenOff?() }
         } label: {

@@ -10,6 +10,8 @@ import SwiftUI
 struct RootView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// 侧栏可见性；侧栏标题右侧的 sidebar.left 按钮要能收起分栏
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
 
     var body: some View {
         @Bindable var model = model
@@ -31,6 +33,8 @@ struct RootView: View {
                     model.completeOnboarding()
                 }
             }
+            // 只在 `-demoScreen share` 下出现：主应用里挂分享扩展那份 ShareView，用来核对设计 06
+            .shareDemoOverlay()
         }
         .background(PasterTheme.bgGrouped)
     }
@@ -41,7 +45,8 @@ struct RootView: View {
         @Bindable var model = model
         return TabView(selection: $model.selectedTab) {
             Tab(PasterTab.history.title, systemImage: PasterTab.history.symbol, value: PasterTab.history) {
-                NavigationStack { HistoryScreen() }
+                // demoDetailDestination：`-demoScreen detail-*` 时把样例条目的详情页推进来（正常启动无影响）
+                NavigationStack { HistoryScreen().demoDetailDestination() }
             }
             Tab(PasterTab.pinboard.title, systemImage: PasterTab.pinboard.symbol, value: PasterTab.pinboard) {
                 NavigationStack { PinboardListScreen() }
@@ -56,29 +61,14 @@ struct RootView: View {
 
     private var splitLayout: some View {
         @Bindable var model = model
-        return NavigationSplitView {
-            SidebarView(selection: $model.sidebarSelection)
+        return NavigationSplitView(columnVisibility: $columnVisibility) {
+            SidebarView(selection: $model.sidebarSelection, columnVisibility: $columnVisibility)
         } detail: {
             NavigationStack {
-                detailContent(for: model.sidebarSelection ?? .history(nil))
+                // 内容分发与 iPad 顶部状态（同步胶囊 + 排序）都在 SplitDetailColumn 里
+                SplitDetailColumn(selection: model.sidebarSelection ?? .history(nil))
             }
         }
-    }
-
-    @ViewBuilder
-    private func detailContent(for selection: SidebarSelection) -> some View {
-        switch selection {
-        case .history(let kind):
-            HistoryScreen(kindFilter: kind)
-        case .pinboard(let id):
-            // 侧栏存的是 PersistentIdentifier，这里换回对象；对象被删掉时回落到 Pinboard 列表
-            if let board = model.modelContext.model(for: id) as? Pinboard {
-                PinboardContentScreen(board: board)
-            } else {
-                PinboardListScreen()
-            }
-        case .settings:
-            SettingsScreen()
-        }
+        .navigationSplitViewStyle(.balanced)
     }
 }

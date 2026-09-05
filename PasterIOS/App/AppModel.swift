@@ -64,16 +64,32 @@ final class AppModel {
 
     /// 顶部搜索词
     var searchText = ""
+    /// iPad 侧栏搜索框的关键词。regular 宽度下 ⌘F 由侧栏接管，
+    /// 输入时同步写进 `searchText`，历史页不必关心关键词是从侧栏还是自己的搜索栏来的。
+    var sidebarSearchText = "" {
+        didSet { searchText = sidebarSearchText }
+    }
     /// 类型筛选（nil = 全部）
     var kindFilter: ClipKind?
     /// 刚插入的条目，历史页据此做一次高亮插入动效
     var highlightedItemID: PersistentIdentifier?
+
+    /// 「新建 Pinboard」Alert 的开关。触发点分散在多处（Pinboard 列表右上的 `+`、空态按钮、
+    /// 任意卡片长按菜单里 `PinboardPickerMenu` 的「新建 Pinboard…」），Alert 本身只由
+    /// `PinboardListScreen` 挂一处，免得同一时刻弹出两个。
+    var presentsNewPinboard = false
 
     // MARK: - 剪贴板横幅（通道 A 的兜底）
 
     var pasteBannerVisible = false
     /// 横幅上的粘贴按钮已经存下内容，原位换成「已保存」再收起
     var pasteBannerSaved = false
+
+    // MARK: - 模态
+
+    /// 「新建 Pinboard」输入框是否弹出。放在 model 上是因为触发点不止一处：
+    /// iPad 侧栏的 PINBOARD 分组头、Pinboard 列表页的 + 都要能拉起同一个 Alert。
+    var presentsNewPinboardAlert = false
 
     // MARK: - 生命周期
 
@@ -85,7 +101,8 @@ final class AppModel {
                                             offReason: bootstrap.offReason)
         self.capture = PasteboardCapture(context: bootstrap.container.mainContext)
 
-        if launch.useDemoData {
+        // history-empty 要的是「有样例库但一条都没有」，所以只建内存容器、不灌样例
+        if launch.useDemoData, launch.demoRoute != .historyEmpty {
             DemoData.populate(in: bootstrap.container.mainContext)
         }
         showsOnboarding = !(launch.skipOnboarding || IOSSettings.onboardingCompleted)
@@ -95,6 +112,8 @@ final class AppModel {
         capture.onOutcome = { [weak self] outcome in
             self?.handle(outcome)
         }
+        // 通道 C 的截图入口：-simulateQuickSave 在这里预置请求，随后第一次 active 就会消费掉
+        QuickSaveCoordinator.primeIfSimulated(launch)
         syncStatus.start()
     }
 
@@ -130,22 +149,21 @@ final class AppModel {
 
     /// 场景回到前台：先消费一键保存，再做通道 A 的例行检查。
     /// 顺序不能反——一键保存是用户明确的动作，即使用户关了自动读取也要存。
+    ///
+    /// 一键保存**排在演示模式的短路之前**：`-simulateQuickSave` 就是靠它在模拟器上走通整条链路，
+    /// 这时数据落在内存容器里（见 StoreBootstrap），仍然不会碰真实库。
     func handleScenePhaseActive() {
-        guard !launch.useDemoData else { return }
         if consumePendingQuickSave() { return }
+        guard !launch.useDemoData else { return }
         capture.checkOnForeground()
         Task { await syncStatus.refreshAccountStatus() }
     }
 
     /// 通道 C：SaveClipboardIntent 在 App Group 里留了个时间戳，主应用激活时消费它。
-    /// 用时间戳而不是布尔值，是为了忽略掉早就过期的请求（比如 Intent 触发后用户没等 App 起来就锁屏了）。
+    /// 具体规则（有效期、为什么忽略自动读取开关）在 `QuickSaveCoordinator`。
     @discardableResult
     func consumePendingQuickSave() -> Bool {
-        guard let requestedAt = IOSSettings.pendingQuickSaveAt else { return false }
-        IOSSettings.pendingQuickSaveAt = nil
-        guard Date().timeIntervalSince(requestedAt) < 60 else { return false }
-        capture.captureNow()
-        return true
+        QuickSaveCoordinator.consume(with: capture)
     }
 
     // MARK: - 采集结果 → 提示
@@ -225,6 +243,23 @@ final class AppModel {
         }
     }
 
+    /// Pinboard 内容页的「全部复制为纯文本」：多条拼成一段写进剪贴板。
+    /// 走 AppModel 而不是界面直接写 `UIPasteboard`，才能顺带 `markSeen()`——
+    /// 少了这一步，下次回前台会把自己刚写进去的内容再存一遍。
+    func copyAllAsPlainText(_ items: [ClipItem]) {
+        let text = items
+            .compactMap { item -> String? in
+                let body = (item.plainText ?? item.displayTitle).trimmingCharacters(in: .whitespacesAndNewlines)
+                return body.isEmpty ? nil : body
+            }
+            .joined(separator: "\n\n")
+        guard !text.isEmpty else { return }
+        UIPasteboard.general.string = text
+        capture.markSeen()
+        toast.show(String(localized: "Copied as plain text"))
+        feedback(.success)
+    }
+
     func pin(_ item: ClipItem, to board: Pinboard) {
         item.pinboard = board
         save()
@@ -279,6 +314,14 @@ final class AppModel {
         modelContext.insert(board)
         save()
         return board
+    }
+
+    /// 任意界面的「新建 Pinboard…」：先切到 Pinboard 标签，再让列表把 Alert 弹出来。
+    /// iPhone 上这样点完就能看到输入框；iPad 侧栏没有「列表」这个选中项，
+    /// Alert 会等到用户下次打开 Pinboard 列表时才出现。
+    func requestNewPinboard() {
+        selectedTab = .pinboard
+        presentsNewPinboard = true
     }
 
     func delete(_ board: Pinboard) {
