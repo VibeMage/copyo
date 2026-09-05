@@ -41,6 +41,13 @@ open build/Build/Products/Release/Paster.app   # 或拷贝到 /Applications
 
 也可以直接用 Xcode 打开 `Paster.xcodeproj` 运行（⌘R）。
 
+iOS / iPadOS 版在同一个工程里（scheme `Paster iOS`，iOS 18+，与 Mac 版共用 `PasterCore` 与 iCloud 数据），模拟器构建：
+
+```bash
+xcodebuild -project Paster.xcodeproj -scheme "Paster iOS" -configuration Debug \
+  -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
+```
+
 工程使用 Xcode 的自动签名，Team 填的是维护者的。贡献者请在 Xcode 的 Signing & Capabilities
 里把 Team 换成自己的，或者构建时传入：
 

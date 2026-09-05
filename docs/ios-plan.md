@@ -1,6 +1,6 @@
 # iOS / iPadOS 版规划
 
-创建日期：2026-09-03 · 最后更新：2026-09-03
+创建日期：2026-09-03 · 最后更新：2026-09-05
 
 ## 一、先说结论：移动端能做什么、不能做什么
 
@@ -71,22 +71,22 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 - [ ] 开发者后台：App ID 开启 iCloud，创建容器 `iCloud.dev.vibemage.Paster`；ASC 应用记录添加 iOS 平台
 - [x] `build-release.sh` 改为归档 + 导出，签名与 entitlements 交给 Xcode；`build-appstore.sh` 适配 iCloud 描述文件
 - [ ] 随 Mac **1.1** 发布 CloudKit 同步（先于 iOS 上线，让 Mac 用户历史先上云）
-- [ ] 设计：Claude Design 出移动端设计稿（见第四节），产出到 `art/ios-design/`
+- [x] 设计：Claude Design 出移动端设计稿（见第四节），原稿在 `art/ios-design/2026-09-05/`，实现依据 `art/ios-design/design-spec.md`
 
 ### Phase 1 · iOS / iPadOS 1.0 —— 看得见、搜得到、复制得出
 
-- [ ] 历史列表 / 卡片、类型筛选、搜索、详情预览、Pinboard
-- [ ] 轻点复制（含纯文本复制）、分享、固定、删除、批量清理
-- [ ] 采集通道 A：回到前台自动读剪贴板并入库（引导用户把「从其他 App 粘贴」设为允许；未允许时用 UIPasteControl 按钮兜底）
-- [ ] 采集通道 B：分享扩展「保存到 Paster」（文本 / 链接 / 图片，可选 Pinboard）
-- [ ] 采集通道 C「一键保存」：一个 `SaveClipboardIntent`，接三种物理入口（详见 3.1）
+- [x] 历史列表 / 卡片、类型筛选、搜索、详情预览、Pinboard
+- [x] 轻点复制（含纯文本复制）、分享、固定、删除、批量清理（设置里的「清空历史」只删未固定条目）
+- [x] 采集通道 A：回到前台自动读剪贴板并入库（引导用户把「从其他 App 粘贴」设为允许；未允许时用 UIPasteControl 按钮兜底）
+- [x] 采集通道 B：分享扩展「保存到 Paster」（文本 / 链接 / 图片，可选 Pinboard）
+- [x] 采集通道 C「一键保存」：一个 `SaveClipboardIntent`，接三种物理入口（详见 3.1）
   - 操作按钮（iPhone 15 Pro 及 iPhone 16 全系起）：iOS 18 起可直接绑定 App 提供的 Control，无需快捷指令
   - 敲击背面（iPhone 8 起所有机型）：设置 → 辅助功能 → 触控 → 轻点背面 → 运行快捷指令
   - 控制中心按钮与锁屏快捷入口（iOS 18）：与操作按钮共用同一个 Control，一次实现三个入口
   - 应用内提供「添加快捷指令」一键导入（iCloud 分享链接），并按入口给出图文指引
-- [ ] iPad：`NavigationSplitView` 侧栏 + 网格，卡片可拖放到 Split View / Slide Over 里的其他 App，硬件键盘快捷键（⌘F 搜索、方向键、回车复制、空格预览）
-- [ ] 首次启动引导（三页：Mac 互通 / 怎么保存 / 开启 iCloud）
-- [ ] 中英本地化（复用 String Catalog）、截图、提审
+- [x] iPad：`NavigationSplitView` 侧栏 + 网格，卡片可拖放到 Split View / Slide Over 里的其他 App，硬件键盘快捷键（⌘F 搜索、方向键、回车复制、空格预览）
+- [x] 首次启动引导（三页：Mac 互通 / 怎么保存 / 开启 iCloud）
+- [ ] 中英本地化（已完成，iOS 主应用 + 两个扩展各自的 String Catalog）、截图（待真机验证后重拍）、提审（待开发者后台配置，见 3.2）
 
 #### 3.1 「一键保存」的两条实现路径
 
@@ -100,6 +100,43 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 小组件和控件的扩展进程**读不到剪贴板**：它们没有前台身份，iOS 10 起后台读取一律为空，iOS 16 的授权弹窗也无处弹出。所以任何「保存剪贴板」的小组件按钮本质上都是「打开 App 再读」；扩展进程能否**写**剪贴板（小组件点按复制）另行验证。
 
 弃用：摇一摇。摇动事件只送达前台 App，后台的 Paster 收不到，快捷指令自动化也没有此触发器。
+
+#### 3.2 Phase 1 实现状态（2026-09-05）
+
+代码全部落地：target `Paster iOS`（`PasterIOS/`）、`PasterShareExtension`、`PasterWidgets`（仅「保存剪贴板」Control）、三 target 共用的 `PasterShared/`（App Intents、分享面板、入库逻辑）。iOS Debug / Release-AppStore 与 Mac 三个配置全新构建零警告，`PasterCore` 12 个测试通过。全部验证都在模拟器上、未签名（`CODE_SIGNING_ALLOWED=NO`）完成，下面列出因此**没验证到**的部分。
+
+构建与截图：
+
+```bash
+xcodebuild -project Paster.xcodeproj -scheme "Paster iOS" -configuration Debug \
+  -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
+xcrun simctl launch --terminate-running-process "iPhone 17 Pro" dev.vibemage.Paster \
+  -demoData -skipOnboarding -demoScreen history -demoTheme dark
+```
+
+启动参数：`-demoData`（内存库 + 设计稿样例数据）、`-skipOnboarding`、`-localOnly`、`-demoScreen <route>`（取值见 `PasterIOS/App/LaunchOptions.swift`）、`-demoTheme light|dark`、`-demoSidebar <item>`（iPad）、`-simulateQuickSave`、`-demoMenu`（仅 Debug）。中英切换加 `-AppleLanguages "(en)"`。
+
+**提审前必须做（开发者后台 / 真机）：**
+
+1. 开发者后台：App ID `dev.vibemage.Paster`、`dev.vibemage.Paster.ShareExtension`、`dev.vibemage.Paster.Widgets` 三个都开启 App Group `group.dev.vibemage.Paster`；主应用另开 iCloud 容器 `iCloud.dev.vibemage.Paster` 与 Push。至今所有构建都没展开过 entitlements，自动签名归档会直接失败。
+2. CloudKit Console：`ClipItem.sourceColorHex`、`Pinboard.iconName`、`Pinboard.colorHex` 是新字段，Development schema 要重新部署到 Production。
+3. 快捷指令：在真机的「快捷指令」里建「获取剪贴板 → Paster：保存内容」，iCloud 分享后把链接填进 `PasterIOS/Screens/Settings/ShortcutLinks.swift`（现在是占位串，按钮只会提示「尚未发布」；「轻点背面」通道依赖它）。
+4. App Store Connect：现有应用记录「添加平台 → iOS」。
+
+**真机验证清单（模拟器做不到）：**
+
+- 三进程共用 App Group 库：分享扩展写入 → 主应用可见 → CloudKit 同步到 Mac；主应用开 CloudKit、扩展用本地容器打开同一文件的并存写法。
+- 一键保存：控制中心 / 操作按钮按下 → 冷启动与热启动两种时序下都能读到剪贴板并提示「已保存」；「没有可保存的内容」「已保存过」两条提示。
+- 系统「从其他 App 粘贴」设为允许后前台读取完全免弹窗；未允许时横幅里的 UIPasteControl 能真正入库。
+- 触摸：轻点复制（卡片是 NavigationLink，靠 highPriorityGesture 抢占，抢不到会变成进详情）、长按菜单与预览点按进详情、左滑删除 / 右滑固定、拖放到旁边的 App、图片捏合缩放、Pinboard 行左右滑。
+- iPad 硬件键盘：⌘1/2/3、⌘F、方向键移焦、↵ / ⇧↵、空格预览、⌘P、⌫。
+- iCloud 状态胶囊三态与设置页状态行（模拟器上恒为「未同步」）。
+- 分享扩展在扩展进程里的外观、取消 / 完成收尾；Control 在控制中心与锁屏里的显示。
+- 引导页第三页的两个开关、设置里的外链与系统设置跳转。
+
+**与设计稿的取舍（需设计拍板）：** 设置总览「允许从其他 App 粘贴」右值显示「系统设置」而非「询问」（iOS 不提供读取该授权的 API）；04b 没有「打开操作按钮设置」按钮（无公开深链）；04e「Paster 键盘」整行留到 Phase 2；隐私说明是外链而非二级页；颜色详情的三个色值胶囊在 440pt 宽上折成两行；引导页插图符号偏下约 14pt；iOS 26 系统返回按钮不带「历史」文字。
+
+**留到 Phase 2 的已知缺陷：** 动态字体放大时角标 / 元信息 / 筛选胶囊不随正文放大；搜索没有 predicate 下推与防抖，条目上万时每敲一字全表扫描；超长正文详情页整串渲染；`isSelected` 卡片状态未接（轻点已绑定复制）；VoiceOver 未验证；AppIcon 只有一张 1024 universal，没有 tinted / dark 变体。
 
 ### Phase 2 · 1.1 —— 把内容送进别的 App
 
