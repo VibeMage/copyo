@@ -63,14 +63,22 @@ public enum ClipImagePreparer {
             return Prepared(png: originalData, pixelWidth: width, pixelHeight: height)
         }
 
+        // 元数据取不到时 longestSide 是 0，`max(min(0, 2048), 1)` 会算成 1，
+        // CGImageSourceCreateThumbnailAtIndex 会老老实实返回一张 1×1 的图，
+        // 调用方还以为保存成功——用户看到「已保存」，历史里却是一个白点。
+        // 取不到就按上限走，让 ImageIO 自己按原图尺寸裁。
+        let thumbnailMaxPixelSize = longestSide > 0 ? min(longestSide, maxPixelSize) : maxPixelSize
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: max(min(longestSide, maxPixelSize), 1),
+            kCGImageSourceThumbnailMaxPixelSize: thumbnailMaxPixelSize,
         ]
         guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
             return nil
         }
+        // 再兜一道：退化成 1×1 说明这条路径根本没拿到真实像素，
+        // 返回 nil 让调用方走「读不出内容」，别静默存下一张白点
+        guard cgImage.width > 1 || cgImage.height > 1 else { return nil }
         return encodePNG(cgImage)
     }
 

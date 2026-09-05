@@ -151,7 +151,21 @@ private struct HidesSyncStatusPillKey: EnvironmentKey {
     static let defaultValue = false
 }
 
+private struct IsSplitDetailKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
 extension EnvironmentValues {
+    /// 当前视图是不是 iPad 分栏的 detail 列。
+    ///
+    /// 界面不能靠「自己有多宽 ≥ 600」来判断是不是 regular 布局：iPad Pro 11 竖屏下
+    /// detail 列只有约 545pt，判据一失效，筛选 chips 会和侧栏分类重复出现、⌘F 双重注册、
+    /// 三列网格与快捷键提示条全都不生效。分栏容器直接把这一位告诉界面。
+    var pasterIsSplitDetail: Bool {
+        get { self[IsSplitDetailKey.self] }
+        set { self[IsSplitDetailKey.self] = newValue }
+    }
+
     /// iPad 分栏时，同步胶囊由 detail 列容器（`SplitDetailColumn`）统一放在导航栏右侧。
     /// 各界面自己那份 `SyncStatusPill` 读到 true 就不画，免得右上角出现两个胶囊。
     /// 只有分栏的 detail 列会把它设成 true，iPhone 的标签栏布局不受影响。

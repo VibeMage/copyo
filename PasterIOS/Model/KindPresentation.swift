@@ -8,7 +8,8 @@ enum KindPresentation {
     static func label(_ kind: ClipKind) -> String {
         switch kind {
         case .text: String(localized: "Text")
-        case .richText: String(localized: "Rich Text")
+        // 设计 3.2 的英文角标是 `Rich`；`Rich Text` 在卡片头部与详情标题里都会被截断
+        case .richText: String(localized: "Rich")
         case .link: String(localized: "Link")
         case .color: String(localized: "Color")
         case .image: String(localized: "Image")

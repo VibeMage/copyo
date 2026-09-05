@@ -57,7 +57,17 @@ struct QuickSaveGuideScreen: View {
                 let steps = steps(for: entry)
                 ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
                     if index > 0 { HairlineSeparator() }
-                    GuideStepRow(index + 1, title: step.title, detail: step.detail)
+                    if entry == .actionButton, index == 1 {
+                        // 设计 04b 步骤 2 右侧的手机示意图。纯自绘，不依赖任何平台能力，
+                        // 是这一页唯一的图形元素
+                        HStack(alignment: .center, spacing: 12) {
+                            GuideStepRow(index + 1, title: step.title, detail: step.detail)
+                            ActionButtonPhoneArt()
+                                .padding(.trailing, 16)
+                        }
+                    } else {
+                        GuideStepRow(index + 1, title: step.title, detail: step.detail)
+                    }
                 }
             }
 
@@ -117,6 +127,33 @@ struct QuickSaveGuideScreen: View {
         case .backTap:
             String(localized: "Back Tap can only run a shortcut, which is why this one needs the shortcut above.")
         }
+    }
+}
+
+/// 设计 04b 步骤 2 右侧的示意图：64 × 100 的机身 + 左侧一段橙色（#FF9F0A）操作按钮。
+private struct ActionButtonPhoneArt: View {
+    var body: some View {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .fill(PasterTheme.fill)
+            .frame(width: 64, height: 100)
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(PasterTheme.separator.opacity(0.6), lineWidth: 1)
+            }
+            .overlay(alignment: .top) {
+                // 顶部听筒条，让它一眼看得出是台手机
+                Capsule()
+                    .fill(PasterTheme.labelTertiary)
+                    .frame(width: 20, height: 3)
+                    .padding(.top, 8)
+            }
+            .overlay(alignment: .leading) {
+                Capsule()
+                    .fill(PasterTheme.warning)
+                    .frame(width: 4, height: 22)
+                    .offset(x: -2, y: -14)
+            }
+            .accessibilityHidden(true)
     }
 }
 

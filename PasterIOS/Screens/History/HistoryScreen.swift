@@ -16,10 +16,19 @@ struct HistoryScreen: View {
 
     @Environment(AppModel.self) private var model
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// 分栏 detail 列会把它设成 true。不能只看自己有多宽：
+    /// iPad Pro 11 竖屏的 detail 列只有约 545pt，「宽 ≥ 600」在那台机器上恒为假，
+    /// 于是筛选 chips 与侧栏分类会同时出现且互相矛盾、⌘F 双重注册、三列网格与快捷键提示条都不生效。
+    @Environment(\.pasterIsSplitDetail) private var isSplitDetail
 
     @Query(sort: \ClipItem.createdAt, order: .reverse) private var items: [ClipItem]
     @Query(sort: [SortDescriptor(\Pinboard.sortIndex), SortDescriptor(\Pinboard.createdAt)])
     private var boards: [Pinboard]
+
+    /// iPad detail 列导航栏右侧的排序菜单写的就是这个键；
+    /// iPhone 上没有排序入口，值恒为默认的「按时间」，与 @Query 的顺序一致。
+    @AppStorage(ClipSortOrder.storageKey, store: IOSSettings.defaults)
+    private var sortRaw = ClipSortOrder.time.rawValue
 
     /// 卡片 → 详情的 zoom 转场源
     @Namespace private var zoomNamespace
@@ -32,6 +41,8 @@ struct HistoryScreen: View {
     @State private var highlightRingID: PersistentIdentifier?
     @State private var detailItem: ClipItem?
     @State private var previewItem: ClipItem?
+    /// 正在被拖走的条目：原位留一张 35% 的影子（设计 09 的 ghost 卡）
+    @State private var draggingItemID: PersistentIdentifier?
     /// 一个 Pinboard 都没有时，右滑固定 / 菜单新建都会先弹这个输入框（设计 03c 的形态）
     @State private var showsNewBoardAlert = false
     @State private var newBoardName = ""
@@ -43,8 +54,18 @@ struct HistoryScreen: View {
 
     var body: some View {
         @Bindable var model = model
+        // 一次 body 里 visibleItems 会被读到三四次，每次都是一遍 filter + filter + sort。
+        // 求值一次往下传，别让它跟着 body 反复跑。
+        let visible = visibleItems
         return ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                if isRegularLayout {
+                    // 设计 09 的内容区标题：28 Bold 画在内容里，不是导航栏的 34pt 大标题
+                    Text(columnTitle)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundStyle(PasterTheme.label)
+                        .padding(.top, 4)
+                }
                 if showsFilterChips {
                     HistoryFilterChips(selection: $model.kindFilter)
                         .padding(.top, 12)
@@ -57,12 +78,12 @@ struct HistoryScreen: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 if isSearching {
-                    Text(resultCountText)
+                    Text(resultCountText(visible))
                         .font(PasterTheme.Fonts.footnote)
                         .foregroundStyle(PasterTheme.labelSecondary)
                         .padding(.top, 14)
                 }
-                content
+                content(visible)
                     .padding(.top, 16)
             }
             .padding(.horizontal, pageInset)
@@ -70,6 +91,18 @@ struct HistoryScreen: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .background(PasterTheme.bgGrouped)
+        // 设计 3.12 的 fade：列表底部 140pt 渐隐到 92% 背景色，
+        // 让最后一张卡片是「淡出」而不是被标签栏硬切一刀。iPad 分栏的设计 09 里没有这一层。
+        .overlay(alignment: .bottom) {
+            if !isRegularLayout {
+                LinearGradient(colors: [PasterTheme.bgGrouped.opacity(0), PasterTheme.bgGrouped.opacity(0.92)],
+                               startPoint: .top,
+                               endPoint: .bottom)
+                    .frame(height: 140)
+                    .allowsHitTesting(false)
+                    .ignoresSafeArea(edges: .bottom)
+            }
+        }
         .onGeometryChange(for: CGSize.self) { $0.size } action: { viewportSize = $0 }
         // 焦点挂在滚动视图上：硬件键盘的方向键 / ↵ / 空格 / ⌫ 都要先有焦点才收得到
         .focusable()
@@ -77,15 +110,17 @@ struct HistoryScreen: View {
         .focused($gridFocused)
         .onKeyPress(phases: .down) { handleKeyPress($0) }
         .background(alignment: .topLeading) { commandShortcuts }
-        .navigationTitle(PasterTab.history.title)
-        .navigationBarTitleDisplayMode(.large)
-        .searchable(text: $model.searchText,
-                    placement: .navigationBarDrawer(displayMode: .always),
-                    prompt: Text(String(localized: "Search history")))
-        .searchFocused($searchFocused)
+        // regular 布局下标题自绘在内容里（上面那一行 28 Bold），导航栏只留工具栏
+        .navigationTitle(isRegularLayout ? "" : PasterTab.history.title)
+        .navigationBarTitleDisplayMode(isRegularLayout ? .inline : .large)
+        // 搜索框只在 compact 出现：设计 09 的搜索在侧栏，且侧栏那条已经带 ⌘F 提示。
+        // 关键词由 AppModel.sidebarSearchText 喂进 searchText，过滤逻辑两边共用。
+        .modifier(HistorySearchable(enabled: !isRegularLayout,
+                                    text: $model.searchText,
+                                    focus: $searchFocused))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                SyncStatusPill(status: model.syncStatus.status, compact: true) {
+                SyncStatusPill(status: model.syncStatus.status, size: .phone) {
                     goToSettings()
                 }
             }
@@ -127,7 +162,13 @@ struct HistoryScreen: View {
     /// regular 宽度（iPad 全屏 / 1-2 分屏）。Slide Over 与 1/3 分屏宽度不足，按 iPhone 走。
     private var isRegularLayout: Bool {
         horizontalSizeClass == .regular
-            && viewportSize.width >= PasterTheme.Metrics.compactWidthThreshold
+            && (isSplitDetail || viewportSize.width >= PasterTheme.Metrics.compactWidthThreshold)
+    }
+
+    /// 内容区标题：侧栏选了某个分类就显示分类名，否则是「历史」
+    private var columnTitle: String {
+        guard let kind = kindFilter else { return PasterTab.history.title }
+        return KindPresentation.label(kind)
     }
 
     private var pageInset: CGFloat {
@@ -166,13 +207,19 @@ struct HistoryScreen: View {
     /// 而 predicate 里写不了「富文本算进文本」这种跨字段规则，两处口径必须一致才用同一个 KindPresentation。
     private var visibleItems: [ClipItem] {
         let byKind = items.filter { KindPresentation.matches($0, filter: activeKind) }
-        guard isSearching else { return byKind }
-        return byKind.filter { $0.searchHaystack.localizedCaseInsensitiveContains(searchQuery) }
+        let matched = isSearching
+            ? byKind.filter { $0.searchHaystack.localizedCaseInsensitiveContains(searchQuery) }
+            : byKind
+        return sortOrder.sorted(matched)
+    }
+
+    private var sortOrder: ClipSortOrder {
+        ClipSortOrder(rawValue: sortRaw) ?? .time
     }
 
     /// 「N 条结果」。英文要分单复数，所以给两个 key；中文两条译文一样。
-    private var resultCountText: String {
-        let count = visibleItems.count
+    private func resultCountText(_ list: [ClipItem]) -> String {
+        let count = list.count
         let format = count == 1 ? String(localized: "%lld result") : String(localized: "%lld results")
         return String(format: format, count)
     }
@@ -180,7 +227,7 @@ struct HistoryScreen: View {
     // MARK: - 内容
 
     @ViewBuilder
-    private var content: some View {
+    private func content(_ visible: [ClipItem]) -> some View {
         if items.isEmpty {
             HistoryEmptyState(onEnableSync: { goToSettings() },
                               onHowToSave: { goToSettings() })
@@ -190,18 +237,18 @@ struct HistoryScreen: View {
             .containerRelativeFrame(.vertical, alignment: .center) { height, _ in
                 max(240, height)
             }
-        } else if visibleItems.isEmpty {
+        } else if visible.isEmpty {
             EmptyState(symbol: "magnifyingglass",
                        title: String(localized: "No results"),
                        message: String(localized: "Try another keyword or filter."))
             .padding(.top, 60)
         } else {
-            grid
+            grid(visible)
         }
     }
 
-    private var grid: some View {
-        MasonryGrid(items: visibleItems,
+    private func grid(_ visible: [ClipItem]) -> some View {
+        MasonryGrid(items: visible,
                     columns: columns,
                     estimatedHeight: { ClipCard.estimatedHeight(for: $0, width: columnWidth, dense: false) }) { item in
             SwipeableCard(onDelete: { delete(item) },
@@ -213,7 +260,13 @@ struct HistoryScreen: View {
                                 previewWidth: columnWidth,
                                 isFocused: isFocusRing(item),
                                 isHighlighted: model.highlightedItemID == item.persistentModelID,
+                                isGhost: draggingItemID == item.persistentModelID,
                                 allowsDrag: isRegularLayout,
+                                onDragChanged: { dragging in
+                                    withAnimation(PasterTheme.springAnimation) {
+                                        draggingItemID = dragging ? item.persistentModelID : nil
+                                    }
+                                },
                                 onCopy: { copy(item) },
                                 onCopyPlainText: { model.copyPlainText(item) },
                                 onPin: { model.pin(item, to: $0) },
@@ -302,8 +355,11 @@ struct HistoryScreen: View {
     /// 方向键、↵、空格、⌫ 走 onKeyPress。两边不重叠，免得一次按键触发两回。
     private var commandShortcuts: some View {
         ZStack {
-            Button(String(localized: "Search")) { searchFocused = true }
-                .keyboardShortcut("f", modifiers: .command)
+            // regular 宽度下 ⌘F 由 iPad 侧栏的搜索框接管；两处都注册的话谁生效不确定
+            if !isRegularLayout {
+                Button(String(localized: "Search")) { searchFocused = true }
+                    .keyboardShortcut("f", modifiers: .command)
+            }
             Button(String(localized: "Pin")) {
                 if let item = focusedItem() { pinToDefault(item) }
             }
@@ -384,7 +440,7 @@ struct HistoryScreen: View {
             model.searchText = HistoryDemoContent.searchQuery
         case .historySaved:
             insertDemoSavedItem()
-        case .detailText, .detailColor, .detailImage, .detailLink:
+        case .detailText, .detailRich, .detailColor, .detailImage, .detailLink, .detailFile:
             detailItem = demoDetailItem(for: route)
         default:
             break
@@ -406,10 +462,34 @@ struct HistoryScreen: View {
         switch route {
         // detail-text 对应设计 02 的长文本条目（有来源 App 的那条），不是本机的验证码短文本
         case .detailText: items.first { $0.kind == .text && $0.sourceAppName != nil && !$0.isMono }
+        case .detailRich: items.first { $0.kind == .richText }
         case .detailColor: items.first { $0.kind == .color }
         case .detailImage: items.first { $0.kind == .image }
         case .detailLink: items.first { $0.kind == .link }
+        case .detailFile: items.first { $0.kind == .file }
         default: nil
+        }
+    }
+}
+
+// MARK: - 条件搜索栏
+
+/// `.searchable` 只在 compact 布局挂上。写成 ViewModifier 是因为条件修饰符会改变视图类型，
+/// 在 body 里直接 `if` 包不住整条链。
+private struct HistorySearchable: ViewModifier {
+    let enabled: Bool
+    @Binding var text: String
+    var focus: FocusState<Bool>.Binding
+
+    func body(content: Content) -> some View {
+        if enabled {
+            content
+                .searchable(text: $text,
+                            placement: .navigationBarDrawer(displayMode: .always),
+                            prompt: Text(String(localized: "Search history")))
+                .searchFocused(focus)
+        } else {
+            content
         }
     }
 }

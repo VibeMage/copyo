@@ -28,7 +28,6 @@ struct PinboardListScreen: View {
     }
 
     var body: some View {
-        @Bindable var model = model
         Group {
             if boards.isEmpty {
                 emptyState
@@ -42,13 +41,6 @@ struct PinboardListScreen: View {
         .toolbar { toolbarContent }
         .navigationDestination(item: $pushedBoard) { board in
             PinboardContentScreen(board: board)
-        }
-        // 新建 Alert 的开关挂在 AppModel 上：历史页长按菜单里的「新建 Pinboard…」也要能拉起它
-        .newPinboardAlert(isPresented: $model.presentsNewPinboard) { name in
-            model.createPinboard(named: name,
-                                 iconName: PinboardAppearance.defaultSymbol,
-                                 colorHex: PinboardAppearance.nextColorHex(existingCount: boards.count))
-            model.toast.show(String(localized: "Pinboard created"), symbol: "pin.fill")
         }
         .alert(deleteAlertTitle, isPresented: deleteAlertBinding, presenting: boardPendingDeletion) { board in
             Button(String(localized: "Cancel"), role: .cancel) { }

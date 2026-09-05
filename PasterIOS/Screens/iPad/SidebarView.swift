@@ -18,7 +18,6 @@ struct SidebarView: View {
     @Query(sort: \Pinboard.sortIndex) private var boards: [Pinboard]
 
     @FocusState private var searchFocused: Bool
-    @State private var newBoardName = ""
 
     init(selection: Binding<SidebarSelection?>,
          columnVisibility: Binding<NavigationSplitViewVisibility>? = nil) {
@@ -49,36 +48,30 @@ struct SidebarView: View {
 
         List(selection: $selection) {
             Section {
-                SidebarRow(title: PasterTab.history.title,
+                SidebarRow(symbol: PasterTab.history.symbol,
+                           symbolColor: PasterTheme.accent,
+                           title: PasterTab.history.title,
                            count: items.count,
-                           isSelected: isHistoryAllSelected) {
-                    SidebarIconTile(symbol: PasterTab.history.symbol,
-                                    color: PasterTheme.accent,
-                                    filled: true)
-                }
+                           isSelected: isHistoryAllSelected)
                 .tag(SidebarSelection.history(nil))
 
                 ForEach(KindPresentation.regularFilters, id: \.self) { kind in
-                    SidebarRow(title: KindPresentation.label(kind),
+                    SidebarRow(symbol: KindPresentation.symbol(kind),
+                               symbolColor: PasterTheme.accent,
+                               title: KindPresentation.label(kind),
                                count: count(for: kind, in: counts),
-                               isSelected: selection == .history(kind)) {
-                        Image(systemName: KindPresentation.symbol(kind))
-                            .font(.system(size: 17))
-                            .foregroundStyle(PasterTheme.accent)
-                            .frame(width: SidebarMetrics.iconTile)
-                    }
+                               isSelected: selection == .history(kind))
                     .tag(SidebarSelection.history(kind))
                 }
             }
 
             Section {
                 ForEach(boards) { board in
-                    SidebarRow(title: board.name,
+                    SidebarRow(symbol: board.iconName ?? "pin.fill",
+                               symbolColor: Color(hexString: board.colorHex ?? "") ?? PasterTheme.accent,
+                               title: board.name,
                                count: board.items?.count ?? 0,
-                               isSelected: selection == .pinboard(board.persistentModelID)) {
-                        SidebarIconTile(symbol: board.iconName ?? "pin.fill",
-                                        color: Color(hexString: board.colorHex ?? "") ?? PasterTheme.accent)
-                    }
+                               isSelected: selection == .pinboard(board.persistentModelID))
                     .tag(SidebarSelection.pinboard(board.persistentModelID))
                 }
             } header: {
@@ -86,6 +79,9 @@ struct SidebarView: View {
             }
         }
         .listStyle(.sidebar)
+        // 选中态由 SidebarRow 自己画 accent 实色底（设计 09），
+        // 把系统那层浅灰高亮的色相清成透明，避免两层叠在一起
+        .tint(.clear)
         .environment(\.defaultMinListRowHeight, SidebarMetrics.rowHeight)
         .scrollContentBackground(.hidden)
         .background(PasterTheme.sidebarBg)
@@ -94,11 +90,6 @@ struct SidebarView: View {
         .toolbar(.hidden, for: .navigationBar)
         .navigationSplitViewColumnWidth(min: 260, ideal: 280, max: 340)
         .background { shortcuts }
-        .alert(String(localized: "New Pinboard"), isPresented: $model.presentsNewPinboardAlert) {
-            TextField(String(localized: "Name"), text: $newBoardName)
-            Button(String(localized: "Cancel"), role: .cancel) { newBoardName = "" }
-            Button(String(localized: "Create")) { createBoard() }
-        }
         .onChange(of: selection) { _, new in
             guard let new else { return }
             model.selectSidebar(new)
@@ -113,9 +104,9 @@ struct SidebarView: View {
             if !model.applyDemoSidebarSelection() {
                 model.syncSidebarSelectionWithTab()
             }
-            // 截图：`-demoScreen pinboard-new` 在 iPad 上落到侧栏的新建 Alert
+            // 截图：`-demoScreen pinboard-new` 在 iPad 上也落到新建 Alert（宿主在 RootView）
             if model.demoRoute == .pinboardNew {
-                model.presentsNewPinboardAlert = true
+                model.presentsNewPinboard = true
             }
         }
     }
@@ -195,8 +186,7 @@ struct SidebarView: View {
                 .foregroundStyle(PasterTheme.labelSecondary)
             Spacer(minLength: 0)
             Button {
-                newBoardName = ""
-                model.presentsNewPinboardAlert = true
+                model.presentsNewPinboard = true
             } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 15, weight: .medium))
@@ -218,21 +208,21 @@ struct SidebarView: View {
         return Button {
             model.selectSidebar(.settings)
         } label: {
-            SidebarRow(title: PasterTab.settings.title, count: nil, isSelected: selected) {
-                Image(systemName: PasterTab.settings.symbol)
-                    .font(.system(size: 17))
-                    .frame(width: SidebarMetrics.iconTile)
-            }
             // 设计 3.14：底部的设置行整行是 label.secondary，不跟上面的分类一样用蓝图标
-            .foregroundStyle(PasterTheme.labelSecondary)
-            .padding(.horizontal, 10)
-            .background {
-                // 这一行在 List 之外，系统的侧栏高亮够不到，选中时自己补一层
-                if selected {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(PasterTheme.fill2)
+            SidebarRow(symbol: PasterTab.settings.symbol,
+                       symbolColor: PasterTheme.labelSecondary,
+                       title: PasterTab.settings.title,
+                       count: nil,
+                       isSelected: selected,
+                       unselectedTitleColor: PasterTheme.labelSecondary)
+                .padding(.horizontal, 10)
+                .background {
+                    // 这一行在 List 之外，系统高亮够不到，选中底跟上面的行走同一套
+                    if selected {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(PasterTheme.accent)
+                    }
                 }
-            }
         }
         .buttonStyle(.plain)
         .padding(.horizontal, SidebarMetrics.inset)
@@ -272,12 +262,6 @@ struct SidebarView: View {
 
     // MARK: - 新建 Pinboard
 
-    private func createBoard() {
-        let trimmed = newBoardName.trimmingCharacters(in: .whitespacesAndNewlines)
-        let board = model.createPinboard(named: trimmed.isEmpty ? String(localized: "New Pinboard") : trimmed)
-        newBoardName = ""
-        model.selectSidebar(.pinboard(board.persistentModelID))
-    }
 }
 
 // MARK: - 行
@@ -292,48 +276,45 @@ private enum SidebarMetrics {
     static let iconTile: CGFloat = 28
 }
 
-/// 一行：图标 + 名称 + 右侧计数。高 38、gap 10（设计 3.14）。
-private struct SidebarRow<Icon: View>: View {
+/// 一行：裸图标 + 名称 + 右侧计数。高 38、gap 10（设计 3.14）。
+///
+/// 设计 09 的侧栏里所有行都是**裸的彩色图标**，没有图标砖——砖只出现在 iPhone 的 Pinboard 列表（03）。
+/// 选中态是 accent 实色底 + 白字 Semibold + 计数 80% 白，不是系统那层浅灰高亮。
+private struct SidebarRow: View {
+    let symbol: String
+    let symbolColor: Color
     let title: String
     let count: Int?
     let isSelected: Bool
-    @ViewBuilder var icon: () -> Icon
+    var unselectedTitleColor: Color = PasterTheme.label
 
     var body: some View {
         HStack(spacing: 10) {
-            icon()
+            Image(systemName: symbol)
+                .font(.system(size: 17))
+                .foregroundStyle(isSelected ? Color.white : symbolColor)
+                .frame(width: SidebarMetrics.iconTile)
             Text(title)
                 .font(.system(size: 15, weight: isSelected ? .semibold : .regular))
+                .foregroundStyle(isSelected ? Color.white : unselectedTitleColor)
                 .lineLimit(1)
             Spacer(minLength: 8)
             if let count {
                 Text(count.formatted())
                     .font(.system(size: 15))
                     .monospacedDigit()
-                    .foregroundStyle(PasterTheme.labelSecondary)
+                    .foregroundStyle(isSelected ? Color.white.opacity(0.8) : PasterTheme.labelSecondary)
             }
         }
         .frame(height: SidebarMetrics.rowHeight)
         .listRowInsets(EdgeInsets(top: 2, leading: SidebarMetrics.rowInset,
                                   bottom: 2, trailing: SidebarMetrics.rowInset))
-    }
-}
-
-/// 图标砖：28 × 28、radius 8、主题色 15% 底 + 同色图标（设计 3.7）。
-/// `filled` 是实色底 + 白图标，给「历史」行用。
-private struct SidebarIconTile: View {
-    let symbol: String
-    let color: Color
-    var filled = false
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: 8, style: .continuous)
-            .fill(filled ? color : color.opacity(0.15))
-            .frame(width: SidebarMetrics.iconTile, height: SidebarMetrics.iconTile)
-            .overlay {
-                Image(systemName: symbol)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(filled ? Color.white : color)
-            }
+        .listRowBackground(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(isSelected ? PasterTheme.accent : Color.clear)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 1)
+        )
+        .listRowSeparator(.hidden)
     }
 }

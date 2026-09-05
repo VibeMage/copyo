@@ -39,22 +39,48 @@ extension ClipItem {
 
     // MARK: - 时间
 
-    /// 「刚刚 / 3 分钟前 / 昨天 18:42 / 9月2日 14:05」
+    /// 「刚刚 / 3 分钟前 / 1 小时前 / 昨天 18:42」，英文对应 `now / 3m / 1h / Yesterday 18:42`。
+    ///
+    /// 当天的分 / 时不走系统的 `.relative` 格式化：那个在英文下给的是 "3 minutes ago"，
+    /// 卡片头部「来源 · 时间」这一行放不下（设计 6.2 要的是 `3m` 这种短形）。
     func relativeTime(reference: Date = Date()) -> String {
         let interval = reference.timeIntervalSince(createdAt)
-        if interval < 60 { return String(localized: "Just now") }
+        if interval < 60 { return String(localized: "now") }
         let calendar = Calendar.current
         if calendar.isDate(createdAt, inSameDayAs: reference) {
-            return createdAt.formatted(.relative(presentation: .numeric, unitsStyle: .wide))
+            let minutes = Int(interval / 60)
+            if minutes < 60 {
+                return String(format: String(localized: "%lldm"), minutes)
+            }
+            return String(format: String(localized: "%lldh"), minutes / 60)
         }
-        // 昨天及更早给「日期 + 时刻」：设计稿的 `昨天 18:42` 就是系统相对日期格式化的结果
-        return Self.dateTimeFormatter.string(from: createdAt)
+        // 昨天保留「日期 + 时刻」：设计 6.4 的 `昨天 18:42` 就是系统相对日期格式化的结果
+        if calendar.isDateInYesterday(createdAt) {
+            return Self.dateTimeFormatter.string(from: createdAt)
+        }
+        // 更早的按设计 6.4 给「3 天前 / 上周」。卡片元信息只有 171pt 宽，
+        // `2026/8/28 13:16` 一定被截成 `202…`，读不出任何时间信息；
+        // 需要精确时刻的是详情页，那里走 absoluteTime，不受这里影响。
+        let days = calendar.dateComponents([.day],
+                                           from: calendar.startOfDay(for: createdAt),
+                                           to: calendar.startOfDay(for: reference)).day ?? 0
+        if days < 7 { return String(format: String(localized: "%lldd"), days) }
+        if days < 14 { return String(localized: "Last week") }
+        return Self.dateOnlyFormatter.string(from: createdAt)
     }
 
     var relativeTime: String { relativeTime() }
 
     /// 详情页的绝对时间：`今天 14:32`
     var absoluteTime: String { Self.dateTimeFormatter.string(from: createdAt) }
+
+    /// 两周以前的条目：只给日期不给时刻，元信息行才放得下
+    private static let dateOnlyFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .none
+        return formatter
+    }()
 
     private static let dateTimeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -190,6 +216,9 @@ final class ImageMetadataCache {
         let cache = NSCache<NSString, Entry>()
         // 一张 iPhone 截图解出来十几 MB，不封顶会在长时间滚动后被系统杀掉
         cache.countLimit = 40
+        // 光限条数不够：Mac 同步过来的 5K 截图一张解出来约 59MB，40 张就是 2GB 级，
+        // 前台应用会先被 jetsam 掉。按解码后的字节数再封一道 96MB 的顶。
+        cache.totalCostLimit = 96 * 1024 * 1024
         return cache
     }()
 
@@ -207,8 +236,14 @@ final class ImageMetadataCache {
         if let cached = cache.object(forKey: key) { return cached }
         guard let data = item.imageData, let image = UIImage(data: data) else { return nil }
         let entry = Entry(image: image, info: Info(size: image.size, format: Self.format(of: data)))
-        cache.setObject(entry, forKey: key)
+        cache.setObject(entry, forKey: key, cost: Self.decodedCost(of: image))
         return entry
+    }
+
+    /// 解码后占的字节数（宽 × 高 × scale² × 4），给 NSCache 的 totalCostLimit 用
+    private static func decodedCost(of image: UIImage) -> Int {
+        let pixels = image.size.width * image.scale * image.size.height * image.scale
+        return Int(pixels.rounded()) * 4
     }
 
     /// 图片内容的哈希在采集时就算好了；没有哈希的老条目退回 objectID 描述

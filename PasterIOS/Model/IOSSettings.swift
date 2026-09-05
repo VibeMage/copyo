@@ -8,7 +8,20 @@ enum IOSSettings {
 
     /// 三个进程共用的 suite。理论上 App Group 一定拿得到；拿不到时退回 standard，
     /// 主应用至少还能正常读写自己的设置，不至于因为一个 nil 就整个跑不起来。
-    static let defaults: UserDefaults = UserDefaults(suiteName: PasterStore.appGroupIdentifier) ?? .standard
+    ///
+    /// `-demoData` 时换成一个一次性的演示 suite 并先清空。LaunchOptions 声明「全部只影响演示状态、
+    /// 不改任何持久化设置」，而截图路径确实会写键：`-simulateQuickSave` 写 pendingQuickSaveAt、
+    /// 复制动作的 markSeen 写 lastPasteboardChangeCount。截图进程常被 `--terminate-running-process`
+    /// 中途杀掉，这些键留在共享 suite 里会让下一次**正常**启动无条件读一次剪贴板。
+    static let defaults: UserDefaults = {
+        if LaunchOptions.current.useDemoData, let demo = UserDefaults(suiteName: demoSuiteName) {
+            demo.removePersistentDomain(forName: demoSuiteName)
+            return demo
+        }
+        return UserDefaults(suiteName: PasterStore.appGroupIdentifier) ?? .standard
+    }()
+
+    private static let demoSuiteName = "\(PasterStore.appGroupIdentifier).demo"
 
     enum Key {
         static let cloudSyncEnabled = "cloudSyncEnabled"

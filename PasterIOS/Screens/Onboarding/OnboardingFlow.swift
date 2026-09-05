@@ -117,9 +117,11 @@ private struct OnboardingPageView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
+                // 中文的 05b 标题会折成两行，插图上下留白按设计原值（40 / 36）时
+                // 第三条说明行会被推出可视区（内容可滚动，但设计要求一屏看全）
                 OnboardingArtwork(kind: content.artwork)
-                    .padding(.top, 40)
-                    .padding(.bottom, 36)
+                    .padding(.top, content.rows.isEmpty ? 40 : 24)
+                    .padding(.bottom, content.rows.isEmpty ? 36 : 24)
 
                 Text(content.title)
                     .font(.system(size: 28, weight: .bold))
@@ -142,7 +144,8 @@ private struct OnboardingPageView: View {
                                           onOpenSettings: onOpenSettings)
                         }
                     }
-                    .padding(.top, 28)
+                    .padding(.top, 20)
+                    .padding(.bottom, 12)
                 }
             }
             .padding(.horizontal, 36)
@@ -214,33 +217,19 @@ private struct OnboardingRow: View {
 
 // MARK: - 插图
 
-/// 180 × 180 白卡 + 红蓝错位色条，卡上摆本页的符号（设计 3.9）
+/// 180 × 180 白卡，卡上摆本页的符号（设计 3.9 / 05a–05c）。
+///
+/// 设计稿三页的 art 只有 accent 色的符号本身，没有红蓝错位色条——
+/// 品牌的红蓝套印按 design-spec 01b 是「全 App 唯一」的那一处（历史空态的插画），
+/// 引导页再画一次就不唯一了。
 private struct OnboardingArtwork: View {
     let kind: OnboardingPageContent.Artwork
-
-    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 44, style: .continuous)
                 .fill(PasterTheme.bgCard)
                 .shadow(color: .black.opacity(0.12), radius: 20, y: 16)
-
-            ZStack {
-                Capsule()
-                    .fill(PasterTheme.Brand.red)
-                    .frame(width: 92, height: 14)
-                    .opacity(0.9)
-                    .offset(x: -3, y: -3)
-                Capsule()
-                    .fill(PasterTheme.Brand.blue)
-                    .frame(width: 92, height: 14)
-                    .opacity(0.85)
-                    .offset(x: 3, y: 3)
-                    .blendMode(colorScheme == .dark ? .screen : .multiply)
-            }
-            .compositingGroup()
-            .offset(y: -23)
 
             symbols
                 .padding(.top, 34)

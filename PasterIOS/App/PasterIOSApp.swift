@@ -26,7 +26,11 @@ struct PasterIOSApp: App {
         }
         .onChange(of: scenePhase) { _, phase in
             // 通道 A：只有回到前台才有机会读剪贴板，iOS 不给后台监听
-            if phase == .active { model.handleScenePhaseActive() }
+            if phase == .active {
+                model.handleScenePhaseActive()
+                // 通道 C 的补读：控件的 perform 可能晚于这次激活才把请求写进 App Group
+                model.retryPendingQuickSaveShortly()
+            }
         }
     }
 }

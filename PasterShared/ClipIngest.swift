@@ -51,6 +51,15 @@ public enum ClipIngest {
     ///
     /// **不开 CloudKit 镜像**：扩展进程没有推送 entitlement，SwiftData 的镜像在这里跑不起来，
     /// 硬开只会拖慢建库并留下一串报错。写进本地库的条目会在主应用下次启动挂上镜像时被同步上去。
+    ///
+    /// 关于「一个文件被两种配置轮流打开」的顾虑（评审提过）：Core Data 里那条经典陷阱的前提是
+    /// **有进程显式关掉 persistent history tracking**。SwiftData 不暴露这个开关，
+    /// 三个进程走的都是同一个 `PasterStore.makeContainer`、同一份 ModelConfiguration，
+    /// 差别只在 `cloudKitDatabase`，history 语义是一致的；用户在设置里开关 iCloud 同步
+    /// 本来就是「同一个 store 挂 / 不挂镜像」的受支持用法。
+    /// 但这条链路至今**一次都没跑通过**（构建全是 CODE_SIGNING_ALLOWED=NO，App Group
+    /// entitlement 没展开），开发者后台配好之后必须在真机上补一次
+    /// 「扩展写 → 主应用读 → CloudKit 同步到 Mac」的端到端复验。
     public static func makeContainer() throws -> ModelContainer {
         try PasterStore.makeContainer(url: PasterStore.appGroupStoreURL(), cloudKit: false)
     }

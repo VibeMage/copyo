@@ -16,8 +16,13 @@ struct HistoryCardView: View {
     var isFocused: Bool
     /// 刚保存进来的那条：从 y −12 / 透明淡入（设计 01d）
     var isHighlighted: Bool
+    /// 正被拖走：原位留一张 35% 的影子（设计 09 的 ghost 卡）
+    var isGhost: Bool = false
     /// iPad 才挂拖放，iPhone 上多一个长按手势会和上下文菜单抢
     var allowsDrag: Bool
+    /// 拖动开始 / 结束。SwiftUI 的 `.draggable` 不给回调，
+    /// 只能借拖动预览视图的 onAppear / onDisappear 判断——预览在拖起来时出现、松手后消失。
+    var onDragChanged: (Bool) -> Void = { _ in }
 
     var onCopy: () -> Void
     var onCopyPlainText: () -> Void
@@ -61,7 +66,7 @@ struct HistoryCardView: View {
             ClipDetailScreen(item: item)
                 .navigationTransition(.zoom(sourceID: item.persistentModelID, in: namespace))
         } label: {
-            ClipCard(item: item, isFocused: isFocused, isPressed: isPressed)
+            ClipCard(item: item, isFocused: isFocused, isPressed: isPressed, isGhost: isGhost)
         }
         .buttonStyle(.plain)
         // 轻点是复制不是进详情——把 tap 抢在 NavigationLink 之前处理。
@@ -70,7 +75,12 @@ struct HistoryCardView: View {
         .matchedTransitionSource(id: item.persistentModelID, in: namespace)
 
         if allowsDrag {
-            link.draggable(item.transferable)
+            link.draggable(item.transferable) {
+                ClipCard(item: item, isLifted: true)
+                    .frame(width: max(240, previewWidth))
+                    .onAppear { onDragChanged(true) }
+                    .onDisappear { onDragChanged(false) }
+            }
         } else {
             link
         }

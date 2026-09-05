@@ -56,6 +56,9 @@ enum PasterTheme {
     static let label = dynamic(light: rgb(0x000000), dark: rgb(0xFFFFFF))
     static let labelSecondary = dynamic(light: rgb(0x3C3C43, 0.6), dark: rgb(0xEBEBF5, 0.6))
     static let labelTertiary = dynamic(light: rgb(0x3C3C43, 0.3), dark: rgb(0xEBEBF5, 0.3))
+    /// 卡片正文的次级色（设计 PasterCard 的 sec2）。比 `labelSecondary` 深一档，
+    /// 富文本卡片的正文用它——元信息行才用 60% 的 `labelSecondary`。
+    static let cardBodySecondary = dynamic(light: rgb(0x3C3C43, 0.9), dark: rgb(0xEBEBF5, 0.85))
     static let fill = dynamic(light: rgb(0x767680, 0.12), dark: rgb(0x767680, 0.24))
     static let fill2 = dynamic(light: rgb(0x767680, 0.2), dark: rgb(0x767680, 0.32))
     static let separator = dynamic(light: rgb(0x3C3C43, 0.24), dark: rgb(0x545458, 0.6))

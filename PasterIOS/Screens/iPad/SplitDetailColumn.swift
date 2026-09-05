@@ -17,9 +17,12 @@ struct SplitDetailColumn: View {
         // 环境值设在 content 上、工具栏加在外面：界面自己的胶囊被压掉，这里这一个照常显示
         content
             .environment(\.pasterHidesSyncStatusPill, true)
+            // 界面据此判断自己在 regular 布局里，不再靠「自己宽 ≥ 600」猜
+            // （iPad Pro 11 竖屏的 detail 列只有约 545pt，那条判据在那台机器上恒为假）
+            .environment(\.pasterIsSplitDetail, true)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    SyncStatusPill(status: model.syncStatus.status, compact: true) {
+                    SyncStatusPill(status: model.syncStatus.status, size: .pad) {
                         model.selectSidebar(.settings)
                     }
                     .environment(\.pasterHidesSyncStatusPill, false)
@@ -36,8 +39,12 @@ struct SplitDetailColumn: View {
         case .history(let kind):
             HistoryScreen(kindFilter: kind)
         case .pinboard(let id):
-            // 侧栏存的是 PersistentIdentifier，这里换回对象；对象被删掉时回落到 Pinboard 列表
-            if let board = model.modelContext.model(for: id) as? Pinboard {
+            // 侧栏存的是 PersistentIdentifier，这里换回对象。
+            // **不能**用 `modelContext.model(for:)`：它返回的是非可选的 any PersistentModel，
+            // 已删除的对象拿到的是失效实例而不是 nil，`as? Pinboard` 一定成功，
+            // 于是 detail 列会继续渲染一个已删除的板并在读 name / items 时崩溃。
+            // 从现有集合里查，取不到才是真的没有。
+            if let board = model.pinboards().first(where: { $0.persistentModelID == id }) {
                 PinboardContentScreen(board: board)
             } else {
                 PinboardListScreen()
@@ -47,10 +54,12 @@ struct SplitDetailColumn: View {
         }
     }
 
-    /// 设置页没有可排序的内容
+    /// 只有历史用这颗排序按钮。设置页没有可排序的内容；
+    /// Pinboard 内容页在自己的标题菜单里已经有一套「排序方式」（设计 03b），
+    /// 再放一颗会出现两个互不相干的排序入口。
     private var showsSort: Bool {
-        if case .settings = selection { return false }
-        return true
+        if case .history = selection { return true }
+        return false
     }
 
     private var sortMenu: some View {

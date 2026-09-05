@@ -35,8 +35,28 @@ struct RootView: View {
             }
             // 只在 `-demoScreen share` 下出现：主应用里挂分享扩展那份 ShareView，用来核对设计 06
             .shareDemoOverlay()
+            // 「新建 Pinboard」Alert 全应用只此一处：触发点有 Pinboard 列表的 +、空态按钮、
+            // iPad 侧栏的分组头 +、卡片长按菜单里的「新建 Pinboard…」。
+            // 挂在根视图而不是各界面，两套布局才不会出现两个宿主绑同一个标志。
+            .newPinboardAlert(isPresented: $model.presentsNewPinboard) { name in
+                createPinboard(named: name)
+            }
         }
         .background(PasterTheme.bgGrouped)
+    }
+
+    // MARK: - 新建 Pinboard
+
+    /// 建板后顺手选中它：iPad 上用户点侧栏的 + 建完就想看到新板，
+    /// iPhone 上写 sidebarSelection 没有可见影响，等转屏成分栏时也落在同一处。
+    private func createPinboard(named name: String) {
+        let board = model.createPinboard(
+            named: name,
+            iconName: PinboardAppearance.defaultSymbol,
+            colorHex: PinboardAppearance.nextColorHex(existingCount: model.pinboards().count)
+        )
+        model.selectSidebar(.pinboard(board.persistentModelID))
+        model.toast.show(String(localized: "Pinboard created"), symbol: "pin.fill")
     }
 
     // MARK: - iPhone
@@ -45,8 +65,8 @@ struct RootView: View {
         @Bindable var model = model
         return TabView(selection: $model.selectedTab) {
             Tab(PasterTab.history.title, systemImage: PasterTab.history.symbol, value: PasterTab.history) {
-                // demoDetailDestination：`-demoScreen detail-*` 时把样例条目的详情页推进来（正常启动无影响）
-                NavigationStack { HistoryScreen().demoDetailDestination() }
+                // `-demoScreen detail-*` 的详情推入在 HistoryScreen 自己的 navigationDestination 里
+                NavigationStack { HistoryScreen() }
             }
             Tab(PasterTab.pinboard.title, systemImage: PasterTab.pinboard.symbol, value: PasterTab.pinboard) {
                 NavigationStack { PinboardListScreen() }

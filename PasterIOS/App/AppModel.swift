@@ -75,8 +75,9 @@ final class AppModel {
     var highlightedItemID: PersistentIdentifier?
 
     /// 「新建 Pinboard」Alert 的开关。触发点分散在多处（Pinboard 列表右上的 `+`、空态按钮、
-    /// 任意卡片长按菜单里 `PinboardPickerMenu` 的「新建 Pinboard…」），Alert 本身只由
-    /// `PinboardListScreen` 挂一处，免得同一时刻弹出两个。
+    /// iPad 侧栏 PINBOARD 分组头的 `+`、任意卡片长按菜单里 `PinboardPickerMenu` 的「新建 Pinboard…」），
+    /// Alert 本身只由 `RootView` 挂一处——两套布局各挂一个的话，
+    /// iPad 上回落到 Pinboard 列表时会有两个宿主绑同一个标志。
     var presentsNewPinboard = false
 
     // MARK: - 剪贴板横幅（通道 A 的兜底）
@@ -84,12 +85,6 @@ final class AppModel {
     var pasteBannerVisible = false
     /// 横幅上的粘贴按钮已经存下内容，原位换成「已保存」再收起
     var pasteBannerSaved = false
-
-    // MARK: - 模态
-
-    /// 「新建 Pinboard」输入框是否弹出。放在 model 上是因为触发点不止一处：
-    /// iPad 侧栏的 PINBOARD 分组头、Pinboard 列表页的 + 都要能拉起同一个 Alert。
-    var presentsNewPinboardAlert = false
 
     // MARK: - 生命周期
 
@@ -153,10 +148,28 @@ final class AppModel {
     /// 一键保存**排在演示模式的短路之前**：`-simulateQuickSave` 就是靠它在模拟器上走通整条链路，
     /// 这时数据落在内存容器里（见 StoreBootstrap），仍然不会碰真实库。
     func handleScenePhaseActive() {
+        // 账号状态与本次激活走哪条采集通道无关，放在最前面，
+        // 免得被一键保存的提前 return 顺带跳过（那次激活的胶囊会停在上一次的状态）
+        if !launch.useDemoData {
+            Task { await syncStatus.refreshAccountStatus() }
+        }
         if consumePendingQuickSave() { return }
         guard !launch.useDemoData else { return }
+        // 引导还盖在屏幕上时不做通道 A 的采集：用户还没看到「Paster 会读剪贴板」这句话，
+        // 这时弹系统「想从 X 粘贴」既突兀又可能把不相干的内容（验证码、口令）直接存进历史。
+        // 一键保存是用户明确按下的动作，所以排在这条门禁之前。
+        guard !showsOnboarding else { return }
         capture.checkOnForeground()
-        Task { await syncStatus.refreshAccountStatus() }
+    }
+
+    /// `handleScenePhaseActive` 里被一键保存接管的那次激活不会再跑通道 A，
+    /// 但控件按下与主应用激活没有定序保证：perform 可能晚于这次 active 才落地。
+    /// 场景激活后再补一次消费，避免那一按被静默丢弃（30 秒有效期由 QuickSaveCoordinator 兜底）。
+    func retryPendingQuickSaveShortly() {
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(500))
+            consumePendingQuickSave()
+        }
     }
 
     /// 通道 C：SaveClipboardIntent 在 App Group 里留了个时间戳，主应用激活时消费它。
@@ -178,12 +191,22 @@ final class AppModel {
         case .duplicate(let item):
             highlightedItemID = item.persistentModelID
             pasteBannerVisible = false
+            // 用户按了一键保存却发现内容早就在库里：高亮环可能在可视区外，
+            // 不给一句提示的话这一按看起来像是什么都没发生
+            if capture.lastOutcomeWasExplicit {
+                toast.show(String(localized: "Already saved"), symbol: "checkmark.circle.fill")
+            }
         case .needsBanner:
             pasteBannerVisible = true
             pasteBannerSaved = false
         case .failed:
             toast.show(String(localized: "Couldn't save"), symbol: "exclamationmark.triangle.fill")
-        case .unchanged, .empty:
+        case .empty:
+            // 通道 A 的例行采集不吭声；一键保存这条路必须有反馈
+            if capture.lastOutcomeWasExplicit {
+                toast.show(String(localized: "Nothing to save"), symbol: "doc.on.clipboard")
+            }
+        case .unchanged:
             break
         }
     }
@@ -325,9 +348,20 @@ final class AppModel {
     }
 
     func delete(_ board: Pinboard) {
+        let id = board.persistentModelID
+        // 默认板设置存的是名字，删掉后不清就会匹配到别的同名板
+        if let name = IOSSettings.defaultPinboardName, name == board.name {
+            IOSSettings.defaultPinboardName = nil
+        }
         // 关系是 nullify：删板不删条目，条目回到历史
         modelContext.delete(board)
         save()
+        // iPad 分栏：侧栏还选着这个板的话，detail 列会继续拿着一个已失效的模型对象重算 body，
+        // 读 name / items 时命中 SwiftData 的「model instance was invalidated」。复位到历史。
+        if sidebarSelection == .pinboard(id) {
+            sidebarSelection = .history(nil)
+            selectedTab = .history
+        }
     }
 
     // MARK: - 设置

@@ -51,13 +51,18 @@ final class SyncStatusMonitor {
 
     @ObservationIgnored private var eventObserver: NSObjectProtocol?
     @ObservationIgnored private var lastSyncedAt: Date?
+    /// 账号状态第一次查回来之前不能说「已同步」，见 init 的注释
+    @ObservationIgnored private var didResolveAccount = false
 
     init(cloudKitActive: Bool, offReason: SyncOffReason? = nil) {
         self.cloudKitActive = cloudKitActive
         if let offReason {
             status = .off(offReason)
         } else if cloudKitActive {
-            status = .synced(nil)
+            // 容器挂上镜像 ≠ 真的能同步：设备没登录 iCloud 时也照样挂得上。
+            // 账号查询是异步的（`start()` 里那次），在它回来之前先说「同步中」——
+            // 直接给「已同步」会在冷启动的几百毫秒到几秒里显示一个假状态。
+            status = .syncing
         } else {
             status = .off(.disabledInSettings)
         }
@@ -90,8 +95,15 @@ final class SyncStatusMonitor {
         let accountStatus = await CloudKitEntitlement.accountStatus()
         switch accountStatus {
         case .available:
-            if case .off(.noAccount) = status { status = .synced(lastSyncedAt) }
+            if !didResolveAccount {
+                // 第一次落到真实状态：把 init 里的「同步中」换成「已同步」
+                didResolveAccount = true
+                status = .synced(lastSyncedAt)
+            } else if case .off(.noAccount) = status {
+                status = .synced(lastSyncedAt)
+            }
         default:
+            didResolveAccount = true
             status = .off(.noAccount)
         }
     }

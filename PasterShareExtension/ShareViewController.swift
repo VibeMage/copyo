@@ -74,12 +74,23 @@ private struct ShareRootView: View {
             boards = session.boards()
         } catch {
             sessionError = error
+            // 开库失败也要立刻上屏。只把错误存着、等用户点了「保存」才弹的话，
+            // 面板看起来完全正常，Pinboard 行还会退化成「还没有 Pinboard」——
+            // 用户会以为自己真的一个板都没有。
+            loadErrorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
 
-        if let loaded = await ShareAttachmentLoader.load(from: items) {
+        switch await ShareAttachmentLoader.load(from: items) {
+        case .payload(let loaded):
             payload = loaded
-        } else {
-            loadErrorMessage = String(localized: "Paster couldn't read what you shared.")
+        case .empty:
+            if loadErrorMessage == nil {
+                loadErrorMessage = String(localized: "Paster couldn't read what you shared.")
+            }
+        case .timedOut:
+            if loadErrorMessage == nil {
+                loadErrorMessage = String(localized: "Timed out reading what you shared.")
+            }
         }
     }
 

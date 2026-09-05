@@ -28,6 +28,11 @@ final class PasteboardCapture {
     /// 每次采集的结果都会回调一次，AppModel 据此发轻提示 / 亮横幅
     var onOutcome: ((Outcome) -> Void)?
 
+    /// 正在回调的这条结果是不是**用户明确动作**触发的（一键保存、横幅上的粘贴按钮）。
+    /// 通道 A 的例行采集读到空剪贴板或重复内容时不该打扰用户；
+    /// 通道 C 必须给反馈——用户刚按下控件，屏幕上什么都不发生就等于失败。
+    private(set) var lastOutcomeWasExplicit = false
+
     init(context: ModelContext) {
         self.context = context
     }
@@ -37,7 +42,15 @@ final class PasteboardCapture {
     @discardableResult
     func checkOnForeground() -> Outcome {
         let changeCount = UIPasteboard.general.changeCount
-        guard IOSSettings.lastPasteboardChangeCount != changeCount else {
+        // 首次运行没有记账。这时**只记账不读取**——`nil != changeCount` 恒为真，
+        // 照原样放行的话安装后第一次打开就会去读剪贴板（弹系统「想从 X 粘贴」，
+        // 或在「允许」下静默把用户手上不相干的内容存进历史）。
+        // IOSSettings 里 lastPasteboardChangeCount 的注释写的就是这条契约。
+        guard let lastChangeCount = IOSSettings.lastPasteboardChangeCount else {
+            IOSSettings.lastPasteboardChangeCount = changeCount
+            return finish(.unchanged)
+        }
+        guard lastChangeCount != changeCount else {
             return finish(.unchanged)
         }
         guard IOSSettings.autoReadOnForeground else {
@@ -53,7 +66,9 @@ final class PasteboardCapture {
     /// changeCount 相同也照读一遍，用户可能就是想把手上这份再存一次。
     @discardableResult
     func captureNow() -> Outcome {
-        capture(changeCount: UIPasteboard.general.changeCount)
+        lastOutcomeWasExplicit = true
+        defer { lastOutcomeWasExplicit = false }
+        return capture(changeCount: UIPasteboard.general.changeCount)
     }
 
     // MARK: - 横幅上的系统粘贴按钮
@@ -61,6 +76,12 @@ final class PasteboardCapture {
     /// UIPasteControl 交回来的 itemProvider。走这条路不需要任何权限——
     /// 用户亲手点了系统按钮，等于一次性授权。
     func save(itemProviders: [NSItemProvider]) async -> Outcome {
+        // 无论存没存成，这一份剪贴板都算「已经处理过」：
+        // UIPasteControl 走的是 itemProvider 通道，UIPasteboard 的 changeCount 一点没变，
+        // 不记账的话下次回前台还会当成新内容再弹一次横幅（或再弹一次系统授权框）。
+        defer { markSeen() }
+        lastOutcomeWasExplicit = true
+        defer { lastOutcomeWasExplicit = false }
         for provider in itemProviders {
             if provider.canLoadObject(ofClass: UIImage.self),
                let image = await loadObject(UIImage.self, from: provider),
@@ -78,7 +99,6 @@ final class PasteboardCapture {
                 return finish(save(text: text as String, rtfData: nil))
             }
         }
-        markSeen()
         return finish(.empty)
     }
 

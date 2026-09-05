@@ -12,7 +12,34 @@ enum ShareAttachmentLoader {
     ///
     /// 网页分享通常同时给 URL 和标题（标题走 `public.plain-text`），这时链接才是用户想留的东西，
     /// 标题只当预览卡的标题行用。从备忘录之类分享纯文字时没有 URL，自然落到文本。
-    static func load(from items: [NSExtensionItem]) async -> SharePayload? {
+    /// 带超时的读取结果。宿主 App 的 `NSItemProvider` 回调不来是分享扩展的常见故障
+    /// （大附件在 iCloud 上还没下完最典型），不设上限的话面板会永远停在转圈的占位卡上。
+    enum Outcome: Sendable {
+        case payload(SharePayload)
+        case empty
+        case timedOut
+    }
+
+    /// 默认 15 秒：够慢速网络下载一张大图，又短到用户不会以为面板卡死
+    static let timeout: TimeInterval = 15
+
+    static func load(from items: [NSExtensionItem], timeout: TimeInterval = timeout) async -> Outcome {
+        await withTaskGroup(of: Outcome.self) { group in
+            group.addTask {
+                guard let payload = await extract(from: items) else { return .empty }
+                return .payload(payload)
+            }
+            group.addTask {
+                try? await Task.sleep(for: .seconds(timeout))
+                return .timedOut
+            }
+            let first = await group.next() ?? .empty
+            group.cancelAll()
+            return first
+        }
+    }
+
+    private static func extract(from items: [NSExtensionItem]) async -> SharePayload? {
         var imageProvider: NSItemProvider?
         var urlProvider: NSItemProvider?
         var textProvider: NSItemProvider?
@@ -127,7 +154,9 @@ enum ShareAttachmentLoader {
                                                              from provider: NSItemProvider) async -> T? {
         guard provider.canLoadObject(ofClass: type) else { return nil }
         return await withCheckedContinuation { continuation in
+            let once = ResumeOnce()
             provider.loadObject(ofClass: type) { object, _ in
+                guard once.claim() else { return }
                 continuation.resume(returning: object as? T)
             }
         }
@@ -136,10 +165,27 @@ enum ShareAttachmentLoader {
     private static func loadItem(from provider: NSItemProvider, type: UTType) async -> NSSecureCoding? {
         guard provider.hasItemConformingToTypeIdentifier(type.identifier) else { return nil }
         return await withCheckedContinuation { continuation in
+            let once = ResumeOnce()
             provider.loadItem(forTypeIdentifier: type.identifier) { item, _ in
+                guard once.claim() else { return }
                 continuation.resume(returning: item)
             }
         }
+    }
+}
+
+/// 只放行第一次回调。个别宿主的 `NSItemProvider` 会把 completion 发两次，
+/// `withCheckedContinuation` 被 resume 第二次是直接崩溃，不是抛错。
+private final class ResumeOnce: @unchecked Sendable {
+    private let lock = NSLock()
+    private var resumed = false
+
+    func claim() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        if resumed { return false }
+        resumed = true
+        return true
     }
 }
 

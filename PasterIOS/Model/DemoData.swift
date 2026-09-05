@@ -34,6 +34,18 @@ enum DemoData {
             item.pinboard = tokenBoard
         }
 
+        // 另外三个板也要有条目：design-spec 6.3 给的条数是 6 / 3 / 12 / 2，
+        // 全灌 0 的话 Pinboard 列表与 iPad 侧栏满屏都是 0，看不出这套设计是怎么用的
+        for (index, specs) in otherBoardSpecs(english: english).enumerated() {
+            guard boards.indices.contains(index + 1) else { continue }
+            let board = boards[index + 1]
+            for spec in specs {
+                let item = spec.makeItem(now: now)
+                context.insert(item)
+                item.pinboard = board
+            }
+        }
+
         try? context.save()
     }
 
@@ -154,6 +166,67 @@ enum DemoData {
         ]
     }
 
+    /// 「常用地址」3 条 /「命令」12 条 /「发票信息」2 条（6.3）。
+    /// 顺序与 `makeBoards` 里第 2、3、4 个板一一对应。
+    private static func otherBoardSpecs(english: Bool) -> [[Spec]] {
+        let addresses: [Spec] = english
+            ? [
+                Spec(kind: .text, text: "331 Caoxi North Rd, Tower B, 12F, Xuhui, Shanghai",
+                     age: 2 * day, source: "Maps", colorHex: "#34C759"),
+                Spec(kind: .text, text: "One Apple Park Way, Cupertino, CA 95014",
+                     age: 5 * day, source: "Safari", colorHex: "#1B8EF1"),
+                Spec(kind: .text, text: "Room 1204, 88 Century Ave, Pudong, Shanghai 200120",
+                     age: 11 * day, source: nil, colorHex: nil),
+            ]
+            : [
+                Spec(kind: .text, text: "上海市徐汇区漕溪北路 331 号中金国际广场 B 座 12 层",
+                     age: 2 * day, source: "地图", colorHex: "#34C759"),
+                Spec(kind: .text, text: "北京市朝阳区望京东路 6 号浦项中心 A 座 21 层",
+                     age: 5 * day, source: "Safari", colorHex: "#1B8EF1"),
+                Spec(kind: .text, text: "上海市浦东新区世纪大道 88 号 1204 室，200120",
+                     age: 11 * day, source: nil, colorHex: nil),
+            ]
+
+        // 命令类内容两种语言一样，只有来源 App 名要切
+        let terminal = english ? "Terminal" : "终端"
+        let commandTexts = [
+            "git rebase -i HEAD~3",
+            "git push --force-with-lease",
+            "git log --oneline --graph --decorate -20",
+            "xcodebuild -scheme Paster -configuration Release build",
+            "xcrun simctl list devices available",
+            "swift test --parallel",
+            "pnpm dlx shadcn@latest add button dialog",
+            "brew upgrade --greedy",
+            "docker compose up -d --build",
+            "rsync -avh --progress ./dist/ deploy@paster:/srv/www/",
+            "find . -name \"*.xcresult\" -mtime +7 -delete",
+            "defaults write com.apple.dock autohide-delay -float 0",
+        ]
+        let commands = commandTexts.enumerated().map { index, text in
+            Spec(kind: .text, text: text,
+                 age: TimeInterval(index + 1) * day / 2,
+                 source: index.isMultiple(of: 3) ? "VS Code" : terminal,
+                 colorHex: index.isMultiple(of: 3) ? "#0078D4" : "#48484A")
+        }
+
+        let billing: [Spec] = english
+            ? [
+                Spec(kind: .text, text: "Paster Software Ltd · VAT GB 123 4567 89",
+                     age: 6 * day, source: "Mail", colorHex: "#1B8EF1"),
+                Spec(kind: .text, text: "IBAN GB29 NWBK 6016 1331 9268 19",
+                     age: 20 * day, source: nil, colorHex: nil),
+            ]
+            : [
+                Spec(kind: .text, text: "抬头：上海帕斯特信息科技有限公司\n税号：91310115MA1K35XXXX",
+                     age: 6 * day, source: "邮件", colorHex: "#1B8EF1"),
+                Spec(kind: .text, text: "开户行：招商银行上海分行营业部\n账号：1219 0688 8810 901",
+                     age: 20 * day, source: nil, colorHex: nil),
+            ]
+
+        return [addresses, commands, billing]
+    }
+
     // MARK: - 资源
 
     /// 富文本条目要有真的 RTF，详情页的富文本渲染路径才走得通。
@@ -177,22 +250,31 @@ enum DemoData {
 
     /// 样例截图。尺寸照 design-spec 的 `1284 × 2778 · PNG`，这样元信息行不用作假。
     /// 只画一次并缓存：`-demoData` 里十条卡片共用同一张。
+    ///
+    /// 渐变照设计 PasterCard 的 `imgBg` 两套值取（浅 `#D9E6F5 → #F3E7D6 60% → #E6DCEF`、
+    /// 深 `#2B3646 → #3D3630 60% → #352D3F`），按 `-demoTheme` 选；
+    /// 原来那套紫橙深色渐变在浅色截图里明显偏暗，两套值都对不上设计。
     private static let sampleImagePNG: Data = {
+        let dark = LaunchOptions.current.demoColorScheme == .dark
+        let hexes = dark
+            ? ["#2B3646", "#3D3630", "#352D3F"]
+            : ["#D9E6F5", "#F3E7D6", "#E6DCEF"]
+        let colors = hexes.compactMap { PasterTheme.uiColor(hexString: $0)?.cgColor }
+
         let size = CGSize(width: 1284, height: 2778)
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
         format.opaque = true
         let renderer = UIGraphicsImageRenderer(size: size, format: format)
         let image = renderer.image { context in
-            let colors = [UIColor(red: 0.05, green: 0.09, blue: 0.20, alpha: 1).cgColor,
-                          UIColor(red: 0.31, green: 0.20, blue: 0.55, alpha: 1).cgColor,
-                          UIColor(red: 0.95, green: 0.45, blue: 0.35, alpha: 1).cgColor]
-            guard let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
+            guard colors.count == hexes.count,
+                  let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
                                             colors: colors as CFArray,
-                                            locations: [0, 0.55, 1]) else { return }
+                                            locations: [0, 0.6, 1]) else { return }
+            // 设计写的是 160deg：基本竖直、略微向右下偏
             context.cgContext.drawLinearGradient(gradient,
                                                  start: .zero,
-                                                 end: CGPoint(x: size.width, y: size.height),
+                                                 end: CGPoint(x: size.width * 0.35, y: size.height),
                                                  options: [])
         }
         return image.pngData() ?? Data()

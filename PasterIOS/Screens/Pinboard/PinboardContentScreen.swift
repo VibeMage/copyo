@@ -18,6 +18,10 @@ struct PinboardContentScreen: View {
     @State private var showsRename = false
     @State private var showsNewPinboard = false
     @State private var showsDeleteConfirmation = false
+    /// 删除流程一旦开始就不再从模型读任何值：`dismiss()` 只是发起 pop，
+    /// 返回动画的两三百毫秒里视图还在树上，body 会重算，而那时对象可能已经失效。
+    @State private var isDeleting = false
+    @State private var deletingName = ""
 
     init(board: Pinboard) {
         self.board = board
@@ -28,7 +32,13 @@ struct PinboardContentScreen: View {
     }
 
     private var items: [ClipItem] {
-        contentSort.sort(board.items ?? [])
+        guard !isDeleting else { return [] }
+        return contentSort.sort(board.items ?? [])
+    }
+
+    /// 标题与确认框都走它：删除中读快照，不碰模型
+    private var displayName: String {
+        isDeleting ? deletingName : board.name
     }
 
     /// 设计 03b 的副行：`6 条 · 按固定时间`
@@ -61,15 +71,20 @@ struct PinboardContentScreen: View {
             .padding(.bottom, PasterTheme.Metrics.tabBarHeight + PasterTheme.Metrics.tabBarBottomInset)
         }
         .background(PasterTheme.bgGrouped)
-        .navigationTitle(board.name)
+        .navigationTitle(displayName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarContent }
         // 设计 03b 的标题带 chevron、点开就是这个菜单。用系统的 title menu 而不是自绘 principal item：
         // principal item 会把返回按钮的「Pinboard」标签挤掉，只剩一个箭头。
         .toolbarTitleMenu { boardMenu }
         .overlay(alignment: .topTrailing) { demoMenuPreview }
-        .renamePinboardAlert(isPresented: $showsRename, currentName: board.name) { newName in
+        .renamePinboardAlert(isPresented: $showsRename, currentName: displayName) { newName in
+            // 默认板设置按名字匹配，改名不跟着迁移的话这个板就悄悄不再是默认板了
+            if IOSSettings.defaultPinboardName == board.name {
+                IOSSettings.defaultPinboardName = newName
+            }
             board.name = newName
+            try? model.modelContext.save()
             model.toast.show(String(localized: "Renamed"), symbol: "pencil")
         }
         .newPinboardAlert(isPresented: $showsNewPinboard) { name in
@@ -78,17 +93,27 @@ struct PinboardContentScreen: View {
                                  colorHex: PinboardAppearance.nextColorHex(existingCount: model.pinboards().count))
             model.toast.show(String(localized: "Pinboard created"), symbol: "pin.fill")
         }
-        .alert(String(format: String(localized: "Delete “%@”?"), board.name),
+        .alert(String(format: String(localized: "Delete “%@”?"), displayName),
                isPresented: $showsDeleteConfirmation) {
             Button(String(localized: "Cancel"), role: .cancel) { }
-            Button(String(localized: "Delete"), role: .destructive) {
-                // 先退出再删：留在已经不存在的板上会拿到空对象
-                dismiss()
-                model.delete(board)
-                model.toast.show(String(localized: "Pinboard deleted"), symbol: "trash.fill")
-            }
+            Button(String(localized: "Delete"), role: .destructive) { deleteBoard() }
         } message: {
             Text(String(localized: "Its clips go back to History and are not deleted."))
+        }
+    }
+
+    /// 与 `ClipDetailScreen` 的删除对齐：先退出、等返回动画走完再删。
+    /// 同一个 runloop 里 `dismiss()` 之后立刻删，视图还在屏幕上就会读到已失效的模型；
+    /// iPad 分栏里 `dismiss()` 更是空操作，只能靠 `isDeleting` 把读取全部挡掉
+    /// （detail 列的复位由 `AppModel.delete(_ board:)` 负责）。
+    private func deleteBoard() {
+        deletingName = board.name
+        isDeleting = true
+        dismiss()
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(320))
+            model.delete(board)
+            model.toast.show(String(localized: "Pinboard deleted"), symbol: "trash.fill")
         }
     }
 
@@ -212,13 +237,14 @@ struct PinboardContentScreen: View {
         }
     }
 
+    // 两个 Binding 的 getter 会随菜单一起重算，删除流程里同样不能碰模型
     private var iconBinding: Binding<String> {
-        Binding(get: { PinboardAppearance.symbol(for: board) },
+        Binding(get: { isDeleting ? PinboardAppearance.defaultSymbol : PinboardAppearance.symbol(for: board) },
                 set: { board.iconName = $0 })
     }
 
     private var colorBinding: Binding<String> {
-        Binding(get: { PinboardAppearance.colorHex(for: board) },
+        Binding(get: { isDeleting ? PinboardAppearance.palette[0] : PinboardAppearance.colorHex(for: board) },
                 set: { board.colorHex = $0 })
     }
 
@@ -228,11 +254,13 @@ struct PinboardContentScreen: View {
     /// 所以带 `-demoMenu` 启动时按设计 03b 的样式画一张静态菜单，只为截图核对。
     @ViewBuilder
     private var demoMenuPreview: some View {
+        #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-demoMenu") {
             PinboardMenuPreview(board: board)
                 .padding(.trailing, 16)
                 .padding(.top, 6)
         }
+        #endif
     }
 }
 
@@ -246,6 +274,7 @@ enum PinboardMenuLabels {
     static var deleteBoard: String { String(localized: "Delete Pinboard") }
 }
 
+#if DEBUG
 /// 设计 3.11 的上下文菜单外观（宽 230、radius 14、行高 44、破坏项前 8pt 分隔块）。
 /// 只在 `-demoMenu` 截图时出现，正常运行永远走系统 `Menu`。
 private struct PinboardMenuPreview: View {
@@ -299,3 +328,4 @@ private struct PinboardMenuPreview: View {
         .frame(height: 44)
     }
 }
+#endif

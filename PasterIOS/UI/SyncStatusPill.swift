@@ -2,8 +2,43 @@ import SwiftUI
 
 /// 设计 3.6：右上角的 iCloud 状态胶囊。未同步态可点，跳到设置。
 struct SyncStatusPill: View {
+
+    /// 设计 3.6 给了三档尺寸：iPhone 40 / iPad 36 / Slide Over 34。
+    /// 原来只有一个 `compact: Bool`，iPhone 与 iPad 都传 true，两处用的都是最小的 Slide Over 档。
+    enum Size {
+        case phone
+        case pad
+        case slideOver
+
+        var height: CGFloat {
+            switch self {
+            case .phone: PasterTheme.Metrics.syncPillHeight
+            case .pad: 36
+            case .slideOver: 34
+            }
+        }
+
+        var symbolSize: CGFloat {
+            switch self {
+            case .phone: 18
+            case .pad: 17
+            case .slideOver: 16
+            }
+        }
+
+        var fontSize: CGFloat {
+            switch self {
+            case .phone, .pad: 13
+            case .slideOver: 12
+            }
+        }
+
+        var leading: CGFloat { self == .phone ? 10 : 8 }
+        var trailing: CGFloat { self == .phone ? 12 : 10 }
+    }
+
     let status: SyncStatus
-    var compact: Bool = false
+    var size: Size = .phone
     var onTapWhenOff: (() -> Void)?
 
     @State private var spinning = false
@@ -34,14 +69,14 @@ struct SyncStatusPill: View {
         Button {
             if status.isOff { onTapWhenOff?() }
         } label: {
-            GlassPill(height: compact ? 34 : PasterTheme.Metrics.syncPillHeight,
-                      leading: compact ? 8 : 10,
-                      trailing: compact ? 10 : 12) {
+            GlassPill(height: size.height,
+                      leading: size.leading,
+                      trailing: size.trailing) {
                 Image(systemName: symbol)
-                    .font(.system(size: compact ? 16 : 18))
+                    .font(.system(size: size.symbolSize))
                     .rotationEffect(.degrees(spinning ? 360 : 0))
                 Text(title)
-                    .font(.system(size: compact ? 12 : 13, weight: .medium))
+                    .font(.system(size: size.fontSize, weight: .medium))
             }
             .foregroundStyle(PasterTheme.labelSecondary)
         }

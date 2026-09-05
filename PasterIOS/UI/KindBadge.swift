@@ -17,6 +17,10 @@ struct KindBadge: View {
         HStack(spacing: 3) {
             Image(systemName: KindPresentation.symbol(kind))
                 .font(.system(size: fontSize, weight: .semibold))
+                // textformat / bold / italic 这一族符号带 zh / ja / ko 本地化变体，
+                // 跟随视图 locale 会把富文本角标画成「格式」两个汉字。角标图形按设计固定拉丁字形，
+                // 只作用于这一个 Image，右边的 Text 仍走当前语言。
+                .environment(\.locale, Locale(identifier: "en"))
             Text(KindPresentation.label(kind))
                 .font(.system(size: fontSize, weight: .semibold))
         }

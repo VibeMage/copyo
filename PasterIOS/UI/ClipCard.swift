@@ -52,6 +52,10 @@ struct ClipCard: View {
                 .font(PasterTheme.Fonts.meta)
                 .foregroundStyle(PasterTheme.labelSecondary)
                 .lineLimit(1)
+                // 设计稿按 440pt 画布画的列宽 194，真机 iPhone 只有 171——
+                // 英文的 `This iPhone · now` 在原字号下放不下，宁可缩到 9.4pt 也要把时间显示全
+                .minimumScaleFactor(0.85)
+                .allowsTightening(true)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if item.pinboard != nil {
@@ -76,8 +80,12 @@ struct ClipCard: View {
         }
     }
 
+    /// 卡片最多显示 6 行，没必要把一份十万字的剪贴板整个交给 Text 去测量。
+    /// 600 字远超 6 行能显示的量，截断在视觉上不可见。
+    private static let bodyRenderLimit = 600
+
     private var textContent: some View {
-        Text(item.plainText ?? "")
+        Text(String((item.plainText ?? "").prefix(Self.bodyRenderLimit)))
             .font(item.isMono ? PasterTheme.Fonts.cardMono(dense: dense) : PasterTheme.Fonts.cardBody(dense: dense))
             .foregroundStyle(PasterTheme.label)
             .lineSpacing(PasterTheme.cardLineSpacing(dense: dense))
@@ -99,7 +107,8 @@ struct ClipCard: View {
             if !remainder.isEmpty {
                 Text(remainder)
                     .font(.system(size: dense ? 12 : 14))
-                    .foregroundStyle(PasterTheme.labelSecondary)
+                    // 富文本正文用专用的 sec2（比元信息行的 label.secondary 深一档），见设计 PasterCard sec2
+                    .foregroundStyle(PasterTheme.cardBodySecondary)
                     .lineSpacing(PasterTheme.cardLineSpacing(dense: dense))
                     .lineLimit(max(1, lineLimit - 2))
             }
@@ -249,7 +258,8 @@ extension ClipCard {
             let lines = min(dense ? 2 : 3, max(1, item.displayTitle.count / charsPerLine + 1))
             contentHeight = CGFloat(lines) * lineHeight + 4 + 16
         case .text, .richText:
-            let text = item.plainText ?? ""
+            // 同样只看前 600 字：估高只要相对大小对就够，全文 split + count 会在每次布局重跑
+            let text = String((item.plainText ?? "").prefix(bodyRenderLimit))
             let hardLines = text.split(separator: "\n", omittingEmptySubsequences: false).count
             let wrapped = max(hardLines, text.count / charsPerLine + 1)
             contentHeight = CGFloat(min(maxLines, max(1, wrapped))) * lineHeight

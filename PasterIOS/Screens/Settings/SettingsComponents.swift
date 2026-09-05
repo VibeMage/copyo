@@ -10,7 +10,9 @@ enum SettingsTint {
     static let question = Color(uiColor: PasterTheme.rgb(0xFF9F0A))
     static let bolt = Color(uiColor: PasterTheme.rgb(0xFF2D55))
     static let clipboard = Color(uiColor: PasterTheme.rgb(0x8E8E93))
-    static let autoRead = Color(uiColor: PasterTheme.rgb(0x5856D6))
+    /// 「自动读取剪贴板」是设计 04 里没有的一行（04e 的「Paster 键盘」留给 Phase 2）。
+    /// 原来借用了键盘那格的 #5856D6，会跟 04 的图标序列撞色；换成不在序列里的青色。
+    static let autoRead = Color(uiColor: PasterTheme.rgb(0x30B0C7))
     static let clock = Color(uiColor: PasterTheme.rgb(0x34C759))
     static let code = Color(uiColor: PasterTheme.rgb(0x48484A))
     static let hand = Color(uiColor: PasterTheme.rgb(0x0A84FF))
@@ -30,7 +32,9 @@ struct SettingsIconTile: View {
             .frame(width: 30, height: 30)
             .overlay {
                 Image(systemName: symbol)
-                    .font(.system(size: 15, weight: .semibold))
+                    // 设计 3.8 的砖内图标是 18pt。SF Symbol 的 point size 与设计稿的图标框不是
+                    // 一一对应（符号自带留白），实拍下来 17 与设计的留白最接近。
+                    .font(.system(size: 17, weight: .semibold))
                     // 分层配色会把砖上的白图标画成半透明，设计要的是纯白
                     .symbolRenderingMode(.monochrome)
                     .foregroundStyle(.white)

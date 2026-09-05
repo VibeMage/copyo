@@ -10,7 +10,8 @@ enum ShareKindPresentation {
     static func label(_ kind: ClipKind) -> String {
         switch kind {
         case .text: String(localized: "Text")
-        case .richText: String(localized: "Rich Text")
+        // 设计 3.2 的英文角标是 `Rich`，与主应用的 KindPresentation 保持同一套文案
+        case .richText: String(localized: "Rich")
         case .link: String(localized: "Link")
         case .color: String(localized: "Color")
         case .image: String(localized: "Image")
@@ -39,6 +40,9 @@ struct ShareKindBadge: View {
         HStack(spacing: 3) {
             Image(systemName: ShareKindPresentation.symbol(kind))
                 .font(.system(size: 11, weight: .semibold))
+                // 与主应用 KindBadge 同一处理：textformat 带中日韩本地化变体，
+                // 不固定拉丁 locale 的话富文本角标会渲染成「格式」字形
+                .environment(\.locale, Locale(identifier: "en"))
             Text(ShareKindPresentation.label(kind))
                 .font(.system(size: 11, weight: .semibold))
         }
@@ -195,9 +199,16 @@ extension SharePayload {
         switch self {
         case .text(let string, let rtf):
             if kind == .color { return String(localized: "Color") }
+            // 英文单数要另给一个键，否则 1 个字符会显示成「1 characters」。
+            // 口径与 ClipDetailInfoGroup 的字数行一致（中文两条译文相同）。
             let count = string.count
-            return rtf == nil
-                ? String(localized: "\(count) characters · Plain text")
+            if rtf == nil {
+                return count == 1
+                    ? String(localized: "1 character · Plain text")
+                    : String(localized: "\(count) characters · Plain text")
+            }
+            return count == 1
+                ? String(localized: "1 character · Rich text")
                 : String(localized: "\(count) characters · Rich text")
         case .link:
             return String(localized: "Link")

@@ -35,10 +35,12 @@ struct PasteBanner: View {
                 PasteControlButton(onPaste: onPaste)
                     .frame(width: 92, height: 34)
                 Button(action: onDismiss) {
+                    // 设计 3.5：28 × 28 的 fill 圆底 + 18pt 的 ×，不是一个裸叉
                     Image(systemName: "xmark")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(PasterTheme.labelSecondary)
                         .frame(width: 28, height: 28)
+                        .background(PasterTheme.fill, in: Circle())
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -48,6 +50,8 @@ struct PasteBanner: View {
         .padding(.vertical, 12)
         .padding(.horizontal, 14)
         .background(PasterTheme.bgCard, in: RoundedRectangle(cornerRadius: PasterTheme.Radius.banner, style: .continuous))
+        // 设计 3.5 的 `0 1px 3px rgba(0,0,0,.08)`：白横幅贴在浅灰背景上，没有投影就浮不起来
+        .shadow(color: .black.opacity(0.08), radius: 1.5, y: 1)
         .overlay(
             RoundedRectangle(cornerRadius: PasterTheme.Radius.banner, style: .continuous)
                 .strokeBorder(PasterTheme.separator.opacity(0.5), lineWidth: 0.5)

@@ -52,7 +52,9 @@ struct ClipDetailActionBar: View {
         .padding(.horizontal, 8)
         .frame(height: PasterTheme.Metrics.tabBarHeight)
         .pasterGlass(in: Capsule())
-        .padding(.bottom, 4)
+        // 设计 3.13：工具栏底距 26，与标签栏齐平。外层是 safeAreaInset，
+        // 底部安全区已经让出 34pt，所以这里要反向补 8pt 才落在 26。
+        .padding(.bottom, -8)
     }
 
     private func iconButton(symbol: String,

@@ -157,10 +157,14 @@ struct SettingsScreen: View {
             Button {
                 route = .allowPaste
             } label: {
+                // 设计 04 这一格的右值是橙色的「询问」。系统不提供读取「从其他 App 粘贴」
+                // 当前值的 API（任何探测都会弹窗），所以不能照抄那个值——那是在假装知道状态。
+                // 折中：文案改成「去系统设置里定」，但保住设计的橙色语义（这一项需要用户处理）。
                 SettingsRowLabel(symbol: "doc.on.clipboard.fill",
                                  color: SettingsTint.clipboard,
                                  title: String(localized: "Allow Paste from Other Apps"),
-                                 detail: String(localized: "Go to Settings"),
+                                 detail: String(localized: "In iOS Settings"),
+                                 detailColor: PasterTheme.warning,
                                  showsDisclosure: true)
             }
             .settingsRow()

@@ -1,6 +1,4 @@
 import CoreTransferable
-// ClipKind 还没标 Sendable（PasterCore 属于另一位代理），
-// 这里的载荷本身是值类型且只读，用 @preconcurrency 把噪音挡掉
 import PasterCore
 import SwiftUI
 import UniformTypeIdentifiers
@@ -18,28 +16,25 @@ struct ClipTransferable: Transferable, Sendable {
     var imagePNG: Data?
     var suggestedName: String
 
-    enum ExportError: Error {
-        /// 这条条目没有这种表示（比如给文本条目要 PNG）
-        case unavailable
-    }
-
     static var transferRepresentation: some TransferRepresentation {
-        // 顺序即优先级：接收方会挑它支持的第一种
+        // 顺序即优先级：接收方会挑它支持的第一种。
+        // 「这条条目没有这种表示」一律走 exportingCondition 关掉整个表示，不要在导出闭包里抛错——
+        // 抛错也能工作，但每次导出都会在日志里刷一条 CoreTransferable Fault。
         DataRepresentation(exportedContentType: .png) { payload in
-            guard let data = payload.imagePNG else { throw ExportError.unavailable }
-            return data
+            payload.imagePNG ?? Data()
         }
         .suggestedFileName { "\($0.suggestedName).png" }
+        .exportingCondition { $0.imagePNG != nil }
 
         DataRepresentation(exportedContentType: .rtf) { payload in
-            guard let data = payload.rtf else { throw ExportError.unavailable }
-            return data
+            payload.rtf ?? Data()
         }
+        .exportingCondition { $0.rtf != nil }
 
         ProxyRepresentation { (payload: ClipTransferable) -> URL in
-            guard let url = payload.url else { throw ExportError.unavailable }
-            return url
+            payload.url ?? URL(filePath: "/")
         }
+        .exportingCondition { $0.url != nil }
 
         ProxyRepresentation(exporting: \.text)
     }

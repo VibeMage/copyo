@@ -60,9 +60,11 @@ enum DemoRoute: String, CaseIterable {
     case historyMenu = "history-menu"
     case historySearch = "history-search"
     case detailText = "detail-text"
+    case detailRich = "detail-rich"
     case detailColor = "detail-color"
     case detailImage = "detail-image"
     case detailLink = "detail-link"
+    case detailFile = "detail-file"
     case pinboards
     case pinboardContent = "pinboard-content"
     case pinboardNew = "pinboard-new"
@@ -80,7 +82,7 @@ enum DemoRoute: String, CaseIterable {
     var tab: PasterTab {
         switch self {
         case .history, .historyEmpty, .historyBanner, .historySaved, .historyMenu, .historySearch,
-             .detailText, .detailColor, .detailImage, .detailLink, .share:
+             .detailText, .detailRich, .detailColor, .detailImage, .detailLink, .detailFile, .share:
             return .history
         case .pinboards, .pinboardContent, .pinboardNew:
             return .pinboard
