@@ -23,3 +23,15 @@ extension Color {
         self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
     }
 }
+
+/// 十六进制颜色串的生成侧，与上面 `Color(hexString:)` 的解析格式配套。
+/// 放在 PasterCore 是因为 Mac 端算出来的来源色要以字符串形式同步给 iOS，两端必须用同一种写法。
+public enum HexColor {
+    /// 把 0...1 的 sRGB 分量格式化成 "#RRGGBB"（大写，与设计稿里的写法一致）
+    public static func string(red: Double, green: Double, blue: Double) -> String {
+        func channel(_ value: Double) -> Int {
+            Int((min(max(value, 0), 1) * 255).rounded())
+        }
+        return String(format: "#%02X%02X%02X", channel(red), channel(green), channel(blue))
+    }
+}

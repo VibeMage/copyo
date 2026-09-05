@@ -22,6 +22,9 @@ public final class ClipItem {
     public var filePaths: [String] = []
     public var sourceAppBundleID: String?
     public var sourceAppName: String?
+    /// 来源 App 的主题色 "#RRGGBB"。只有 Mac 端算得出（沙盒里的 iOS 拿不到别的 App 的图标），
+    /// 采集时算好写进来，iOS 直接用它给卡片淡染；本机保存的条目为 nil。
+    public var sourceColorHex: String?
     public var charCount: Int = 0
     public var pinboard: Pinboard?
 
@@ -36,7 +39,8 @@ public final class ClipItem {
                 imageData: Data? = nil,
                 filePaths: [String] = [],
                 sourceAppBundleID: String? = nil,
-                sourceAppName: String? = nil) {
+                sourceAppName: String? = nil,
+                sourceColorHex: String? = nil) {
         self.createdAt = Date()
         self.kindRaw = kind.rawValue
         self.plainText = plainText
@@ -45,6 +49,7 @@ public final class ClipItem {
         self.filePaths = filePaths
         self.sourceAppBundleID = sourceAppBundleID
         self.sourceAppName = sourceAppName
+        self.sourceColorHex = sourceColorHex
         self.charCount = plainText?.count ?? 0
     }
 }

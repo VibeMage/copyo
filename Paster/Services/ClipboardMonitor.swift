@@ -71,6 +71,9 @@ final class ClipboardMonitor {
     private func capture(from pb: NSPasteboard, sourceApp: NSRunningApplication?) {
         let bundleID = sourceApp?.bundleIdentifier
         let appName = sourceApp?.localizedName
+        // 来源色在采集这一刻算好存进条目：iOS 的沙盒里取不到别的 App 的图标，
+        // 卡片的淡染色只能靠 Mac 端同步过去的这个值
+        let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
 
         if let urls = pb.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL],
            !urls.isEmpty {
@@ -79,7 +82,8 @@ final class ClipboardMonitor {
                                         plainText: paths.joined(separator: "\n"),
                                         filePaths: paths,
                                         sourceAppBundleID: bundleID,
-                                        sourceAppName: appName))
+                                        sourceAppName: appName,
+                                        sourceColorHex: colorHex))
             return
         }
 
@@ -92,35 +96,39 @@ final class ClipboardMonitor {
                                         plainText: text,
                                         rtfData: rtf,
                                         sourceAppBundleID: bundleID,
-                                        sourceAppName: appName))
+                                        sourceAppName: appName,
+                                        sourceColorHex: colorHex))
             return
         }
 
         // 图片：优先直接取现成的 PNG 数据；只有 TIFF 时在后台线程转码，避免阻塞主线程
         if let png = pb.data(forType: .png) {
-            insertImage(png, bundleID: bundleID, appName: appName)
+            insertImage(png, bundleID: bundleID, appName: appName, colorHex: colorHex)
         } else if let tiff = pb.data(forType: .tiff) ?? NSImage(pasteboard: pb)?.tiffRepresentation {
             // monitor 与应用同生命周期，强捕获 self 安全
             Task.detached(priority: .utility) {
                 guard let rep = NSBitmapImageRep(data: tiff),
                       let png = rep.representation(using: .png, properties: [:]) else { return }
                 await MainActor.run {
-                    self.insertImage(png, bundleID: bundleID, appName: appName)
+                    self.insertImage(png, bundleID: bundleID, appName: appName, colorHex: colorHex)
                 }
             }
         }
     }
 
-    private func insertImage(_ png: Data, bundleID: String?, appName: String?) {
+    private func insertImage(_ png: Data, bundleID: String?, appName: String?, colorHex: String?) {
         let item = ClipItem(kind: .image,
                             imageData: png,
                             sourceAppBundleID: bundleID,
-                            sourceAppName: appName)
+                            sourceAppName: appName,
+                            sourceColorHex: colorHex)
         item.imageHash = ContentHash.sha256(png)
         insertDeduplicated(item)
     }
 
-    /// 与最近记录去重：内容相同则把旧条目提到最前，而不是重复插入
+    /// 与最近记录去重：内容相同则把旧条目提到最前，而不是重复插入。
+    /// 同一套规则在 PasterCore 的 `ClipSaver` 里另有一份跨平台实现（iOS 主应用与扩展在用），
+    /// 这里为避免 Mac 版回归没有改成调用它——改动去重条件或上限策略时两处都要改。
     private func insertDeduplicated(_ newItem: ClipItem) {
         var descriptor = FetchDescriptor<ClipItem>(sortBy: [SortDescriptor(\.createdAt, order: .reverse)])
         descriptor.fetchLimit = 50
@@ -142,6 +150,7 @@ final class ClipboardMonitor {
             duplicate.createdAt = Date()
             duplicate.sourceAppBundleID = newItem.sourceAppBundleID
             duplicate.sourceAppName = newItem.sourceAppName
+            duplicate.sourceColorHex = newItem.sourceColorHex
             // 同一文本这次可能带来不同的富文本格式（或不再有），同步最新表示
             if newItem.kind != .image && newItem.kind != .file {
                 duplicate.rtfData = newItem.rtfData
