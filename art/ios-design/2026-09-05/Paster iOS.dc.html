@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><style>body{margin:0;background:#ecebe7;font-family:-apple-system,"SF Pro","PingFang SC",system-ui,sans-serif}a{color:#0A84FF}a:hover{color:#0066CC}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}.dv-next{margin:22px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}.dv-note{max-width:760px;margin:0 0 20px;font:13px/1.55 system-ui,sans-serif;color:rgba(0,0,0,.7)}.dv-note b{color:#1a1a1a}</style></helmet>
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">历史主屏 · 三个方向（双列瀑布流，差异在色带处理与密度）</span></div>
+<p class="dv-note"><b>共同点：</b>iOS 26 大标题 + Liquid Glass 浮动标签栏；类型筛选胶囊；卡片圆角 12；来源色按真实 App 色由 Mac 端同步，本机条目中性灰；轻点复制、长按菜单、左滑删除右滑固定。示例内容为中英混合日常内容。三个方向只在「色带怎么用」和「一屏放多少」上不同。</p>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a"><div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>套印 · Mac 卡片直译：实心色带 + 白字，中等密度，搜索栏在标题下</div><div class="dv-card" style="padding:24px;background:#e4e3df"><div style="display:flex;gap:24px">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ pw }}" height="{{ ph }}" hint-size="440px,956px">
+<div style="position:relative;height:956px;display:flex;flex-direction:column;overflow:hidden">
+<div style="padding:62px 20px 0">
+<div style="display:flex;justify-content:flex-end;align-items:center;height:44px"><div style="height:40px;padding:0 12px;border-radius:20px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.7);backdrop-filter:blur(12px) saturate(180%);box-shadow:0 1px 3px rgba(0,0,0,.06),inset 0 0 0 .5px rgba(0,0,0,.06);font-size:13px;font-weight:500;color:rgba(60,60,67,.7)">{{ cloudL }}已同步</div></div>
+<div style="font-size:34px;font-weight:700;line-height:41px;letter-spacing:.4px;color:#000;margin-top:4px">历史</div>
+<div style="margin-top:10px;height:36px;border-radius:18px;background:rgba(118,118,128,.12);display:flex;align-items:center;gap:6px;padding:0 10px;color:rgba(60,60,67,.6);font-size:17px">{{ magL }}搜索历史</div>
+<div style="display:flex;gap:8px;margin-top:12px;overflow:hidden"><span style="height:32px;padding:0 14px;border-radius:16px;background:#0A84FF;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center">全部</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.12);color:#000;font-size:14px;font-weight:500;display:flex;align-items:center">文本</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.12);color:#000;font-size:14px;font-weight:500;display:flex;align-items:center">链接</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.12);color:#000;font-size:14px;font-weight:500;display:flex;align-items:center">图片</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.12);color:#000;font-size:14px;font-weight:500;display:flex;align-items:center">颜色</span></div>
+</div>
+<div style="flex:1;overflow:hidden;padding:14px 20px 0"><div style="column-count:2;column-gap:10px">
+<sc-for list="{{ items }}" as="it" hint-placeholder-count="6">
+<div style="break-inside:avoid;margin:0 0 10px;border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.05)">
+<div style="display:flex;align-items:center;gap:6px;height:26px;padding:0 6px 0 5px;background:{{ it.color }}">
+<span style="display:flex;align-items:center;gap:3px;height:18px;padding:0 6px 0 5px;border-radius:9px;background:{{ it.badgeBg }};color:{{ it.onBand }};font-size:11px;font-weight:600;white-space:nowrap">{{ it.glyphB }}{{ it.kindLabel }}</span>
+<span style="flex:1;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ it.onBand }}">{{ it.source }}</span>
+<span style="font-size:11px;white-space:nowrap;opacity:.8;color:{{ it.onBand }}">{{ it.time }}</span>
+</div>
+<div style="padding:10px">
+<sc-if value="{{ it.isText }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;line-height:18px;color:#000;display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isMono }}" hint-placeholder-val="{{ false }}"><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:12px;line-height:17px;color:#000;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isRich }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;line-height:18px;color:#000"><div style="font-weight:700">{{ it.title }}</div><div style="white-space:pre-line;color:rgba(60,60,67,.9)">{{ it.text }}</div></div></sc-if>
+<sc-if value="{{ it.isLink }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;color:rgba(60,60,67,.6)">{{ it.domain }}</div><div style="font-size:13px;line-height:18px;font-weight:600;color:#000;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ it.title }}</div><div style="font-size:11px;color:#0A84FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.text }}</div></div></sc-if>
+<sc-if value="{{ it.isColor }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:8px;background:{{ it.hex }}"></div><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:13px;font-weight:600;color:#000">{{ it.hex }}</div></div></sc-if>
+<sc-if value="{{ it.isImage }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:8px"><div style="aspect-ratio:9/16;max-height:150px;border-radius:8px;background:linear-gradient(160deg,#d9e6f5,#f3e7d6 60%,#e6dcef);position:relative;overflow:hidden"><div style="position:absolute;left:10px;right:10px;top:12px;height:8px;border-radius:4px;background:rgba(0,0,0,.08)"></div><div style="position:absolute;left:10px;right:40px;top:28px;height:8px;border-radius:4px;background:rgba(0,0,0,.08)"></div><div style="position:absolute;left:10px;right:10px;top:50px;bottom:12px;border-radius:6px;background:rgba(255,255,255,.55)"></div></div><div style="font-size:11px;color:rgba(60,60,67,.6)">{{ it.meta }}</div></div></sc-if>
+<sc-if value="{{ it.isFile }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:40px;border-radius:5px;background:rgba(118,118,128,.12);display:flex;align-items:center;justify-content:center">{{ it.glyphC }}</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.title }}</div><div style="margin-top:3px;display:inline-flex;align-items:center;height:16px;padding:0 6px;border-radius:4px;background:rgba(118,118,128,.14);font-size:10px;font-weight:600;color:rgba(60,60,67,.7)">仅 Mac</div></div></div></sc-if>
+</div></div>
+</sc-for>
+</div></div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:140px;background:linear-gradient(rgba(242,242,247,0),rgba(242,242,247,.9) 60%);pointer-events:none"></div>
+<div style="position:absolute;left:0;right:0;bottom:26px;display:flex;justify-content:center;z-index:30"><div style="display:flex;align-items:center;height:64px;padding:0 6px;border-radius:32px;background:rgba(255,255,255,.72);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 1px 3px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.08),inset 0 0 0 .5px rgba(0,0,0,.06)"><div style="width:92px;height:52px;border-radius:26px;background:rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#0A84FF;font-size:10px;font-weight:600">{{ tabClockOn }}历史</div><div style="width:92px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(60,60,67,.6);font-size:10px;font-weight:500">{{ tabPinL }}Pinboard</div><div style="width:92px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(60,60,67,.6);font-size:10px;font-weight:500">{{ tabGearL }}设置</div></div></div>
+</div>
+</x-import>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ pw }}" height="{{ ph }}" dark="{{ true }}" hint-size="440px,956px">
+<div style="position:relative;height:956px;display:flex;flex-direction:column;overflow:hidden">
+<div style="padding:62px 20px 0">
+<div style="display:flex;justify-content:flex-end;align-items:center;height:44px"><div style="height:40px;padding:0 12px;border-radius:20px;display:flex;align-items:center;gap:6px;background:rgba(120,120,128,.28);backdrop-filter:blur(12px) saturate(180%);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.15);font-size:13px;font-weight:500;color:rgba(235,235,245,.7)">{{ cloudD }}已同步</div></div>
+<div style="font-size:34px;font-weight:700;line-height:41px;letter-spacing:.4px;color:#fff;margin-top:4px">历史</div>
+<div style="margin-top:10px;height:36px;border-radius:18px;background:rgba(118,118,128,.24);display:flex;align-items:center;gap:6px;padding:0 10px;color:rgba(235,235,245,.6);font-size:17px">{{ magD }}搜索历史</div>
+<div style="display:flex;gap:8px;margin-top:12px;overflow:hidden"><span style="height:32px;padding:0 14px;border-radius:16px;background:#0A84FF;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center">全部</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.24);color:#fff;font-size:14px;font-weight:500;display:flex;align-items:center">文本</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.24);color:#fff;font-size:14px;font-weight:500;display:flex;align-items:center">链接</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.24);color:#fff;font-size:14px;font-weight:500;display:flex;align-items:center">图片</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.24);color:#fff;font-size:14px;font-weight:500;display:flex;align-items:center">颜色</span></div>
+</div>
+<div style="flex:1;overflow:hidden;padding:14px 20px 0"><div style="column-count:2;column-gap:10px">
+<sc-for list="{{ items }}" as="it" hint-placeholder-count="6">
+<div style="break-inside:avoid;margin:0 0 10px;border-radius:12px;background:#1C1C1E;overflow:hidden">
+<div style="display:flex;align-items:center;gap:6px;height:26px;padding:0 6px 0 5px;background:{{ it.color }}">
+<span style="display:flex;align-items:center;gap:3px;height:18px;padding:0 6px 0 5px;border-radius:9px;background:{{ it.badgeBg }};color:{{ it.onBand }};font-size:11px;font-weight:600;white-space:nowrap">{{ it.glyphB }}{{ it.kindLabel }}</span>
+<span style="flex:1;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ it.onBand }}">{{ it.source }}</span>
+<span style="font-size:11px;white-space:nowrap;opacity:.8;color:{{ it.onBand }}">{{ it.time }}</span>
+</div>
+<div style="padding:10px">
+<sc-if value="{{ it.isText }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;line-height:18px;color:#fff;display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isMono }}" hint-placeholder-val="{{ false }}"><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:12px;line-height:17px;color:#fff;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isRich }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;line-height:18px;color:#fff"><div style="font-weight:700">{{ it.title }}</div><div style="white-space:pre-line;color:rgba(235,235,245,.85)">{{ it.text }}</div></div></sc-if>
+<sc-if value="{{ it.isLink }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;color:rgba(235,235,245,.6)">{{ it.domain }}</div><div style="font-size:13px;line-height:18px;font-weight:600;color:#fff;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ it.title }}</div><div style="font-size:11px;color:#0A84FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.text }}</div></div></sc-if>
+<sc-if value="{{ it.isColor }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:8px"><div style="height:72px;border-radius:8px;background:{{ it.hex }}"></div><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:13px;font-weight:600;color:#fff">{{ it.hex }}</div></div></sc-if>
+<sc-if value="{{ it.isImage }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:8px"><div style="aspect-ratio:9/16;max-height:150px;border-radius:8px;background:linear-gradient(160deg,#2b3646,#3d3630 60%,#352d3f);position:relative;overflow:hidden"><div style="position:absolute;left:10px;right:10px;top:12px;height:8px;border-radius:4px;background:rgba(255,255,255,.12)"></div><div style="position:absolute;left:10px;right:40px;top:28px;height:8px;border-radius:4px;background:rgba(255,255,255,.12)"></div><div style="position:absolute;left:10px;right:10px;top:50px;bottom:12px;border-radius:6px;background:rgba(255,255,255,.1)"></div></div><div style="font-size:11px;color:rgba(235,235,245,.6)">{{ it.meta }}</div></div></sc-if>
+<sc-if value="{{ it.isFile }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:40px;border-radius:5px;background:rgba(118,118,128,.24);display:flex;align-items:center;justify-content:center">{{ it.glyphC }}</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.title }}</div><div style="margin-top:3px;display:inline-flex;align-items:center;height:16px;padding:0 6px;border-radius:4px;background:rgba(118,118,128,.28);font-size:10px;font-weight:600;color:rgba(235,235,245,.7)">仅 Mac</div></div></div></sc-if>
+</div></div>
+</sc-for>
+</div></div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:140px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.9) 60%);pointer-events:none"></div>
+<div style="position:absolute;left:0;right:0;bottom:26px;display:flex;justify-content:center;z-index:30"><div style="display:flex;align-items:center;height:64px;padding:0 6px;border-radius:32px;background:rgba(120,120,128,.28);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 8px 24px rgba(0,0,0,.3),inset 0 0 0 .5px rgba(255,255,255,.15)"><div style="width:92px;height:52px;border-radius:26px;background:rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#0A84FF;font-size:10px;font-weight:600">{{ tabClockOn }}历史</div><div style="width:92px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(235,235,245,.6);font-size:10px;font-weight:500">{{ tabPinD }}Pinboard</div><div style="width:92px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(235,235,245,.6);font-size:10px;font-weight:500">{{ tabGearD }}设置</div></div></div>
+</div>
+</x-import>
+</div></div></div>
+
+<div class="dv-opt" id="1b"><div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>细边 · 3pt 色边 + 灰字元信息，高密度，搜索按 iOS 26 放进标签栏</div><div class="dv-card" style="padding:24px;background:#e4e3df"><div style="display:flex;gap:24px">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ pw }}" height="{{ ph }}" hint-size="440px,956px">
+<div style="position:relative;height:956px;display:flex;flex-direction:column;overflow:hidden">
+<div style="padding:62px 16px 0">
+<div style="display:flex;justify-content:flex-end;align-items:center;height:44px"><div style="width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.7);backdrop-filter:blur(12px) saturate(180%);box-shadow:0 1px 3px rgba(0,0,0,.06),inset 0 0 0 .5px rgba(0,0,0,.06)">{{ cloudL }}</div></div>
+<div style="display:flex;align-items:baseline;gap:10px;margin-top:4px"><div style="font-size:34px;font-weight:700;line-height:41px;letter-spacing:.4px;color:#000">历史</div><div style="font-size:13px;color:rgba(60,60,67,.6)">iCloud · 刚刚同步</div></div>
+<div style="display:flex;gap:6px;margin-top:8px;overflow:hidden"><span style="height:28px;padding:0 12px;border-radius:14px;background:#000;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center">全部</span><span style="height:28px;padding:0 12px;border-radius:14px;background:rgba(118,118,128,.12);color:#000;font-size:13px;font-weight:500;display:flex;align-items:center">文本</span><span style="height:28px;padding:0 12px;border-radius:14px;background:rgba(118,118,128,.12);color:#000;font-size:13px;font-weight:500;display:flex;align-items:center">链接</span><span style="height:28px;padding:0 12px;border-radius:14px;background:rgba(118,118,128,.12);color:#000;font-size:13px;font-weight:500;display:flex;align-items:center">图片</span><span style="height:28px;padding:0 12px;border-radius:14px;background:rgba(118,118,128,.12);color:#000;font-size:13px;font-weight:500;display:flex;align-items:center">颜色</span></div>
+</div>
+<div style="flex:1;overflow:hidden;padding:12px 16px 0"><div style="column-count:2;column-gap:8px">
+<sc-for list="{{ items }}" as="it" hint-placeholder-count="6">
+<div style="break-inside:avoid;margin:0 0 8px;border-radius:12px;background:#fff;overflow:hidden;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.08)">
+<div style="height:3px;background:{{ it.color }}"></div>
+<div style="padding:8px 10px 10px">
+<div style="display:flex;align-items:center;gap:4px;margin-bottom:6px;font-size:11px;color:rgba(60,60,67,.6);white-space:nowrap">{{ it.glyphC }}<span style="font-weight:600;color:{{ it.color }}">{{ it.kindLabel }}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis">{{ it.source }}</span><span>{{ it.time }}</span></div>
+<sc-if value="{{ it.isText }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;line-height:16px;color:#000;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isMono }}" hint-placeholder-val="{{ false }}"><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:11px;line-height:15px;color:#000;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isRich }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;line-height:16px;color:#000"><div style="font-weight:700">{{ it.title }}</div><div style="white-space:pre-line;color:rgba(60,60,67,.9)">{{ it.text }}</div></div></sc-if>
+<sc-if value="{{ it.isLink }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:3px"><div style="font-size:12px;line-height:16px;font-weight:600;color:#000;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ it.title }}</div><div style="font-size:11px;color:#0A84FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.domain }}</div></div></sc-if>
+<sc-if value="{{ it.isColor }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px"><div style="width:36px;height:36px;border-radius:8px;background:{{ it.hex }}"></div><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:12px;font-weight:600;color:#000">{{ it.hex }}</div></div></sc-if>
+<sc-if value="{{ it.isImage }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px"><div style="aspect-ratio:9/16;max-height:120px;border-radius:6px;background:linear-gradient(160deg,#d9e6f5,#f3e7d6 60%,#e6dcef);position:relative;overflow:hidden"><div style="position:absolute;left:8px;right:8px;top:10px;height:6px;border-radius:3px;background:rgba(0,0,0,.08)"></div><div style="position:absolute;left:8px;right:8px;top:24px;bottom:10px;border-radius:5px;background:rgba(255,255,255,.55)"></div></div><div style="font-size:11px;color:rgba(60,60,67,.6)">{{ it.meta }}</div></div></sc-if>
+<sc-if value="{{ it.isFile }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:6px"><div style="font-size:12px;font-weight:600;color:#000;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.title }}</div><div style="display:inline-flex;align-items:center;height:16px;padding:0 5px;border-radius:4px;background:rgba(118,118,128,.14);font-size:10px;font-weight:600;color:rgba(60,60,67,.7);white-space:nowrap">仅 Mac</div></div></sc-if>
+</div></div>
+</sc-for>
+</div></div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:140px;background:linear-gradient(rgba(242,242,247,0),rgba(242,242,247,.9) 60%);pointer-events:none"></div>
+<div style="position:absolute;left:0;right:0;bottom:26px;display:flex;justify-content:center;gap:10px;z-index:30"><div style="display:flex;align-items:center;height:64px;padding:0 6px;border-radius:32px;background:rgba(255,255,255,.72);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 1px 3px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.08),inset 0 0 0 .5px rgba(0,0,0,.06)"><div style="width:84px;height:52px;border-radius:26px;background:rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#0A84FF;font-size:10px;font-weight:600">{{ tabClockOn }}历史</div><div style="width:84px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(60,60,67,.6);font-size:10px;font-weight:500">{{ tabPinL }}Pinboard</div><div style="width:84px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(60,60,67,.6);font-size:10px;font-weight:500">{{ tabGearL }}设置</div></div><div style="width:64px;height:64px;border-radius:32px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.72);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 1px 3px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.08),inset 0 0 0 .5px rgba(0,0,0,.06)">{{ magBigL }}</div></div>
+</div>
+</x-import>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ pw }}" height="{{ ph }}" dark="{{ true }}" hint-size="440px,956px">
+<div style="position:relative;height:956px;display:flex;flex-direction:column;overflow:hidden">
+<div style="padding:62px 16px 0">
+<div style="display:flex;justify-content:flex-end;align-items:center;height:44px"><div style="width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:rgba(120,120,128,.28);backdrop-filter:blur(12px) saturate(180%);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.15)">{{ cloudD }}</div></div>
+<div style="display:flex;align-items:baseline;gap:10px;margin-top:4px"><div style="font-size:34px;font-weight:700;line-height:41px;letter-spacing:.4px;color:#fff">历史</div><div style="font-size:13px;color:rgba(235,235,245,.6)">iCloud · 刚刚同步</div></div>
+<div style="display:flex;gap:6px;margin-top:8px;overflow:hidden"><span style="height:28px;padding:0 12px;border-radius:14px;background:#fff;color:#000;font-size:13px;font-weight:600;display:flex;align-items:center">全部</span><span style="height:28px;padding:0 12px;border-radius:14px;background:rgba(118,118,128,.24);color:#fff;font-size:13px;font-weight:500;display:flex;align-items:center">文本</span><span style="height:28px;padding:0 12px;border-radius:14px;background:rgba(118,118,128,.24);color:#fff;font-size:13px;font-weight:500;display:flex;align-items:center">链接</span><span style="height:28px;padding:0 12px;border-radius:14px;background:rgba(118,118,128,.24);color:#fff;font-size:13px;font-weight:500;display:flex;align-items:center">图片</span><span style="height:28px;padding:0 12px;border-radius:14px;background:rgba(118,118,128,.24);color:#fff;font-size:13px;font-weight:500;display:flex;align-items:center">颜色</span></div>
+</div>
+<div style="flex:1;overflow:hidden;padding:12px 16px 0"><div style="column-count:2;column-gap:8px">
+<sc-for list="{{ items }}" as="it" hint-placeholder-count="6">
+<div style="break-inside:avoid;margin:0 0 8px;border-radius:12px;background:#1C1C1E;overflow:hidden;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.08)">
+<div style="height:3px;background:{{ it.color }}"></div>
+<div style="padding:8px 10px 10px">
+<div style="display:flex;align-items:center;gap:4px;margin-bottom:6px;font-size:11px;color:rgba(235,235,245,.6);white-space:nowrap">{{ it.glyphC }}<span style="font-weight:600;color:{{ it.color }}">{{ it.kindLabel }}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis">{{ it.source }}</span><span>{{ it.time }}</span></div>
+<sc-if value="{{ it.isText }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;line-height:16px;color:#fff;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isMono }}" hint-placeholder-val="{{ false }}"><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:11px;line-height:15px;color:#fff;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isRich }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;line-height:16px;color:#fff"><div style="font-weight:700">{{ it.title }}</div><div style="white-space:pre-line;color:rgba(235,235,245,.85)">{{ it.text }}</div></div></sc-if>
+<sc-if value="{{ it.isLink }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:3px"><div style="font-size:12px;line-height:16px;font-weight:600;color:#fff;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ it.title }}</div><div style="font-size:11px;color:#0A84FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.domain }}</div></div></sc-if>
+<sc-if value="{{ it.isColor }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px"><div style="width:36px;height:36px;border-radius:8px;background:{{ it.hex }}"></div><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:12px;font-weight:600;color:#fff">{{ it.hex }}</div></div></sc-if>
+<sc-if value="{{ it.isImage }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px"><div style="aspect-ratio:9/16;max-height:120px;border-radius:6px;background:linear-gradient(160deg,#2b3646,#3d3630 60%,#352d3f);position:relative;overflow:hidden"><div style="position:absolute;left:8px;right:8px;top:10px;height:6px;border-radius:3px;background:rgba(255,255,255,.12)"></div><div style="position:absolute;left:8px;right:8px;top:24px;bottom:10px;border-radius:5px;background:rgba(255,255,255,.1)"></div></div><div style="font-size:11px;color:rgba(235,235,245,.6)">{{ it.meta }}</div></div></sc-if>
+<sc-if value="{{ it.isFile }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:6px"><div style="font-size:12px;font-weight:600;color:#fff;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.title }}</div><div style="display:inline-flex;align-items:center;height:16px;padding:0 5px;border-radius:4px;background:rgba(118,118,128,.28);font-size:10px;font-weight:600;color:rgba(235,235,245,.7);white-space:nowrap">仅 Mac</div></div></sc-if>
+</div></div>
+</sc-for>
+</div></div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:140px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.9) 60%);pointer-events:none"></div>
+<div style="position:absolute;left:0;right:0;bottom:26px;display:flex;justify-content:center;gap:10px;z-index:30"><div style="display:flex;align-items:center;height:64px;padding:0 6px;border-radius:32px;background:rgba(120,120,128,.28);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 8px 24px rgba(0,0,0,.3),inset 0 0 0 .5px rgba(255,255,255,.15)"><div style="width:84px;height:52px;border-radius:26px;background:rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#0A84FF;font-size:10px;font-weight:600">{{ tabClockOn }}历史</div><div style="width:84px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(235,235,245,.6);font-size:10px;font-weight:500">{{ tabPinD }}Pinboard</div><div style="width:84px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(235,235,245,.6);font-size:10px;font-weight:500">{{ tabGearD }}设置</div></div><div style="width:64px;height:64px;border-radius:32px;display:flex;align-items:center;justify-content:center;background:rgba(120,120,128,.28);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 8px 24px rgba(0,0,0,.3),inset 0 0 0 .5px rgba(255,255,255,.15)">{{ magBigD }}</div></div>
+</div>
+</x-import>
+</div></div></div>
+
+<div class="dv-opt" id="1c"><div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>染色 · 整卡淡染来源色 + 实心类型角标，低密度大字，搜索栏在标题下</div><div class="dv-card" style="padding:24px;background:#e4e3df"><div style="display:flex;gap:24px">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ pw }}" height="{{ ph }}" hint-size="440px,956px">
+<div style="position:relative;height:956px;display:flex;flex-direction:column;overflow:hidden">
+<div style="padding:62px 20px 0">
+<div style="display:flex;justify-content:flex-end;align-items:center;height:44px"><div style="width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.7);backdrop-filter:blur(12px) saturate(180%);box-shadow:0 1px 3px rgba(0,0,0,.06),inset 0 0 0 .5px rgba(0,0,0,.06)">{{ cloudL }}</div></div>
+<div style="font-size:34px;font-weight:700;line-height:41px;letter-spacing:.4px;color:#000;margin-top:4px">历史</div>
+<div style="margin-top:10px;height:36px;border-radius:18px;background:rgba(118,118,128,.12);display:flex;align-items:center;gap:6px;padding:0 10px;color:rgba(60,60,67,.6);font-size:17px">{{ magL }}搜索历史</div>
+<div style="display:flex;gap:8px;margin-top:12px;overflow:hidden"><span style="height:32px;padding:0 14px;border-radius:16px;background:#0A84FF;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center">全部</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.12);color:#000;font-size:14px;font-weight:500;display:flex;align-items:center">文本</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.12);color:#000;font-size:14px;font-weight:500;display:flex;align-items:center">链接</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.12);color:#000;font-size:14px;font-weight:500;display:flex;align-items:center">图片</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.12);color:#000;font-size:14px;font-weight:500;display:flex;align-items:center">颜色</span></div>
+</div>
+<div style="flex:1;overflow:hidden;padding:16px 20px 0"><div style="column-count:2;column-gap:12px">
+<sc-for list="{{ items }}" as="it" hint-placeholder-count="6">
+<div style="break-inside:avoid;margin:0 0 12px;border-radius:12px;overflow:hidden;padding:12px;background:{{ it.tintL }}">
+<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px"><span style="display:flex;align-items:center;gap:4px;height:20px;padding:0 7px 0 6px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap;background:{{ it.color }};color:{{ it.onBand }}">{{ it.glyphB }}{{ it.kindLabel }}</span><span style="flex:1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(60,60,67,.6)">{{ it.source }} · {{ it.time }}</span></div>
+<sc-if value="{{ it.isText }}" hint-placeholder-val="{{ true }}"><div style="font-size:15px;line-height:20px;color:#000;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isMono }}" hint-placeholder-val="{{ false }}"><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:13px;line-height:18px;color:#000;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isRich }}" hint-placeholder-val="{{ false }}"><div style="font-size:15px;line-height:20px;color:#000"><div style="font-weight:700">{{ it.title }}</div><div style="white-space:pre-line;font-size:14px;color:rgba(60,60,67,.9)">{{ it.text }}</div></div></sc-if>
+<sc-if value="{{ it.isLink }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:15px;line-height:20px;font-weight:600;color:#000;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ it.title }}</div><div style="font-size:12px;color:#0A84FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.domain }}</div></div></sc-if>
+<sc-if value="{{ it.isColor }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:8px"><div style="height:80px;border-radius:8px;background:{{ it.hex }}"></div><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:15px;font-weight:600;color:#000">{{ it.hex }}</div></div></sc-if>
+<sc-if value="{{ it.isImage }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:8px"><div style="aspect-ratio:9/16;max-height:160px;border-radius:8px;background:linear-gradient(160deg,#d9e6f5,#f3e7d6 60%,#e6dcef);position:relative;overflow:hidden"><div style="position:absolute;left:10px;right:10px;top:12px;height:8px;border-radius:4px;background:rgba(0,0,0,.08)"></div><div style="position:absolute;left:10px;right:10px;top:30px;bottom:12px;border-radius:6px;background:rgba(255,255,255,.55)"></div></div><div style="font-size:12px;color:rgba(60,60,67,.6)">{{ it.meta }}</div></div></sc-if>
+<sc-if value="{{ it.isFile }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:15px;font-weight:600;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.title }}</div><div style="display:inline-flex;align-self:flex-start;align-items:center;height:18px;padding:0 6px;border-radius:5px;background:rgba(0,0,0,.06);font-size:11px;font-weight:600;color:rgba(60,60,67,.7)">仅 Mac</div></div></sc-if>
+</div>
+</sc-for>
+</div></div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:140px;background:linear-gradient(rgba(242,242,247,0),rgba(242,242,247,.9) 60%);pointer-events:none"></div>
+<div style="position:absolute;left:0;right:0;bottom:26px;display:flex;justify-content:center;z-index:30"><div style="display:flex;align-items:center;height:64px;padding:0 6px;border-radius:32px;background:rgba(255,255,255,.72);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 1px 3px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.08),inset 0 0 0 .5px rgba(0,0,0,.06)"><div style="width:92px;height:52px;border-radius:26px;background:rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#0A84FF;font-size:10px;font-weight:600">{{ tabClockOn }}历史</div><div style="width:92px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(60,60,67,.6);font-size:10px;font-weight:500">{{ tabPinL }}Pinboard</div><div style="width:92px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(60,60,67,.6);font-size:10px;font-weight:500">{{ tabGearL }}设置</div></div></div>
+</div>
+</x-import>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ pw }}" height="{{ ph }}" dark="{{ true }}" hint-size="440px,956px">
+<div style="position:relative;height:956px;display:flex;flex-direction:column;overflow:hidden">
+<div style="padding:62px 20px 0">
+<div style="display:flex;justify-content:flex-end;align-items:center;height:44px"><div style="width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:rgba(120,120,128,.28);backdrop-filter:blur(12px) saturate(180%);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.15)">{{ cloudD }}</div></div>
+<div style="font-size:34px;font-weight:700;line-height:41px;letter-spacing:.4px;color:#fff;margin-top:4px">历史</div>
+<div style="margin-top:10px;height:36px;border-radius:18px;background:rgba(118,118,128,.24);display:flex;align-items:center;gap:6px;padding:0 10px;color:rgba(235,235,245,.6);font-size:17px">{{ magD }}搜索历史</div>
+<div style="display:flex;gap:8px;margin-top:12px;overflow:hidden"><span style="height:32px;padding:0 14px;border-radius:16px;background:#0A84FF;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center">全部</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.24);color:#fff;font-size:14px;font-weight:500;display:flex;align-items:center">文本</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.24);color:#fff;font-size:14px;font-weight:500;display:flex;align-items:center">链接</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.24);color:#fff;font-size:14px;font-weight:500;display:flex;align-items:center">图片</span><span style="height:32px;padding:0 14px;border-radius:16px;background:rgba(118,118,128,.24);color:#fff;font-size:14px;font-weight:500;display:flex;align-items:center">颜色</span></div>
+</div>
+<div style="flex:1;overflow:hidden;padding:16px 20px 0"><div style="column-count:2;column-gap:12px">
+<sc-for list="{{ items }}" as="it" hint-placeholder-count="6">
+<div style="break-inside:avoid;margin:0 0 12px;border-radius:12px;overflow:hidden;padding:12px;background:{{ it.tintD }}">
+<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px"><span style="display:flex;align-items:center;gap:4px;height:20px;padding:0 7px 0 6px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap;background:{{ it.color }};color:{{ it.onBand }}">{{ it.glyphB }}{{ it.kindLabel }}</span><span style="flex:1;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(235,235,245,.6)">{{ it.source }} · {{ it.time }}</span></div>
+<sc-if value="{{ it.isText }}" hint-placeholder-val="{{ true }}"><div style="font-size:15px;line-height:20px;color:#fff;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isMono }}" hint-placeholder-val="{{ false }}"><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:13px;line-height:18px;color:#fff;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all">{{ it.text }}</div></sc-if>
+<sc-if value="{{ it.isRich }}" hint-placeholder-val="{{ false }}"><div style="font-size:15px;line-height:20px;color:#fff"><div style="font-weight:700">{{ it.title }}</div><div style="white-space:pre-line;font-size:14px;color:rgba(235,235,245,.85)">{{ it.text }}</div></div></sc-if>
+<sc-if value="{{ it.isLink }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:15px;line-height:20px;font-weight:600;color:#fff;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ it.title }}</div><div style="font-size:12px;color:#0A84FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.domain }}</div></div></sc-if>
+<sc-if value="{{ it.isColor }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:8px"><div style="height:80px;border-radius:8px;background:{{ it.hex }}"></div><div style="font-family:'SF Mono',Menlo,ui-monospace,monospace;font-size:15px;font-weight:600;color:#fff">{{ it.hex }}</div></div></sc-if>
+<sc-if value="{{ it.isImage }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:8px"><div style="aspect-ratio:9/16;max-height:160px;border-radius:8px;background:linear-gradient(160deg,#2b3646,#3d3630 60%,#352d3f);position:relative;overflow:hidden"><div style="position:absolute;left:10px;right:10px;top:12px;height:8px;border-radius:4px;background:rgba(255,255,255,.12)"></div><div style="position:absolute;left:10px;right:10px;top:30px;bottom:12px;border-radius:6px;background:rgba(255,255,255,.1)"></div></div><div style="font-size:12px;color:rgba(235,235,245,.6)">{{ it.meta }}</div></div></sc-if>
+<sc-if value="{{ it.isFile }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:15px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.title }}</div><div style="display:inline-flex;align-self:flex-start;align-items:center;height:18px;padding:0 6px;border-radius:5px;background:rgba(255,255,255,.1);font-size:11px;font-weight:600;color:rgba(235,235,245,.7)">仅 Mac</div></div></sc-if>
+</div>
+</sc-for>
+</div></div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:140px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.9) 60%);pointer-events:none"></div>
+<div style="position:absolute;left:0;right:0;bottom:26px;display:flex;justify-content:center;z-index:30"><div style="display:flex;align-items:center;height:64px;padding:0 6px;border-radius:32px;background:rgba(120,120,128,.28);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 8px 24px rgba(0,0,0,.3),inset 0 0 0 .5px rgba(255,255,255,.15)"><div style="width:92px;height:52px;border-radius:26px;background:rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#0A84FF;font-size:10px;font-weight:600">{{ tabClockOn }}历史</div><div style="width:92px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(235,235,245,.6);font-size:10px;font-weight:500">{{ tabPinD }}Pinboard</div><div style="width:92px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(235,235,245,.6);font-size:10px;font-weight:500">{{ tabGearD }}设置</div></div></div>
+</div>
+</x-import>
+</div></div></div>
+
+</div>
+<p class="dv-next">下一步可以说：「选 <a class="dv-oid" href="#1a">1a</a>，但搜索放进标签栏像 <a class="dv-oid" href="#1b">1b</a>」 · 「<a class="dv-oid" href="#1c">1c</a> 的染色太重，降到 8%」 · 「定 <a class="dv-oid" href="#1b">1b</a>，铺全部界面」</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const el = React.createElement;
+    const svg = (paths, c, s = 11, sw = 2.4) => el('svg', { width: s, height: s, viewBox: '0 0 24 24', fill: 'none', stroke: c, strokeWidth: sw, strokeLinecap: 'round', strokeLinejoin: 'round', style: { flex: 'none' } }, ...paths.map((p, i) => el('path', typeof p === 'string' ? { key: i, d: p } : { key: i, ...p })));
+    const G = {
+      text: ['M4 6h16', 'M4 12h12', 'M4 18h8'],
+      richText: ['M5 4h14', 'M12 4v16', 'M8 20h8'],
+      link: ['M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1', 'M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1'],
+      color: ['M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z', { d: 'M12 3a9 9 0 0 0 0 18z', fill: 'currentColor', stroke: 'none' }],
+      image: ['M4 5h16v14H4z', 'M4 16l5-5 4 4 3-3 4 4', { d: 'M16 9.5a1 1 0 1 0 0-.01', strokeWidth: 3 }],
+      file: ['M6 3h8l5 5v13H6z', 'M14 3v5h5'],
+    };
+    const KL = { text: '文本', richText: '富文本', link: '链接', color: '颜色', image: '图片', file: '文件' };
+    const lum = (hex) => { const n = parseInt(hex.slice(1), 16); const r = n >> 16, g = (n >> 8) & 255, b = n & 255; return (0.299 * r + 0.587 * g + 0.114 * b) / 255; };
+    const raw = [
+      { kind: 'text', source: '本机', color: '#8E8E93', time: '刚刚', text: '【抖音】验证码 482913，5 分钟内有效，请勿泄露给他人。' },
+      { kind: 'text', mono: true, source: '终端', color: '#48484A', time: '3 分钟前', text: 'git rebase -i HEAD~3 && git push --force-with-lease' },
+      { kind: 'text', source: '微信', color: '#07C160', time: '12 分钟前', text: '周五下午三点在 3 楼小会议室对一下 Q4 的排期，记得把上周的漏斗数据带上，顺便看看新江湾那边场地的报价。' },
+      { kind: 'link', source: 'Safari', color: '#1B8EF1', time: '25 分钟前', domain: 'developer.apple.com', title: 'Adopting Liquid Glass | Apple Developer Documentation', text: 'https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass' },
+      { kind: 'color', source: 'Figma', color: '#A259FF', time: '1 小时前', hex: '#FF9F0A' },
+      { kind: 'image', source: '预览', color: '#5B8DC9', time: '1 小时前', meta: '1284 × 2778 · PNG' },
+      { kind: 'richText', source: '备忘录', color: '#F7C600', time: '2 小时前', title: '站会纪要 9/4', text: '· 登录页改版下周灰度\n· 图标最终稿 8a 已定\n· TestFlight 周三发' },
+      { kind: 'file', source: '访达', color: '#1E9BF0', time: '昨天 18:42', title: 'Q3-复盘.key' },
+      { kind: 'text', mono: true, source: 'VS Code', color: '#0078D4', time: '昨天 16:10', text: 'pnpm dlx shadcn@latest add button dialog' },
+      { kind: 'text', source: '本机', color: '#8E8E93', time: '昨天 09:30', text: '上海市徐汇区漕溪北路 331 号中金国际广场 B 座 12 层' },
+    ];
+    const items = raw.map((r) => {
+      const light = lum(r.color) > 0.62;
+      const onBand = light ? 'rgba(0,0,0,.78)' : '#fff';
+      return {
+        ...r,
+        kindLabel: KL[r.kind],
+        onBand,
+        badgeBg: light ? 'rgba(0,0,0,.1)' : 'rgba(255,255,255,.22)',
+        glyphB: el('span', { style: { color: onBand, display: 'flex' } }, svg(G[r.kind], 'currentColor')),
+        glyphC: el('span', { style: { color: r.color, display: 'flex' } }, svg(G[r.kind], 'currentColor', r.kind === 'file' ? 18 : 11)),
+        tintL: `color-mix(in srgb, ${r.color} 12%, #fff)`,
+        tintD: `color-mix(in srgb, ${r.color} 20%, #1C1C1E)`,
+        isText: r.kind === 'text' && !r.mono,
+        isMono: r.kind === 'text' && !!r.mono,
+        isRich: r.kind === 'richText',
+        isLink: r.kind === 'link',
+        isColor: r.kind === 'color',
+        isImage: r.kind === 'image',
+        isFile: r.kind === 'file',
+      };
+    });
+    const cloud = (c) => svg(['M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 11.5 3.3 3.3 0 0 0 7 18z', 'M9.5 14l1.8 1.8L15 12'], c, 18, 1.8);
+    const mag = (c, s = 16) => svg(['M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14z', 'M16 16l5 5'], c, s, 2.2);
+    const clock = (c) => svg(['M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z', 'M12 7v5l3 2'], c, 24, 2);
+    const pin = (c) => svg(['M9 3h6l-1 6 3 3H7l3-3z', 'M12 12v9'], c, 24, 2);
+    const gear = (c) => svg(['M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6z', 'M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1'], c, 24, 2);
+    return {
+      pw: 440, ph: 956, items,
+      cloudL: cloud('rgba(60,60,67,.7)'), cloudD: cloud('rgba(235,235,245,.7)'),
+      magL: mag('rgba(60,60,67,.6)'), magD: mag('rgba(235,235,245,.6)'),
+      magBigL: mag('rgba(60,60,67,.75)', 24), magBigD: mag('rgba(235,235,245,.75)', 24),
+      tabClockOn: clock('#0A84FF'),
+      tabPinL: pin('rgba(60,60,67,.6)'), tabPinD: pin('rgba(235,235,245,.6)'),
+      tabGearL: gear('rgba(60,60,67,.6)'), tabGearD: gear('rgba(235,235,245,.6)'),
+    };
+  }
+}
+</script>
+</body>
+</html>
