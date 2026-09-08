@@ -29,7 +29,7 @@ struct PanelRootView: View {
     @State private var pendingPinItem: ClipItem?
     @FocusState private var searchFocused: Bool
 
-    let onPaste: (ClipItem, _ asPlainText: Bool) -> Void
+    let onCopy: (ClipItem, _ asPlainText: Bool) -> Void
     let onClose: () -> Void
 
     private var visibleItems: [ClipItem] {
@@ -244,16 +244,15 @@ struct PanelRootView: View {
         CardView(item: item, isSelected: index == selectedIndex)
             .id(item.persistentModelID)
             .onTapGesture(count: 2) {
-                onPaste(item, false)
+                onCopy(item, false)
             }
             .onTapGesture {
                 selectedIndex = index
             }
             .onDrag { dragProvider(for: item) }
             .contextMenu {
-                Button("Paste") { onPaste(item, false) }
-                Button("Paste as Plain Text") { onPaste(item, true) }
-                Button("Copy Only") { copyOnly(item) }
+                Button("Copy") { onCopy(item, false) }
+                Button("Copy as Plain Text") { onCopy(item, true) }
                 Divider()
                 if pinboards.isEmpty {
                     Button("Pin to Pinboard…") {
@@ -350,7 +349,7 @@ struct PanelRootView: View {
 
     private func pasteSelected(asPlainText: Bool) {
         guard let item = selectedItem else { return }
-        onPaste(item, asPlainText)
+        onCopy(item, asPlainText)
     }
 
     private func deleteSelected() {
@@ -371,11 +370,6 @@ struct PanelRootView: View {
         if selectedIndex >= max(0, visibleItems.count - 1) {
             selectedIndex = max(0, visibleItems.count - 2)
         }
-    }
-
-    private func copyOnly(_ item: ClipItem) {
-        AppDelegate.shared?.pasteService.copyToPasteboard(item)
-        onClose()
     }
 
     private func openNewPinboardAlert(pinning item: ClipItem?) {

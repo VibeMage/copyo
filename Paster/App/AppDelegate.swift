@@ -25,8 +25,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         UserDefaults.standard.register(defaults: [
             "historyLimit": 500,
-            "autoPaste": true,
-            "pasteSound": true,
             "plainTextPaste": false,
         ])
 
@@ -85,16 +83,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSApplication.shared.registerForRemoteNotifications()
         }
 
-        // 用户在系统设置里改动辅助功能授权后，让粘贴路径重新评估并允许再次提示
-        DistributedNotificationCenter.default().addObserver(
-            forName: NSNotification.Name("com.apple.accessibility.api"),
-            object: nil, queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in
-                self?.pasteService.resetAccessibilityWarning()
-            }
-        }
-
         // 自动化/截图辅助：-forceDark 强制深色外观；-showSettings 直接打开设置窗口
         if ProcessInfo.processInfo.arguments.contains("-forceDark") {
             NSApp.appearance = NSAppearance(named: .darkAqua)
@@ -133,14 +121,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let alert = NSAlert()
         alert.messageText = String(localized: "Welcome to Paster")
 #if APPSTORE
-        // 沙盒版拿不到系统授权弹窗（PasteService.ensureAccessibility 里已说明），
-        // 也就不能承诺「会引导授权」；同时这里是唯一能告诉用户设置在哪的地方。
+        // 沙盒版的面板里有齿轮按钮，这里是唯一能告诉用户设置在哪的地方；
+        // 直接分发版只能靠右键菜单栏图标打开设置。
         alert.informativeText = String(localized: """
         Paster lives in the menu bar (the clipboard icon in the top-right corner).
 
         • Press \(HotkeyConfig.load().displayString) anytime to bring up the clipboard panel
         • Everything you copy is saved automatically — type to search
-        • Select an item and press Return to paste it into the previous app. Turn Paster on in System Settings → Privacy & Security → Accessibility to allow this
+        • Select an item and press Return to put it back on the clipboard, then paste it with ⌘V
         • Open Settings from the gear in the panel, or by right-clicking the menu bar icon
         """)
 #else
@@ -149,7 +137,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         • Press \(HotkeyConfig.load().displayString) anytime to bring up the clipboard panel
         • Everything you copy is saved automatically — type to search
-        • Select an item and press Return to paste it into the previous app (requires Accessibility permission; you’ll be guided through granting it the first time)
+        • Select an item and press Return to put it back on the clipboard, then paste it with ⌘V
+        • Open Settings by right-clicking the menu bar icon
         """)
 #endif
         alert.addButton(withTitle: String(localized: "Try It Now"))

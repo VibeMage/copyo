@@ -44,8 +44,8 @@ final class PanelController: NSObject, NSWindowDelegate {
         panel.delegate = self
 
         let rootView = PanelRootView(
-            onPaste: { [weak self] item, asPlainText in
-                self?.pasteAndDismiss(item, asPlainText: asPlainText)
+            onCopy: { [weak self] item, asPlainText in
+                self?.copyAndDismiss(item, asPlainText: asPlainText)
             },
             onClose: { [weak self] in
                 self?.hide(reactivatePrevious: true)
@@ -93,8 +93,8 @@ final class PanelController: NSObject, NSWindowDelegate {
         NotificationCenter.default.post(name: .pasterPanelDidShow, object: nil)
     }
 
-    /// - Parameter reactivatePrevious: Esc/快捷键主动关闭时把焦点还给之前的应用；
-    ///   点击其他应用导致的收起或粘贴流程则不需要（粘贴自己会激活目标应用）
+    /// - Parameter reactivatePrevious: Esc/快捷键主动关闭或选中条目后把焦点还给之前的应用；
+    ///   点击其他应用导致的收起则不需要（焦点已经在那个应用上）
     func hide(reactivatePrevious: Bool = false) {
         guard panel.isVisible, !isAnimatingOut else { return }
         isAnimatingOut = true
@@ -120,10 +120,10 @@ final class PanelController: NSObject, NSWindowDelegate {
         panel.makeKeyAndOrderFront(nil)
     }
 
-    private func pasteAndDismiss(_ item: ClipItem, asPlainText: Bool) {
-        let target = previousApp
-        hide()
-        pasteService.paste(item, to: target, asPlainText: asPlainText)
+    /// 选中条目：写回剪贴板，收起面板并把焦点还给之前的应用，用户接着按 ⌘V 即可
+    private func copyAndDismiss(_ item: ClipItem, asPlainText: Bool) {
+        pasteService.copyToPasteboard(item, asPlainText: asPlainText)
+        hide(reactivatePrevious: true)
     }
 
     /// 面板显示在鼠标所在的屏幕（多显示器场景）

@@ -43,11 +43,8 @@ struct SettingsView: View {
 // MARK: - 通用
 
 struct GeneralSettingsView: View {
-    @AppStorage("autoPaste") private var autoPaste = true
     @AppStorage("plainTextPaste") private var plainTextPaste = false
-    @AppStorage("pasteSound") private var pasteSound = true
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
-    @State private var accessibilityTrusted = PasteService.isAccessibilityTrusted
 
     var body: some View {
         Form {
@@ -66,33 +63,17 @@ struct GeneralSettingsView: View {
                     }
             }
             Section {
-                Toggle("Paste into the previous app on selection", isOn: $autoPaste)
-                Toggle("Always paste as plain text", isOn: $plainTextPaste)
-                Toggle("Paste sound", isOn: $pasteSound)
+                Toggle("Always copy as plain text", isOn: $plainTextPaste)
             } footer: {
-                if autoPaste && !accessibilityTrusted {
-                    HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.orange)
-                        Text("Auto-paste requires Accessibility permission")
-                        Button("Open System Settings") {
-                            openAccessibilitySettings()
-                        }
-                    }
+                Text("Applies when you press Return. ⌥↩ always copies as plain text.")
                     .font(.system(size: 12))
-                }
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-            accessibilityTrusted = PasteService.isAccessibilityTrusted
             launchAtLogin = SMAppService.mainApp.status == .enabled
         }
-    }
-
-    private func openAccessibilitySettings() {
-        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
-        NSWorkspace.shared.open(url)
     }
 }
 
@@ -469,8 +450,8 @@ struct ShortcutsSettingsView: View {
 
     private let fixedShortcuts: [(String, String)] = [
         (String(localized: "Move between cards"), "← →"),
-        (String(localized: "Paste selected item"), "↩"),
-        (String(localized: "Paste selected item as plain text"), "⌥↩"),
+        (String(localized: "Copy selected item"), "↩"),
+        (String(localized: "Copy selected item as plain text"), "⌥↩"),
         (String(localized: "Preview selected item (when search is empty)"), String(localized: "Space")),
         (String(localized: "Search"), String(localized: "Just type")),
         (String(localized: "Delete selected item"), "⌘⌫"),
