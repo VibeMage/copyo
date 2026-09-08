@@ -125,7 +125,15 @@ No account, no login, no network. All data is stored locally.
 
 ## 六、构建与上传
 
+**1.0 的上架包一律从 `release/1.0` 分支构建**，不要从 main 打：
+main 已经带上 iCloud（CloudKit）同步和推送 entitlements，归档时需要一张
+Mac App Development 描述文件，而这要求团队里注册过 Mac；`release/1.0` 是提审
+commit c7dd41f 加上「移除自动粘贴」，entitlements 只有沙盒，和 1.0 (3) 一样不需要描述文件，
+商店描述里「零网络请求」的说法也仍然成立。iCloud 版本留给 1.1。
+
 ```bash
+git worktree add ../Paster-release-1.0 release/1.0   # 已存在则跳过
+cd ../Paster-release-1.0
 UPLOAD=1 ./scripts/build-appstore.sh   # 归档 → 导出 .pkg → 直接上传 App Store Connect
 ```
 
@@ -265,10 +273,16 @@ tmp=$(mktemp -d) && cp docs/support/index.html "$tmp/" && cd "$tmp" \
   && gh api -X POST repos/VibeMage/paster-support/pages -f 'source[branch]=main' -f 'source[path]=/'
 ```
 
-### 提交顺序
+### 提交顺序（支持页面已于 2026-09-09 上线，仓库已公开）
 
-1. 支持页面上线并用浏览器确认能打开。
-2. App Store Connect → App 信息/版本页 → 技术支持网址 改为新 URL。
-3. `UPLOAD=1 ./scripts/build-appstore.sh` 上传 1.0 (4)，在版本页选中新构建。
-4. 审核备注替换为第四节的新版本。
-5. 在「App 审核 → 消息」里贴上面的回复正文，然后重新提交审核。
+1. 上传 1.0 (4)：从 `release/1.0` 出包（见第六节），用 Transporter 拖入
+   `build/appstore/Paster-1.0-appstore.pkg` → Deliver；或直接 `UPLOAD=1` 让脚本上传。
+   上传后等 App Store Connect 处理完（收到「已完成处理」邮件，通常 5–30 分钟）。
+2. App Store Connect → 我的 App → Paster → 1.0 版本页：
+   - 「构建版本」移除 1.0 (3)，选择 1.0 (4)。
+   - 「技术支持网址」改为 `https://vibemage.github.io/Paster/support/`。
+   - 「描述」中英文各改一行（见第三节：回车后内容回到剪贴板，⌘V 粘贴）。
+   - 「App 审核信息 → 备注」整段替换为第四节的新版本。
+   - 存储。
+3. 「App 审核」区域打开与审核的消息记录，回复上面的回复正文。
+4. 点右上角「提交以供审核」。
