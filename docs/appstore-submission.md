@@ -223,17 +223,17 @@ This build was tested on a physical MacBook running macOS 26.6.1 before submissi
 - 欢迎对话框只讲快捷键、搜索、回车复制和设置入口。
 - 审核备注（第四节）改写，明确应用不使用辅助功能以及快捷键的实现方式。
 - 新增支持页面 `docs/support/index.html`（中英双语：联系方式、快速上手、FAQ、隐私政策链接）。
-- Release-AppStore 的 `CURRENT_PROJECT_VERSION` 已递增到 4。
+- Release-AppStore 的 `CURRENT_PROJECT_VERSION` 已递增到 4；导出时 Xcode 又自动抬到 5（见提交顺序）。
 - 自动粘贴的旧实现保留在 git 历史里（commit af221d4 时的 `Paster/Services/PasteService.swift`）。上架后若要加回，提审时需自带 2.4.5 的说明，且可能再次被拒。
 
 ### 回复正文（贴到 App 审核 → 消息，两条拒审一起回）
 
 ```
-Thank you for the detailed review. Both issues are addressed in build 1.0 (4).
+Thank you for the detailed review. Both issues are addressed in build 1.0 (5).
 
 Guideline 2.4.5 – Accessibility
 
-The feature that used Accessibility, "Paste into the previous app on selection", has been removed from the app. Build 4 no longer calls any Accessibility API and never asks for Accessibility access; nothing in the app requires it. When the user selects an item and presses Return, Paster puts it on the clipboard, closes the panel and returns focus to the app they were using, where they paste with Command+V.
+The feature that used Accessibility, "Paste into the previous app on selection", has been removed from the app. Build 5 no longer calls any Accessibility API and never asks for Accessibility access; nothing in the app requires it. When the user selects an item and presses Return, Paster puts it on the clipboard, closes the panel and returns focus to the app they were using, where they paste with Command+V.
 
 For clarity: the Shift+Command+V shortcut never used Accessibility. It is registered with the Carbon RegisterEventHotKey API, which needs no permission, and is unchanged.
 
@@ -275,11 +275,13 @@ tmp=$(mktemp -d) && cp docs/support/index.html "$tmp/" && cd "$tmp" \
 
 ### 提交顺序（支持页面已于 2026-09-09 上线，仓库已公开）
 
-1. 上传 1.0 (4)：从 `release/1.0` 出包（见第六节），用 Transporter 拖入
+1. 上传新构建：从 `release/1.0` 出包（见第六节），用 Transporter 拖入
    `build/appstore/Paster-1.0-appstore.pkg` → Deliver；或直接 `UPLOAD=1` 让脚本上传。
+   注意包里的构建号由 Xcode 导出时自动抬高（取 App Store Connect 上已有的最大值加一），
+   2026-09-09 出的包是 1.0 (5)，回复正文里的构建号要与实际上传的一致。
    上传后等 App Store Connect 处理完（收到「已完成处理」邮件，通常 5–30 分钟）。
 2. App Store Connect → 我的 App → Paster → 1.0 版本页：
-   - 「构建版本」移除 1.0 (3)，选择 1.0 (4)。
+   - 「构建版本」移除 1.0 (3)，选择新上传的构建（1.0 (5)）。
    - 「技术支持网址」改为 `https://vibemage.github.io/Paster/support/`。
    - 「描述」中英文各改一行（见第三节：回车后内容回到剪贴板，⌘V 粘贴）。
    - 「App 审核信息 → 备注」整段替换为第四节的新版本。
