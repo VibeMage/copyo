@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paster Support · 支持与帮助</title>
+<meta name="description" content="Support, FAQ and contact information for Paster, the open-source clipboard manager for macOS.">
+<style>
+  :root {
+    --bg: #fafafa; --fg: #1d1d1f; --muted: #6e6e73; --card: #ffffff; --line: #e5e5ea;
+    --accent: #0a66ff; --kbd-bg: #f2f2f7; --kbd-fg: #3a3a3c;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111113; --fg: #f2f2f7; --muted: #98989d; --card: #1c1c1e; --line: #2c2c2e;
+            --accent: #4c8dff; --kbd-bg: #2c2c2e; --kbd-fg: #e5e5ea; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 16px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 20px 64px; }
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  header .icon { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #4c8dff, #0a66ff);
+                 display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 22px; flex: none; }
+  h1 { font-size: 28px; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: 20px; margin: 40px 0 12px; letter-spacing: -0.01em; }
+  h3 { font-size: 16px; margin: 20px 0 6px; }
+  p { margin: 0 0 12px; }
+  .lead { color: var(--muted); margin-bottom: 20px; }
+  nav.lang { display: flex; gap: 8px; margin: 12px 0 28px; }
+  nav.lang a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; color: var(--fg); font-size: 14px; }
+  nav.lang a:hover { border-color: var(--accent); color: var(--accent); }
+  a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; margin: 0 0 14px; }
+  .card p:last-child { margin-bottom: 0; }
+  kbd { display: inline-block; padding: 1px 7px; border-radius: 6px; background: var(--kbd-bg); color: var(--kbd-fg);
+        font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; border: 1px solid var(--line); }
+  code { font: 14px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--kbd-bg); padding: 1px 5px; border-radius: 5px; }
+  ol, ul { padding-left: 22px; margin: 0 0 12px; }
+  li { margin: 4px 0; }
+  details { border-top: 1px solid var(--line); padding: 12px 0; }
+  details:last-of-type { border-bottom: 1px solid var(--line); }
+  summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--muted); font-weight: 400; }
+  details[open] summary::after { content: "–"; }
+  details > *:not(summary) { margin-top: 8px; }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  section.zh { margin-top: 64px; padding-top: 32px; border-top: 2px solid var(--line); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="icon" aria-hidden="true">P</div>
+    <h1>Paster</h1>
+  </header>
+  <p class="lead">Support &amp; help · 支持与帮助</p>
+  <nav class="lang" aria-label="Language">
+    <a href="#en">English</a>
+    <a href="#zh">中文</a>
+  </nav>
+
+  <!-- ===================== English ===================== -->
+  <section id="en">
+    <p>Paster is an open-source clipboard history manager for macOS. Everything you copy is kept on your Mac, and one keyboard shortcut brings any earlier item back. No account, no telemetry, no servers.</p>
+
+    <h2>Contact</h2>
+    <div class="card">
+      <p><strong>Email:</strong> <a href="mailto:iyn@live.com">iyn@live.com</a><br>
+         We usually reply within a few days. Please include your macOS version and, if relevant, the app version from Settings → About.</p>
+      <p><strong>Bug reports &amp; feature requests:</strong> <a href="https://github.com/VibeMage/Paster/issues">github.com/VibeMage/Paster/issues</a></p>
+    </div>
+
+    <h2>Quick start</h2>
+    <div class="card">
+      <ol>
+        <li>Paster lives in the menu bar (the clipboard icon in the top-right corner). It has no Dock icon and no main window.</li>
+        <li>Copy anything in any app. It shows up in Paster automatically.</li>
+        <li>Press <kbd>⇧⌘V</kbd> or click the menu bar icon to open the clipboard panel. Type to search, use <kbd>←</kbd> <kbd>→</kbd> to move, <kbd>Space</kbd> to preview.</li>
+        <li>Press <kbd>Return</kbd> to put the selected item back on the clipboard. The panel closes and you're back in the app you were using, so just press <kbd>⌘V</kbd>.</li>
+        <li>Right-click a card to pin it to a Pinboard, copy it as plain text or delete it. Settings are behind the gear button in the panel, or right-click the menu bar icon.</li>
+      </ol>
+    </div>
+
+    <h2>FAQ</h2>
+    <details>
+      <summary>Pressing Return doesn't paste anything. Is that a bug?</summary>
+      <p>No. Return puts the item on the clipboard, closes the panel and returns you to the app you were using; press <kbd>⌘V</kbd> to paste. Paster deliberately never types into other apps, which is also why it needs no special permissions.</p>
+    </details>
+    <details>
+      <summary>Does Paster need any system permissions?</summary>
+      <p>No. Paster asks for neither Accessibility nor Input Monitoring, and it never watches what you type in other apps. The <kbd>⇧⌘V</kbd> shortcut uses the standard system hotkey API. If you choose iCloud sync, it uses the Apple account already signed in on your Mac.</p>
+    </details>
+    <details>
+      <summary>How do I change the shortcut?</summary>
+      <p>Settings → Shortcuts → click the current shortcut and press a new combination. It must include ⌘, ⌥ or ⌃. “Reset” restores <kbd>⇧⌘V</kbd>.</p>
+    </details>
+    <details>
+      <summary>Where is my data stored? Does anything leave my Mac?</summary>
+      <p>Everything stays on your Mac: the App Store version keeps its data in <code>~/Library/Containers/dev.vibemage.Paster/</code>, the direct-download version in <code>~/Library/Application Support/Paster/</code>. Paster has no analytics, no crash reporting and no servers of its own. See the <a href="https://gist.github.com/VibeMage/d39d7165d762ecfd0f16f72ad1fc553e">privacy policy</a>.</p>
+    </details>
+    <details>
+      <summary>How does sync between my Macs work?</summary>
+      <p>Settings → Sync. You can either point Paster at a folder you choose (for example a folder inside iCloud Drive or another synced drive), or use your own iCloud account. In both cases the data is stored with the provider you picked; it never passes through a server run by us.</p>
+    </details>
+    <details>
+      <summary>Something I copied doesn't appear in the history.</summary>
+      <p>Content that apps mark as concealed or transient (passwords from password managers, for example) is skipped on purpose and never recorded.</p>
+    </details>
+    <details>
+      <summary>How do I delete items or clear the history?</summary>
+      <p>Select a card and press <kbd>⌘⌫</kbd>, or right-click it and choose Delete. The history limit and “clear history” are in Settings → Clipboard. Pinned items on Pinboards are not affected by history cleanup.</p>
+    </details>
+    <details>
+      <summary>How do I uninstall Paster completely?</summary>
+      <ol>
+        <li>Quit Paster (right-click the menu bar icon → Quit).</li>
+        <li>Move Paster.app to the Trash (or delete it from Launchpad for the App Store version).</li>
+        <li>Delete the data folder listed above if you want the history removed too.</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- ===================== 中文 ===================== -->
+  <section id="zh" class="zh" lang="zh-Hans">
+    <p>Paster 是一款开源的 macOS 剪贴板历史工具。复制过的所有内容都保存在你自己的 Mac 上，一个快捷键就能把之前复制的东西找回来。无账号、无遥测、无服务器。</p>
+
+    <h2>联系我们</h2>
+    <div class="card">
+      <p><strong>邮箱：</strong><a href="mailto:iyn@live.com">iyn@live.com</a><br>
+         通常几天内回复。请附上 macOS 版本，以及「设置 → 关于」里的应用版本号。</p>
+      <p><strong>问题反馈与功能建议：</strong><a href="https://github.com/VibeMage/Paster/issues">github.com/VibeMage/Paster/issues</a></p>
+    </div>
+
+    <h2>快速上手</h2>
+    <div class="card">
+      <ol>
+        <li>Paster 常驻菜单栏（右上角的剪贴板图标），没有 Dock 图标，也没有主窗口。</li>
+        <li>在任意应用里复制任何内容，它会自动出现在 Paster 中。</li>
+        <li>按 <kbd>⇧⌘V</kbd> 或点击菜单栏图标呼出面板。直接输入即可搜索，<kbd>←</kbd> <kbd>→</kbd> 切换卡片，<kbd>Space</kbd> 预览。</li>
+        <li>按 <kbd>Return</kbd> 把选中的条目放回剪贴板。面板随即收起并回到你之前使用的应用，直接按 <kbd>⌘V</kbd> 粘贴即可。</li>
+        <li>右键卡片可固定到 Pinboard、以纯文本复制或删除。设置在面板右上角的齿轮按钮里，或右键菜单栏图标。</li>
+      </ol>
+    </div>
+
+    <h2>常见问题</h2>
+    <details>
+      <summary>按回车没有粘贴任何内容，是不是坏了？</summary>
+      <p>不是。回车会把条目放回剪贴板、收起面板并回到你之前使用的应用，按 <kbd>⌘V</kbd> 即可粘贴。Paster 有意不向其他应用模拟输入，所以也不需要任何特殊权限。</p>
+    </details>
+    <details>
+      <summary>Paster 需要什么系统权限吗？</summary>
+      <p>不需要。Paster 不申请「辅助功能」和「输入监控」权限，也从不监听你在其他应用中的输入。<kbd>⇧⌘V</kbd> 快捷键使用系统标准的全局热键接口。若选择 iCloud 同步，使用的是 Mac 上已登录的 Apple 账户。</p>
+    </details>
+    <details>
+      <summary>怎么修改快捷键？</summary>
+      <p>设置 → 快捷键 → 点击当前快捷键，然后按下新的组合键（必须包含 ⌘、⌥ 或 ⌃）。「重置」可恢复为 <kbd>⇧⌘V</kbd>。</p>
+    </details>
+    <details>
+      <summary>数据存在哪里？会上传吗？</summary>
+      <p>全部保存在本机：App Store 版在 <code>~/Library/Containers/dev.vibemage.Paster/</code>，直接下载版在 <code>~/Library/Application Support/Paster/</code>。Paster 没有统计分析、没有崩溃上报，也没有自己的服务器。详见<a href="https://gist.github.com/VibeMage/d39d7165d762ecfd0f16f72ad1fc553e">隐私政策</a>。</p>
+    </details>
+    <details>
+      <summary>多台 Mac 之间怎么同步？</summary>
+      <p>设置 → 同步。可以让 Paster 使用你指定的文件夹（例如 iCloud Drive 或其他网盘里的文件夹），也可以使用你自己的 iCloud 账户。两种方式下数据都保存在你选择的服务商那里，不会经过我们的服务器。</p>
+    </details>
+    <details>
+      <summary>有些复制的内容没有出现在历史里。</summary>
+      <p>被应用标记为隐藏或临时的内容（例如密码管理器里的密码）会被有意跳过，永远不会记录。</p>
+    </details>
+    <details>
+      <summary>怎么删除条目或清空历史？</summary>
+      <p>选中卡片按 <kbd>⌘⌫</kbd>，或右键选择删除。历史上限和「清空历史」在 设置 → 剪贴板。固定在 Pinboard 上的条目不受历史清理影响。</p>
+    </details>
+    <details>
+      <summary>怎么彻底卸载 Paster？</summary>
+      <ol>
+        <li>退出 Paster（右键菜单栏图标 → 退出）。</li>
+        <li>把 Paster.app 移到废纸篓（App Store 版可在启动台中删除）。</li>
+        <li>若也要删除历史记录，删除上面列出的数据目录。</li>
+      </ol>
+    </details>
+  </section>
+
+  <footer>
+    © 2026 Paster Contributors · GNU GPLv3 ·
+    <a href="https://gist.github.com/VibeMage/d39d7165d762ecfd0f16f72ad1fc553e">Privacy Policy / 隐私政策</a>
+  </footer>
+</main>
+</body>
+</html>

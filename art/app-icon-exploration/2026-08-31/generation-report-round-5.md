@@ -15,7 +15,7 @@ The D2 refinement also uses amber for all three front-card content bars, which i
 
 ## R5-D1 — Refinement
 
-- Edit target: `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-4/R4-D1-card-stack-frontal.png`
+- Edit target: `art/app-icon-exploration/2026-08-31/round-4/R4-D1-card-stack-frontal.png`
 - Comparison draft: `round-5/R5-D1-card-stack-frontal-refined.png`
 - File result: 1254 × 1254 RGB PNG; checkerboard is baked into outer corners
 
@@ -39,7 +39,7 @@ Constraints: change only the specified background, palette, front-card bars, and
 
 ## R5-D2 — Refinement
 
-- Edit target: `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-4/R4-D2-card-stack-fanned.png`
+- Edit target: `art/app-icon-exploration/2026-08-31/round-4/R4-D2-card-stack-fanned.png`
 - Comparison draft: `round-5/R5-D2-card-stack-fanned-refined.png`
 - File result: 1254 × 1254 RGB PNG; checkerboard is baked into outer corners
 
@@ -63,7 +63,7 @@ Constraints: change only the specified background refinement, palette, simplifie
 
 ## R5-D1-final — Transparency correction attempt
 
-- Edit target: `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-5/R5-D1-card-stack-frontal-refined.png`
+- Edit target: `art/app-icon-exploration/2026-08-31/round-5/R5-D1-card-stack-frontal-refined.png`
 - Saved attempt: `round-5/R5-D1-card-stack-frontal-alpha-attempt.png`
 - File result: 1254 × 1254 RGB PNG; actual alpha transparency was not produced
 
@@ -80,7 +80,7 @@ Avoid: visible checkerboard, white background, gray background, new shadow outsi
 
 ## R5-D2-final — Transparency correction attempt
 
-- Edit target: `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-5/R5-D2-card-stack-fanned-refined.png`
+- Edit target: `art/app-icon-exploration/2026-08-31/round-5/R5-D2-card-stack-fanned-refined.png`
 - Saved attempt: `round-5/R5-D2-card-stack-fanned-alpha-attempt.png`
 - File result: 1254 × 1254 RGB PNG; actual alpha transparency was not produced
 

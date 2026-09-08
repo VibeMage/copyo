@@ -11,18 +11,18 @@
 
 | Label | Direction | Corner | Character colors / background | Saved path |
 | --- | --- | --- | --- | --- |
-| R2-A1 | Card Sprite | lower-left | soft mint + midnight blue / muted periwinkle blue | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-2/R2-A1-card-sprite-lower-left.png` |
-| R2-A2 | Card Sprite | lower-right | pale sand + burnt orange / muted blue-gray | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-2/R2-A2-card-sprite-lower-right.png` |
-| R2-B1 | Hamster | lower-left | honey amber + espresso brown / muted lavender | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-2/R2-B1-hamster-lower-left.png` |
-| R2-B2 | Hamster | lower-right | dusty blue + deep indigo / muted peach | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-2/R2-B2-hamster-lower-right.png` |
-| R2-C1 | Pigeon | lower-left | pale lavender + burgundy / muted seafoam green | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-2/R2-C1-pigeon-lower-left.png` |
-| R2-C2 | Pigeon | lower-right | soft coral + deep teal / muted sand beige | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-2/R2-C2-pigeon-lower-right.png` |
-| R3-A1 | Card Sprite | lower-left | fresh apple green + ink navy / muted lilac | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-3/R3-A1-card-sprite-lower-left.png` |
-| R3-A2 | Card Sprite | lower-right | butter yellow + charcoal blue / muted aqua | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-3/R3-A2-card-sprite-lower-right.png` |
-| R3-B1 | Hamster | lower-left | pale peach + terracotta / muted olive green | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-3/R3-B1-hamster-lower-left.png` |
-| R3-B2 | Hamster | lower-right | cool white + cobalt blue / muted coral pink | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-3/R3-B2-hamster-lower-right.png` |
-| R3-C1 | Pigeon | lower-left | soft mint + forest green / muted rose pink | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-3/R3-C1-pigeon-lower-left.png` |
-| R3-C2 | Pigeon | lower-right | warm cream + cobalt blue / muted orange | `/Users/alan/Dev/Paster/art/app-icon-exploration/2026-08-31/round-3/R3-C2-pigeon-lower-right.png` |
+| R2-A1 | Card Sprite | lower-left | soft mint + midnight blue / muted periwinkle blue | `art/app-icon-exploration/2026-08-31/round-2/R2-A1-card-sprite-lower-left.png` |
+| R2-A2 | Card Sprite | lower-right | pale sand + burnt orange / muted blue-gray | `art/app-icon-exploration/2026-08-31/round-2/R2-A2-card-sprite-lower-right.png` |
+| R2-B1 | Hamster | lower-left | honey amber + espresso brown / muted lavender | `art/app-icon-exploration/2026-08-31/round-2/R2-B1-hamster-lower-left.png` |
+| R2-B2 | Hamster | lower-right | dusty blue + deep indigo / muted peach | `art/app-icon-exploration/2026-08-31/round-2/R2-B2-hamster-lower-right.png` |
+| R2-C1 | Pigeon | lower-left | pale lavender + burgundy / muted seafoam green | `art/app-icon-exploration/2026-08-31/round-2/R2-C1-pigeon-lower-left.png` |
+| R2-C2 | Pigeon | lower-right | soft coral + deep teal / muted sand beige | `art/app-icon-exploration/2026-08-31/round-2/R2-C2-pigeon-lower-right.png` |
+| R3-A1 | Card Sprite | lower-left | fresh apple green + ink navy / muted lilac | `art/app-icon-exploration/2026-08-31/round-3/R3-A1-card-sprite-lower-left.png` |
+| R3-A2 | Card Sprite | lower-right | butter yellow + charcoal blue / muted aqua | `art/app-icon-exploration/2026-08-31/round-3/R3-A2-card-sprite-lower-right.png` |
+| R3-B1 | Hamster | lower-left | pale peach + terracotta / muted olive green | `art/app-icon-exploration/2026-08-31/round-3/R3-B1-hamster-lower-left.png` |
+| R3-B2 | Hamster | lower-right | cool white + cobalt blue / muted coral pink | `art/app-icon-exploration/2026-08-31/round-3/R3-B2-hamster-lower-right.png` |
+| R3-C1 | Pigeon | lower-left | soft mint + forest green / muted rose pink | `art/app-icon-exploration/2026-08-31/round-3/R3-C1-pigeon-lower-left.png` |
+| R3-C2 | Pigeon | lower-right | warm cream + cobalt blue / muted orange | `art/app-icon-exploration/2026-08-31/round-3/R3-C2-pigeon-lower-right.png` |
 
 ## Exact prompts
 
