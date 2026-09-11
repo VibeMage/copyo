@@ -1,6 +1,6 @@
 # Mac App Store 提审材料与操作清单
 
-创建日期：2026-09-01 · 最后更新：2026-09-09
+创建日期：2026-09-01 · 最后更新：2026-09-11
 
 ## 一、App Store Connect 建应用（你来操作）
 
@@ -288,3 +288,14 @@ tmp=$(mktemp -d) && cp docs/support/index.html "$tmp/" && cd "$tmp" \
    - 存储。
 3. 「App 审核」区域打开与审核的消息记录，回复上面的回复正文。
 4. 点右上角「提交以供审核」。
+
+## 十、审核通过（2026-09-11，1.0 (5)）
+
+- 状态：审核通过，欧盟之外地区上架，商店页面最长 24 小时后可见。
+- 欧盟 27 国暂不可售：需要先在 App Store Connect 完成《数字服务法案》(DSA) 交易者状态声明。
+  Paster 免费、无内购、无广告，个人账号可选「非交易者」：应用随即在欧盟可售，商店页对欧盟用户
+  显示一条「消费者保护法不适用」的提示，不公开任何联系方式。若选「交易者」，个人开发者的地址、
+  电话、邮箱会公开显示在欧盟商店页，并需邮箱/手机验证和上传证明文件。
+- 操作路径：App Store Connect → 业务（Business）→ 协议（Agreements）→ 合规（Compliance）→
+  Digital Services Act → Complete Compliance Requirements → 选「This is not a trader account」→ Done。
+  也可在 App → App 信息 → App Store Regulations and Permits 里按应用单独设置。
