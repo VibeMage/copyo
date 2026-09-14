@@ -40,7 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // 下面的 catch 永远抓不到，所以必须自己先判一次并把原因写给设置页。
             let wantsCloudKit = syncMode == .icloud && CloudSyncStatus.hasCloudKitEntitlement
             if syncMode == .icloud && !wantsCloudKit {
-                CloudSyncStatus.record(containerError: String(localized: "This copy of Paster is not signed for iCloud sync."))
+                CloudSyncStatus.record(containerError: String(localized: "This copy of Déjà is not signed for iCloud sync."))
             }
             do {
                 container = try PasterStore.makeContainer(url: storeURL, cloudKit: wantsCloudKit)
@@ -76,7 +76,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService.updateActivation()
 
         if cloudKitActive {
-            // CloudKit 的远程变更靠静默推送下发。Paster 是常驻菜单栏的应用，
+            // CloudKit 的远程变更靠静默推送下发。Déjà 是常驻菜单栏的应用，
             // 一开就是好几天，不注册推送的话别的设备改了什么只有下次启动才看得到。
             // 按 Apple 文档（Syncing a Core Data store with CloudKit），下行数据由系统
             // 在后台完成，应用不需要把 didReceiveRemoteNotification 转发给容器。
@@ -111,7 +111,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         CloudSyncStatus.record(pushError: "")
     }
 
-    /// 用户在 Applications 里再次双击 Paster 时呼出面板（否则毫无反应，会以为应用坏了）
+    /// 用户在 Applications 里再次双击 Déjà 时呼出面板（否则毫无反应，会以为应用坏了）
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
         panelController.show()
         return false
@@ -119,12 +119,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showWelcome() {
         let alert = NSAlert()
-        alert.messageText = String(localized: "Welcome to Paster")
+        alert.messageText = String(localized: "Welcome to Déjà")
 #if APPSTORE
         // 沙盒版的面板里有齿轮按钮，这里是唯一能告诉用户设置在哪的地方；
         // 直接分发版只能靠右键菜单栏图标打开设置。
         alert.informativeText = String(localized: """
-        Paster lives in the menu bar (the clipboard icon in the top-right corner).
+        Déjà lives in the menu bar (the clipboard icon in the top-right corner).
 
         • Press \(HotkeyConfig.load().displayString) anytime to bring up the clipboard panel
         • Everything you copy is saved automatically — type to search
@@ -133,7 +133,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         """)
 #else
         alert.informativeText = String(localized: """
-        Paster lives in the menu bar (the clipboard icon in the top-right corner).
+        Déjà lives in the menu bar (the clipboard icon in the top-right corner).
 
         • Press \(HotkeyConfig.load().displayString) anytime to bring up the clipboard panel
         • Everything you copy is saved automatically — type to search
@@ -162,9 +162,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // 自定义模板图标（纯黑+透明），系统按明暗模式自动反色
             let icon = NSImage(named: "MenuBarIcon")
             icon?.isTemplate = true
-            icon?.accessibilityDescription = "Paster"
+            icon?.accessibilityDescription = "Déjà"
             button.image = icon ?? NSImage(systemSymbolName: "doc.on.clipboard.fill",
-                                           accessibilityDescription: "Paster")
+                                           accessibilityDescription: "Déjà")
             button.action = #selector(statusItemClicked)
             button.target = self
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
@@ -184,7 +184,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
 
         let config = HotkeyConfig.load()
-        let openItem = NSMenuItem(title: String(localized: "Open Paster"),
+        let openItem = NSMenuItem(title: String(localized: "Open Déjà"),
                                   action: #selector(openPanel),
                                   keyEquivalent: config.keyEquivalentCharacter ?? "")
         openItem.keyEquivalentModifierMask = config.cocoaModifiers
@@ -203,7 +203,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: String(localized: "Quit Paster"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: String(localized: "Quit Déjà"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitItem)
 
         // 临时挂载菜单以支持右键弹出，弹出后立即移除，保持左键点击直接开面板

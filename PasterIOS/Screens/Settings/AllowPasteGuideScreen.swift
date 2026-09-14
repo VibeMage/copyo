@@ -4,7 +4,7 @@ import SwiftUI
 ///
 /// 设计稿的状态卡写「当前：每次询问」，但 iOS 不提供读取 `UIPasteboard` 授权状态的 API
 /// （`UIPasteboard.detectPatterns` 之类都会触发弹窗），照抄会显示一个假状态。
-/// 所以这里改成说明卡：只讲未设为「允许」时系统的行为，并说明 Paster 读不到当前值。
+/// 所以这里改成说明卡：只讲未设为「允许」时系统的行为，并说明 Déjà 读不到当前值。
 struct AllowPasteGuideScreen: View {
     @Environment(\.openURL) private var openURL
 
@@ -12,10 +12,10 @@ struct AllowPasteGuideScreen: View {
         GuideScroll {
             statusCard
 
-            GuideParagraph(text: String(localized: "Set it to Allow and Paster reads the clipboard the moment it opens, with no prompt. This is an iOS privacy setting, so it can only be changed in Settings."))
+            GuideParagraph(text: String(localized: "Set it to Allow and Déjà reads the clipboard the moment it opens, with no prompt. This is an iOS privacy setting, so it can only be changed in Settings."))
 
             GroupedCard {
-                GuideStepRow(1, title: String(localized: "Open Settings › Apps › Paster"))
+                GuideStepRow(1, title: String(localized: "Open Settings › Apps › Déjà"))
                 HairlineSeparator()
                 GuideStepRow(2, title: String(localized: "Tap “Paste from Other Apps”"))
                 HairlineSeparator()
@@ -25,7 +25,7 @@ struct AllowPasteGuideScreen: View {
                 }
             }
 
-            GuidePrimaryButton(title: String(localized: "Open Paster's Settings"),
+            GuidePrimaryButton(title: String(localized: "Open Déjà's Settings"),
                                symbol: "arrow.up.forward.app") {
                 if let url = SettingsLinks.appSettings { openURL(url) }
             }
@@ -48,7 +48,7 @@ struct AllowPasteGuideScreen: View {
                 Text(String(localized: "iOS asks every time"))
                     .font(.system(size: 15))
                     .foregroundStyle(PasterTheme.label)
-                Text(String(localized: "Paster can't read the current value of this setting"))
+                Text(String(localized: "Déjà can't read the current value of this setting"))
                     .font(.system(size: 13))
                     .foregroundStyle(PasterTheme.labelSecondary)
                     .fixedSize(horizontal: false, vertical: true)

@@ -48,6 +48,6 @@ extension ClipItem {
                          rtf: kind == .richText ? rtfData : nil,
                          url: linkURL,
                          imagePNG: kind == .image ? imageData : nil,
-                         suggestedName: displayTitle.isEmpty ? "Paster" : String(displayTitle.prefix(40)))
+                         suggestedName: displayTitle.isEmpty ? "Déjà" : String(displayTitle.prefix(40)))
     }
 }

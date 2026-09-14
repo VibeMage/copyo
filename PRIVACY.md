@@ -4,7 +4,7 @@
 
 ## English
 
-Paster does not collect, transmit, or sell any data. Period.
+Déjà (formerly Paster) does not collect, transmit, or sell any data. Period.
 
 - **Clipboard history** is stored only on your Mac (and, if you enable sync, in a
   folder you choose — such as your own iCloud Drive). It never touches our servers,
@@ -22,7 +22,7 @@ Questions: open an issue at https://github.com/VibeMage/Paster/issues
 
 ## 中文
 
-Paster 不收集、不传输、不出售任何数据。
+拾遗（Déjà，曾用名 Paster）不收集、不传输、不出售任何数据。
 
 - **剪贴板历史**只保存在你的 Mac 上（若开启同步，则保存在你自己选择的文件夹中，
   例如你自己的 iCloud Drive）。它不会经过我们的服务器——因为我们根本没有服务器。

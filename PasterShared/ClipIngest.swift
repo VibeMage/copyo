@@ -42,7 +42,7 @@ public enum ClipIngest {
             case .nothingToSave:
                 return String(localized: "There's nothing to save here.")
             case .storeUnavailable:
-                return String(localized: "Paster can't open its library right now.")
+                return String(localized: "Déjà can't open its library right now.")
             }
         }
     }

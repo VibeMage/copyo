@@ -57,7 +57,7 @@ struct ClipDetailScreen: View {
             Button(String(localized: "Cancel"), role: .cancel) {}
             Button(String(localized: "Delete"), role: .destructive, action: performDelete)
         } message: {
-            Text(String(localized: "It will be removed from Paster on all your devices."))
+            Text(String(localized: "It will be removed from Déjà on all your devices."))
         }
     }
 

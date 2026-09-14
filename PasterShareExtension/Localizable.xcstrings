@@ -154,6 +154,57 @@
         }
       }
     },
+    "Déjà can't open its library right now.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déjà can't open its library right now."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拾遗暂时打不开自己的资料库。"
+          }
+        }
+      }
+    },
+    "Déjà couldn't read that image.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déjà couldn't read that image."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拾遗读不出这张图片。"
+          }
+        }
+      }
+    },
+    "Déjà couldn't read what you shared.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déjà couldn't read what you shared."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拾遗读不出你分享的内容。"
+          }
+        }
+      }
+    },
     "File": {
       "extractionState": "manual",
       "localizations": {
@@ -290,70 +341,19 @@
         }
       }
     },
-    "Opens Paster and saves whatever is on the clipboard right now.": {
+    "Opens Déjà and saves whatever is on the clipboard right now.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Opens Paster and saves whatever is on the clipboard right now."
+            "value": "Opens Déjà and saves whatever is on the clipboard right now."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "打开 Paster，把此刻剪贴板里的内容存下来。"
-          }
-        }
-      }
-    },
-    "Paster can't open its library right now.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster can't open its library right now."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster 暂时打不开自己的资料库。"
-          }
-        }
-      }
-    },
-    "Paster couldn't read that image.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster couldn't read that image."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster 读不出这张图片。"
-          }
-        }
-      }
-    },
-    "Paster couldn't read what you shared.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster couldn't read what you shared."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster 读不出你分享的内容。"
+            "value": "打开拾遗，把此刻剪贴板里的内容存下来。"
           }
         }
       }
@@ -443,19 +443,19 @@
         }
       }
     },
-    "Save to Paster": {
+    "Save to Déjà": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save to Paster"
+            "value": "Save to Déjà"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "保存到 Paster"
+            "value": "保存到拾遗"
           }
         }
       }
@@ -477,36 +477,36 @@
         }
       }
     },
-    "Saves text, a link, or an image to Paster without opening the app.": {
+    "Saves text, a link, or an image to Déjà without opening the app.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saves text, a link, or an image to Paster without opening the app."
+            "value": "Saves text, a link, or an image to Déjà without opening the app."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "把文本、链接或图片存进 Paster，不打开 App。"
+            "value": "把文本、链接或图片存进拾遗，不打开 App。"
           }
         }
       }
     },
-    "Saves what's on the clipboard to Paster.": {
+    "Saves what's on the clipboard to Déjà.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saves what's on the clipboard to Paster."
+            "value": "Saves what's on the clipboard to Déjà."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "把剪贴板里的内容存进 Paster。"
+            "value": "把剪贴板里的内容存进拾遗。"
           }
         }
       }

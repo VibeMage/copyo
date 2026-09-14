@@ -358,19 +358,19 @@
         }
       }
     },
-    "After copying, press the Action Button, double-tap the back of your iPhone, or tap the Control Center button. Paster opens and shows “Saved”.": {
+    "After copying, press the Action Button, double-tap the back of your iPhone, or tap the Control Center button. Déjà opens and shows “Saved”.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "After copying, press the Action Button, double-tap the back of your iPhone, or tap the Control Center button. Paster opens and shows “Saved”."
+            "value": "After copying, press the Action Button, double-tap the back of your iPhone, or tap the Control Center button. Déjà opens and shows “Saved”."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "复制后按操作按钮、敲两下手机背面，或点控制中心按钮。Paster 会打开并提示「已保存」。"
+            "value": "复制后按操作按钮、敲两下手机背面，或点控制中心按钮。拾遗会打开并提示「已保存」。"
           }
         }
       }
@@ -1174,19 +1174,87 @@
         }
       }
     },
-    "Every time you open or come back to Paster it reads the current clipboard and saves it to your history. “Paste from Other Apps” has to be set to Allow.": {
+    "Déjà can't open its library right now.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Every time you open or come back to Paster it reads the current clipboard and saves it to your history. “Paste from Other Apps” has to be set to Allow."
+            "value": "Déjà can't open its library right now."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "每次打开或回到 Paster，自动读取当前剪贴板并存入历史。需要把「从其他 App 粘贴」设为允许。"
+            "value": "拾遗暂时打不开自己的资料库。"
+          }
+        }
+      }
+    },
+    "Déjà can't read the current value of this setting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déjà can't read the current value of this setting"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拾遗读不到这项设置的当前值"
+          }
+        }
+      }
+    },
+    "Déjà couldn't read that image.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déjà couldn't read that image."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拾遗读不出这张图片。"
+          }
+        }
+      }
+    },
+    "Déjà couldn't read what you shared.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déjà couldn't read what you shared."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拾遗读不出你分享的内容。"
+          }
+        }
+      }
+    },
+    "Every time you open or come back to Déjà it reads the current clipboard and saves it to your history. “Paste from Other Apps” has to be set to Allow.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every time you open or come back to Déjà it reads the current clipboard and saves it to your history. “Paste from Other Apps” has to be set to Allow."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每次打开或回到拾遗，自动读取当前剪贴板并存入历史。需要把「从其他 App 粘贴」设为允许。"
           }
         }
       }
@@ -1225,13 +1293,13 @@
         }
       }
     },
-    "File contents stay on your Mac. Paster keeps the name so you can find it there.": {
+    "File contents stay on your Mac. Déjà keeps the name so you can find it there.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "File contents stay on your Mac. Paster keeps the name so you can find it there."
+            "value": "File contents stay on your Mac. Déjà keeps the name so you can find it there."
           }
         },
         "zh-Hans": {
@@ -1361,13 +1429,13 @@
         }
       }
     },
-    "How Paster Saves Clips": {
+    "How Déjà Saves Clips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "How Paster Saves Clips"
+            "value": "How Déjà Saves Clips"
           }
         },
         "zh-Hans": {
@@ -1497,19 +1565,19 @@
         }
       }
     },
-    "It will be removed from Paster on all your devices.": {
+    "It will be removed from Déjà on all your devices.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "It will be removed from Paster on all your devices."
+            "value": "It will be removed from Déjà on all your devices."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "会从你所有设备上的 Paster 中移除。"
+            "value": "会从你所有设备上的拾遗中移除。"
           }
         }
       }
@@ -1888,19 +1956,19 @@
         }
       }
     },
-    "One press saves whatever is on the clipboard right now. Paster opens and shows “Saved”.": {
+    "One press saves whatever is on the clipboard right now. Déjà opens and shows “Saved”.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "One press saves whatever is on the clipboard right now. Paster opens and shows “Saved”."
+            "value": "One press saves whatever is on the clipboard right now. Déjà opens and shows “Saved”."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按一下就把当前剪贴板存进 Paster。系统会打开 Paster 并显示「已保存」。"
+            "value": "按一下就把当前剪贴板存进拾遗。系统会打开拾遗并显示「已保存」。"
           }
         }
       }
@@ -1939,19 +2007,19 @@
         }
       }
     },
-    "Open Paster's Settings": {
+    "Open Déjà's Settings": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Paster's Settings"
+            "value": "Open Déjà's Settings"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "打开 Paster 的系统设置"
+            "value": "打开拾遗的系统设置"
           }
         }
       }
@@ -1990,19 +2058,19 @@
         }
       }
     },
-    "Open Settings › Apps › Paster": {
+    "Open Settings › Apps › Déjà": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Settings › Apps › Paster"
+            "value": "Open Settings › Apps › Déjà"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "打开「设置 › App › Paster」"
+            "value": "打开「设置 › App › 拾遗」"
           }
         }
       }
@@ -2041,19 +2109,19 @@
         }
       }
     },
-    "Opens Paster and saves whatever is on the clipboard right now.": {
+    "Opens Déjà and saves whatever is on the clipboard right now.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Opens Paster and saves whatever is on the clipboard right now."
+            "value": "Opens Déjà and saves whatever is on the clipboard right now."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "打开 Paster，把此刻剪贴板里的内容存下来。"
+            "value": "打开拾遗，把此刻剪贴板里的内容存下来。"
           }
         }
       }
@@ -2075,87 +2143,19 @@
         }
       }
     },
-    "Paster can't open its library right now.": {
+    "Pick “Save Clipboard” under Déjà": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Paster can't open its library right now."
+            "value": "Pick “Save Clipboard” under Déjà"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Paster 暂时打不开自己的资料库。"
-          }
-        }
-      }
-    },
-    "Paster can't read the current value of this setting": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster can't read the current value of this setting"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster 读不到这项设置的当前值"
-          }
-        }
-      }
-    },
-    "Paster couldn't read that image.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster couldn't read that image."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster 读不出这张图片。"
-          }
-        }
-      }
-    },
-    "Paster couldn't read what you shared.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster couldn't read what you shared."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paster 读不出你分享的内容。"
-          }
-        }
-      }
-    },
-    "Pick “Save Clipboard” under Paster": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pick “Save Clipboard” under Paster"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在列表里选 Paster 的「保存剪贴板」"
+            "value": "在列表里选拾遗的「保存剪贴板」"
           }
         }
       }
@@ -2602,19 +2602,19 @@
         }
       }
     },
-    "Save to Paster": {
+    "Save to Déjà": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save to Paster"
+            "value": "Save to Déjà"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "保存到 Paster"
+            "value": "保存到拾遗"
           }
         }
       }
@@ -2636,36 +2636,36 @@
         }
       }
     },
-    "Saves text, a link, or an image to Paster without opening the app.": {
+    "Saves text, a link, or an image to Déjà without opening the app.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saves text, a link, or an image to Paster without opening the app."
+            "value": "Saves text, a link, or an image to Déjà without opening the app."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "把文本、链接或图片存进 Paster，不打开 App。"
+            "value": "把文本、链接或图片存进拾遗，不打开 App。"
           }
         }
       }
     },
-    "Saves what's on the clipboard to Paster.": {
+    "Saves what's on the clipboard to Déjà.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saves what's on the clipboard to Paster."
+            "value": "Saves what's on the clipboard to Déjà."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "把剪贴板里的内容存进 Paster。"
+            "value": "把剪贴板里的内容存进拾遗。"
           }
         }
       }
@@ -2704,19 +2704,19 @@
         }
       }
     },
-    "Select text or an image in any app, tap Share, then tap “Save to Paster”. You can pick a Pinboard on the way in.": {
+    "Select text or an image in any app, tap Share, then tap “Save to Déjà”. You can pick a Pinboard on the way in.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Select text or an image in any app, tap Share, then tap “Save to Paster”. You can pick a Pinboard on the way in."
+            "value": "Select text or an image in any app, tap Share, then tap “Save to Déjà”. You can pick a Pinboard on the way in."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在任何 App 里选中文字或图片，点「分享」，再点「保存到 Paster」。可以顺手选 Pinboard。"
+            "value": "在任何 App 里选中文字或图片，点「分享」，再点「保存到拾遗」。可以顺手选 Pinboard。"
           }
         }
       }
@@ -2755,19 +2755,19 @@
         }
       }
     },
-    "Set it to Allow and Paster reads the clipboard the moment it opens, with no prompt. This is an iOS privacy setting, so it can only be changed in Settings.": {
+    "Set it to Allow and Déjà reads the clipboard the moment it opens, with no prompt. This is an iOS privacy setting, so it can only be changed in Settings.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Set it to Allow and Paster reads the clipboard the moment it opens, with no prompt. This is an iOS privacy setting, so it can only be changed in Settings."
+            "value": "Set it to Allow and Déjà reads the clipboard the moment it opens, with no prompt. This is an iOS privacy setting, so it can only be changed in Settings."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "设为「允许」后，打开 Paster 时自动读取剪贴板，不再弹窗。这是 iOS 的隐私设置，只能在系统「设置」里更改。"
+            "value": "设为「允许」后，打开拾遗时自动读取剪贴板，不再弹窗。这是 iOS 的隐私设置，只能在系统「设置」里更改。"
           }
         }
       }
@@ -3163,19 +3163,19 @@
         }
       }
     },
-    "Takes effect after you reopen Paster": {
+    "Takes effect after you reopen Déjà": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Takes effect after you reopen Paster"
+            "value": "Takes effect after you reopen Déjà"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "重新打开 Paster 后生效"
+            "value": "重新打开拾遗后生效"
           }
         }
       }
@@ -3214,19 +3214,19 @@
         }
       }
     },
-    "Tap “Add a Control” and search for Paster": {
+    "Tap “Add a Control” and search for Déjà": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tap “Add a Control” and search for Paster"
+            "value": "Tap “Add a Control” and search for Déjà"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "点「添加控件」，搜索 Paster"
+            "value": "点「添加控件」，搜索拾遗"
           }
         }
       }
@@ -3299,19 +3299,19 @@
         }
       }
     },
-    "The control comes with Paster, so there is nothing to add first.": {
+    "The control comes with Déjà, so there is nothing to add first.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The control comes with Paster, so there is nothing to add first."
+            "value": "The control comes with Déjà, so there is nothing to add first."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "这个控件由 Paster 自带，不需要先添加任何东西。"
+            "value": "这个控件由拾遗自带，不需要先添加任何东西。"
           }
         }
       }
@@ -3605,36 +3605,36 @@
         }
       }
     },
-    "When you open Paster": {
+    "When you open Déjà": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "When you open Paster"
+            "value": "When you open Déjà"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "打开 Paster 时"
+            "value": "打开拾遗时"
           }
         }
       }
     },
-    "With this off, Paster won't read the clipboard when it opens — use the banner at the top of History to paste and save by hand.": {
+    "With this off, Déjà won't read the clipboard when it opens — use the banner at the top of History to paste and save by hand.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "With this off, Paster won't read the clipboard when it opens — use the banner at the top of History to paste and save by hand."
+            "value": "With this off, Déjà won't read the clipboard when it opens — use the banner at the top of History to paste and save by hand."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "关闭后，回到 Paster 不会自动读取剪贴板；用历史顶部的横幅手动粘贴保存。"
+            "value": "关闭后，回到拾遗不会自动读取剪贴板；用历史顶部的横幅手动粘贴保存。"
           }
         }
       }
@@ -3775,19 +3775,19 @@
         }
       }
     },
-    "iOS won't let apps read the clipboard in the background, so Paster only saves at these three moments.": {
+    "iOS won't let apps read the clipboard in the background, so Déjà only saves at these three moments.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "iOS won't let apps read the clipboard in the background, so Paster only saves at these three moments."
+            "value": "iOS won't let apps read the clipboard in the background, so Déjà only saves at these three moments."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "iOS 不允许 App 在后台读剪贴板，所以 Paster 只在这三种时刻保存内容。"
+            "value": "iOS 不允许 App 在后台读剪贴板，所以拾遗只在这三种时刻保存内容。"
           }
         }
       }
@@ -3877,19 +3877,19 @@
         }
       }
     },
-    "“Save to Paster” in any app": {
+    "“Save to Déjà” in any app": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "“Save to Paster” in any app"
+            "value": "“Save to Déjà” in any app"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "任何 App 里「保存到 Paster」"
+            "value": "任何 App 里「保存到拾遗」"
           }
         }
       }

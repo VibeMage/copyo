@@ -10,7 +10,7 @@ enum SettingsTint {
     static let question = Color(uiColor: PasterTheme.rgb(0xFF9F0A))
     static let bolt = Color(uiColor: PasterTheme.rgb(0xFF2D55))
     static let clipboard = Color(uiColor: PasterTheme.rgb(0x8E8E93))
-    /// 「自动读取剪贴板」是设计 04 里没有的一行（04e 的「Paster 键盘」留给 Phase 2）。
+    /// 「自动读取剪贴板」是设计 04 里没有的一行（04e 的「Déjà 键盘」留给 Phase 2）。
     /// 原来借用了键盘那格的 #5856D6，会跟 04 的图标序列撞色；换成不在序列里的青色。
     static let autoRead = Color(uiColor: PasterTheme.rgb(0x30B0C7))
     static let clock = Color(uiColor: PasterTheme.rgb(0x34C759))

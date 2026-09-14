@@ -212,7 +212,7 @@ enum DemoData {
 
         let billing: [Spec] = english
             ? [
-                Spec(kind: .text, text: "Paster Software Ltd · VAT GB 123 4567 89",
+                Spec(kind: .text, text: "Déjà Software Ltd · VAT GB 123 4567 89",
                      age: 6 * day, source: "Mail", colorHex: "#1B8EF1"),
                 Spec(kind: .text, text: "IBAN GB29 NWBK 6016 1331 9268 19",
                      age: 20 * day, source: nil, colorHex: nil),

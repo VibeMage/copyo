@@ -35,8 +35,8 @@ cd "$(dirname "$0")/.."
 
 TEAM_ID=9A94W79V84
 BUNDLE_ID=dev.vibemage.Paster
-# 上架脚本用的是 build/Paster.xcarchive，这里另起一个名字，两个脚本互不覆盖
-ARCHIVE=build/Paster-Release.xcarchive
+# 上架脚本用的是 build/Deja.xcarchive，这里另起一个名字，两个脚本互不覆盖
+ARCHIVE=build/Deja-Release.xcarchive
 
 VERSION=$(sed -n 's/.*MARKETING_VERSION = "\{0,1\}\([0-9][0-9.A-Za-z-]*\)"\{0,1\};.*/\1/p' Paster.xcodeproj/project.pbxproj | head -1)
 if [[ -z "$VERSION" ]]; then
@@ -69,7 +69,7 @@ matches_signing_error() {
   grep -qE "No signing certificate|no valid signing identity|doesn't include signing certificate|No profiles for|requires a provisioning profile|No account for team|No Accounts|valid signing identity|no devices from which|doesn't support the|conflicting provisioning settings" "$1"
 }
 
-echo "==> 归档 Paster $VERSION (Release)"
+echo "==> 归档 Déjà $VERSION (Release)"
 rm -rf "$ARCHIVE"
 ARCHIVE_LOG=$(mktemp)
 ARCHIVE_ARGS=(
@@ -152,9 +152,9 @@ fi
 grep -E "warning:" "$EXPORT_LOG" | grep -v appintentsmetadata || true
 rm -f "$EXPORT_LOG"
 
-APP="$EXPORT_DIR/out/Paster.app"
+APP="$EXPORT_DIR/out/Deja.app"
 if [[ ! -d "$APP" ]]; then
-  echo "导出成功但没找到 Paster.app，请检查 ${EXPORT_DIR}/out" >&2
+  echo "导出成功但没找到 Deja.app，请检查 ${EXPORT_DIR}/out" >&2
   exit 1
 fi
 codesign --verify --strict "$APP"
@@ -163,8 +163,8 @@ codesign --verify --strict "$APP"
 if [[ -n "${NOTARY_PROFILE:-}" ]]; then
   echo "==> 提交 Apple 公证（通常 1-5 分钟）"
   NOTARY_TMP=$(mktemp -d)
-  ditto -c -k --keepParent "$APP" "$NOTARY_TMP/Paster.zip"
-  xcrun notarytool submit "$NOTARY_TMP/Paster.zip" --keychain-profile "$NOTARY_PROFILE" --wait
+  ditto -c -k --keepParent "$APP" "$NOTARY_TMP/Deja.zip"
+  xcrun notarytool submit "$NOTARY_TMP/Deja.zip" --keychain-profile "$NOTARY_PROFILE" --wait
   rm -rf "$NOTARY_TMP"
   echo "==> Staple 公证票据"
   xcrun stapler staple "$APP"
@@ -177,17 +177,17 @@ echo "==> 生成 DMG"
 STAGING=$(mktemp -d)
 cp -R "$APP" "$STAGING/"
 ln -s /Applications "$STAGING/Applications"
-hdiutil create -volname "Paster" -srcfolder "$STAGING" -ov -quiet \
-  -format UDZO "dist/Paster-$VERSION.dmg"
+hdiutil create -volname "Déjà" -srcfolder "$STAGING" -ov -quiet \
+  -format UDZO "dist/Deja-$VERSION.dmg"
 rm -rf "$STAGING"
 
 echo "==> 生成 ZIP"
-ditto -c -k --keepParent "$APP" "dist/Paster-$VERSION.zip"
+ditto -c -k --keepParent "$APP" "dist/Deja-$VERSION.zip"
 
 rm -rf "$EXPORT_DIR"
 
 # 构建产物不进启动台/Spotlight（xcodebuild 每次都会自动注册）
-for _p in "$ARCHIVE/Products/Applications/Paster.app" build/Build/Products/Release/Paster.app; do
+for _p in "$ARCHIVE/Products/Applications/Deja.app" build/Build/Products/Release/Deja.app; do
   [ -d "$_p" ] && /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -u "$_p" 2>/dev/null || true
 done
 

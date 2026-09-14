@@ -119,7 +119,7 @@ struct SidebarView: View {
         @Bindable var model = model
         return VStack(spacing: 10) {
             HStack(spacing: 8) {
-                Text(verbatim: "Paster")
+                Text(verbatim: "Déjà")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(PasterTheme.label)
                 Spacer(minLength: 0)

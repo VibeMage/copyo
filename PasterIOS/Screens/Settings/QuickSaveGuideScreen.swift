@@ -38,7 +38,7 @@ struct QuickSaveGuideScreen: View {
 
     var body: some View {
         GuideScroll {
-            GuideParagraph(text: String(localized: "One press saves whatever is on the clipboard right now. Paster opens and shows “Saved”."))
+            GuideParagraph(text: String(localized: "One press saves whatever is on the clipboard right now. Déjà opens and shows “Saved”."))
 
             QuickSaveSegmentedControl(selection: $entry)
 
@@ -96,7 +96,7 @@ struct QuickSaveGuideScreen: View {
                      detail: String(localized: "iPhone 15 Pro and later")),
                 Step(title: String(localized: "Swipe to “Controls”, then tap “Choose a Control”"),
                      detail: nil),
-                Step(title: String(localized: "Pick “Save Clipboard” under Paster"),
+                Step(title: String(localized: "Pick “Save Clipboard” under Déjà"),
                      detail: String(localized: "Press and hold the Action Button to save")),
             ]
         case .backTap:
@@ -112,7 +112,7 @@ struct QuickSaveGuideScreen: View {
             [
                 Step(title: String(localized: "Open Control Center and press and hold an empty spot"),
                      detail: nil),
-                Step(title: String(localized: "Tap “Add a Control” and search for Paster"),
+                Step(title: String(localized: "Tap “Add a Control” and search for Déjà"),
                      detail: nil),
                 Step(title: String(localized: "Add “Save Clipboard”"),
                      detail: String(localized: "The Lock Screen buttons work the same way")),
@@ -123,7 +123,7 @@ struct QuickSaveGuideScreen: View {
     private func footnote(for entry: QuickSaveEntry) -> String {
         switch entry {
         case .actionButton, .controlCenter:
-            String(localized: "The control comes with Paster, so there is nothing to add first.")
+            String(localized: "The control comes with Déjà, so there is nothing to add first.")
         case .backTap:
             String(localized: "Back Tap can only run a shortcut, which is why this one needs the shortcut above.")
         }

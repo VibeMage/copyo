@@ -8,7 +8,7 @@ struct AboutScreen: View {
         GuideScroll(spacing: 24) {
             VStack(spacing: 12) {
                 AppMark()
-                Text(verbatim: "Paster")
+                Text(verbatim: "Déjà")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(PasterTheme.label)
                 Text(String(format: String(localized: "Version %@"), AppInfo.versionDisplay))
