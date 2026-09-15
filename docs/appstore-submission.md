@@ -1,6 +1,6 @@
 # Mac App Store 提审材料与操作清单
 
-创建日期：2026-09-01 · 最后更新：2026-09-14
+创建日期：2026-09-01 · 最后更新：2026-09-15
 
 ## 一、App Store Connect 建应用（你来操作）
 
@@ -29,8 +29,8 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
 | 字段 | 填写 |
 | --- | --- |
-| 名称 | en：`Déjà: Clipboard History`　zh-Hans：`拾遗 Déjà - 剪贴板历史`（1.0.1 起；名称按语言分别填写） |
-| 技术支持网址 | `https://vibemage.github.io/Paster/support/`（不变。仓库暂不改名，见第十一节） |
+| 名称 | `Copyo: Clipboard History`（1.0.1 起，中英文商店同名，不设中文名） |
+| 技术支持网址 | `https://vibemage.github.io/Paster/support/`（不变；仓库暂不改名，见第十一节） |
 | 营销网址 | 留空 |
 | 版本 | 1.0（与构建的 MARKETING_VERSION 一致） |
 | 版权 | `© 2026 Paster Contributors` |
@@ -52,7 +52,7 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 ```
 按下 ⇧⌘V，你复制过的一切从屏幕底部滑出。
 
-拾遗（Déjà，曾用名 Paster）是一款开源的剪贴板管理工具：
+Copyo（曾用名 Paster）是一款开源的剪贴板管理工具：
 • 自动记录复制过的文本、富文本、链接、颜色、图片和文件
 • 底部卡片面板，即输即搜，全键盘操作
 • 选中回车，内容立刻回到剪贴板，⌘V 即可粘贴
@@ -69,7 +69,7 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 ```
 Press ⇧⌘V and everything you've ever copied slides up from the bottom of your screen.
 
-Déjà (formerly Paster) is an open-source clipboard manager:
+Copyo (formerly Paster) is an open-source clipboard manager:
 • Automatically captures text, rich text, links, colors, images and files
 • Bottom card panel — type to search, fully keyboard-driven
 • Hit Return and it's back on your clipboard, ready to paste with ⌘V
@@ -83,15 +83,15 @@ No telemetry, no analytics, no network requests. Fully open source.
 
 ### 关键词（100 字符内）
 
-- zh：`剪贴板,粘贴,历史,剪切板,效率,复制,clipboard,paste,deja,拾遗,paster`
-- en：`clipboard,paste,history,copy,manager,productivity,snippets,pasteboard,deja,paster`
+- zh：`剪贴板,粘贴,历史,剪切板,效率,复制,clipboard,paste,copyo,paster`
+- en：`clipboard,paste,history,copy,manager,productivity,snippets,pasteboard,copyo,paster`
 
 ## 四、审核备注（App Review Notes，重点！）
 
 菜单栏工具是审核重点对象，把这段贴进「审核备注」能少一轮拒审：
 
 ```
-Déjà (formerly Paster) is a menu bar app (LSUIElement) with no Dock icon or main window.
+Copyo (formerly Paster) is a menu bar app (LSUIElement) with no Dock icon or main window.
 
 How to use:
 1. On first launch a welcome dialog explains the basics.
@@ -301,34 +301,33 @@ tmp=$(mktemp -d) && cp docs/support/index.html "$tmp/" && cd "$tmp" \
   Digital Services Act → Complete Compliance Requirements → 选「This is not a trader account」→ Done。
   也可在 App → App 信息 → App Store Regulations and Permits 里按应用单独设置。
 
-## 十一、改名：Paster → Déjà / 拾遗（2026-09-14，随 1.0.1 提交）
+## 十一、改名：Paster → Copyo（2026-09-15，随 1.0.1 提交）
 
-### 为什么改
+### 为什么改、为什么是它
 
-- pasterapp.com 的 Paster 是同平台同品类的 macOS 剪贴板管理器，2026-02-28 上线，比我们早半年；另有 Kai Luo 的老 Paster。对方在先使用，名称争议一旦提起，被动的是我们。
-- App Store 搜索会把 paster 归一成 paste，新应用被 Paste 系老应用淹没；不含 paste 词根的名字才有机会。
-- 候选名逐一查过 Mac/iOS 商店、GitHub、域名和 Google，Déjà 是同类冲突最少、辨识度最高的；中文商店单独用「拾遗」（中国区商店零同名）。对抗性 review 的结论和暴露点见会话记录：deja 一词占不住（约 30 个无关同名应用、deja.app 是别人的学习软件）、拾遗与同名公众号/手游共存、拾遗第 9 类商标未查。
+- pasterapp.com 的 Paster 是同平台同品类的 macOS 剪贴板管理器，2026-02-28 上线，比我们早半年；对方在先使用，名称争议一旦提起，被动的是我们。App Store 搜索又把 paster 归一成 paste，新应用被 Paste 系老应用淹没。
+- 先后评估过 Déjà + 拾遗（含义好但约 30 个同名应用、deja.app 是别人的产品，独立性不达标）、Revoici（法语真词「它又在这儿了」，最独立，但英语用户读音有门槛且易被听成 revoice）、Copylet（近似 couplet、字形近 Copilot）。最终选 **Copyo**：copy 加一个 o，好念好记，Mac/iOS 商店（美区、中国区）零同名，Google 无同名产品，copyo.app / .io / .dev 可注册；.com 自 2012 年被人持有，GitHub 的 copyo 是闲置个人账号。全部候选与检查数据见对比板（Claude artifact「Paster 改名候选板」）。
+- 不设中文名：中英文商店和界面统一叫 Copyo。
 
 ### 代码层面改了什么（`rename_brand.py`，main 与 release/1.0 都已执行）
 
-- 产品文件名 `Deja.app`（PRODUCT_NAME = Deja），显示名英文 `Déjà`、中文 `拾遗`（Paster/InfoPlist.xcstrings 本地化 CFBundleDisplayName / CFBundleName），Finder 显示本地化名字所需的 `LSHasLocalizedDisplayName` 由 Config/Paster-Info.plist 合并进 Info.plist。
-- 用户可见文案：欢迎对话框、菜单栏菜单、设置窗口标题、关于页、iOS 引导与分享扩展；中文界面统一叫「拾遗」。
+- 产品文件名 `Copyo.app`（PRODUCT_NAME = Copyo），显示名 `Copyo`，用户可见文案全部改名（欢迎对话框、菜单栏菜单、设置窗口标题、关于页、iOS 引导与分享扩展）。
 - **不动的**：bundle ID `dev.vibemage.Paster`、数据目录 `Application Support/Paster/`、沙盒容器路径、同步文件夹里的 `Paster/` 子目录、CloudKit 容器、PasterCore 模块名、target/scheme 名、工程文件名。老用户升级后数据原地保留。
-- release/1.0 的 MARKETING_VERSION 升到 1.0.1；上架包 `Deja-1.0.1-appstore.pkg`。
-- 仓库**暂不改名**：GitHub 对 github.com 链接会自动跳转，但 Pages 项目站地址不跳转，线上 1.0 的支持网址会在 1.0.1 过审前失效。等注册了自定义域名（如 dejaclip.app）挂到 Pages 之后再把仓库改成 `deja`，届时地址不再依赖仓库名。
+- release/1.0 的 MARKETING_VERSION 升到 1.0.1；上架包 `Copyo-1.0.1-appstore.pkg`。
+- 仓库暂不改名（Pages 项目站地址不随仓库改名跳转，线上 1.0 的支持网址会失效）。等注册了自定义域名（推荐 copyo.app）挂到 Pages 之后再改仓库名。
 
 ### 提交 1.0.1 前你要做的
 
-1. 商标检索（各五分钟）：美国 https://tmsearch.uspto.gov 搜 DEJA（第 9 类）；中国 https://sbj.cnipa.gov.cn 商标网上查询 → 近似查询 → 第 9 类 / 第 42 类 搜「拾遗」。有在先的软件类注册就回来改中文名（只改商店元数据即可）。
-2. 可选：注册 dejaclip.app（RDAP 查过可注册），挂到 GitHub Pages 做自定义域名，以后改名不再影响支持网址。
+1. 商标检索（五分钟）：https://tmsearch.uspto.gov 搜 COPYO（第 9 类）。中国区可顺手在 https://sbj.cnipa.gov.cn 查一下。
+2. 建议尽快注册 copyo.app（RDAP 查过可注册），挂到 GitHub Pages 做自定义域名。
 
 ### App Store Connect 操作
 
 1. Paster → 版本 → ➕ 新版本 `1.0.1`。
-2. App 信息 → 可本地化信息：英文名称 `Déjà: Clipboard History`；简体中文名称 `拾遗 Déjà - 剪贴板历史`。副标题不变。
+2. App 信息 → 可本地化信息：英文与简体中文名称都改为 `Copyo: Clipboard History`。副标题不变。
 3. 版本页：描述（第三节新版）、关键词（第三节新版）、审核备注（第四节新版）。技术支持网址不变。
 4. 此版本的新增内容：
-   - zh：`Paster 更名为「拾遗」（Déjà）。功能不变，你的历史记录、Pinboard 和设置全部原地保留。`
-   - en：`Paster is now Déjà. Same app, same data — only the name has changed.`
-5. Transporter 拖入 `build/appstore/Deja-1.0.1-appstore.pkg` → Deliver；处理完后在版本页选中该构建。
-6. 提交以供审核。名称在审核通过并发布后才会在商店里变更；商店链接里的 id 不变，旧的 `paster-clipboard-history` slug 会自动跳到新 slug。
+   - zh：`Paster 更名为 Copyo。功能不变，你的历史记录、Pinboard 和设置全部原地保留。`
+   - en：`Paster is now Copyo. Same app, same data — only the name has changed.`
+5. Transporter 拖入 `build/appstore/Copyo-1.0.1-appstore.pkg` → Deliver；处理完后在版本页选中该构建。
+6. 提交以供审核。名称在审核通过并发布后才会在商店里变更；商店链接里的 id 不变。

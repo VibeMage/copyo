@@ -155,7 +155,7 @@ final class AppModel {
         }
         if consumePendingQuickSave() { return }
         guard !launch.useDemoData else { return }
-        // 引导还盖在屏幕上时不做通道 A 的采集：用户还没看到「Déjà 会读剪贴板」这句话，
+        // 引导还盖在屏幕上时不做通道 A 的采集：用户还没看到「Copyo 会读剪贴板」这句话，
         // 这时弹系统「想从 X 粘贴」既突兀又可能把不相干的内容（验证码、口令）直接存进历史。
         // 一键保存是用户明确按下的动作，所以排在这条门禁之前。
         guard !showsOnboarding else { return }

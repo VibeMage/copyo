@@ -9,7 +9,7 @@
 # 前置条件（一次性，在 Xcode 里完成）:
 #   1. Xcode → Settings → Accounts 登录有 App Store 权限的 Apple ID
 #   2. 该团队下创建两张证书:
-#        Apple Distribution         —— 给 Deja.app 签名
+#        Apple Distribution         —— 给 Copyo.app 签名
 #        Mac Installer Distribution —— 给导出的 .pkg 签名
 #   3. App Store Connect 里建好 bundle id 为 dev.vibemage.Paster 的 App 记录
 #   4. 开发者后台 → Identifiers → dev.vibemage.Paster 勾选 iCloud (CloudKit)
@@ -33,7 +33,7 @@ cd "$(dirname "$0")/.."
 
 TEAM_ID=9A94W79V84
 BUNDLE_ID=dev.vibemage.Paster
-ARCHIVE=build/Deja.xcarchive
+ARCHIVE=build/Copyo.xcarchive
 
 # 版本号必须取自真正被归档的那份配置。project.pbxproj 里三个 target 配置各有一行
 # MARKETING_VERSION / CURRENT_PROJECT_VERSION，按文件顺序 sed 到的第一行是 Debug 的值；
@@ -60,7 +60,7 @@ fi
 # 刻意不放进 dist/：build-release.sh 每次跑都会 rm -rf dist，
 # 先出上架包再出直分发包的话，.pkg 会被无声删掉。build/ 已在 .gitignore 里。
 PKG_DIR=build/appstore
-PKG="${PKG_DIR}/Deja-${VERSION}-appstore.pkg"
+PKG="${PKG_DIR}/Copyo-${VERSION}-appstore.pkg"
 
 # 证书缺失是这个脚本最常见的失败原因，日志里那一大段 provisioning 报错很难读，
 # 命中关键字时直接给出该去 Xcode 做什么。
@@ -70,7 +70,7 @@ print_signing_help() {
 看起来是签名证书或描述文件缺失。请在 Xcode 里补齐后重试：
   1. Xcode → Settings → Accounts，登录后选中团队 ${TEAM_ID}
   2. Manage Certificates… → 左下角 + 号，创建这两张证书：
-       Apple Distribution         （给 Deja.app 签名）
+       Apple Distribution         （给 Copyo.app 签名）
        Mac Installer Distribution （给导出的 .pkg 签名）
   3. 确认 App Store Connect 里已存在 bundle id 为 ${BUNDLE_ID} 的 App 记录，
      否则自动申请描述文件会失败
@@ -93,7 +93,7 @@ matches_signing_error() {
   grep -qE "No signing certificate|no valid signing identity|doesn't include signing certificate|No profiles for|requires a provisioning profile|No account for team|No Accounts|valid signing identity|Distribution certificate|no devices from which|doesn't support the|conflicting provisioning settings" "$1"
 }
 
-echo "==> 归档 Déjà ${VERSION} (build ${BUILD_NUMBER}, Release-AppStore)"
+echo "==> 归档 Copyo ${VERSION} (build ${BUILD_NUMBER}, Release-AppStore)"
 rm -rf "$ARCHIVE"
 ARCHIVE_LOG=$(mktemp)
 if ! xcodebuild -project Paster.xcodeproj -scheme Paster -configuration Release-AppStore \
@@ -229,7 +229,7 @@ PLIST
 fi
 
 # 归档产物不进启动台/Spotlight
-for _p in build/Deja.xcarchive/Products/Applications/Deja.app build/Build/Products/Release-AppStore/Deja.app; do
+for _p in build/Copyo.xcarchive/Products/Applications/Copyo.app build/Build/Products/Release-AppStore/Copyo.app; do
   [ -d "$_p" ] && /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -u "$_p" 2>/dev/null || true
 done
 echo "安装包：${PKG}"

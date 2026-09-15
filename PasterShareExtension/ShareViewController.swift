@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 import UIKit
 
-/// 采集通道 B 的入口：系统分享面板里的「保存到 Déjà」。
+/// 采集通道 B 的入口：系统分享面板里的「保存到 Copyo」。
 ///
 /// 类名被 `Info.plist` 的 `NSExtensionPrincipalClass` 引用，改名要同步改 plist。
 /// 界面本体是 SwiftUI 的 `ShareView`（在 PasterShared 里，主应用的 `-demoScreen share` 用同一份），
@@ -85,7 +85,7 @@ private struct ShareRootView: View {
             payload = loaded
         case .empty:
             if loadErrorMessage == nil {
-                loadErrorMessage = String(localized: "Déjà couldn't read what you shared.")
+                loadErrorMessage = String(localized: "Copyo couldn't read what you shared.")
             }
         case .timedOut:
             if loadErrorMessage == nil {

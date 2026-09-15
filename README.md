@@ -1,6 +1,6 @@
-# Déjà
+# Copyo
 
-Déjà（中文名「拾遗」，曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜单栏常驻，`⇧⌘V` 呼出底部卡片面板，历史即输即搜。
+Copyo（曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜单栏常驻，`⇧⌘V` 呼出底部卡片面板，历史即输即搜。
 所有数据仅保存在本机（`~/Library/Application Support/Paster/`），无任何网络请求，适合不允许安装第三方闭源工具的办公环境。
 
 ## 功能
@@ -24,7 +24,7 @@ Déjà（中文名「拾遗」，曾用名 Paster）是一款开源的 macOS 剪
 
 ## 安装
 
-从 [Releases](https://github.com/VibeMage/Paster/releases) 下载最新 DMG，打开后把 Déjà
+从 [Releases](https://github.com/VibeMage/Paster/releases) 下载最新 DMG，打开后把 Copyo
 拖进 Applications 即可。官方发布均已使用 Developer ID 签名并通过 Apple 公证——双击即可打开，
 仅首次有一次「从互联网下载的 App」标准确认弹窗。
 
@@ -35,7 +35,7 @@ Déjà（中文名「拾遗」，曾用名 Paster）是一款开源的 macOS 剪
 ```bash
 git clone <repo-url> && cd Paster
 xcodebuild -project Paster.xcodeproj -scheme Paster -configuration Release -derivedDataPath build build
-open build/Build/Products/Release/Deja.app   # 或拷贝到 /Applications
+open build/Build/Products/Release/Copyo.app   # 或拷贝到 /Applications
 ```
 
 也可以直接用 Xcode 打开 `Paster.xcodeproj` 运行（⌘R）。
@@ -65,7 +65,7 @@ xcodebuild -project Paster.xcodeproj -scheme Paster -configuration Release \
 ```bash
 NOTARY_PROFILE=paster-notary ./scripts/build-release.sh
 # 归档 → 以 Developer ID 导出（签名、entitlements、描述文件由 Xcode 处理）
-# → Apple 公证 → staple → 产出 dist/Deja-<版本>.dmg + .zip
+# → Apple 公证 → staple → 产出 dist/Copyo-<版本>.dmg + .zip
 ```
 
 首次需要一次性配置公证凭据（App 专用密码在 account.apple.com 生成）：
@@ -78,7 +78,7 @@ xcrun notarytool store-credentials paster-notary \
 - 脚本需要一份 Developer ID 证书与对应的描述文件（含 iCloud 容器与推送能力）。
   **没有开发者证书时**（比如自行从源码构建）：直接用上一节的 `CODE_SIGNING_ALLOWED=NO`
   构建即可，产物只适合本机使用；拿到其他机器会提示「已损坏，无法打开」（Gatekeeper 对
-  无开发者身份应用的固定提示），需执行一次 `xattr -cr /Applications/Deja.app`。
+  无开发者身份应用的固定提示），需执行一次 `xattr -cr /Applications/Copyo.app`。
 - 企业环境若有 MDM（Jamf 等），也可以白名单分发。
 
 ### 更新
@@ -112,10 +112,10 @@ xcrun notarytool store-credentials paster-notary \
 ## 架构
 
 ```
-Déjà/
+Copyo/
 ├── App/        应用入口、菜单栏常驻（NSStatusItem）
 ├── Models/     SwiftData 模型：ClipItem、Pinboard
-├── Services/   剪贴板轮询监听、写回剪贴板、全局快捷键、iCloud 同步、图标取色、缩略图缓存
+├── Services/   剪贴板轮询监听、写回与模拟 ⌘V、全局快捷键、iCloud 同步、图标取色、缩略图缓存
 ├── Panel/      底部滑出面板（NSPanel + SwiftUI）：卡片流、搜索、预览
 └── Settings/   设置窗口（通用 / 历史 / 同步 / 快捷键 / 关于）
 ```
@@ -124,7 +124,7 @@ Déjà/
 
 - macOS 没有剪贴板变化通知 API，`ClipboardMonitor` 以 0.3s 间隔轮询 `NSPasteboard.changeCount`（所有剪贴板工具的通用做法）
 - 文本优先于图片抓取：Excel/Numbers 等复制文本时会同时放一份图像渲染，必须按文本记录
-- 全局快捷键使用 Carbon `RegisterEventHotKey`，零第三方依赖；应用不使用辅助功能权限
+- 全局快捷键使用 Carbon `RegisterEventHotKey`，零第三方依赖；模拟 `⌘V` 前会确认目标应用已回到前台
 - 存储使用 SwiftData（SQLite），图片走 `externalStorage` + SHA-256 去重 + 缩略图缓存
 - 同步有两条互斥的通道：文件夹方式是快照合并（iCloud Drive 或任意共享目录皆可，
   无需付费开发者账号，但不传播删除）；iCloud 方式由 SwiftData 直接镜像到 CloudKit

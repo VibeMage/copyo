@@ -67,7 +67,7 @@ final class PanelController: NSObject, NSWindowDelegate {
 
     func show() {
         guard !panel.isVisible else { return }
-        // 前台应用可能已经是 Déjà 自己（如设置窗口在前台），此时保留上一次记录的目标应用
+        // 前台应用可能已经是 Copyo 自己（如设置窗口在前台），此时保留上一次记录的目标应用
         let front = NSWorkspace.shared.frontmostApplication
         if front?.processIdentifier != ProcessInfo.processInfo.processIdentifier {
             previousApp = front

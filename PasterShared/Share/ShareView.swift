@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 设计 06：分享面板「保存到 Déjà」。
+/// 设计 06：分享面板「保存到 Copyo」。
 ///
 /// 放在 PasterShared 而不是扩展目录里，是为了让主应用的 `-demoScreen share` 用**同一份视图**截图——
 /// 分享扩展在模拟器里没法从系统分享面板拉起来，只能靠这条路核对设计。
@@ -101,7 +101,7 @@ public struct ShareView: View {
             Spacer(minLength: 0)
             HStack(spacing: 8) {
                 PasterMark()
-                Text(String(localized: "Save to Déjà"))
+                Text(String(localized: "Save to Copyo"))
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(ShareTheme.label)
             }

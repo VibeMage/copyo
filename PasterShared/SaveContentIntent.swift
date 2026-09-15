@@ -5,16 +5,16 @@ import UniformTypeIdentifiers
 
 /// 采集通道 C（快捷指令路径）：静默保存，不打开主应用。
 ///
-/// 典型用法是在快捷指令里组合「获取剪贴板 → Déjà 保存内容」，绑到敲击背面或操作按钮上：
+/// 典型用法是在快捷指令里组合「获取剪贴板 → Copyo 保存内容」，绑到敲击背面或操作按钮上：
 /// 剪贴板由快捷指令系统读（用户已经在 Shortcuts 里授过权），内容作为参数传进来，
-/// Déjà 全程不碰剪贴板，也不用把自己拉到前台——用户留在当前 App 里，只看到一条顶部横幅。
+/// Copyo 全程不碰剪贴板，也不用把自己拉到前台——用户留在当前 App 里，只看到一条顶部横幅。
 ///
 /// 三个参数三选一（至少给一个），优先级 图片 > 链接 > 文本：
 /// 网页分享类的输入通常同时带 URL 和标题，链接比标题更有保存价值。
 struct SaveContentIntent: AppIntent {
     static let title: LocalizedStringResource = "Save Content"
     static let description = IntentDescription(
-        "Saves text, a link, or an image to Déjà without opening the app.",
+        "Saves text, a link, or an image to Copyo without opening the app.",
         categoryName: "Clipboard",
         searchKeywords: ["clipboard", "save", "clip"]
     )
@@ -31,7 +31,7 @@ struct SaveContentIntent: AppIntent {
     var image: IntentFile?
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Save \(\.$text) to Déjà") {
+        Summary("Save \(\.$text) to Copyo") {
             \.$url
             \.$image
         }
@@ -75,7 +75,7 @@ enum SaveContentError: Swift.Error, CustomLocalizedStringResourceConvertible {
         case .noContent:
             "Give Save Content some text, a link, or an image."
         case .unreadableImage:
-            "Déjà couldn't read that image."
+            "Copyo couldn't read that image."
         }
     }
 }

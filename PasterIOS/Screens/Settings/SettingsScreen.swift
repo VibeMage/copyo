@@ -69,7 +69,7 @@ struct SettingsScreen: View {
             .settingsRow()
             // 容器是在 App 启动时按这个开关建的，运行中改不了，只能提示重开
             .onChange(of: cloudSyncEnabled) { _, _ in
-                model.toast.show(String(localized: "Takes effect after you reopen Déjà"),
+                model.toast.show(String(localized: "Takes effect after you reopen Copyo"),
                                  symbol: "arrow.clockwise")
             }
 
@@ -138,7 +138,7 @@ struct SettingsScreen: View {
             } label: {
                 SettingsRowLabel(symbol: "questionmark.circle.fill",
                                  color: SettingsTint.question,
-                                 title: String(localized: "How Déjà Saves Clips"),
+                                 title: String(localized: "How Copyo Saves Clips"),
                                  showsDisclosure: true)
             }
             .settingsRow()
@@ -203,7 +203,7 @@ struct SettingsScreen: View {
         } header: {
             Text(String(localized: "Clipboard"))
         } footer: {
-            Text(String(localized: "With this off, Déjà won't read the clipboard when it opens — use the banner at the top of History to paste and save by hand."))
+            Text(String(localized: "With this off, Copyo won't read the clipboard when it opens — use the banner at the top of History to paste and save by hand."))
         }
     }
 

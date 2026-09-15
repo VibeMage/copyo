@@ -29,7 +29,7 @@ enum QuickSaveCoordinator {
         IOSSettings.pendingQuickSaveAt = nil
         guard Date().timeIntervalSince(requestedAt) < validity else { return false }
         // 用 captureNow 而不是 checkOnForeground：用户亲手按了按钮，
-        // 「打开 Déjà 时读取剪贴板」这个开关在这条路上不适用，changeCount 没变也照存。
+        // 「打开 Copyo 时读取剪贴板」这个开关在这条路上不适用，changeCount 没变也照存。
         capture.captureNow()
         return true
     }

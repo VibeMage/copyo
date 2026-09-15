@@ -187,7 +187,7 @@ struct ClipDetailPreview: View {
             .background(PasterTheme.dynamic(light: PasterTheme.rgb(0x000000, 0.06),
                                             dark: PasterTheme.rgb(0xFFFFFF, 0.1)),
                         in: RoundedRectangle(cornerRadius: 5, style: .continuous))
-            Text(String(localized: "File contents stay on your Mac. Déjà keeps the name so you can find it there."))
+            Text(String(localized: "File contents stay on your Mac. Copyo keeps the name so you can find it there."))
                 .font(.footnote)
                 .foregroundStyle(PasterTheme.labelSecondary)
                 .lineSpacing(2)

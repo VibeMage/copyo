@@ -120,6 +120,57 @@
         }
       }
     },
+    "Copyo can't open its library right now.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo can't open its library right now."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 暂时打不开自己的资料库。"
+          }
+        }
+      }
+    },
+    "Copyo couldn't read that image.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo couldn't read that image."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 读不出这张图片。"
+          }
+        }
+      }
+    },
+    "Copyo couldn't read what you shared.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo couldn't read what you shared."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 读不出你分享的内容。"
+          }
+        }
+      }
+    },
     "Couldn't save": {
       "extractionState": "manual",
       "localizations": {
@@ -150,57 +201,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "不固定"
-          }
-        }
-      }
-    },
-    "Déjà can't open its library right now.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Déjà can't open its library right now."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "拾遗暂时打不开自己的资料库。"
-          }
-        }
-      }
-    },
-    "Déjà couldn't read that image.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Déjà couldn't read that image."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "拾遗读不出这张图片。"
-          }
-        }
-      }
-    },
-    "Déjà couldn't read what you shared.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Déjà couldn't read what you shared."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "拾遗读不出你分享的内容。"
           }
         }
       }
@@ -341,19 +341,19 @@
         }
       }
     },
-    "Opens Déjà and saves whatever is on the clipboard right now.": {
+    "Opens Copyo and saves whatever is on the clipboard right now.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Opens Déjà and saves whatever is on the clipboard right now."
+            "value": "Opens Copyo and saves whatever is on the clipboard right now."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "打开拾遗，把此刻剪贴板里的内容存下来。"
+            "value": "打开 Copyo，把此刻剪贴板里的内容存下来。"
           }
         }
       }
@@ -443,19 +443,19 @@
         }
       }
     },
-    "Save to Déjà": {
+    "Save to Copyo": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save to Déjà"
+            "value": "Save to Copyo"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "保存到拾遗"
+            "value": "保存到 Copyo"
           }
         }
       }
@@ -477,36 +477,36 @@
         }
       }
     },
-    "Saves text, a link, or an image to Déjà without opening the app.": {
+    "Saves text, a link, or an image to Copyo without opening the app.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saves text, a link, or an image to Déjà without opening the app."
+            "value": "Saves text, a link, or an image to Copyo without opening the app."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "把文本、链接或图片存进拾遗，不打开 App。"
+            "value": "把文本、链接或图片存进 Copyo，不打开 App。"
           }
         }
       }
     },
-    "Saves what's on the clipboard to Déjà.": {
+    "Saves what's on the clipboard to Copyo.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saves what's on the clipboard to Déjà."
+            "value": "Saves what's on the clipboard to Copyo."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "把剪贴板里的内容存进拾遗。"
+            "value": "把剪贴板里的内容存进 Copyo。"
           }
         }
       }
