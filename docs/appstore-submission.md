@@ -32,10 +32,10 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
 | 字段 | 填写 |
 | --- | --- |
-| 名称 | `Copyo: Clipboard History`（1.0.1 起，中英文商店同名，不设中文名） |
+| 名称 | `Copyo: Clipboard History`（中英文商店同名，不设中文名） |
 | 技术支持网址 | `https://vibemage.github.io/copyo/support/`（仓库 2026-09-16 已改名为 copyo，旧地址随之 404，见第十二节） |
 | 营销网址 | 留空 |
-| 版本 | 1.0.1（与构建的 MARKETING_VERSION 一致） |
+| 版本 | 1.0（新应用记录从 1.0 重新开始，与构建的 MARKETING_VERSION 一致） |
 | 版权 | `© 2026 Copyo Contributors` |
 
 ### 推广文本（170 字符内，可随时改无需审核）
@@ -390,7 +390,7 @@ GitHub 仓库从 `VibeMage/Paster` 改名为 `VibeMage/copyo`。GitHub 会为 gi
 bundle ID、容器标识——原封不动留着 Paster。这一轮把它们全部改掉。
 
 前提变了：**2026-09-19 旧的 App Store Connect 应用记录（`dev.vibemage.Paster`，商店里的 Paster）已被删除，
-1.0.1 不再是「改名上架」，而是以 Copyo 的身份重新建记录、重新提审。** Apple 不允许复用已删除应用的
+改名不再是「换个名字发新版」，而是以 Copyo 的身份重新建记录、从 1.0 重新提审。** Apple 不允许复用已删除应用的
 bundle ID，所以 bundle ID 必须换，正好与改名一起做完。
 
 ### 改了什么
@@ -429,7 +429,8 @@ bundle ID，所以 bundle ID 必须换，正好与改名一起做完。
 4. CloudKit Console：在新容器里跑一遍 Development schema，确认 `ClipItem` / `Pinboard` 两张表齐全后
    部署到 Production（正式版发布前必须做完）。
 5. ASC → 我的 App → ➕ 新建 App：平台 macOS，名称 `Copyo: Clipboard History`，套装 ID `dev.vibemage.Copyo`，
-   SKU `copyo`（旧记录的 SKU `paster` 随记录一起没了）。商店文案、关键词、审核备注见第三、四节。
+   SKU `copyo`（旧记录的 SKU `paster` 随记录一起没了）。版本号 **1.0**，构建号从 **1** 开始——新记录没有
+   历史构建，`CURRENT_PROJECT_VERSION` 已经重置为 1。商店文案、关键词、审核备注见第三、四节。
 6. 描述文件：自动签名会按新 App ID 重新生成；Developer ID 那张要包含新的 iCloud 容器与 App Group，
    否则 `build-release.sh` 归档会失败。
 
