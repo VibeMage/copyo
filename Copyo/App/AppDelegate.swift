@@ -83,12 +83,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSApplication.shared.registerForRemoteNotifications()
         }
 
-        // 自动化/截图辅助：-forceDark 强制深色外观；-showSettings 直接打开设置窗口
+        // 自动化/截图辅助：-forceDark 强制深色外观；-showSettings 直接打开设置窗口；
+        // -showPanel 启动即拉起面板（拍商店截图时用，省得去模拟 ⇧⌘V——
+        // 全局快捷键走 Carbon，模拟按键要给控制方开辅助功能权限）
         if ProcessInfo.processInfo.arguments.contains("-forceDark") {
             NSApp.appearance = NSAppearance(named: .darkAqua)
         }
         if ProcessInfo.processInfo.arguments.contains("-showSettings") {
             openSettings()
+        }
+        if ProcessInfo.processInfo.arguments.contains("-showPanel") {
+            panelController.show()
         }
 
         // 首次启动：LSUIElement 应用没有窗口也没有 Dock 图标，

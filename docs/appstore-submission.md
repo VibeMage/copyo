@@ -552,8 +552,45 @@ Cardo、Roneo、Inkyo 等十余个也都撞了在架应用或踩了发音雷。
    欧盟那部分与 DSA 交易者状态绑在一起。
 3. **DSA 交易者状态**（见第十节）。
 4. **构建版本**：还没有可上传的包。需要用新的 App ID 归档签名。
-5. **截图 03 / 04 要重拍**：仓库里 `art/store/03-preview-*` 的副标题写着「then ↩ to paste」，
-   `04-shortcuts-*` 的设置页里还是「Paste selected item」「Paste selected item as plain text」——
-   这两条文案在 1.0 (4) 移除自动粘贴时就删了。拿去提审等于截图展示一个会自动粘贴的应用，
-   而审核备注写的是本应用不粘贴、不使用辅助功能，自相矛盾，有再吃一次 2.4.5 的风险。
-   目前版本页只放了 01、02 两张干净的。
+5. ~~截图 03 / 04 要重拍~~ **已重拍**，见第十六节。
+
+## 十六、商店截图重拍（2026-09-19）
+
+### 为什么必须重拍
+
+初版四张是 Paster 1.0 时代拍的，其中两张仍在宣传 **1.0 (4) 已经移除的自动粘贴**：
+
+- `03-preview-*`：副标题「Preview text, images and files — then ↩ **to paste**」／「↩ **直接粘贴**」
+- `04-shortcuts-*`：设置页截图里是「**Paste** selected item」「**Paste** selected item as plain text」，
+  这两条文案在移除自动粘贴时就改成了 Copy / 复制
+
+拿去提审等于截图展示一个会自动粘贴的应用，而审核备注写的是「本应用不粘贴、不使用辅助功能」，
+自相矛盾——2.4.5 正是 2026-09-08 那次拒审的条款。
+
+### 做了什么
+
+四张**全部重拍**，而不是只补两张：初版面板高 564px，本机采集出来是 507px（屏幕宽高比不同），
+只换两张会让卡片大小对不上。
+
+新增 `scripts/make-store-shots.py`，把这件事变成可复现的管线：统一的渐变背景板
+（`art/store/_background-plate.png`，从初版反推）+ 应用图标 + 标题 + 副标题 + 真实 UI 截图。
+版式参数（图标位置与尺寸、标题/副标题基线与字号、设置窗口贴图位置）都由初版实测标定，
+新图与初版逐像素对齐（图标包围盒 1218–1340 × 204–329，完全一致）。
+
+`AppDelegate` 新增 `-showPanel` 启动开关（与既有的 `-forceDark`、`-demoPreview`、
+`-settingsTab` 同类），启动即拉起面板，省得靠模拟 ⇧⌘V——全局快捷键走 Carbon，
+模拟按键要给控制方开辅助功能权限。
+
+演示数据用一个一次性 Swift 包灌进库里再拍，**不要拿自己的真实剪贴板去拍**，
+那会把私人内容发到 App Store 上。拍完记得删掉 `~/Library/Application Support/Copyo/`。
+
+### 改掉的文案
+
+| 截图 | 旧（作废） | 新 |
+| --- | --- | --- |
+| 03 en | Preview text, images and files — then ↩ to paste | Preview text, images and files without leaving the panel |
+| 03 zh | 大图预览文本、图片和文件，↩ 直接粘贴 | 大图预览文本、图片和文件，不用离开面板 |
+| 04 en | Summon, search, **paste**, preview — and ⇧⌘V is yours to remap | Summon, search, **copy**, preview — and ⇧⌘V is yours to remap |
+| 04 zh | 呼出、导航、**粘贴**、预览，全程快捷键；⇧⌘V 可自定义 | 呼出、导航、**复制**、预览，全程快捷键；⇧⌘V 可自定义 |
+
+01 与 02 的文案原样保留，只是重新采集了 UI。
