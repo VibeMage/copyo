@@ -417,23 +417,6 @@
 			};
 			name = Release;
 		};
-		AB0000000000000000000010 /* Release-AppStore */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				SDKROOT = macosx;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-			};
-			name = "Release-AppStore";
-		};
 		AB000000000000000000000E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -441,12 +424,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Copyo/Copyo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -467,13 +451,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Copyo/Copyo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -487,6 +472,23 @@
 			};
 			name = Release;
 		};
+		AB0000000000000000000010 /* Release-AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = "Release-AppStore";
+		};
 		AB0000000000000000000011 /* Release-AppStore */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -494,12 +496,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Copyo/CopyoAppStore.entitlements;
 				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9A94W79V84;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -527,7 +531,7 @@
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. MIT License.";
@@ -562,7 +566,7 @@
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. MIT License.";
@@ -597,7 +601,7 @@
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. MIT License.";
@@ -633,7 +637,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CopyoShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. MIT License.";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -665,7 +669,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CopyoShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. MIT License.";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -697,7 +701,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CopyoShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. MIT License.";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -730,7 +734,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CopyoWidgets/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. MIT License.";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -762,7 +766,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CopyoWidgets/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. MIT License.";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -794,7 +798,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CopyoWidgets/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Copyo";
+				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. MIT License.";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
