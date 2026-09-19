@@ -4,6 +4,9 @@
 
 ## 一、App Store Connect 建应用（你来操作）
 
+> ⚠️ 下面这张表是 2026-09-01 建第一条应用记录时填的。**那条记录已于 2026-09-19 删除**，
+> 重新建记录请按第十三节的新值填（名称 `Copyo: Clipboard History`、套装 ID `dev.vibemage.Copyo`、SKU `copyo`）。
+
 appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
 | 字段 | 填写 |
@@ -132,6 +135,9 @@ Mac App Development 描述文件，而这要求团队里注册过 Mac；`release
 commit c7dd41f 加上「移除自动粘贴」，entitlements 只有沙盒，和 1.0 (3) 一样不需要描述文件，
 商店描述里「零网络请求」的说法也仍然成立。iCloud 版本留给 1.1。
 
+（`release/1.0` 分支没有跟进 2026-09-19 的第二轮改名，那边仍然是 `Paster.xcodeproj` / scheme `Paster`，
+脚本照旧能跑；main 上的工程已改名为 `Copyo.xcodeproj`，见第十三节。）
+
 ```bash
 git worktree add ../Paster-release-1.0 release/1.0   # 已存在则跳过
 cd ../Paster-release-1.0
@@ -212,7 +218,7 @@ This build was tested on a physical MacBook running macOS 26.6.1 before submissi
 
 | 条款 | 审核说法 | 事实 |
 | --- | --- | --- |
-| 2.4.5 | 应用用辅助功能（Accessibility）来实现热键，属于把无障碍功能挪作他用 | 全局快捷键走 Carbon `RegisterEventHotKey`（`Paster/Services/HotkeyManager.swift`），不需要任何权限。辅助功能只在自动粘贴时用于向目标应用发送 ⌘V（当时的 `PasteService.sendCmdV`，现已删除）。审核员把两者混为一谈，欢迎对话框和设置页当时的文案也确实没把两者分开 |
+| 2.4.5 | 应用用辅助功能（Accessibility）来实现热键，属于把无障碍功能挪作他用 | 全局快捷键走 Carbon `RegisterEventHotKey`（当时的 `Paster/Services/HotkeyManager.swift`，现在是 `Copyo/Services/HotkeyManager.swift`），不需要任何权限。辅助功能只在自动粘贴时用于向目标应用发送 ⌘V（当时的 `PasteService.sendCmdV`，现已删除）。审核员把两者混为一谈，欢迎对话框和设置页当时的文案也确实没把两者分开 |
 | 1.5 | 支持网址（Gist）不是一个可以提问、求助的网页 | Gist 里只写了「仓库发布后公开」，而仓库当时是私有的，用户没有任何联系渠道 |
 
 ### 1.0 (4) 的改动
@@ -316,6 +322,7 @@ tmp=$(mktemp -d) && cp docs/support/index.html "$tmp/" && cd "$tmp" \
 
 - 产品文件名 `Copyo.app`（PRODUCT_NAME = Copyo），显示名 `Copyo`，用户可见文案全部改名（欢迎对话框、菜单栏菜单、设置窗口标题、关于页、iOS 引导与分享扩展）。
 - **不动的**：bundle ID `dev.vibemage.Paster`、数据目录 `Application Support/Paster/`、沙盒容器路径、同步文件夹里的 `Paster/` 子目录、CloudKit 容器、PasterCore 模块名、target/scheme 名、工程文件名。老用户升级后数据原地保留。
+  （这份「不动的」清单在 2026-09-19 的第二轮改名里几乎全部改掉了，只有 bundle ID 与沙盒容器路径仍然保留，见第十三节。）
 - release/1.0 的 MARKETING_VERSION 升到 1.0.1；上架包 `Copyo-1.0.1-appstore.pkg`。
 - 仓库当时暂未改名（Pages 项目站地址不随仓库改名跳转，线上 1.0 的支持网址会失效）。**这条后来没有守住**：仓库于 2026-09-16 改名为 `copyo`，预言的后果照样发生，详见第十二节。
 
@@ -368,8 +375,76 @@ GitHub 仓库从 `VibeMage/Paster` 改名为 `VibeMage/copyo`。GitHub 会为 gi
 因此 **1.0.1 要尽快提交**：窗口期长短就等于 1.0.1 的提审到上架时间。提交时务必把版本页的技术支持网址
 改成 `https://vibemage.github.io/copyo/support/`，这是本次改动里最关键的一个字段。
 
+> 后续：2026-09-19 旧应用记录被整条删除，商店里已经没有那个页面，这条 404 也就无从点起了。
+> 新记录从第一版起就填 `https://vibemage.github.io/copyo/support/`。
+
 ### 长期根治
 
 注册 `copyo.app`，在 copyo 仓库 `docs/` 下放 CNAME 并在 Pages 设置里绑定，支持网址改用
 `https://copyo.app/support/`。此后再改仓库名也不会断。注意这**不能**修复旧的 `/Paster/` 路径，
 那个路径只能靠方案 A 的跳转仓库兜底。
+
+## 十三、第二轮改名：把 Paster 从工程里清干净（2026-09-19，仅 main）
+
+第十一节那次改名只动了产品名与用户可见文案，工程内部——目录、target、模块、类型名、数据路径、
+bundle ID、容器标识——原封不动留着 Paster。这一轮把它们全部改掉。
+
+前提变了：**2026-09-19 旧的 App Store Connect 应用记录（`dev.vibemage.Paster`，商店里的 Paster）已被删除，
+1.0.1 不再是「改名上架」，而是以 Copyo 的身份重新建记录、重新提审。** Apple 不允许复用已删除应用的
+bundle ID，所以 bundle ID 必须换，正好与改名一起做完。
+
+### 改了什么
+
+- 源码目录：`Paster/` → `Copyo/`、`PasterCore/` → `CopyoCore/`、`PasterIOS/` → `CopyoIOS/`、
+  `PasterShared/` → `CopyoShared/`、`PasterShareExtension/` → `CopyoShareExtension/`、
+  `PasterWidgets/` → `CopyoWidgets/`
+- 工程：`Paster.xcodeproj` → `Copyo.xcodeproj`；target `Paster` → `Copyo`、`Paster iOS` → `Copyo iOS`、
+  `PasterShareExtension` → `CopyoShareExtension`、`PasterWidgets` → `CopyoWidgets`；两个共享 scheme 同步改名
+- Swift 模块与类型：`PasterCore` → `CopyoCore`、`PasterStore` → `CopyoStore`、`PasterSchema` → `CopyoSchema`、
+  `PasterTheme` → `CopyoTheme`、`PasterTab` → `CopyoTab` 等
+- **bundle ID：`dev.vibemage.Paster` → `dev.vibemage.Copyo`**，两个扩展同步改成
+  `dev.vibemage.Copyo.ShareExtension` / `dev.vibemage.Copyo.Widgets`
+- Control 的 `kind`：`dev.vibemage.Copyo.saveClipboard`（跟着 bundle ID 走）
+- App Group：`group.dev.vibemage.Paster` → `group.dev.vibemage.Copyo`
+- iCloud 容器：`iCloud.dev.vibemage.Paster` → `iCloud.dev.vibemage.Copyo`
+- 本地数据库：`Application Support/Paster/Paster.store` → `Application Support/Copyo/Copyo.store`
+- 文件夹同步的子目录：`<共享目录>/Paster/` → `<共享目录>/Copyo/`
+- 公证钥匙串配置名的示例：`paster-notary` → `copyo-notary`（只是示例，已经配好的旧 profile
+  传 `NOTARY_PROFILE=paster-notary` 照样能用）
+
+### 没改
+
+- `art/`、`specs/` 下的设计稿与设计说明，以及本文件第八至十二节的历史记录：都是带日期的存档，原样留着。
+- **`release/1.0` 分支没动。** 那条分支仍然是 `Paster.xcodeproj` / scheme `Paster` / bundle ID
+  `dev.vibemage.Paster`，现在已经没有用武之地了——新的应用记录是新的 bundle ID，上架包只能从 main 出。
+  留着当 1.0 的存档即可。
+
+### 你要在开发者后台 / ASC 做的
+
+1. Certificates, Identifiers & Profiles → Identifiers → ➕ App IDs：`dev.vibemage.Copyo`（主应用）、
+   `dev.vibemage.Copyo.ShareExtension`、`dev.vibemage.Copyo.Widgets`。
+2. Identifiers → App Groups → ➕ `group.dev.vibemage.Copyo`，三个 App ID 都勾上。
+3. Identifiers → iCloud Containers → ➕ `iCloud.dev.vibemage.Copyo`；主应用 App ID 勾选
+   iCloud (CloudKit) 选中该容器，并勾上 Push Notifications。
+4. CloudKit Console：在新容器里跑一遍 Development schema，确认 `ClipItem` / `Pinboard` 两张表齐全后
+   部署到 Production（正式版发布前必须做完）。
+5. ASC → 我的 App → ➕ 新建 App：平台 macOS，名称 `Copyo: Clipboard History`，套装 ID `dev.vibemage.Copyo`，
+   SKU `copyo`（旧记录的 SKU `paster` 随记录一起没了）。商店文案、关键词、审核备注见第三、四节。
+6. 描述文件：自动签名会按新 App ID 重新生成；Developer ID 那张要包含新的 iCloud 容器与 App Group，
+   否则 `build-release.sh` 归档会失败。
+
+### 老用户升级后会发生什么
+
+- **直发版（Developer ID，未沙盒）**：数据库自动从 `Application Support/Paster/` 搬到 `Copyo/`，
+  `Paster.store` 三件套连同外部图片目录 `.Paster_SUPPORT` 一起改名。外部图片目录的名字是 Core Data 从
+  store 文件名推导的，不一起改等于把所有图片藏起来，所以搬迁必须成对做（`LegacyStoreMigration`，
+  `CopyoCore` 里有对应测试）。搬不动时（权限、文件被占用）继续用旧位置打开，绝不丢数据。
+- **App Store 版（沙盒）**：bundle ID 变了，沙盒容器也跟着变成
+  `~/Library/Containers/dev.vibemage.Copyo/`。**旧容器里的历史读不到**——沙盒不允许新应用访问
+  另一个 bundle ID 的容器，没有官方迁移途径。商店里的 1.0 只活了 8 天（2026-09-11 上架，
+  2026-09-19 删除），受影响的用户极少；真要照顾他们，只能在新版里加一个「从旧版导入」的
+  `NSOpenPanel` 让用户手动选中旧容器目录，目前没做。
+- **文件夹同步**：本机把共享目录里的 `Paster/` 整体改名成 `Copyo/`。还没升级的其他 Mac 会把 `Paster/`
+  重新建出来并继续往里写，升级后的这台会继续只读合并那个目录，所以改名窗口期里两边的条目都不会丢。
+- **iCloud 同步**：容器换了，等于重新上云。CloudKit 同步从未随正式版发布，线上没有用户受影响；
+  开发机上旧容器里的数据作废，本地库不受影响。

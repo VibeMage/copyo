@@ -350,7 +350,7 @@
         </details>
         <details>
           <summary>Where is my data stored? Does anything leave my Mac?</summary>
-          <p>Everything stays on your Mac: the App Store version keeps its data in <code>~/Library/Containers/dev.vibemage.Paster/</code>, the direct-download version in <code>~/Library/Application Support/Paster/</code> (the folders keep their original name). Copyo has no analytics, no crash reporting and no servers of its own. See the <a href="https://gist.github.com/VibeMage/d39d7165d762ecfd0f16f72ad1fc553e">privacy policy</a>.</p>
+          <p>Everything stays on your Mac: the App Store version keeps its data in <code>~/Library/Containers/dev.vibemage.Copyo/</code>, the direct-download version in <code>~/Library/Application Support/Copyo/</code>. Copyo has no analytics, no crash reporting and no servers of its own. See the <a href="https://gist.github.com/VibeMage/d39d7165d762ecfd0f16f72ad1fc553e">privacy policy</a>.</p>
         </details>
         <details>
           <summary>How does sync between my Macs work?</summary>
@@ -431,7 +431,7 @@
         </details>
         <details>
           <summary>数据存在哪里？会上传吗？</summary>
-          <p>全部保存在本机：App Store 版在 <code>~/Library/Containers/dev.vibemage.Paster/</code>，直接下载版在 <code>~/Library/Application Support/Paster/</code>（目录名沿用旧名）。Copyo没有统计分析、没有崩溃上报，也没有自己的服务器。详见<a href="https://gist.github.com/VibeMage/d39d7165d762ecfd0f16f72ad1fc553e">隐私政策</a>。</p>
+          <p>全部保存在本机：App Store 版在 <code>~/Library/Containers/dev.vibemage.Copyo/</code>，直接下载版在 <code>~/Library/Application Support/Copyo/</code>。Copyo没有统计分析、没有崩溃上报，也没有自己的服务器。详见<a href="https://gist.github.com/VibeMage/d39d7165d762ecfd0f16f72ad1fc553e">隐私政策</a>。</p>
         </details>
         <details>
           <summary>多台 Mac 之间怎么同步？</summary>
@@ -477,7 +477,7 @@
     buttons.forEach(function (b) {
       b.setAttribute('aria-pressed', b.getAttribute('data-set-lang') === lang ? 'true' : 'false');
     });
-    try { localStorage.setItem('paster-lang', lang); } catch (e) {}
+    try { localStorage.setItem('copyo-lang', lang); } catch (e) {}
   }
   var initial = 'en';
   var hash = location.hash.replace('#', '');
@@ -485,7 +485,7 @@
     initial = hash;
   } else {
     var saved = null;
-    try { saved = localStorage.getItem('paster-lang'); } catch (e) {}
+    try { saved = localStorage.getItem('copyo-lang'); } catch (e) {}
     if (saved === 'zh' || saved === 'en') initial = saved;
     else if ((navigator.language || '').toLowerCase().indexOf('zh') === 0) initial = 'zh';
   }
