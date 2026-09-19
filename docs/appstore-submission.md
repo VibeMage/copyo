@@ -634,3 +634,53 @@ ASC 默认一套截图通用于所有本地化版本。要给中文单独一套�
 
 ⚠️ 上传多张时**必须一张一张传、等上一张处理完再传下一张**——一次选多个文件，ASC 落盘顺序是乱的
 （实测传 4 张得到的顺序是 03、02、01、04）。
+
+## 十八、1.0 构建版本出包成功（2026-09-20）
+
+### 签名前置（本机一次性）
+
+初次在本机构建时 `security find-identity` 返回 0、描述文件目录为空，`build-appstore.sh` 依次报了
+`No Accounts` → `no devices from which to generate a provisioning profile`。补齐顺序：
+
+1. Xcode → Settings → Accounts 登录，选团队 `9A94W79V84`
+2. Manage Certificates… → ➕ 新建三张（私钥只存在于创建它的那台机器，旧 Mac 上的证书在
+   Xcode 里显示 **Not in Keychain**，下载不下来，只能新建或从旧机导出 `.p12`）：
+   `Apple Development` / `Apple Distribution` / `Mac Installer Distribution`
+3. Xcode 打开工程 → target Copyo → Signing & Capabilities → **Register Device**
+   （归档用 Apple Development 身份，需要 Mac App Development 描述文件，
+   而这类描述文件要求账号里至少有一台已注册的 Mac；`xcodebuild` 自己不会注册设备）
+
+Xcode 随之重写了 `project.pbxproj`，顺带补上了 Copyo 的 Release-AppStore 一直缺失的
+`DEVELOPMENT_TEAM`（见 commit fae79f8）。
+
+### 产物核验
+
+`build/appstore/Copyo-1.0-appstore.pkg`（1.9 MB），展开后逐项核过：
+
+| 项目 | 值 |
+| --- | --- |
+| .app 签名 | `Apple Distribution: NING YUAN (9A94W79V84)` |
+| .pkg 签名 | `3rd Party Mac Developer Installer: NING YUAN (9A94W79V84)` |
+| aps-environment | `production` |
+| iCloud 容器 / 环境 | `iCloud.dev.vibemage.Copyo` / `Production` |
+| 沙盒 | `com.apple.security.app-sandbox: true` |
+| Bundle ID / 版本 | `dev.vibemage.Copyo` / 1.0 (1) |
+| LSUIElement | true |
+| 最低系统 | macOS 14.0 |
+| 出口合规 | `ITSAppUsesNonExemptEncryption: false` |
+| 图标 / 本地化 | `AppIcon.icns` ✓ / `en.lproj` + `zh-Hans.lproj` ✓ |
+
+归档阶段那份是 Apple Development 签名、`aps-environment: development`，**这是正常的**——
+`-exportArchive` 会重签成 Apple Distribution 并切到 production。要核验的是导出后的 `.pkg`，不是归档。
+
+### 商务页面新冒出来的两条阻塞
+
+1. **法律实体合规筛查**（带移除警告，优先级最高）：横幅「请立即查看"NING YUAN"的相关信息。
+   如未能提交补充文稿，你的内容可能会从 App Store 移除」。要求上传显示**英文法律实体名称**与
+   出生日期的政府证件。**用护照身份信息页，不要用中国大陆身份证**——身份证既无英文姓名也无
+   英文格式。护照拼音姓名要与账号登记的 `NING YUAN` 完全一致（含顺序）。
+   受此影响，**免费 App 协议的状态从「有效」变成了「等待用户信息」**，协议不恢复有效会挡提审与上架。
+2. **DSA 交易商状态**：另一条横幅「完成合规要求」，个人账号选「非交易商」即可（见第十节）。
+   不做只影响欧盟可售，不挡审核。
+
+上传构建版本不依赖协议状态，可以与补材料并行。
