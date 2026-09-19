@@ -552,7 +552,20 @@ Cardo、Roneo、Inkyo 等十余个也都撞了在架应用或踩了发音雷。
 2. **价格与销售范围**：定价时间表与供应情况都还是空的，提审前必须设置（免费 + 选国家/地区）。
    欧盟那部分与 DSA 交易者状态绑在一起。
 3. **DSA 交易者状态**（见第十节）。
-4. **构建版本**：还没有可上传的包。需要用新的 App ID 归档签名。
+4. **构建版本**：还没有可上传的包。2026-09-19 在本机跑 `./scripts/build-appstore.sh` 归档失败，
+   根因是 **Xcode 里一个 Apple ID 都没登录**（`error: No Accounts: Add a new account in Accounts settings.`），
+   连带没有任何证书与描述文件（`security find-identity` 返回 0，描述文件目录为空）。按顺序补：
+
+   1. Xcode → Settings → Accounts → ➕ 登录 Apple ID，选中团队 `9A94W79V84`
+   2. Manage Certificates… → ➕ 建 **Apple Distribution** 与 **Mac Installer Distribution**
+   3. 用 Xcode 打开 `Copyo.xcodeproj` → target Copyo → Signing & Capabilities，勾上
+      Automatically manage signing 并选团队——**这一步会把本机注册进账号**。归档用的是
+      Apple Development 身份，要一张 Mac App Development 描述文件，而这类描述文件
+      必须账号里至少注册过一台 Mac，`xcodebuild` 自己不会注册设备
+   4. 重跑 `./scripts/build-appstore.sh`
+
+   脚本列的另外两条前置（ASC 里有 `dev.vibemage.Copyo` 的应用记录、App ID 开好 iCloud+Push
+   与容器）**今天都已经满足**，见第十四节。
 5. ~~截图 03 / 04 要重拍~~ **已重拍**，见第十六节。
 
 ## 十六、商店截图重拍（2026-09-19）
