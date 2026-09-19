@@ -1,7 +1,7 @@
 # Copyo
 
 Copyo（曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜单栏常驻，`⇧⌘V` 呼出底部卡片面板，历史即输即搜。
-所有数据仅保存在本机（`~/Library/Application Support/Paster/`），无任何网络请求，适合不允许安装第三方闭源工具的办公环境。
+所有数据仅保存在本机（`~/Library/Application Support/Copyo/`），无任何网络请求，适合不允许安装第三方闭源工具的办公环境。
 
 ## 功能
 
@@ -24,9 +24,9 @@ Copyo（曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜�
 
 ## 安装
 
-推荐从 [Mac App Store](https://apps.apple.com/app/id6807507103) 安装。
+Mac App Store 版本正在以 Copyo 的身份重新提审（旧的 Paster 记录已下架删除），过审后这里会放上新链接。
 
-也可以从 [Releases](https://github.com/VibeMage/copyo/releases) 下载 DMG，打开后把 Copyo
+目前请从 [Releases](https://github.com/VibeMage/copyo/releases) 下载 DMG，打开后把 Copyo
 拖进 Applications 即可。官方发布均已使用 Developer ID 签名并通过 Apple 公证——双击即可打开，
 仅首次有一次「从互联网下载的 App」标准确认弹窗。
 
@@ -35,17 +35,17 @@ Copyo（曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜�
 需要 Xcode 16+、macOS 14+。
 
 ```bash
-git clone <repo-url> && cd Paster
-xcodebuild -project Paster.xcodeproj -scheme Paster -configuration Release -derivedDataPath build build
+git clone <repo-url> && cd copyo
+xcodebuild -project Copyo.xcodeproj -scheme Copyo -configuration Release -derivedDataPath build build
 open build/Build/Products/Release/Copyo.app   # 或拷贝到 /Applications
 ```
 
-也可以直接用 Xcode 打开 `Paster.xcodeproj` 运行（⌘R）。
+也可以直接用 Xcode 打开 `Copyo.xcodeproj` 运行（⌘R）。
 
-iOS / iPadOS 版在同一个工程里（scheme `Paster iOS`，iOS 18+，与 Mac 版共用 `PasterCore` 与 iCloud 数据），模拟器构建：
+iOS / iPadOS 版在同一个工程里（scheme `Copyo iOS`，iOS 18+，与 Mac 版共用 `CopyoCore` 与 iCloud 数据），模拟器构建：
 
 ```bash
-xcodebuild -project Paster.xcodeproj -scheme "Paster iOS" -configuration Debug \
+xcodebuild -project Copyo.xcodeproj -scheme "Copyo iOS" -configuration Debug \
   -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
 ```
 
@@ -53,19 +53,19 @@ xcodebuild -project Paster.xcodeproj -scheme "Paster iOS" -configuration Debug \
 里把 Team 换成自己的，或者构建时传入：
 
 ```bash
-xcodebuild -project Paster.xcodeproj -scheme Paster -configuration Release \
+xcodebuild -project Copyo.xcodeproj -scheme Copyo -configuration Release \
   -derivedDataPath build DEVELOPMENT_TEAM=<你的 Team ID> build
 ```
 
 只想编译看看、不打算安装到别的机器，也可以加 `CODE_SIGNING_ALLOWED=NO` 直接跳过签名。
 注意 iCloud 同步依赖 App ID 上的 iCloud 容器与推送能力，换成自己的 Team 构建时这一项不可用
-（需要在自己的开发者账号里建一个 iCloud 容器并改掉 `PasterStore.cloudKitContainerIdentifier`），
+（需要在自己的开发者账号里建一个 iCloud 容器并改掉 `CopyoStore.cloudKitContainerIdentifier`），
 其余功能不受影响。
 
 ## 打包分发（维护者）
 
 ```bash
-NOTARY_PROFILE=paster-notary ./scripts/build-release.sh
+NOTARY_PROFILE=copyo-notary ./scripts/build-release.sh
 # 归档 → 以 Developer ID 导出（签名、entitlements、描述文件由 Xcode 处理）
 # → Apple 公证 → staple → 产出 dist/Copyo-<版本>.dmg + .zip
 ```
@@ -73,7 +73,7 @@ NOTARY_PROFILE=paster-notary ./scripts/build-release.sh
 首次需要一次性配置公证凭据（App 专用密码在 account.apple.com 生成）：
 
 ```bash
-xcrun notarytool store-credentials paster-notary \
+xcrun notarytool store-credentials copyo-notary \
   --apple-id <AppleID邮箱> --team-id <TEAMID> --password <App专用密码>
 ```
 
@@ -86,7 +86,7 @@ xcrun notarytool store-credentials paster-notary \
 ### 更新
 
 官方发布签名身份固定：新版 DMG 覆盖安装（拖进 Applications 替换）即可，历史数据在
-`~/Library/Application Support/Paster/`，不受影响。
+`~/Library/Application Support/Copyo/`，不受影响（1.0 的 `Paster/` 目录会在首次启动时自动搬过去）。
 
 ## 图标
 
@@ -130,7 +130,7 @@ Copyo/
 - 存储使用 SwiftData（SQLite），图片走 `externalStorage` + SHA-256 去重 + 缩略图缓存
 - 同步有两条互斥的通道：文件夹方式是快照合并（iCloud Drive 或任意共享目录皆可，
   无需付费开发者账号，但不传播删除）；iCloud 方式由 SwiftData 直接镜像到 CloudKit
-  私有数据库，增删改全量同步。两者共用同一份 `Paster.store`，同一时刻只有一种生效
+  私有数据库，增删改全量同步。两者共用同一份 `Copyo.store`，同一时刻只有一种生效
 
 ## License
 

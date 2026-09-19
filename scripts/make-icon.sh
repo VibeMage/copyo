@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 MASTER="${1:-art/icon-master.png}"
-DEST="Paster/Assets.xcassets/AppIcon.appiconset"
+DEST="Copyo/Assets.xcassets/AppIcon.appiconset"
 
 if [[ ! -f "$MASTER" ]]; then
   echo "找不到主图标: $MASTER" >&2

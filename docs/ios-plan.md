@@ -9,8 +9,8 @@ iOS 对剪贴板的限制远多于 macOS。Mac 版的核心循环是「后台静
 | Mac 版能力 | iOS / iPadOS 现状 | 替代方案 |
 | --- | --- | --- |
 | 后台每 0.3s 轮询剪贴板，静默抓取一切 | **不可能**。应用只有在前台时才能读剪贴板，后台任务读不到 | 回到前台时自动读一次；分享扩展；快捷指令/操作按钮 |
-| 读剪贴板无感 | iOS 16+ 程序化读取会弹「允许 Paster 粘贴来自 X 的内容？」 | 引导用户在 设置 → Paster → 从其他 App 粘贴 → 选「允许」，之后不再弹；或用系统 UIPasteControl 按钮（用户主动点则免弹） |
-| ⇧⌘V 全局快捷键 | **没有全局快捷键**。硬件键盘快捷键仅在 Paster 处于前台时有效 | 操作按钮 / 背面轻点 / 控制中心按钮 / 小组件 / 键盘扩展 |
+| 读剪贴板无感 | iOS 16+ 程序化读取会弹「允许 Copyo 粘贴来自 X 的内容？」 | 引导用户在 设置 → Copyo → 从其他 App 粘贴 → 选「允许」，之后不再弹；或用系统 UIPasteControl 按钮（用户主动点则免弹） |
+| ⇧⌘V 全局快捷键 | **没有全局快捷键**。硬件键盘快捷键仅在 Copyo 处于前台时有效 | 操作按钮 / 背面轻点 / 控制中心按钮 / 小组件 / 键盘扩展 |
 | 模拟 ⌘V 粘贴到前台应用 | **不可能**。没有 CGEvent，没有辅助功能 API | 复制后用户手动粘贴；键盘扩展直接输入文本；iPad 拖放到旁边的 App |
 | 文件类型条目（路径） | 路径在 iOS 上无意义 | 文件条目不同步到 iOS（或只显示文件名） |
 | 来源应用图标与颜色 | 沙盒里拿不到其他 App 的图标 | 只显示来源应用名（Mac 同步来的条目自带名字）；iOS 本机保存的条目来源为空 |
@@ -21,7 +21,7 @@ iOS 对剪贴板的限制远多于 macOS。Mac 版的核心循环是「后台静
 2. 手机上想留住的内容，通过分享面板 / 操作按钮 / 打开 App 存进同一份历史，Mac 上也能看到；
 3. 把内容送进其他 App：iPhone 靠键盘扩展和「复制→粘贴」两步，iPad 额外有拖放。
 
-顺带一提：Universal Clipboard（通用剪贴板）本身就能把 iPhone 复制的内容送到附近 Mac 的剪贴板，Mac 版 Paster 会照常抓到——这是免费获得的「手机采集」通道，文档里要提醒用户。
+顺带一提：Universal Clipboard（通用剪贴板）本身就能把 iPhone 复制的内容送到附近 Mac 的剪贴板，Mac 版 Copyo 会照常抓到——这是免费获得的「手机采集」通道，文档里要提醒用户。
 
 ### 关于「后台监听」的定论
 
@@ -29,7 +29,7 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 
 真正可用的只有两条：
 
-1. **回到前台自动读取**：打开 Paster 即保存当前剪贴板，是最基本的兜底。
+1. **回到前台自动读取**：打开 Copyo 即保存当前剪贴板，是最基本的兜底。
 2. **借道 Mac**：通用剪贴板把手机复制的内容送到附近的 Mac，Mac 版抓到后经 CloudKit 回流手机。
 
 评估过并弃用的方案：iPad 分屏常驻（让一个剪贴板应用长期霸占屏幕对用户不友好）；快捷指令自动化按「某 App 打开 / 关闭」触发（只覆盖列出的应用，配置繁琐，不适合普通用户）；通知栏常驻按钮（iOS 没有 Android 那种前台服务常驻通知；本地通知可被划掉、按钮仍需打开 App 才能读；灵动岛实时活动最多存活 8 小时、按钮同样只能打开 App、且把实时活动当常驻快捷方式违背 HIG，有审核风险）。iOS 上「随时一划就到」的常驻入口就是控制中心与锁屏控件，已包含在一键保存里。
@@ -38,26 +38,27 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 
 ### 2.1 同步：CloudKit 私有数据库（SwiftData 原生）
 
-- `ModelConfiguration(cloudKitDatabase: .private("iCloud.dev.vibemage.Paster"))`，Mac 与 iOS 共用同一容器。
+- `ModelConfiguration(cloudKitDatabase: .private("iCloud.dev.vibemage.Copyo"))`，Mac 与 iOS 共用同一容器。
+  容器标识在 2026-09-19 随改名从 `iCloud.dev.vibemage.Paster` 换成了现在这个。旧容器从未随正式版发布过，直接弃用即可；已经拿旧容器同步过的开发机，本地库照常在，云端那份不要了。
 - 现有 `ClipItem` / `Pinboard` 模型已满足 CloudKit 要求（全部属性有默认值或可选、关系可选、无 unique 约束），**不需要改模型**。`externalStorage` 的图片会自动作为 CKAsset 上传。
 - 与现有文件夹快照同步的关系：**并存，二选一**。公司 Mac 常被 MDM 禁用 iCloud，文件夹同步（含自定义目录）仍是这类环境的唯一出路；CloudKit 是个人设备之间的默认选项。iOS 只做 CloudKit。
 - 行为差异要写进设置页说明：快照同步不传播删除，CloudKit 会——一台设备删了，处处都删；Mac 的「历史上限」清理也会同步生效。
 - 部署纪律：CloudKit schema 必须在 CloudKit Console 从 Development **部署到 Production** 之后才能发正式版；上线后字段只能加不能删/改类型。
 - 直发版（Developer ID）也能用 CloudKit：`build-release.sh` 已改为归档 + `-exportArchive`，entitlements 展开与 Developer ID 描述文件嵌入由 Xcode 完成；前提是后台有一份包含该 iCloud 容器与推送的 Developer ID 描述文件。
 
-### 2.2 代码共享：抽出 `PasterCore` 本地 Swift Package
+### 2.2 代码共享：抽出 `CopyoCore` 本地 Swift Package
 
 | 归属 | 内容 |
 | --- | --- |
-| **PasterCore（共享）** | 模型、`ClipKind` 分类逻辑（链接/颜色识别）、SHA-256 去重、缩略图生成（改用 ImageIO/CGImage 消除 NSImage/UIImage 差异）、CloudKit 容器配置、通用格式化 |
+| **CopyoCore（共享）** | 模型、`ClipKind` 分类逻辑（链接/颜色识别）、SHA-256 去重、缩略图生成（改用 ImageIO/CGImage 消除 NSImage/UIImage 差异）、CloudKit 容器配置、通用格式化 |
 | Mac 独有 | `ClipboardMonitor`、`HotkeyManager`、`PasteService`、`AppIconProvider`、面板（NSPanel）、文件夹快照同步 |
 | iOS 独有 | 前台采集、分享扩展、键盘扩展、小组件、控制中心控件、App Intents |
 
-粗略估计现有 2600 行里约四成可下沉到 PasterCore。先抽包、再加 iOS target，Mac 版必须逐字节无回归。
+粗略估计现有 2600 行里约四成可下沉到 CopyoCore。先抽包、再加 iOS target，Mac 版必须逐字节无回归。
 
 ### 2.3 工程与商店
 
-- 同一 `Paster.xcodeproj` 增加 `Paster iOS` target（Bundle ID **同为** `dev.vibemage.Paster`，这是通用购买的硬性要求），扩展用 `dev.vibemage.Paster.ShareExtension` 等后缀。
+- 同一 `Copyo.xcodeproj` 增加 `Copyo iOS` target（Bundle ID **同为** `dev.vibemage.Copyo`，这是通用购买的硬性要求），扩展用 `dev.vibemage.Copyo.ShareExtension` 等后缀。
 - App Store Connect：在现有应用记录里「添加平台 → iOS」，自动成为 Universal Purchase，SKU `paster` 不变。Mac 1.0 审核期间做这件事不影响审核。
 - 隐私问卷维持「不收集数据」：私有 iCloud 数据库里的内容开发者无法访问，按 Apple 的定义不算收集。
 - 最低系统：**iOS 18 / iPadOS 18**（控制中心控件、SwiftData 成熟度），用 Xcode 26 编译自动获得 iOS 26 的 Liquid Glass 外观。Mac 版维持 macOS 14。
@@ -66,9 +67,9 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 
 ### Phase 0 · 地基（Mac 侧，与设计稿并行，iOS 一行 UI 都不写）
 
-- [x] 抽出 `PasterCore` 包，Mac 版接入，构建产物无回归
+- [x] 抽出 `CopyoCore` 包，Mac 版接入，构建产物无回归
 - [x] Mac 版接入 CloudKit 同步：设置页「同步方式：iCloud / 文件夹 / 关闭」（两台 Mac 之间增删改与图片的实机验证，要等下一条的开发者后台配置就绪后再补）
-- [ ] 开发者后台：App ID 开启 iCloud，创建容器 `iCloud.dev.vibemage.Paster`；ASC 应用记录添加 iOS 平台
+- [ ] 开发者后台：App ID 开启 iCloud，创建容器 `iCloud.dev.vibemage.Copyo`；ASC 应用记录添加 iOS 平台
 - [x] `build-release.sh` 改为归档 + 导出，签名与 entitlements 交给 Xcode；`build-appstore.sh` 适配 iCloud 描述文件
 - [ ] 随 Mac **1.1** 发布 CloudKit 同步（先于 iOS 上线，让 Mac 用户历史先上云）
 - [x] 设计：Claude Design 出移动端设计稿（见第四节），原稿在 `art/ios-design/2026-09-05/`，实现依据 `art/ios-design/design-spec.md`
@@ -78,7 +79,7 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 - [x] 历史列表 / 卡片、类型筛选、搜索、详情预览、Pinboard
 - [x] 轻点复制（含纯文本复制）、分享、固定、删除、批量清理（设置里的「清空历史」只删未固定条目）
 - [x] 采集通道 A：回到前台自动读剪贴板并入库（引导用户把「从其他 App 粘贴」设为允许；未允许时用 UIPasteControl 按钮兜底）
-- [x] 采集通道 B：分享扩展「保存到 Paster」（文本 / 链接 / 图片，可选 Pinboard）
+- [x] 采集通道 B：分享扩展「保存到 Copyo」（文本 / 链接 / 图片，可选 Pinboard）
 - [x] 采集通道 C「一键保存」：一个 `SaveClipboardIntent`，接三种物理入口（详见 3.1）
   - 操作按钮（iPhone 15 Pro 及 iPhone 16 全系起）：iOS 18 起可直接绑定 App 提供的 Control，无需快捷指令
   - 敲击背面（iPhone 8 起所有机型）：设置 → 辅助功能 → 触控 → 轻点背面 → 运行快捷指令
@@ -92,35 +93,35 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 
 | 路径 | 触发方式 | 剪贴板由谁读 | 体验 | 依赖 |
 | --- | --- | --- | --- | --- |
-| **Control**（iOS 18 ControlWidget） | 操作按钮 / 控制中心 / 锁屏 | Intent 设 `openAppWhenRun`，打开 App 后在前台读 | 零配置，按下即存，但会切到 Paster 并显示「已保存」，需手动切回 | 无 |
-| **快捷指令**（获取剪贴板 → Paster 保存） | 操作按钮 / 敲击背面 | 快捷指令系统读，内容作为参数传给 Intent，App 不碰剪贴板 | 全程静默，顶部横幅「已保存」，不离开当前 App | 需导入一次快捷指令；Shortcuts 的「从其他 App 粘贴」需设为允许 |
+| **Control**（iOS 18 ControlWidget） | 操作按钮 / 控制中心 / 锁屏 | Intent 设 `openAppWhenRun`，打开 App 后在前台读 | 零配置，按下即存，但会切到 Copyo 并显示「已保存」，需手动切回 | 无 |
+| **快捷指令**（获取剪贴板 → Copyo 保存） | 操作按钮 / 敲击背面 | 快捷指令系统读，内容作为参数传给 Intent，App 不碰剪贴板 | 全程静默，顶部横幅「已保存」，不离开当前 App | 需导入一次快捷指令；Shortcuts 的「从其他 App 粘贴」需设为允许 |
 
 两条都做：Control 是 Apple 为操作按钮设计的正规接法，快捷指令则覆盖没有操作按钮的机型（敲击背面），且体验更静默。
 
 小组件和控件的扩展进程**读不到剪贴板**：它们没有前台身份，iOS 10 起后台读取一律为空，iOS 16 的授权弹窗也无处弹出。所以任何「保存剪贴板」的小组件按钮本质上都是「打开 App 再读」；扩展进程能否**写**剪贴板（小组件点按复制）另行验证。
 
-弃用：摇一摇。摇动事件只送达前台 App，后台的 Paster 收不到，快捷指令自动化也没有此触发器。
+弃用：摇一摇。摇动事件只送达前台 App，后台的 Copyo 收不到，快捷指令自动化也没有此触发器。
 
 #### 3.2 Phase 1 实现状态（2026-09-05）
 
-代码全部落地：target `Paster iOS`（`PasterIOS/`）、`PasterShareExtension`、`PasterWidgets`（仅「保存剪贴板」Control）、三 target 共用的 `PasterShared/`（App Intents、分享面板、入库逻辑）。iOS Debug / Release-AppStore 与 Mac 三个配置全新构建零警告，`PasterCore` 12 个测试通过。全部验证都在模拟器上、未签名（`CODE_SIGNING_ALLOWED=NO`）完成，下面列出因此**没验证到**的部分。
+代码全部落地：target `Copyo iOS`（`CopyoIOS/`）、`CopyoShareExtension`、`CopyoWidgets`（仅「保存剪贴板」Control）、三 target 共用的 `CopyoShared/`（App Intents、分享面板、入库逻辑）。iOS Debug / Release-AppStore 与 Mac 三个配置全新构建零警告，`CopyoCore` 12 个测试通过。全部验证都在模拟器上、未签名（`CODE_SIGNING_ALLOWED=NO`）完成，下面列出因此**没验证到**的部分。
 
 构建与截图：
 
 ```bash
-xcodebuild -project Paster.xcodeproj -scheme "Paster iOS" -configuration Debug \
+xcodebuild -project Copyo.xcodeproj -scheme "Copyo iOS" -configuration Debug \
   -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
-xcrun simctl launch --terminate-running-process "iPhone 17 Pro" dev.vibemage.Paster \
+xcrun simctl launch --terminate-running-process "iPhone 17 Pro" dev.vibemage.Copyo \
   -demoData -skipOnboarding -demoScreen history -demoTheme dark
 ```
 
-启动参数：`-demoData`（内存库 + 设计稿样例数据）、`-skipOnboarding`、`-localOnly`、`-demoScreen <route>`（取值见 `PasterIOS/App/LaunchOptions.swift`）、`-demoTheme light|dark`、`-demoSidebar <item>`（iPad）、`-simulateQuickSave`、`-demoMenu`（仅 Debug）。中英切换加 `-AppleLanguages "(en)"`。
+启动参数：`-demoData`（内存库 + 设计稿样例数据）、`-skipOnboarding`、`-localOnly`、`-demoScreen <route>`（取值见 `CopyoIOS/App/LaunchOptions.swift`）、`-demoTheme light|dark`、`-demoSidebar <item>`（iPad）、`-simulateQuickSave`、`-demoMenu`（仅 Debug）。中英切换加 `-AppleLanguages "(en)"`。
 
 **提审前必须做（开发者后台 / 真机）：**
 
-1. 开发者后台：App ID `dev.vibemage.Paster`、`dev.vibemage.Paster.ShareExtension`、`dev.vibemage.Paster.Widgets` 三个都开启 App Group `group.dev.vibemage.Paster`；主应用另开 iCloud 容器 `iCloud.dev.vibemage.Paster` 与 Push。至今所有构建都没展开过 entitlements，自动签名归档会直接失败。
-2. CloudKit Console：`ClipItem.sourceColorHex`、`Pinboard.iconName`、`Pinboard.colorHex` 是新字段，Development schema 要重新部署到 Production。
-3. 快捷指令：在真机的「快捷指令」里建「获取剪贴板 → Paster：保存内容」，iCloud 分享后把链接填进 `PasterIOS/Screens/Settings/ShortcutLinks.swift`（现在是占位串，按钮只会提示「尚未发布」；「轻点背面」通道依赖它）。
+1. 开发者后台：App ID `dev.vibemage.Copyo`、`dev.vibemage.Copyo.ShareExtension`、`dev.vibemage.Copyo.Widgets` 三个都开启 App Group `group.dev.vibemage.Copyo`；主应用另开 iCloud 容器 `iCloud.dev.vibemage.Copyo` 与 Push。至今所有构建都没展开过 entitlements，自动签名归档会直接失败。
+2. CloudKit Console：容器换成了 `iCloud.dev.vibemage.Copyo`，schema 要在**新容器**里从头跑一遍 Development，确认 `ClipItem` / `Pinboard` 两张表（含 `sourceColorHex`、`iconName`、`colorHex`）齐全后再部署到 Production。
+3. 快捷指令：在真机的「快捷指令」里建「获取剪贴板 → Copyo：保存内容」，iCloud 分享后把链接填进 `CopyoIOS/Screens/Settings/ShortcutLinks.swift`（现在是占位串，按钮只会提示「尚未发布」；「轻点背面」通道依赖它）。
 4. App Store Connect：现有应用记录「添加平台 → iOS」。
 
 **真机验证清单（模拟器做不到）：**
@@ -134,7 +135,7 @@ xcrun simctl launch --terminate-running-process "iPhone 17 Pro" dev.vibemage.Pas
 - 分享扩展在扩展进程里的外观、取消 / 完成收尾；Control 在控制中心与锁屏里的显示。
 - 引导页第三页的两个开关、设置里的外链与系统设置跳转。
 
-**与设计稿的取舍（需设计拍板）：** 设置总览「允许从其他 App 粘贴」右值显示「系统设置」而非「询问」（iOS 不提供读取该授权的 API）；04b 没有「打开操作按钮设置」按钮（无公开深链）；04e「Paster 键盘」整行留到 Phase 2；隐私说明是外链而非二级页；颜色详情的三个色值胶囊在 440pt 宽上折成两行；引导页插图符号偏下约 14pt；iOS 26 系统返回按钮不带「历史」文字。
+**与设计稿的取舍（需设计拍板）：** 设置总览「允许从其他 App 粘贴」右值显示「系统设置」而非「询问」（iOS 不提供读取该授权的 API）；04b 没有「打开操作按钮设置」按钮（无公开深链）；04e「Copyo 键盘」整行留到 Phase 2；隐私说明是外链而非二级页；颜色详情的三个色值胶囊在 440pt 宽上折成两行；引导页插图符号偏下约 14pt；iOS 26 系统返回按钮不带「历史」文字。
 
 **留到 Phase 2 的已知缺陷：** 动态字体放大时角标 / 元信息 / 筛选胶囊不随正文放大；搜索没有 predicate 下推与防抖，条目上万时每敲一字全表扫描；超长正文详情页整串渲染；`isSelected` 卡片状态未接（轻点已绑定复制）；VoiceOver 未验证；AppIcon 只有一张 1024 universal，没有 tinted / dark 变体。
 
@@ -162,22 +163,22 @@ xcrun simctl launch --terminate-running-process "iPhone 17 Pro" dev.vibemage.Pas
 ### 4.2 Claude Design 提示词（可直接粘贴，配合 4.1 的参考图上传）
 
 ````text
-为开源剪贴板工具 Paster 设计 iOS 与 iPadOS 应用。
+为开源剪贴板工具 Copyo 设计 iOS 与 iPadOS 应用。
 
 ## 背景
-- Paster 的 Mac 版已经上架：按下快捷键，一个深色卡片面板从屏幕底部滑出，展示复制过的所有内容（文本、富文本、链接、颜色、图片、文件），即输即搜，回车粘贴。参考图见附件。
+- Copyo 的 Mac 版已经上架：按下快捷键，一个深色卡片面板从屏幕底部滑出，展示复制过的所有内容（文本、富文本、链接、颜色、图片、文件），即输即搜，回车粘贴。参考图见附件。
 - 移动版的定位：Mac 剪贴板历史的口袋入口 + 手机侧收集器。通过 iCloud 与 Mac 同步，Mac 上复制过的一切在手机上随时可搜、可复制；手机上想留住的内容，存进同一份历史。
 - 用户画像：中英文圈的效率工具用户，含开发者。界面文案先出简体中文，关键界面附英文版。
 
 ## 平台硬约束（设计中不得出现做不到的交互）
 - iOS 无法在后台读剪贴板、没有全局快捷键、不能把内容自动粘贴进其他 App。不要设计任何「自动粘贴」「后台监听」「常驻通知」的开关或按钮。
-- 保存内容进 Paster 只有三条通道：
-  1. 打开或回到 Paster 时自动读取当前剪贴板；
-  2. 系统分享面板里的「保存到 Paster」；
-  3. 「一键保存」：操作按钮 / 敲击背面 / 控制中心按钮，按下后会打开 Paster 并显示「已保存」。
+- 保存内容进 Copyo 只有三条通道：
+  1. 打开或回到 Copyo 时自动读取当前剪贴板；
+  2. 系统分享面板里的「保存到 Copyo」；
+  3. 「一键保存」：操作按钮 / 敲击背面 / 控制中心按钮，按下后会打开 Copyo 并显示「已保存」。
 - 内容送进其他 App 只有三条路：轻点卡片复制后手动粘贴；键盘扩展直接输入；iPad 上拖放到旁边的 App。
 - 手机本机保存的条目没有来源 App 信息；Mac 同步来的条目有来源 App 名，但没有图标。
-- 自动读取剪贴板需要用户在 iOS 设置里把 Paster 的「从其他 App 粘贴」设为「允许」，否则系统每次弹窗。未允许时，界面用系统样式的「粘贴」按钮兜底。
+- 自动读取剪贴板需要用户在 iOS 设置里把 Copyo 的「从其他 App 粘贴」设为「允许」，否则系统每次弹窗。未允许时，界面用系统样式的「粘贴」按钮兜底。
 
 ## 品牌与风格
 - App 图标：骨白卡片 + 红蓝双层错位套印。红 #FF2D55、蓝 #0A84FF、卡片 #F7F3EA、内容条 #16161A、深底 #1B1620 到 #08060B 径向渐变。红蓝错位只用于图标、空态和引导页的点缀，正文界面不要滥用。
@@ -235,4 +236,4 @@ xcrun simctl launch --terminate-running-process "iPhone 17 Pro" dev.vibemage.Pas
 
 - 键盘扩展：4.4.1 要求提供输入功能与切换键盘的途径；申请完全访问必须有隐私政策链接（已有）
 - 剪贴板读取：审核员可能质疑自动读取，引导页与审核备注要说明「仅前台、用户可关」
-- 分享扩展与 App Intent 的名称含 "Paster" 即可，不要出现任何商业剪贴板产品名
+- 分享扩展与 App Intent 的名称含 "Copyo" 即可，不要出现任何商业剪贴板产品名
