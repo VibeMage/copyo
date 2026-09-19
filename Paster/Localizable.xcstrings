@@ -185,13 +185,13 @@
         }
       }
     },
-    "Any folder all of your devices share works — for example a folder inside iCloud Drive, or a company drive. Copyo keeps its files in a Copyo subfolder and can only reach the folder you pick here.": {
+    "Any folder all of your devices share works — for example a folder inside iCloud Drive, or a company drive. Copyo keeps its files in its own subfolder and can only reach the folder you pick here.": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "任意多台设备都能共享的文件夹皆可，例如 iCloud Drive 里的某个文件夹或公司共享盘。Copyo 会把自己的文件放在其中的 Copyo 子文件夹里，且只能访问你在此选定的文件夹。"
+            "value": "任意多台设备都能共享的文件夹皆可，例如 iCloud Drive 里的某个文件夹或公司共享盘。Copyo 会把自己的文件放在其中的专属子文件夹里，且只能访问你在此选定的文件夹。"
           }
         }
       }

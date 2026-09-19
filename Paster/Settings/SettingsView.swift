@@ -352,7 +352,7 @@ private struct FolderSyncSections: View {
                     chooseFolder()
                 }
             }
-            Text("Any folder all of your devices share works — for example a folder inside iCloud Drive, or a company drive. Copyo keeps its files in a Copyo subfolder and can only reach the folder you pick here.")
+            Text("Any folder all of your devices share works — for example a folder inside iCloud Drive, or a company drive. Copyo keeps its files in its own subfolder and can only reach the folder you pick here.")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
                 .task { refreshFolderPath() }

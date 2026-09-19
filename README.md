@@ -24,7 +24,9 @@ Copyo（曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜�
 
 ## 安装
 
-从 [Releases](https://github.com/VibeMage/Paster/releases) 下载最新 DMG，打开后把 Copyo
+推荐从 [Mac App Store](https://apps.apple.com/app/id6807507103) 安装。
+
+也可以从 [Releases](https://github.com/VibeMage/copyo/releases) 下载 DMG，打开后把 Copyo
 拖进 Applications 即可。官方发布均已使用 Developer ID 签名并通过 Apple 公证——双击即可打开，
 仅首次有一次「从互联网下载的 App」标准确认弹窗。
 
@@ -115,7 +117,7 @@ xcrun notarytool store-credentials paster-notary \
 Copyo/
 ├── App/        应用入口、菜单栏常驻（NSStatusItem）
 ├── Models/     SwiftData 模型：ClipItem、Pinboard
-├── Services/   剪贴板轮询监听、写回与模拟 ⌘V、全局快捷键、iCloud 同步、图标取色、缩略图缓存
+├── Services/   剪贴板轮询监听、写回剪贴板并把焦点还给之前的应用、全局快捷键、iCloud 同步、图标取色、缩略图缓存
 ├── Panel/      底部滑出面板（NSPanel + SwiftUI）：卡片流、搜索、预览
 └── Settings/   设置窗口（通用 / 历史 / 同步 / 快捷键 / 关于）
 ```
@@ -124,7 +126,7 @@ Copyo/
 
 - macOS 没有剪贴板变化通知 API，`ClipboardMonitor` 以 0.3s 间隔轮询 `NSPasteboard.changeCount`（所有剪贴板工具的通用做法）
 - 文本优先于图片抓取：Excel/Numbers 等复制文本时会同时放一份图像渲染，必须按文本记录
-- 全局快捷键使用 Carbon `RegisterEventHotKey`，零第三方依赖；模拟 `⌘V` 前会确认目标应用已回到前台
+- 全局快捷键使用 Carbon `RegisterEventHotKey`，零第三方依赖；应用不使用辅助功能权限
 - 存储使用 SwiftData（SQLite），图片走 `externalStorage` + SHA-256 去重 + 缩略图缓存
 - 同步有两条互斥的通道：文件夹方式是快照合并（iCloud Drive 或任意共享目录皆可，
   无需付费开发者账号，但不传播删除）；iCloud 方式由 SwiftData 直接镜像到 CloudKit

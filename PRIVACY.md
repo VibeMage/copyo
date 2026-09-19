@@ -18,7 +18,7 @@ Copyo (formerly Paster) does not collect, transmit, or sell any data. Period.
 Since no data is collected, there is nothing for us to access, share, or delete.
 Deleting the app (and its data folder) removes everything.
 
-Questions: open an issue at https://github.com/VibeMage/Paster/issues
+Questions: open an issue at https://github.com/VibeMage/copyo/issues
 
 ## 中文
 
@@ -34,4 +34,4 @@ Copyo（曾用名 Paster）不收集、不传输、不出售任何数据。
 由于不收集任何数据，我们无从访问、共享或删除你的数据。
 删除应用（及其数据目录）即可清除一切。
 
-如有疑问：https://github.com/VibeMage/Paster/issues
+如有疑问：https://github.com/VibeMage/copyo/issues

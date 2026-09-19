@@ -3,7 +3,7 @@ import UIKit
 
 /// 设置页里的外链与版本号。
 enum SettingsLinks {
-    static let repository = URL(string: "https://github.com/VibeMage/Paster")!
+    static let repository = URL(string: "https://github.com/VibeMage/copyo")!
 
     /// 仓库私有期间用公开 Gist，与 docs/appstore-submission.md 里提交给 App Store 的隐私政策 URL 保持一致。
     /// 换成仓库内 PRIVACY.md 时两处要同时改。

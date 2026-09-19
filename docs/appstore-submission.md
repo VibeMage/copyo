@@ -1,6 +1,6 @@
 # Mac App Store 提审材料与操作清单
 
-创建日期：2026-09-01 · 最后更新：2026-09-15
+创建日期：2026-09-01 · 最后更新：2026-09-19
 
 ## 一、App Store Connect 建应用（你来操作）
 
@@ -30,10 +30,10 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 | 字段 | 填写 |
 | --- | --- |
 | 名称 | `Copyo: Clipboard History`（1.0.1 起，中英文商店同名，不设中文名） |
-| 技术支持网址 | `https://vibemage.github.io/Paster/support/`（不变；仓库暂不改名，见第十一节） |
+| 技术支持网址 | `https://vibemage.github.io/copyo/support/`（仓库 2026-09-16 已改名为 copyo，旧地址随之 404，见第十二节） |
 | 营销网址 | 留空 |
-| 版本 | 1.0（与构建的 MARKETING_VERSION 一致） |
-| 版权 | `© 2026 Paster Contributors` |
+| 版本 | 1.0.1（与构建的 MARKETING_VERSION 一致） |
+| 版权 | `© 2026 Copyo Contributors` |
 
 ### 推广文本（170 字符内，可随时改无需审核）
 
@@ -103,7 +103,7 @@ How to use:
 5. Settings are available from the gear button in the panel header,
    or by right-clicking the menu bar icon.
 
-About permissions: Paster does not use Accessibility, event taps or input
+About permissions: Copyo does not use Accessibility, event taps or input
 monitoring, and never asks for any privacy permission. The
 Shift+Command+V shortcut is registered with the Carbon
 RegisterEventHotKey API, which needs no permission.
@@ -252,6 +252,9 @@ grep -n "REPLACE-ME" docs/support/index.html
 sed -i '' 's/support@REPLACE-ME.example/你的邮箱/g' docs/support/index.html
 ```
 
+> ⚠️ 以下命令是 2026-09-09 当时的操作记录，仓库那时还叫 `Paster`。仓库已于 2026-09-16 改名为 `copyo`，
+> 现在的支持页面地址是 `https://vibemage.github.io/copyo/support/`。照抄下面的命令会操作到不存在的仓库。
+
 **方案 A（推荐，与「上架即开源」的计划一致）**：仓库转公开，用 main 分支的 /docs 目录做 GitHub Pages。
 issues 页面同时可用，PRIVACY.md 和支持页里的 issues 链接都会生效。
 
@@ -274,7 +277,7 @@ tmp=$(mktemp -d) && cp docs/support/index.html "$tmp/" && cd "$tmp" \
   && gh api -X POST repos/VibeMage/paster-support/pages -f 'source[branch]=main' -f 'source[path]=/'
 ```
 
-### 提交顺序（支持页面已于 2026-09-09 上线，仓库已公开）
+### 提交顺序（1.0 的历史记录；1.0.1 请按第十一节的「App Store Connect 操作」，那里的支持网址才是现在有效的）
 
 1. 上传新构建：从 `release/1.0` 出包（见第六节），用 Transporter 拖入
    `build/appstore/Paster-1.0-appstore.pkg` → Deliver；或直接 `UPLOAD=1` 让脚本上传。
@@ -314,7 +317,7 @@ tmp=$(mktemp -d) && cp docs/support/index.html "$tmp/" && cd "$tmp" \
 - 产品文件名 `Copyo.app`（PRODUCT_NAME = Copyo），显示名 `Copyo`，用户可见文案全部改名（欢迎对话框、菜单栏菜单、设置窗口标题、关于页、iOS 引导与分享扩展）。
 - **不动的**：bundle ID `dev.vibemage.Paster`、数据目录 `Application Support/Paster/`、沙盒容器路径、同步文件夹里的 `Paster/` 子目录、CloudKit 容器、PasterCore 模块名、target/scheme 名、工程文件名。老用户升级后数据原地保留。
 - release/1.0 的 MARKETING_VERSION 升到 1.0.1；上架包 `Copyo-1.0.1-appstore.pkg`。
-- 仓库暂不改名（Pages 项目站地址不随仓库改名跳转，线上 1.0 的支持网址会失效）。等注册了自定义域名（推荐 copyo.app）挂到 Pages 之后再改仓库名。
+- 仓库当时暂未改名（Pages 项目站地址不随仓库改名跳转，线上 1.0 的支持网址会失效）。**这条后来没有守住**：仓库于 2026-09-16 改名为 `copyo`，预言的后果照样发生，详见第十二节。
 
 ### 提交 1.0.1 前你要做的
 
@@ -323,11 +326,48 @@ tmp=$(mktemp -d) && cp docs/support/index.html "$tmp/" && cd "$tmp" \
 
 ### App Store Connect 操作
 
-1. Paster → 版本 → ➕ 新版本 `1.0.1`。
+1. 应用（商店里现在仍显示 Paster）→ 版本 → ➕ 新版本 `1.0.1`。
 2. App 信息 → 可本地化信息：英文与简体中文名称都改为 `Copyo: Clipboard History`。副标题不变。
-3. 版本页：描述（第三节新版）、关键词（第三节新版）、审核备注（第四节新版）。技术支持网址不变。
+3. 版本页：描述（第三节新版）、关键词（第三节新版）、审核备注（第四节新版）、技术支持网址改为 `https://vibemage.github.io/copyo/support/`（**必须改，旧地址已 404**）、版权改为 `© 2026 Copyo Contributors`。
 4. 此版本的新增内容：
    - zh：`Paster 更名为 Copyo。功能不变，你的历史记录、Pinboard 和设置全部原地保留。`
    - en：`Paster is now Copyo. Same app, same data — only the name has changed.`
 5. Transporter 拖入 `build/appstore/Copyo-1.0.1-appstore.pkg` → Deliver；处理完后在版本页选中该构建。
 6. 提交以供审核。名称在审核通过并发布后才会在商店里变更；商店链接里的 id 不变。
+
+## 十二、仓库改名导致线上支持网址 404（2026-09-16 发生，2026-09-19 排查）
+
+### 发生了什么
+
+GitHub 仓库从 `VibeMage/Paster` 改名为 `VibeMage/copyo`。GitHub 会为 github.com 的仓库链接做 301 跳转，
+但 **GitHub Pages 项目站地址不跳转**——第十一节里预先写下的正是这个风险，改名时没有照做。
+
+| 地址 | 状态 |
+| --- | --- |
+| `https://vibemage.github.io/copyo/support/` | 200 |
+| `https://vibemage.github.io/Paster/support/` | 404 ← 线上 1.0 在 App Store 填的就是这个 |
+
+后果：已上架的 1.0 (5) 商品页上的「App 支持」按钮点开是 GitHub 的 404 页。1.5 条款正是 2026-09-08 那次拒审的原因之一。
+
+### 为什么不能直接去 App Store Connect 改
+
+「技术支持网址」是**版本级**字段。Apple 自 2018 年 4 月起规定，支持网址、营销网址和「此版本新增内容」
+只能随新版本提交一起修改（见 developer.apple.com/news/?id=12072010c）。已批准版本上可随时编辑的只有
+推广文本和版权。所以线上 1.0 的这个链接，在 1.0.1 过审之前无法通过 ASC 修好。
+
+### 两条路（二选一，需要你决定）
+
+**A. 建一个跳转仓库**（唯一能立刻修好线上 1.0 的办法）
+新建公开仓库 `VibeMage/Paster`，只放 `docs/.nojekyll` 与 `docs/support/index.html`（meta refresh 跳到
+`/copyo/support/`），Pages 设为 main 分支 /docs。旧地址几分钟内恢复。
+代价：`github.com/VibeMage/Paster` 的改名 301 会被这个新仓库顶掉。所以**必须先**把仓库内所有指向旧仓库名的
+链接改完（已于 2026-09-19 改完）并把两个工作树的 `git remote` 换成 `copyo.git`（已改），否则 push 会推到跳转仓库。
+
+**B. 不建，接受窗口期**
+等 1.0.1 过审上架，支持网址随新版本一起切到 `/copyo/support/`。这期间（1–3 天）线上 1.0 的支持链接持续 404。
+
+### 长期根治
+
+注册 `copyo.app`，在 copyo 仓库 `docs/` 下放 CNAME 并在 Pages 设置里绑定，支持网址改用
+`https://copyo.app/support/`。此后再改仓库名也不会断。注意这**不能**修复旧的 `/Paster/` 路径，
+那个路径只能靠方案 A 的跳转仓库兜底。
