@@ -355,7 +355,7 @@ GitHub 仓库从 `VibeMage/Paster` 改名为 `VibeMage/copyo`。GitHub 会为 gi
 只能随新版本提交一起修改（见 developer.apple.com/news/?id=12072010c）。已批准版本上可随时编辑的只有
 推广文本和版权。所以线上 1.0 的这个链接，在 1.0.1 过审之前无法通过 ASC 修好。
 
-### 两条路（二选一，需要你决定）
+### 处理方式（2026-09-19 已决定：走 B，不建跳转仓库）
 
 **A. 建一个跳转仓库**（唯一能立刻修好线上 1.0 的办法）
 新建公开仓库 `VibeMage/Paster`，只放 `docs/.nojekyll` 与 `docs/support/index.html`（meta refresh 跳到
@@ -363,8 +363,10 @@ GitHub 仓库从 `VibeMage/Paster` 改名为 `VibeMage/copyo`。GitHub 会为 gi
 代价：`github.com/VibeMage/Paster` 的改名 301 会被这个新仓库顶掉。所以**必须先**把仓库内所有指向旧仓库名的
 链接改完（已于 2026-09-19 改完）并把两个工作树的 `git remote` 换成 `copyo.git`（已改），否则 push 会推到跳转仓库。
 
-**B. 不建，接受窗口期**
+**B. 不建，接受窗口期** ← **已选**
 等 1.0.1 过审上架，支持网址随新版本一起切到 `/copyo/support/`。这期间（1–3 天）线上 1.0 的支持链接持续 404。
+因此 **1.0.1 要尽快提交**：窗口期长短就等于 1.0.1 的提审到上架时间。提交时务必把版本页的技术支持网址
+改成 `https://vibemage.github.io/copyo/support/`，这是本次改动里最关键的一个字段。
 
 ### 长期根治
 
