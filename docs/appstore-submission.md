@@ -56,7 +56,7 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 ```
 按下 ⇧⌘V，你复制过的一切从屏幕底部滑出。
 
-Copyo（曾用名 Paster）是一款开源的剪贴板管理工具：
+Copyo 是一款开源的剪贴板管理工具：
 • 自动记录复制过的文本、富文本、链接、颜色、图片和文件
 • 底部卡片面板，即输即搜，全键盘操作
 • 选中回车，内容立刻回到剪贴板，⌘V 即可粘贴
@@ -73,7 +73,7 @@ Copyo（曾用名 Paster）是一款开源的剪贴板管理工具：
 ```
 Press ⇧⌘V and everything you've ever copied slides up from the bottom of your screen.
 
-Copyo (formerly Paster) is an open-source clipboard manager:
+Copyo is an open-source clipboard manager:
 • Automatically captures text, rich text, links, colors, images and files
 • Bottom card panel — type to search, fully keyboard-driven
 • Hit Return and it's back on your clipboard, ready to paste with ⌘V
@@ -87,15 +87,15 @@ No telemetry, no analytics, no network requests. Fully open source.
 
 ### 关键词（100 字符内）
 
-- zh：`剪贴板,粘贴,历史,剪切板,效率,复制,clipboard,paste,copyo,paster`
-- en：`clipboard,paste,history,copy,manager,productivity,snippets,pasteboard,copyo,paster`
+- zh：`剪贴板,粘贴,历史,剪切板,效率,复制,clipboard,paste,copyo,clip`
+- en：`clipboard,paste,history,copy,manager,productivity,snippets,pasteboard,copyo,clip`
 
 ## 四、审核备注（App Review Notes，重点！）
 
 菜单栏工具是审核重点对象，把这段贴进「审核备注」能少一轮拒审：
 
 ```
-Copyo (formerly Paster) is a menu bar app (LSUIElement) with no Dock icon or main window.
+Copyo is a menu bar app (LSUIElement) with no Dock icon and no main window.
 
 How to use:
 1. On first launch a welcome dialog explains the basics.
@@ -518,3 +518,42 @@ Cardo、Roneo、Inkyo 等十余个也都撞了在架应用或踩了发音雷。
    路径见第十节，个人账号选「非交易者」即可。
 4. 商店文案、关键词、截图、隐私问卷按第二至五节填进 1.0 版本页。注意简体中文名称已含「剪贴板历史」，
    第三节那句中文副标题「剪贴板历史，一按即达」与之重复，填之前调一下。
+
+## 十五、1.0 版本页填写进度（2026-09-19）
+
+### 已填好并保存
+
+| 项目 | 状态 |
+| --- | --- |
+| 英文：推广文本 / 描述 / 关键词 / 技术支持网址 / 版权 | ✅ |
+| 简体中文：推广文本 / 描述 / 关键词 / 技术支持网址 | ✅ |
+| 审核备注（英文） | ✅ |
+| 「需要登录」勾选 | ✅ 已取消（ASC 默认勾上，Copyo 不需要登录账号，勾着且账号为空会卡验证） |
+| 截图 | ✅ 2 张（`01-panel-en` / `02-search-en`）。ASC 默认一套截图用于所有本地化版本，要分语言得用「媒体管理」 |
+| 隐私政策网址 | ✅ 指向公开 Gist |
+| 数据收集问卷 | ✅ 已答「不会从此 App 中收集数据」并保存 |
+| 类别 | ✅ 主要 = 效率 |
+
+### 对第三节原稿做的三处修改（已同步回本文档）
+
+1. **删掉「曾用名 Paster」/「formerly Paster」**（描述与审核备注各一处）。
+   pasterapp.com 的 Paster 是别家公司仍在售的产品，在商店文案里写「曾用名 Paster」
+   容易被读成与对方有关联；而且旧记录已删，商店里没有任何连续性需要交代。
+2. **关键词里的 `paster` 换成 `clip`**（中英文各一处）。拿竞品名当关键词违反 App Store 规则，
+   而且那正是我们要摆脱的名字。
+3. **⇧⌘V 一律写成 `Shift+Command+V`**。第三节本来就警告过 ASC 的推广文本/关键词字段
+   不接受按键符号；为保持一致，描述与审核备注里也用了展开写法。
+
+### 还没做（需要你本人）
+
+1. **发布隐私答复**。App 隐私页右上角「发布」，弹窗要你确认「答复准确无误且遵守《App Store 审核指南》
+   和适用的法律」——这是一条以你名义作出的合规声明，我没有代你点。答案已经存好，点一下即可。
+2. **价格与销售范围**：定价时间表与供应情况都还是空的，提审前必须设置（免费 + 选国家/地区）。
+   欧盟那部分与 DSA 交易者状态绑在一起。
+3. **DSA 交易者状态**（见第十节）。
+4. **构建版本**：还没有可上传的包。需要用新的 App ID 归档签名。
+5. **截图 03 / 04 要重拍**：仓库里 `art/store/03-preview-*` 的副标题写着「then ↩ to paste」，
+   `04-shortcuts-*` 的设置页里还是「Paste selected item」「Paste selected item as plain text」——
+   这两条文案在 1.0 (4) 移除自动粘贴时就删了。拿去提审等于截图展示一个会自动粘贴的应用，
+   而审核备注写的是本应用不粘贴、不使用辅助功能，自相矛盾，有再吃一次 2.4.5 的风险。
+   目前版本页只放了 01、02 两张干净的。
