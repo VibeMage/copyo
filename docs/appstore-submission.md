@@ -5,7 +5,8 @@
 ## 一、App Store Connect 建应用（你来操作）
 
 > ⚠️ 下面这张表是 2026-09-01 建第一条应用记录时填的。**那条记录已于 2026-09-19 删除**，
-> 重新建记录请按第十三节的新值填（名称 `Copyo: Clipboard History`、套装 ID `dev.vibemage.Copyo`、SKU `copyo`）。
+> 新记录已于 2026-09-19 建好，实际填的值见第十三节（名称 `Copyo - Clipboard History`、套装 ID
+> `dev.vibemage.Copyo`、SKU `copyo`、Apple ID `6813955206`）。
 
 appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
@@ -32,7 +33,7 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
 | 字段 | 填写 |
 | --- | --- |
-| 名称 | `Copyo: Clipboard History`（中英文商店同名，不设中文名） |
+| 名称 | `Copyo - Clipboard History`（英文）／`Copyo - 剪贴板历史`（简体中文本地化名称） |
 | 技术支持网址 | `https://vibemage.github.io/copyo/support/`（仓库 2026-09-16 已改名为 copyo，旧地址随之 404，见第十二节） |
 | 营销网址 | 留空 |
 | 版本 | 1.0（新应用记录从 1.0 重新开始，与构建的 MARKETING_VERSION 一致） |
@@ -428,7 +429,7 @@ bundle ID，所以 bundle ID 必须换，正好与改名一起做完。
    iCloud (CloudKit) 选中该容器，并勾上 Push Notifications。
 4. CloudKit Console：在新容器里跑一遍 Development schema，确认 `ClipItem` / `Pinboard` 两张表齐全后
    部署到 Production（正式版发布前必须做完）。
-5. ASC → 我的 App → ➕ 新建 App：平台 macOS，名称 `Copyo: Clipboard History`，套装 ID `dev.vibemage.Copyo`，
+5. ASC → 我的 App → ➕ 新建 App：平台 macOS，名称 `Copyo - Clipboard History`，套装 ID `dev.vibemage.Copyo`，
    SKU `copyo`（旧记录的 SKU `paster` 随记录一起没了）。版本号 **1.0**，构建号从 **1** 开始——新记录没有
    历史构建，`CURRENT_PROJECT_VERSION` 已经重置为 1。商店文案、关键词、审核备注见第三、四节。
 6. 描述文件：自动签名会按新 App ID 重新生成；Developer ID 那张要包含新的 iCloud 容器与 App Group，
@@ -449,3 +450,71 @@ bundle ID，所以 bundle ID 必须换，正好与改名一起做完。
   重新建出来并继续往里写，升级后的这台会继续只读合并那个目录，所以改名窗口期里两边的条目都不会丢。
 - **iCloud 同步**：容器换了，等于重新上云。CloudKit 同步从未随正式版发布，线上没有用户受影响；
   开发机上旧容器里的数据作废，本地库不受影响。
+
+## 十四、重建记录的实际结果（2026-09-19 当天完成）
+
+### 开发者后台（全部建好）
+
+| 标识 | 值 | 配置 |
+| --- | --- | --- |
+| App ID（主应用） | `dev.vibemage.Copyo` | 全平台；App Groups ✓、iCloud + CloudKit（1 个容器）✓、Push ✓ |
+| App ID（分享扩展） | `dev.vibemage.Copyo.ShareExtension` | App Groups ✓ |
+| App ID（小组件） | `dev.vibemage.Copyo.Widgets` | App Groups ✓ |
+| App Group | `group.dev.vibemage.Copyo` | 三个 App ID 都已勾选 |
+| iCloud 容器 | `iCloud.dev.vibemage.Copyo` | 主应用 App ID 已选中 |
+
+### ASC 应用记录
+
+| 字段 | 值 |
+| --- | --- |
+| 名称（英语 美国，主要语言） | `Copyo - Clipboard History`（25 字符） |
+| 名称（简体中文本地化） | `Copyo - 剪贴板历史`（13 字符） |
+| 平台 | macOS（iOS 待 Phase 1 就绪后「添加平台」） |
+| 套装 ID | `dev.vibemage.Copyo` |
+| SKU | `copyo` |
+| Apple ID | `6813955206` |
+| 状态 | 1.0 准备提交 |
+
+### 商店名为什么不是光秃秃的「Copyo」
+
+ASC 拒绝了裸名 `Copyo`：「你输入的 App 名称已被使用」。查证结果：
+
+- **不是被上架应用占用**。iTunes Search API（美区 + 中国区 × Mac + iOS）对 `copyo` 的精确匹配为零，
+  中国区 resultCount 直接是 0。
+- 也**不是我们自己的旧记录攥着**：旧记录从建立到删除，App 信息里的名称一直是 `Paster`，
+  第十一节计划的 `Copyo: Clipboard History` 那一步从未执行。
+- 结论：**第三方在 App Store Connect 里预留了这个字符串**。预留名不出现在商店里，但会挡住新记录，
+  且等不到自动释放，支持请求也需要证明名称使用权。
+
+ASC 锁的是精确名称字符串，Apple 官方给的解法就是加限定词；这个品类本来也人人都加
+（货架邻居 `CopyClip - Clipboard History`，连 Paste 本尊都是 `Paste – Limitless Clipboard`），
+所以加后缀在品牌上零损失。**不要再尝试把商店名改回裸名 `Copyo`。**
+
+评估过的替代品牌全部否掉，主要死因是同品类撞名——**Pinza** 与 **Magpie** 各有一个正在上架的
+macOS 菜单栏剪贴板管理器，重蹈 Paster / pasterapp.com 的覆辙；Twofold、Clipo / Clippo、ClipDeck、
+Cardo、Roneo、Inkyo 等十余个也都撞了在架应用或踩了发音雷。
+
+### 旧 App ID 删不掉（Apple 拒绝）
+
+尝试删除 `dev.vibemage.Paster` 时 Apple 返回：
+
+> The App ID '9A94W79V84.dev.vibemage.Paster' appears to be in use by the App Store,
+> so it can not be removed at this time.
+
+说明已删除的应用记录在 Apple 侧仍与该 bundle ID 绑定（同样的原因，它也不出现在新建记录的套装 ID
+下拉里）。**这不是操作失误，是 Apple 的限制**，过一段时间可以再试；删不掉也无害，闲置而已。
+`iCloud.dev.vibemage.Paster` 容器同理——iCloud 容器详情页只有 Description 与 Save，**压根没有删除入口**
+（对比 App ID 详情页是 Remove + Save），列表筛选器里那个 Hidden 档也没有对应的操作控件。
+
+### 待办（按紧急程度）
+
+1. **注册 `copyo.app` / `copyo.io` / `copyo.dev`**。第十一节写的是「可注册」，至今仍然**没有注册**——
+   RDAP 权威查询（带对照组）对三个域名均返回 not found。谁都能抢，尽快拿下。
+   `copyo.com` 自 2012 年被人持有（GoDaddy 锁定，空页面），放弃。
+2. **递交美国第 9 类 COPYO 商标申请**。我们对 ASC 里那个预留者、以及一家同拼写的孟菲斯 AI 文案 SaaS
+   「Copyo」都是在后方；有申请在手 + GitHub 提交这类带日期的首次使用证据，将来遇到 App 名称争议才有得打。
+   ⚠️ USPTO 注册库**未能核实**（Justia 403、无公开 API、WIPO 有反爬验证），「商标干净」属未证实而非已证实。
+3. **DSA 交易者状态**。ASC 首页横幅：不提供交易商状态则无法提交新 App 或更新以在欧盟分发。
+   路径见第十节，个人账号选「非交易者」即可。
+4. 商店文案、关键词、截图、隐私问卷按第二至五节填进 1.0 版本页。注意简体中文名称已含「剪贴板历史」，
+   第三节那句中文副标题「剪贴板历史，一按即达」与之重复，填之前调一下。
