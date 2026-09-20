@@ -900,3 +900,67 @@ iCloud 版本留给 1.1」。但第十八节核验的 `Copyo-1.0-appstore.pkg` �
   （`SettingsView.swift:179`、`AppDelegate.swift:242`），删 Pinboard 也只是解绑
   （`Pinboard.swift:13` 是 `.nullify`）。想彻底清空要先删 Pinboard 再清历史，顺序错了
   最敏感的内容还留在 iCloud 里。建议加一个「删除所有数据」。
+
+## 二十四、2.1「需要补充信息」的处理（2026-09-20）
+
+1.0 (1) 提交当天被退回，条款是 **Guideline 2.1 Performance: App Completeness**，
+正文是新开发者账号首次提审的标准模板：要一段真机录屏 + 六项说明。
+**不是功能拒审**，补齐即可。
+
+### 关键发现：状态是「被拒绝」而不是「等待审核」
+
+这一点改变了整个策略。此前按「等待审核」判断，以为描述与审核备注是只读的、
+要改必须撤回重排队；进 ASC 才看到状态是**被拒绝**，所有版本级字段都可编辑，
+右上角「保存」与「更新审核」都是亮的。于是描述、推广文本、审核备注全部就地改正，
+不用撤回、不损失排队位置。
+
+### 做了什么
+
+| 项目 | 内容 |
+| --- | --- |
+| 录屏 | 1080p / 1 分 57 秒 / 6.5 MB。从「应用程序」双击启动开始，含首启动欢迎框、菜单栏图标、现场复制四类内容、⇧⌘V 呼面板、即输即搜、空格预览、**回车→焦点交还→用户自己按 ⌘V**、设置五个标签页 |
+| 回复正文 | 按 Apple 六项编号逐条回答，3985 字（回复框上限 4000） |
+| 审核备注 | 整段重写，六项齐全，3980 字（备注上限 4000） |
+| 附件 | 录屏同时挂在「App 审核信息 → 附件」与消息线程两处 |
+| 描述 / 推广文本 | 中英两套一并改正「零网络请求」的说法 |
+
+### 录屏怎么做的（下次照做）
+
+**必须用 Release-AppStore 配置构建**：`APPSTORE` 编译标志只在这个配置里开，
+Debug 版的欢迎语和面板齿轮按钮都和审核员看到的不一样。
+并且要**从送审那个提交单开 worktree 构建**（本次是 `fae79f8`），否则 main 上
+后加的法语会出现在画面里，一眼就能看出录的不是送审那个包。
+
+录制环境三件事缺一不可，否则会把私人内容拍给 Apple：
+
+```bash
+defaults write com.apple.finder CreateDesktop -bool false       # 桌面图标
+defaults write com.apple.dock autohide -bool true               # 程序坞
+defaults write com.apple.WindowManager StandardHideWidgets -bool true   # 桌面小组件
+killall Finder Dock WindowManager
+```
+
+演示素材放 `/Users/Shared/CopyoDemo/`——空格预览会显示**完整路径**
+（`PreviewOverlay.swift:52`），放家目录会把用户名带进画面。
+（卡片本身只显示文件名，`CardView.swift:161` 取的是 `lastPathComponent`。）
+
+应用语言用单应用覆盖，不必改系统语言：
+
+```bash
+defaults write dev.vibemage.Copyo AppleLanguages -array en
+defaults write dev.vibemage.Copyo hasCompletedOnboarding -bool false   # 让欢迎框重新出现
+```
+
+`hasCompletedOnboarding` 必须走 `defaults write` 而不是直接删容器里的 plist：
+cfprefsd 有缓存，直接改文件不生效。
+
+### 踩过的坑
+
+- **访达的「输入定位」对合成的 unicode 事件不生效**，文本框里有效。靠它定位要打开的
+  应用会时灵时不灵，改用辅助功能 API 按名字取行再双击才稳。
+- **卡片时间戳渲染一次就冻住**：面板只隐藏不销毁，视图不重算，新条目永远显示
+  `in 0 sec.`，直到有新条目进来触发整列刷新。1.0 (1) 里就有，属已知瑕疵。
+- **ASC 的回复框与备注框都是 4000 字上限**，超了保存会红框报错并显示差多少字。
+- **回复框会抢焦点**：焦点停在上面时在别处打的字会进到回复框里。发送前务必核对
+  一遍正文，别把不相干的内容发给 Apple。
+
