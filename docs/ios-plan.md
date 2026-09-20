@@ -134,6 +134,11 @@ xcrun simctl launch --terminate-running-process "iPhone 17 Pro" dev.vibemage.Cop
 - iCloud 状态胶囊三态与设置页状态行（模拟器上恒为「未同步」）。
 - 分享扩展在扩展进程里的外观、取消 / 完成收尾；Control 在控制中心与锁屏里的显示。
 - 引导页第三页的两个开关、设置里的外链与系统设置跳转。
+- **主屏小组件（Phase 2 新增，见 3.5）**：小 / 中两个尺寸摆到主屏上的**实际渲染**，命令行验证不到；
+  表头那格同步状态在「只从 Mac 同步、手机不动」的情况下要显示「已同步」而不是一直「同步中…」；
+  点卡片会拉起主应用并完成复制，且**不会**把那条顶到历史最前面（那是 `markSeen` 没生效的表现）。
+- **系统搜索（Phase 2 新增，见 3.4）**：开关打开后条目能在主屏下拉搜到、点开直达详情；
+  **删掉一条之后它必须立刻从系统搜索里消失**——这条最要紧，跨进程标识符出过一次问题（见 3.4）。
 
 **与设计稿的取舍（需设计拍板）：** 设置总览「允许从其他 App 粘贴」右值显示「系统设置」而非「询问」（iOS 不提供读取该授权的 API）；04b 没有「打开操作按钮设置」按钮（无公开深链）；04e「Copyo 键盘」整行留到 Phase 2；隐私说明是外链而非二级页；颜色详情的三个色值胶囊在 440pt 宽上折成两行；引导页插图符号偏下约 14pt；iOS 26 系统返回按钮不带「历史」文字。
 
@@ -169,13 +174,6 @@ iOS 要的是满幅 1024×1024 且**不带 alpha**（自己会套超椭圆遮罩
 - [x] 小组件（小 / 中）：最近条目，点按即复制（2026-09-20，见 3.5）
 - [x] Core Spotlight 索引：系统搜索直达条目（2026-09-20，见 3.4）
 
-
-### Phase 2 · 1.1 —— 把内容送进别的 App
-
-- [ ] 键盘扩展：横向卡片条 + 搜索 + 地球键 + 最小打字行（审核指南 4.4.1 要求键盘必须能输入字符）。需要「允许完全访问」才能读共享容器，引导文案要解释清楚
-- [ ] 小组件（小 / 中）：最近条目，点按即复制（交互式小组件 + App Intent）
-- [x] Core Spotlight 索引：系统搜索直达条目（2026-09-20，见 3.4）
-
 #### 3.4 Core Spotlight（2026-09-20）
 
 `CopyoShared/SpotlightIndexer.swift`，**开关默认关**——历史里躺着验证码、密码和私聊片段，
@@ -207,6 +205,79 @@ store 文件内稳定，重装 / 重建库由 store 令牌兜住。
 （它原地改了 `createdAt`，文本类还会改 `rtfData` / `kindRaw`）；CloudKit 镜像进来的增删在应用这侧
 **一个调用点都没有**，只能靠冷启动与回前台的对账兜；`-demoData` 下总闸在建库之前就合上，
 否则十几条样例（含那条验证码）会被写进**开发者本人**的 Spotlight 索引，并在截图进程退出后留在那里。
+
+#### 3.5 共享 UI 词汇上收 + 主屏小组件（2026-09-20）
+
+##### 先上收，再写小组件
+
+`ShareTheme.swift` 的文件头一直写着「主应用的 `CopyoTheme` 属于 target *Copyo iOS*，分享扩展编译不到它，
+所以这里重抄一份……改设计 token 时两处都要改」，`SharePreviewCard` 里还有第二份 `KindPresentation`
+与第二份 `KindBadge`。再加一个小组件就是第三份，再加键盘就是第四份，于是先把它们上收到
+`CopyoShared/UI/`：`CopyoTheme`、`KindPresentation`、`KindBadge` 三个文件搬过去，`ShareTheme.swift`
+整个删掉，`ShareKindPresentation` / `ShareKindBadge` 一并删掉。`CopyoShared` 本来就是三个 target 的
+同步组，所以**没有动 project.pbxproj**，`CopyoIOS/` 里也一行 import 都不用改。
+
+**`ClipCard` 没有上收，而且不该上收。** 两条硬理由：`TimelineEntry` 装不下 `@Model`
+（它绑在 `ModelContext` 上，跨不了进程），所以吃 `ClipItem` 的卡片对小组件毫无用处；而 `ClipCard`
+会牵出 `CopyoIOS/Model/ClipItem+Display.swift` 里的 `ImageMetadataCache`——96MB 的
+`totalCostLimit` 加全尺寸 `UIImage(data:)` 解码，一张同步过来的 5K 截图就约 59MB，
+放进只有约 30MB 预算的扩展进程是当场 jetsam。小组件改成渲染扁平的 `ClipSnapshot` 值类型。
+
+搬迁前逐项对了一遍 token 表，颜色 / 圆角 / 间距 / 字号全部一致，界面逐像素不变（模拟器上核过
+历史页与分享面板）。只有两处真的不一样，**都如实记下来没有偷偷抹平**：
+
+- `ShareTheme.rowBackground`（`#FFFFFF` / `#2C2C2E`）在 `CopyoTheme` 里没有对应 token。最近的
+  `menu` 带 0.86 透明度——那是画浮在内容之上的菜单用的，套到实心行上会把面板底色透上来，
+  深色下又回到「整行看不见」的老问题（`bgCard` 与 `sheet` 在深色里同为 `#1C1C1E`）。
+  已在 `CopyoTheme` 里单独给它一个名字 `rowOpaque`，而不是硬指向 `menu`。
+- `ShareTheme.uiColor(hexString:)` 只收 6 位 `#RRGGBB`，`CopyoTheme` 的还收 8 位。分享面板只会传
+  nil（内容还没入库，没有来源色），渲染上没有区别，但输入契约确实放宽了。
+
+##### 小组件
+
+`CopyoWidgets` target 本来就编译 `CopyoShared`、链接 `CopyoCore`，所以**不需要新 target、新 App ID
+或新 entitlement**，只是在 `CopyoWidgetsBundle` 里多列一个。`ControlWidget` 并不 refine `Widget`，
+但 `WidgetBundleBuilder` 有专门适配它的 `buildExpression` 重载，两者可以并存。
+`SaveClipboardControl.kind` **一个字都没动**——改了等于换一个控件，用户在控制中心配好的按钮会消失。
+
+三条在主应用里不存在的约束：
+
+- 开库必须 `cloudKit: false`。`CopyoWidgets.entitlements` 里只有 App Group，没有 iCloud 容器也没有
+  `aps-environment`，挂镜像会直接抛错、小组件永远停在占位图上。
+- `TimelineEntry` 里**不能**放 `ClipItem`，映射成 `ClipSnapshot`（Sendable 值类型）。
+- **全程不碰 `item.imageData`**。它是 `@Attribute(.externalStorage)`，读一下就把整张图 fault 进来；
+  图片条目一律画占位块，与 `ClipCard` 在「CloudKit 资产还没下载」时画的是同一个。
+
+##### 「点按复制」为什么要绕回主应用
+
+扩展进程几乎肯定写不了 `UIPasteboard.general`（`UIPasteboard.h` 没有
+`API_UNAVAILABLE(iosApplicationExtension)` 标注，所以**编译一声不吭**，只在真机运行时失败；
+而模拟器据说不拦，测了会得到假的通过）。但更要紧的是：**就算写得了也不该那么写。**
+`AppModel.copy(_:)` 会顺手 `capture.markSeen()`，把 `UIPasteboard.general.changeCount` 记下来。
+扩展算不出这个数（它连 pasteboard 对象都碰不到），少了它，下一次回前台
+`PasteboardCapture.checkOnForeground()` 会发现计数变了，把刚复制的这条重新入库，命中
+`ClipSaver` 的去重 `.refreshed` 分支并 `createdAt = Date()`——**用户每从小组件复制一次，
+那条就悄悄跳到历史顶部一次**。所以走的是与一键保存同一条路：Intent 记一个请求进 App Group，
+`openAppWhenRun` 把主应用拉起来，回到前台后由 `AppModel.copy` 完成。
+
+##### 同步状态那一格：抄的时机有个坑
+
+中尺寸表头右边要显示「已同步 / 同步中 / 未同步」，而小组件进程问不出来（没有 iCloud entitlement，
+`CKContainer` 一句都问不了），只能由主应用抄进 App Group。第一版抄在「库变了就刷小组件」那一刻，
+但 `SyncStatusMonitor.init` 在账号查询回来之前一律给「同步中」（那是异步查询），而冷启动那次刷新是
+**同步**跑完的——抄过去的正是那个还没落定的值。此后只有本机库变更才会再抄一次，而
+「只在 Mac 上复制、手机只用来看」恰恰是这个小组件最主要的用法，那条路上一次本机变更都没有：
+同步一切正常的用户会永远看到「同步中…」。改成账号状态解析回来之后再补抄一次，且只在值真的变了
+才写并重取时间线（回前台是高频事件，WidgetKit 每天只有四五十次后台刷新配额）。
+
+另外 `-localOnly` 要和 `-demoData` **分别挡**：两个是互不相干的开关，离线冒烟与没有 iCloud 账号的 CI
+跑的正是「只加 `-localOnly`」，那种启动会算出 `.off` 写进真实 suite，把开发者自己主屏上的小组件
+钉在「未同步」上，还要钉满 24 小时有效期。
+
+##### 还没验的
+
+小组件的**实际渲染**没有验证过：要么靠 Xcode 预览，要么把小组件真的摆到主屏上，
+两条都不是命令行能做的。已补进下面的真机验证清单。
 
 ### Phase 3 · 1.2 —— 打磨
 

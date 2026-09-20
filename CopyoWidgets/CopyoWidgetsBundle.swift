@@ -2,9 +2,13 @@ import AppIntents
 import SwiftUI
 import WidgetKit
 
+/// 一个 bundle 同时装主屏小组件与控件。
+/// `ControlWidget` 并不 refine `Widget`，但 `WidgetBundleBuilder` 有一个专门适配它的
+/// `buildExpression` 重载，所以两种东西可以并排写在这里，不必再开一个扩展 target。
 @main
 struct CopyoWidgetsBundle: WidgetBundle {
     var body: some Widget {
+        RecentClipsWidget()
         SaveClipboardControl()
     }
 }
