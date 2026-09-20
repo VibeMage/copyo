@@ -2,11 +2,12 @@
 
 ## 计划中
 
-- [ ] Mac App Store 上架（1.0 已提交审核，材料见 docs/appstore-submission.md）
+- [ ] Mac App Store 上架（1.0 曾于 2026-09-11 过审上架，2026-09-19 连同旧应用记录一起删除；
+  现以 Copyo 身份用新 bundle ID `dev.vibemage.Copyo` 重新建记录提审，材料见 docs/appstore-submission.md）
 - [ ] CloudKit iCloud 同步（Mac 1.1 已实现，待发布；与文件夹快照同步并存、二选一，模型无需改动）
 - [ ] iOS / iPadOS 版（详见 docs/ios-plan.md）
   - 定位：Mac 剪贴板历史的口袋入口 + 手机侧收集器，同一应用记录组成 Universal Purchase
-  - Phase 0：抽出共享 `PasterCore` 包，Mac 先接入 CloudKit（已完成）
+  - Phase 0：抽出共享 `CopyoCore` 包，Mac 先接入 CloudKit（已完成）
   - Phase 1：历史 / 搜索 / Pinboard / 复制，三条保存通道（前台自动读取、分享扩展、一键保存：操作按钮 / 敲击背面 / 控制中心），iPad 侧栏与拖放（2026-09-05 代码完成，待开发者后台配置、真机验证与提审，见 docs/ios-plan.md 3.2）
   - Phase 2：键盘扩展、小组件、Spotlight 索引
 - [ ] 法语本地化（英文/中文已完成，String Catalog 就绪，添加语言即可）

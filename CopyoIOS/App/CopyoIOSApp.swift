@@ -1,0 +1,36 @@
+import CopyoCore
+import SwiftData
+import SwiftUI
+
+@main
+struct CopyoIOSApp: App {
+    @State private var model: AppModel
+    @Environment(\.scenePhase) private var scenePhase
+
+    private let launch: LaunchOptions
+
+    init() {
+        // 默认值要先注册：建库时就会读 cloudSyncEnabled
+        IOSSettings.registerDefaults()
+        let launch = LaunchOptions.current
+        self.launch = launch
+        _model = State(initialValue: AppModel(bootstrap: StoreBootstrap.make(launch: launch), launch: launch))
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            RootView()
+                .environment(model)
+                .modelContainer(model.container)
+                .preferredColorScheme(launch.demoColorScheme)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // 通道 A：只有回到前台才有机会读剪贴板，iOS 不给后台监听
+            if phase == .active {
+                model.handleScenePhaseActive()
+                // 通道 C 的补读：控件的 perform 可能晚于这次激活才把请求写进 App Group
+                model.retryPendingQuickSaveShortly()
+            }
+        }
+    }
+}
