@@ -66,11 +66,26 @@ public enum CopyoStore {
 
     /// 建立容器。`cloudKit` 为 true 时把这份存储镜像到 CloudKit 私有数据库；
     /// 存储 URL 两种情况完全一致，因此切换同步方式只是换一层镜像，本地数据原样保留。
-    public static func makeContainer(url: URL, cloudKit: Bool) throws -> ModelContainer {
+    /// `allowsSave` 默认 true，现有调用方一处都不用改。传 false 是**只读打开**，目前只有
+    /// 键盘扩展这么用，理由是那个进程独有的两条约束：
+    ///
+    /// - 键盘可能是 schema 变更后**第一个**打开这份库的进程（用户完全可能先在别处打字、
+    ///   过几天才再打开 Copyo）。可写配置会就地跑轻量迁移，而那要在键盘那点内存预算和
+    ///   很短的看门狗时限里完成；只读配置不迁移，它会直接失败，于是键盘能退化成
+    ///   「打开 Copyo 后再试」，而不是迁到一半被系统杀掉。
+    /// - 键盘写进去的东西在主应用下次启动之前上不了 CloudKit，还会和主应用自己的排序打架。
+    ///   只读是把「不许写」这条约束**交给 SwiftData 去保证**，而不是指望每个调用点自觉。
+    ///
+    /// 注意只读打开本身也可能抛：真正只读的 SQLite 在 WAL 需要恢复时会拒绝打开。调用方必须
+    /// 为抛错准备好界面，不能 `try!`。
+    public static func makeContainer(url: URL, cloudKit: Bool, allowsSave: Bool = true) throws -> ModelContainer {
         let schema = Schema(CopyoSchema.models)
         let configuration = cloudKit
-            ? ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .private(cloudKitContainerIdentifier))
-            : ModelConfiguration(schema: schema, url: url)
+            ? ModelConfiguration(schema: schema,
+                                 url: url,
+                                 allowsSave: allowsSave,
+                                 cloudKitDatabase: .private(cloudKitContainerIdentifier))
+            : ModelConfiguration(schema: schema, url: url, allowsSave: allowsSave)
         return try ModelContainer(for: schema, configurations: configuration)
     }
 }
