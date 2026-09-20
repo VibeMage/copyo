@@ -1,0 +1,160 @@
+# PR / push 门禁：不碰任何证书，只做无签名编译和 CopyoCore 单元测试。
+# 刻意与 release.yml 分开：fork 发起的 PR 取不到任何 secret、GITHUB_TOKEN 也只读，
+# 签名和发布放进同一个 workflow 只会让外部贡献者的 PR 永远是红的。
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    # paths-ignore 只写在 push 上。被路径过滤跳过的作业不会变成 success，
+    # 将来若把本 workflow 设成 required check，纯文档 PR 会永远卡在 pending。
+    paths-ignore:
+      - 'art/**'
+      - 'docs/**'
+      - 'specs/**'
+      - '**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    # Actions 的隐式默认是 `bash -e {0}`，没有 pipefail：
+    # `xcodebuild | tee | xcbeautify` 里 xcodebuild 挂了会被管道尾巴的退出码吞掉，作业假绿。
+    # 这里统一成 bash，每个步骤再显式 `set -o pipefail` 作双保险。
+    shell: bash
+
+jobs:
+  build:
+    name: 构建校验
+    # 不锁 Xcode 版本：门禁反而希望第一时间发现镜像漂移。
+    # 锁版本是 release.yml 的事（换 Xcode = 换 SDK，会影响公证合规判定）。
+    runs-on: macos-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+          # 构建不需要 git 凭据，就别把 token 留在 .git/config 里
+          persist-credentials: false
+
+      - name: 工具链自检
+        run: |
+          xcodebuild -version
+          swift --version
+          # 工程 objectVersion=77 + PBXFileSystemSynchronizedRootGroup，Xcode 15 连打开都打不开。
+          # 要炸就炸在第一步，不要等编译了十分钟才报一堆看不懂的解析错误。
+          major=$(xcodebuild -version | sed -n '1s/Xcode \([0-9]*\).*/\1/p')
+          if [ -z "$major" ] || [ "$major" -lt 16 ]; then
+            echo "::error::需要 Xcode 16+，当前镜像是 $(xcodebuild -version | head -1)"
+            exit 1
+          fi
+
+      - name: 编译 macOS（Debug）
+        run: |
+          set -o pipefail
+          mkdir -p build/logs
+          prettify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
+          # 这组签名设置一个都不能少：工程里写死了 CODE_SIGN_IDENTITY（含 sdk 限定版）= "Apple Development"
+          # 和 DEVELOPMENT_TEAM=9A94W79V84，只给 CODE_SIGNING_ALLOWED=NO 时，
+          # 带受限 entitlements（iCloud / aps-environment）的 target 仍会因为申请不到描述文件而失败。
+          # destination 必须写具体的 arch：用 generic 时 Debug 的 ONLY_ACTIVE_ARCH=YES 不生效，白编一倍架构。
+          xcodebuild build \
+            -project Copyo.xcodeproj \
+            -scheme Copyo \
+            -configuration Debug \
+            -destination 'platform=macOS,arch=arm64' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            "CODE_SIGN_IDENTITY[sdk=macosx*]=" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            2>&1 | tee build/logs/macos-debug.log | prettify
+          # xcodebuild 在「跳过了 target」「产物落到别的子目录」等情况下照样返回 0
+          test -d build/Build/Products/Debug/Copyo.app \
+            || { echo '::error::xcodebuild 返回 0 但没产出 Copyo.app'; exit 1; }
+
+      - name: 编译 macOS（Release-AppStore）
+        run: |
+          set -o pipefail
+          mkdir -p build/logs
+          prettify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
+          # 只有这份配置带 SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APPSTORE"，
+          # 代码里那些 `#if APPSTORE` 分支别的配置根本编不到。
+          # 不编它，沙盒版的编译错误要等到维护者本地打上架包时才暴露。
+          xcodebuild build \
+            -project Copyo.xcodeproj \
+            -scheme Copyo \
+            -configuration Release-AppStore \
+            -destination 'platform=macOS,arch=arm64' \
+            -derivedDataPath build \
+            ONLY_ACTIVE_ARCH=YES \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            "CODE_SIGN_IDENTITY[sdk=macosx*]=" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            2>&1 | tee build/logs/macos-appstore.log | prettify
+          test -d 'build/Build/Products/Release-AppStore/Copyo.app' \
+            || { echo '::error::xcodebuild 返回 0 但没产出 Copyo.app'; exit 1; }
+
+      - name: 编译 iOS（模拟器）
+        run: |
+          set -o pipefail
+          mkdir -p build/logs
+          prettify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
+          # 必须用 generic：写 `name=iPhone 16` 这类具体机型，镜像换代后模拟器消失就会挂。
+          # 代价是 generic 默认编双 slice，所以显式 ARCHS=arm64。
+          # 这一条会连带编 CopyoShareExtension 与 CopyoWidgets（它们内嵌在 iOS app 里），
+          # 和上面两条合起来才覆盖全部四个 target。
+          xcodebuild build \
+            -project Copyo.xcodeproj \
+            -scheme 'Copyo iOS' \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            "CODE_SIGN_IDENTITY[sdk=macosx*]=" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            2>&1 | tee build/logs/ios-debug.log | prettify
+          test -d 'build/Build/Products/Debug-iphonesimulator/Copyo.app' \
+            || { echo '::error::xcodebuild 返回 0 但没产出 Copyo.app'; exit 1; }
+
+      - name: 单元测试（CopyoCore）
+        run: |
+          set -o pipefail
+          mkdir -p build/logs
+          # 绝对不要写 `xcodebuild test`：两个共享 scheme 的 <Testables> 都是空的，
+          # 工程里也没有任何 unit-test 类型的 target，xcodebuild 会直接报
+          # "Scheme Copyo is not currently configured for the test action."
+          # 真正的测试全在 CopyoCore 这个本地 Swift 包里，只有 swift test 跑得到。
+          # 包里 import SwiftData / SwiftUI / CryptoKit，所以只能在 macOS runner 上跑。
+          swift test --package-path CopyoCore 2>&1 | tee build/logs/swift-test.log
+
+      - name: 上传构建日志
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-logs
+          path: build/logs/
+          if-no-files-found: ignore
+          retention-days: 7
