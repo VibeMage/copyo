@@ -22,7 +22,7 @@
 success，将来若把 `ci.yml` 设成 required check，纯文档 PR 会永远卡在 pending 无法合并。
 
 `ci.yml` 跑四件事：无签名编译 macOS Debug、无签名编译 macOS Release-AppStore、无签名编译 iOS 模拟器
-（连带编两个扩展），以及 `swift test --package-path PasterCore`。不碰任何证书，所以 fork 出去的 PR 也能跑绿。
+（连带编两个扩展），以及 `swift test --package-path CopyoCore`。不碰任何证书，所以 fork 出去的 PR 也能跑绿。
 
 为什么要单独编一遍 Release-AppStore：只有这份配置带 `APPSTORE` 编译条件，代码里那些 `#if APPSTORE`
 分支别的配置根本编不到。不编它，沙盒版的编译错误要等到你本地打上架包时才暴露。
@@ -42,12 +42,12 @@ action 有没有新版本，有就自动提 PR。它不参与构建，删掉也�
 | --- | --- | --- |
 | `DEVELOPER_ID_CERT_P12_BASE64` | Developer ID Application 证书 **连同私钥**导出的 .p12，再 base64 | 钥匙串访问 → 找到证书 → 右键「导出」→ 选 .p12 → 设一个导出密码 |
 | `DEVELOPER_ID_CERT_PASSWORD` | 上面导出时设的那个密码 | —— |
-| `PROFILE_APP_BASE64` | `dev.vibemage.Paster` 的 Developer ID 描述文件（`.provisionprofile`）base64 | 开发者后台 → Profiles → ➕ → Developer ID Application → 选该 App ID → 下载 |
+| `PROFILE_APP_BASE64` | `dev.vibemage.Copyo` 的 Developer ID 描述文件（`.provisionprofile`）base64 | 开发者后台 → Profiles → ➕ → Developer ID Application → 选该 App ID → 下载 |
 | `ASC_KEY_P8_BASE64` | App Store Connect API key 私钥 `.p8` 的 base64，用于非交互公证 | App Store Connect → 用户和访问 → 集成 → 密钥 → ➕，角色给 Developer 就够 |
 | `ASC_KEY_ID` | 上面那把 key 的 Key ID（10 位字母数字） | 同一个页面上列着 |
 | `ASC_ISSUER_ID` | Issuer ID（UUID 格式），整个团队共用一个 | 同一个页面顶部 |
 
-只需要**一份**描述文件：macOS 的 Copyo.app 不内嵌任何扩展（PasterShareExtension 和 PasterWidgets
+只需要**一份**描述文件：macOS 的 Copyo.app 不内嵌任何扩展（CopyoShareExtension 和 CopyoWidgets
 都只属于 iOS 版），所以不存在「一次归档要喂多份描述文件」的情况。
 
 base64 编码在 macOS 上是 `base64 -i 输入 -o 输出`（Linux 上是 `base64 -w0`），workflow 里解码
@@ -71,14 +71,14 @@ base64 -i AuthKey_XXXXXXXXXX.p8 -o key.txt
 放进 secret 只会让 YAML 难读，换不来任何安全收益：
 
 - Team ID `9A94W79V84`
-- Bundle ID `dev.vibemage.Paster`
-- App Group `group.dev.vibemage.Paster`
-- iCloud 容器 `iCloud.dev.vibemage.Paster`
+- Bundle ID `dev.vibemage.Copyo`
+- App Group `group.dev.vibemage.Copyo`
+- iCloud 容器 `iCloud.dev.vibemage.Copyo`
 
 ## 四、一次性准备（开发者后台侧）
 
-1. **App ID 上的能力**：Identifiers → `dev.vibemage.Paster` 必须已勾选 iCloud（CloudKit，容器
-   `iCloud.dev.vibemage.Paster`）与 Push Notifications。entitlements 里有这两项而 App ID 没开，
+1. **App ID 上的能力**：Identifiers → `dev.vibemage.Copyo` 必须已勾选 iCloud（CloudKit，容器
+   `iCloud.dev.vibemage.Copyo`）与 Push Notifications。entitlements 里有这两项而 App ID 没开，
    描述文件根本申请不下来——和 `scripts/build-release.sh` 里 `print_signing_help()` 讲的是同一件事。
 2. **证书**：Certificates → Developer ID Application → 下载并装进本机钥匙串 → 在钥匙串访问里导出
    为 .p12，**导出时必须带私钥**（展开证书条目选中那把钥匙一起导，只导证书是没用的）。
@@ -144,7 +144,7 @@ git push origin v1.0.1
 免得看见全绿就以为万事大吉：
 
 - **工程里没有任何测试 target**，两个共享 scheme 的 `<Testables>` 都是空的，`xcodebuild test` 会直接
-  报 "Scheme Paster is not currently configured for the test action."。真正跑到的测试只有 `PasterCore`
+  报 "Scheme Copyo is not currently configured for the test action."。真正跑到的测试只有 `CopyoCore`
   那个本地包里的那些，Mac 应用本体（面板、监听、同步）一行都没覆盖。
 - **受限 entitlements 与描述文件对不上时，包在别人机器上才会被系统终止**，CI 这边照样全绿。
   发布前请在一台没有开发者证书的 Mac 上真装一次。

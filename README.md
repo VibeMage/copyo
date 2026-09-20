@@ -86,7 +86,7 @@ xcrun notarytool store-credentials copyo-notary \
 ### 自动构建（GitHub Actions）
 
 每个 PR 和推送到 main（纯文档改动除外）都会跑 `.github/workflows/ci.yml`：无签名编译
-macOS Debug、macOS Release-AppStore、iOS 模拟器三条，外加 `swift test --package-path PasterCore`。
+macOS Debug、macOS Release-AppStore、iOS 模拟器三条，外加 `swift test --package-path CopyoCore`。
 不需要任何证书，fork 出去的 PR 也能跑绿。
 
 推送 `v<版本>` 形式的 tag 触发 `.github/workflows/release.yml`：校验 tag 与工程里的

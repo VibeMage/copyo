@@ -27,7 +27,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 TEAM_ID=9A94W79V84
-BUNDLE_ID=dev.vibemage.Paster
+BUNDLE_ID=dev.vibemage.Copyo
 # 本地脚本用 build/Copyo-Release.xcarchive，上架脚本用 build/Copyo.xcarchive，
 # 这里再起一个名字，三者互不覆盖。
 ARCHIVE=build/Copyo-CI.xcarchive
@@ -72,27 +72,32 @@ trap cleanup EXIT
 echo "==> 归档 Copyo $VERSION (Release, 手动签名)"
 rm -rf "$ARCHIVE"
 # -configuration Release 不可省：scheme 的 ArchiveAction 绑的是 Release-AppStore，
-# 那套用 PasterAppStore.entitlements（带 app-sandbox）且 CODE_SIGN_IDENTITY="-"（ad-hoc），
+# 那套用 CopyoAppStore.entitlements（带 app-sandbox）且 CODE_SIGN_IDENTITY="-"（ad-hoc），
 # 省掉这个参数会「全绿地」产出一个根本不能直分发的包。
 #
-# 命令行直接传 PROVISIONING_PROFILE_SPECIFIER 在这条路径上是安全的：macOS 的 Paster target
+# 命令行直接传 PROVISIONING_PROFILE_SPECIFIER 在这条路径上是安全的：macOS 的 Copyo target
 # 只有 Sources / Frameworks / Resources 三个构建阶段、依赖为空，工程里唯一的
 # Embed Foundation Extensions 属于 iOS app，两个 appex 也都是 SDKROOT=iphoneos ——
 # macOS 包里不含任何扩展，不存在「一条命令要喂多份描述文件」的问题。
+#
+# 签名身份要连 sdk 限定的那份一起覆盖：工程里同时写了 CODE_SIGN_IDENTITY 和
+# CODE_SIGN_IDENTITY[sdk=macosx*]，两个都是 "Apple Development"。只覆盖无条件的那个，
+# 万一限定版仍然生效，归档就会去找一张 runner 上根本没有的 Apple Development 证书。
 #
 # 绝不要清空 CODE_SIGN_ENTITLEMENTS：entitlements 里的 aps-environment 写的是
 # $(APS_ENVIRONMENT)，靠 build setting 代入；丢了它会展开成空串，
 # 轻则 codesign 失败，重则签出一个和描述文件对不上、在用户机器上被系统直接终止的包。
 if ! run_logged "$LOG_DIR/archive.log" \
   xcodebuild archive \
-    -project Paster.xcodeproj \
-    -scheme Paster \
+    -project Copyo.xcodeproj \
+    -scheme Copyo \
     -configuration Release \
     -destination 'generic/platform=macOS' \
     -archivePath "$ARCHIVE" \
     -derivedDataPath build \
     CODE_SIGN_STYLE=Manual \
     CODE_SIGN_IDENTITY="$CI_SIGN_IDENTITY" \
+    "CODE_SIGN_IDENTITY[sdk=macosx*]=$CI_SIGN_IDENTITY" \
     PROVISIONING_PROFILE_SPECIFIER="$CI_PROVISIONING_PROFILE" \
     DEVELOPMENT_TEAM="$TEAM_ID" \
     OTHER_CODE_SIGN_FLAGS="--keychain $CI_KEYCHAIN"; then
@@ -168,14 +173,14 @@ if ! grep -q 'flags=.*runtime' "$LOG_DIR/verify.log"; then
   echo "签名里没有强化运行时（hardened runtime），公证一定会被拒" >&2
   exit 1
 fi
-# 直分发版用的是 Paster.entitlements（不带沙盒）。如果这里出现了 app-sandbox，
+# 直分发版用的是 Copyo.entitlements（不带沙盒）。如果这里出现了 app-sandbox，
 # 说明归档跑的是 Release-AppStore 配置 —— 那是上架包，装到用户机器上行为完全不同。
 if grep -q 'com.apple.security.app-sandbox' "$LOG_DIR/entitlements.log"; then
   echo "产物带了 app-sandbox，说明归档用错了配置（应为 Release 而非 Release-AppStore）" >&2
   exit 1
 fi
 # 反过来，iCloud 容器必须在，否则同步功能会在用户机器上静默失效
-if ! grep -q 'iCloud.dev.vibemage.Paster' "$LOG_DIR/entitlements.log"; then
+if ! grep -q 'iCloud.dev.vibemage.Copyo' "$LOG_DIR/entitlements.log"; then
   echo "产物的 entitlements 里没有 iCloud 容器，同步会失效" >&2
   exit 1
 fi
