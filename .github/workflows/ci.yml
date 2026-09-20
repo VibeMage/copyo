@@ -43,6 +43,8 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 1
+          # 构建不需要 git 凭据，就别把 token 留在 .git/config 里
+          persist-credentials: false
 
       - name: 工具链自检
         run: |

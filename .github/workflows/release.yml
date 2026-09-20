@@ -5,9 +5,13 @@
 # 描述文件安装、创建 Release），真正的构建逻辑全在 scripts/ci-release.sh 里，
 # 那样它可读、可 diff，也能在本机用同一组环境变量复现。
 #
-# 没配签名 secret 时不会失败，而是降级成「未签名构建校验」：产物只作为 workflow
-# artifact 提供，绝不挂到 Release 上 —— README 向用户承诺「官方发布均已签名并公证」，
-# 往 Release 页面挂未签名的包会当场破坏这句话。
+# 手动触发（Run workflow）是演练：缺哪一环就降级到哪一步，产物只作为 workflow
+# artifact 提供，绝不挂到 Release 上。没配任何 secret 时也能完整跑一遍，
+# 用来验证 checkout、Xcode 和编译链路。
+#
+# 推 tag 则是在要一次正式发布，凑不齐签名或公证就当场失败，不会全绿地什么都不发 ——
+# README 向用户承诺「官方发布均已签名并公证」，挂一个未公证的包会当场破坏这句话，
+# 而静悄悄地不发则会让维护者以为已经发了。
 name: Release
 
 on:
@@ -56,6 +60,11 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 1
+          # 这个 job 的 token 有 contents: write。默认 checkout 会把它写进
+          # .git/config 的 extraheader，之后任意一步（包括构建脚本、任意依赖）
+          # 都能拿着它推代码。本流程只用 gh release create，它读的是 GH_TOKEN 环境变量，
+          # 不需要 git 凭据，所以直接关掉。
+          persist-credentials: false
 
       # 所有不需要证书的断言都放在最前面：几秒钟的事，
       # 免得白跑一遍归档 + 公证才发现 tag 和工程里的版本号对不上。
@@ -94,9 +103,12 @@ jobs:
           # 工程里的版本号必须用 -showBuildSettings 取，不能照抄 build-release.sh 里那个 sed：
           # 文件顺序上第一个 MARKETING_VERSION 属于 Debug 配置，而归档用的是 Release。
           # 用 -target 而不是 -scheme：-scheme 会把 scheme 里所有 target 的设置都打出来。
+          # 末尾的 || true 不能省：本步骤跑在 `bash -e -o pipefail` 下，xcodebuild 失败
+          # （或 awk 提前 exit 让它收到 SIGPIPE）会让整个命令替换失败并当场退出脚本，
+          # 下面那句友好的报错就永远打不出来，日志里只剩一个光秃秃的退出码。
           proj_version=$(xcodebuild -project Paster.xcodeproj -target Paster \
             -configuration Release -showBuildSettings 2>/dev/null \
-            | awk '/ MARKETING_VERSION = /{print $3; exit}')
+            | awk '/ MARKETING_VERSION = /{print $3; exit}') || true
           if [ -z "$proj_version" ]; then
             echo "::error::读不到工程里的 MARKETING_VERSION"
             exit 1
@@ -122,9 +134,26 @@ jobs:
              && [ -n "$ASC_KEY" ] && [ -n "$ASC_KEY_ID" ] && [ -n "$ASC_ISSUER_ID" ]; then
             notarize=true
           fi
+          # 发布必须同时满足签名和公证：README 和本文件头部都向用户承诺
+          # 「Release 页面上的 DMG 永远是签过名并公证过的」，只守住签名那一半是不够的。
           publish=false
-          if [ "$signed" = true ] && [ "$is_tag" = true ] && [ "$DRY_RUN" != "true" ]; then
+          if [ "$signed" = true ] && [ "$notarize" = true ] \
+             && [ "$is_tag" = true ] && [ "$DRY_RUN" != "true" ]; then
             publish=true
+          fi
+
+          # 推 tag 就是在要一次正式发布。凑不齐条件时必须当场红掉而不是全绿地什么都不发 ——
+          # 后者是最糟的一种结果：维护者以为发了，Release 页面上却空无一物。
+          # 演练（workflow_dispatch / dry_run）不受这条约束，缺什么就降级跑到哪一步。
+          if [ "$is_tag" = true ] && [ "$DRY_RUN" != "true" ] && [ "$publish" != true ]; then
+            if [ "$signed" != true ]; then
+              echo "::error::推了 tag $tag，但没配置 DEVELOPER_ID_CERT_P12_BASE64，无法产出可发布的包。"
+            else
+              echo "::error::推了 tag $tag，但本次不会公证：ASC_KEY_P8_BASE64 / ASC_KEY_ID / ASC_ISSUER_ID 未配齐，或勾了 skip_notarize。"
+              echo "::error::拒绝把未公证的包挂上 Release —— README 向用户承诺官方发布均已签名并公证。"
+            fi
+            echo "::error::配置方法与演练顺序见 docs/ci.md。想先空跑一遍请用 Actions 页面的 Run workflow。"
+            exit 1
           fi
 
           if [ "$signed" != true ]; then
@@ -159,11 +188,18 @@ jobs:
           printf '%s' "$P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
 
           security create-keychain -p "$keychain_password" "$keychain"
+          # 先登记再做后面的事：这一步中途失败时，always() 的清理步骤才知道要删哪个钥匙串，
+          # 否则它会连同导入的私钥一起留在磁盘和搜索列表里。
+          echo "CI_KEYCHAIN=$keychain" >> "$GITHUB_ENV"
           # 不带任何选项 = 永不超时、不随休眠上锁。
           # 新钥匙串默认 5 分钟无操作自锁，归档跑到一半 codesign 就会失败，
           # 而报出来的错和「钥匙串锁了」毫无关系。
           security set-keychain-settings "$keychain"
           security unlock-keychain -p "$keychain_password" "$keychain"
+          # -T 列出哪些程序可以无提示地使用这把私钥。这里刻意不用更省事的 -A（放行一切），
+          # 但也保留了 /usr/bin/security：去掉它更安全（私钥就无法被 security export 导出了），
+          # 代价是万一某个环节确实要经它访问私钥，表现是弹授权框、无 TTY 下静默挂到超时 ——
+          # 最难排查的一类故障。想收紧请先用 workflow_dispatch 演练一次再改。
           security import "$RUNNER_TEMP/cert.p12" -k "$keychain" -P "$P12_PASSWORD" \
             -f pkcs12 -T /usr/bin/codesign -T /usr/bin/security
           rm -f "$RUNNER_TEMP/cert.p12"
@@ -187,7 +223,6 @@ jobs:
             exit 1
           fi
           echo "签名身份：$identity"
-          echo "CI_KEYCHAIN=$keychain" >> "$GITHUB_ENV"
           echo "CI_SIGN_IDENTITY=$identity" >> "$GITHUB_ENV"
 
       - name: 安装描述文件
@@ -282,12 +317,21 @@ jobs:
       # 失败时日志能拿得到 —— 这正是本地脚本把日志写进 mktemp（随 runner 一起蒸发）的反面
       - name: 上传产物与日志
         if: always()
+        # 这一步纯粹是为了事后能拿到日志，不该左右发布结果。
+        # 不加这行的话：不含状态函数的 if: 会被隐式加上 success()，
+        # artifact 服务抖一下就会让下面的「创建 Release」被跳过 ——
+        # 归档、签名、公证全做完了，最后什么都没发。
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: release-${{ steps.ctx.outputs.version }}
+          # 带上 run_attempt：v4 的 artifact 不可变，同名上传直接 409。
+          # 少了它，「Re-run failed jobs」必然在这一步失败。
+          name: release-${{ steps.ctx.outputs.version }}-${{ github.run_attempt }}
           path: |
             dist/
             build/logs/
+            build/Build/Products/Release/Copyo.app
+            build/Copyo-CI.xcarchive/dSYMs
           if-no-files-found: ignore
           retention-days: 14
 
