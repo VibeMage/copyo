@@ -83,6 +83,33 @@ xcrun notarytool store-credentials copyo-notary \
   无开发者身份应用的固定提示），需执行一次 `xattr -cr /Applications/Copyo.app`。
 - 企业环境若有 MDM（Jamf 等），也可以白名单分发。
 
+### 自动构建（GitHub Actions）
+
+每个 PR 和推送到 main（纯文档改动除外）都会跑 `.github/workflows/ci.yml`：无签名编译
+macOS Debug、macOS Release-AppStore、iOS 模拟器三条，外加 `swift test --package-path CopyoCore`。
+不需要任何证书，fork 出去的 PR 也能跑绿。
+
+推送 `v<版本>` 形式的 tag 触发 `.github/workflows/release.yml`：校验 tag 与工程里的
+`MARKETING_VERSION` 一致 → 归档 → 以 Developer ID 手动签名导出 → Apple 公证 → staple
+→ 产出 DMG / ZIP，并自动创建 Release 附上产物。
+
+```bash
+# 先把 project.pbxproj 里的 MARKETING_VERSION 改成要发的版本并提交，再打 tag
+git tag v1.0.1 && git push origin v1.0.1
+```
+
+CI 跑的不是上面那条 `build-release.sh`，而是 `scripts/ci-release.sh`：无人值守的 runner
+既没有 Xcode 里登录的 Apple ID，也没有已注册的 Mac，自动签名那条路在它上面走不通，
+所以 CI 改走手动签名 + 预装的 Developer ID 描述文件。两边产出的 .app 与 DMG 完全一致，
+CI 只额外多附一份 `SHA256SUMS.txt`。
+
+在 Actions 页面手动触发（Run workflow）是演练：缺哪一环就降级到哪一步，没配任何 secret
+时也能跑完，产物只作为 workflow artifact 提供、不会挂到 Release 上。推 tag 则是在要一次
+正式发布，签名或公证凑不齐就当场失败——这保证了 Release 页面上的 DMG 永远是签过名并
+公证过的。
+
+证书与凭据怎么配、怎么先演练一遍再推 tag，见 [`docs/ci.md`](docs/ci.md)。
+
 ### 更新
 
 官方发布签名身份固定：新版 DMG 覆盖安装（拖进 Applications 替换）即可，历史数据在

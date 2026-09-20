@@ -1,0 +1,356 @@
+# 推送 v* 形式的 tag 触发：归档 → 以 Developer ID 手动签名导出 → Apple 公证 → staple
+# → 打包 DMG / ZIP → 创建 GitHub Release 并附上产物。
+#
+# 这个 workflow 是一层薄壳：只负责 GitHub 特有的部分（secret 解码、临时钥匙串、
+# 描述文件安装、创建 Release），真正的构建逻辑全在 scripts/ci-release.sh 里，
+# 那样它可读、可 diff，也能在本机用同一组环境变量复现。
+#
+# 手动触发（Run workflow）是演练：缺哪一环就降级到哪一步，产物只作为 workflow
+# artifact 提供，绝不挂到 Release 上。没配任何 secret 时也能完整跑一遍，
+# 用来验证 checkout、Xcode 和编译链路。
+#
+# 推 tag 则是在要一次正式发布，凑不齐签名或公证就当场失败，不会全绿地什么都不发 ——
+# README 向用户承诺「官方发布均已签名并公证」，挂一个未公证的包会当场破坏这句话，
+# 而静悄悄地不发则会让维护者以为已经发了。
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '只构建，不创建 Release'
+        type: boolean
+        default: true
+      skip_notarize:
+        description: '跳过公证（先单独验证签名链路）'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  # 刻意不取消：半途取消会留下一个已创建、却没附上任何产物的 Release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    name: 构建并发布
+    runs-on: macos-latest
+    timeout-minutes: 90
+    env:
+      # 仓库是公开的，这两个标识符早就提交进库了，Team ID 更是嵌在每个签名 app 里、
+      # 本来就是公开设计。放进 secret 只会让 YAML 难读，没有任何安全收益。
+      TEAM_ID: 9A94W79V84
+      BUNDLE_ID: dev.vibemage.Copyo
+      # 留空 = 用镜像默认的 Xcode（并把版本打进日志）。
+      # 想锁定就填前缀，比如 "26.4"；镜像上带补丁号和不带补丁号的命名并不规则，
+      # 所以这里按前缀匹配后取最高版本，而不是写死一个完整路径。
+      XCODE_VERSION: ''
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+          # 这个 job 的 token 有 contents: write。默认 checkout 会把它写进
+          # .git/config 的 extraheader，之后任意一步（包括构建脚本、任意依赖）
+          # 都能拿着它推代码。本流程只用 gh release create，它读的是 GH_TOKEN 环境变量，
+          # 不需要 git 凭据，所以直接关掉。
+          persist-credentials: false
+
+      # 所有不需要证书的断言都放在最前面：几秒钟的事，
+      # 免得白跑一遍归档 + 公证才发现 tag 和工程里的版本号对不上。
+      - name: 准备与校验
+        id: ctx
+        env:
+          # secrets 上下文在任何 if: 里都读不到（job 级、step 级都不行），
+          # 必须先经 env 传进来，在 bash 里判断后写进 $GITHUB_OUTPUT。
+          P12: ${{ secrets.DEVELOPER_ID_CERT_P12_BASE64 }}
+          ASC_KEY: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          SKIP_NOTARIZE: ${{ inputs.skip_notarize }}
+        run: |
+          # 选定 Xcode
+          if [ -n "$XCODE_VERSION" ]; then
+            xc=$(find /Applications -maxdepth 1 -name "Xcode_${XCODE_VERSION}*.app" | sort -V | tail -1)
+            if [ -z "$xc" ]; then
+              echo "::error::找不到 Xcode ${XCODE_VERSION}*，镜像上现有的是："
+              find /Applications -maxdepth 1 -name 'Xcode*.app'
+              exit 1
+            fi
+            echo "DEVELOPER_DIR=$xc/Contents/Developer" >> "$GITHUB_ENV"
+            export DEVELOPER_DIR="$xc/Contents/Developer"
+          fi
+          echo "使用的 Xcode：$(xcodebuild -version | head -1)"
+
+          # 取版本号：tag 触发时 GITHUB_REF_NAME 就是 tag 名；
+          # 手动触发通常跑在分支上，这时没有 tag 可言，一律按演练处理。
+          is_tag=false
+          case "$GITHUB_REF" in refs/tags/*) is_tag=true ;; esac
+          tag="$GITHUB_REF_NAME"
+          version="${tag#v}"
+
+          # 工程里的版本号必须用 -showBuildSettings 取，不能照抄 build-release.sh 里那个 sed：
+          # 文件顺序上第一个 MARKETING_VERSION 属于 Debug 配置，而归档用的是 Release。
+          # 用 -target 而不是 -scheme：-scheme 会把 scheme 里所有 target 的设置都打出来。
+          # 末尾的 || true 不能省：本步骤跑在 `bash -e -o pipefail` 下，xcodebuild 失败
+          # （或 awk 提前 exit 让它收到 SIGPIPE）会让整个命令替换失败并当场退出脚本，
+          # 下面那句友好的报错就永远打不出来，日志里只剩一个光秃秃的退出码。
+          proj_version=$(xcodebuild -project Copyo.xcodeproj -target Copyo \
+            -configuration Release -showBuildSettings 2>/dev/null \
+            | awk '/ MARKETING_VERSION = /{print $3; exit}') || true
+          if [ -z "$proj_version" ]; then
+            echo "::error::读不到工程里的 MARKETING_VERSION"
+            exit 1
+          fi
+
+          if [ "$is_tag" = true ]; then
+            if [ "$proj_version" != "$version" ]; then
+              echo "::error::tag $tag 与工程里的 MARKETING_VERSION $proj_version 不一致。"
+              echo "::error::请先把 project.pbxproj 里的 MARKETING_VERSION 改成 $version 并提交，再重新打 tag。"
+              exit 1
+            fi
+          else
+            # 手动触发：没有 tag，版本号以工程为准，且绝不创建 Release
+            version="$proj_version"
+            echo "::notice::非 tag 触发，按演练处理：只构建，不创建 Release"
+          fi
+
+          # 判断这次能走到哪一步
+          signed=false
+          [ -n "$P12" ] && signed=true
+          notarize=false
+          if [ "$signed" = true ] && [ "$SKIP_NOTARIZE" != "true" ] \
+             && [ -n "$ASC_KEY" ] && [ -n "$ASC_KEY_ID" ] && [ -n "$ASC_ISSUER_ID" ]; then
+            notarize=true
+          fi
+          # 发布必须同时满足签名和公证：README 和本文件头部都向用户承诺
+          # 「Release 页面上的 DMG 永远是签过名并公证过的」，只守住签名那一半是不够的。
+          publish=false
+          if [ "$signed" = true ] && [ "$notarize" = true ] \
+             && [ "$is_tag" = true ] && [ "$DRY_RUN" != "true" ]; then
+            publish=true
+          fi
+
+          # 推 tag 就是在要一次正式发布。凑不齐条件时必须当场红掉而不是全绿地什么都不发 ——
+          # 后者是最糟的一种结果：维护者以为发了，Release 页面上却空无一物。
+          # 演练（workflow_dispatch / dry_run）不受这条约束，缺什么就降级跑到哪一步。
+          if [ "$is_tag" = true ] && [ "$DRY_RUN" != "true" ] && [ "$publish" != true ]; then
+            if [ "$signed" != true ]; then
+              echo "::error::推了 tag $tag，但没配置 DEVELOPER_ID_CERT_P12_BASE64，无法产出可发布的包。"
+            else
+              echo "::error::推了 tag $tag，但本次不会公证：ASC_KEY_P8_BASE64 / ASC_KEY_ID / ASC_ISSUER_ID 未配齐，或勾了 skip_notarize。"
+              echo "::error::拒绝把未公证的包挂上 Release —— README 向用户承诺官方发布均已签名并公证。"
+            fi
+            echo "::error::配置方法与演练顺序见 docs/ci.md。想先空跑一遍请用 Actions 页面的 Run workflow。"
+            exit 1
+          fi
+
+          if [ "$signed" != true ]; then
+            echo "::warning::未配置 DEVELOPER_ID_CERT_P12_BASE64，本次降级为未签名构建校验，不会创建 Release。配置方法见 docs/ci.md"
+          elif [ "$notarize" != true ]; then
+            echo "::warning::本次跳过公证（未配齐 ASC_* secret 或手动勾了 skip_notarize），产物签了名但没公证"
+          fi
+
+          {
+            echo "tag=$tag"
+            echo "version=$version"
+            echo "signed=$signed"
+            echo "notarize=$notarize"
+            echo "publish=$publish"
+          } >> "$GITHUB_OUTPUT"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "版本 $version / 签名 $signed / 公证 $notarize / 发布 $publish"
+
+      - name: 导入签名证书
+        if: steps.ctx.outputs.signed == 'true'
+        env:
+          P12: ${{ secrets.DEVELOPER_ID_CERT_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.DEVELOPER_ID_CERT_PASSWORD }}
+        run: |
+          keychain="$RUNNER_TEMP/build.keychain-db"
+          keychain_password=$(openssl rand -base64 24)
+          # GitHub 只对 secret 原文自动打码，自己派生出来的值不会，必须手动登记
+          echo "::add-mask::$keychain_password"
+
+          umask 077
+          # macOS 的 base64 用 -D、GNU 用 -d，只有 --decode 两边都认
+          printf '%s' "$P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+
+          security create-keychain -p "$keychain_password" "$keychain"
+          # 先登记再做后面的事：这一步中途失败时，always() 的清理步骤才知道要删哪个钥匙串，
+          # 否则它会连同导入的私钥一起留在磁盘和搜索列表里。
+          echo "CI_KEYCHAIN=$keychain" >> "$GITHUB_ENV"
+          # 不带任何选项 = 永不超时、不随休眠上锁。
+          # 新钥匙串默认 5 分钟无操作自锁，归档跑到一半 codesign 就会失败，
+          # 而报出来的错和「钥匙串锁了」毫无关系。
+          security set-keychain-settings "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          # -T 列出哪些程序可以无提示地使用这把私钥。这里刻意不用更省事的 -A（放行一切），
+          # 但也保留了 /usr/bin/security：去掉它更安全（私钥就无法被 security export 导出了），
+          # 代价是万一某个环节确实要经它访问私钥，表现是弹授权框、无 TTY 下静默挂到超时 ——
+          # 最难排查的一类故障。想收紧请先用 workflow_dispatch 演练一次再改。
+          security import "$RUNNER_TEMP/cert.p12" -k "$keychain" -P "$P12_PASSWORD" \
+            -f pkcs12 -T /usr/bin/codesign -T /usr/bin/security
+          rm -f "$RUNNER_TEMP/cert.p12"
+          # 少了这一步，codesign 访问私钥时会弹 GUI 授权框 —— 无 TTY 下不是报错，
+          # 是一直挂到 timeout-minutes 为止。输出必须丢掉，它会把钥匙串条目打到 stdout。
+          security set-key-partition-list -S apple-tool:,apple:,codesign: \
+            -s -k "$keychain_password" "$keychain" > /dev/null
+
+          # 只 -s 新钥匙串会把 login.keychain-db 挤出搜索列表，
+          # 后续工具找不到 Apple 的根证书和中间证书，报 "No signing certificate found"。
+          # $old 不加引号、依赖词分割是故意的。
+          old=$(security list-keychains -d user | sed -e 's/^[[:space:]]*"//' -e 's/"$//')
+          # shellcheck disable=SC2086
+          security list-keychains -d user -s "$keychain" $old
+
+          # 自己从钥匙串里解析签名身份，省得维护者再多存一个 secret
+          identity=$(security find-identity -v -p codesigning "$keychain" \
+            | sed -n 's/.*"\(Developer ID Application: .*\)"/\1/p' | head -1)
+          if [ -z "$identity" ]; then
+            echo "::error::钥匙串里没有 Developer ID Application 证书。导出 .p12 时请确认带上了私钥。"
+            exit 1
+          fi
+          echo "签名身份：$identity"
+          echo "CI_SIGN_IDENTITY=$identity" >> "$GITHUB_ENV"
+
+      - name: 安装描述文件
+        if: steps.ctx.outputs.signed == 'true'
+        env:
+          PROFILE: ${{ secrets.PROFILE_APP_BASE64 }}
+        run: |
+          if [ -z "$PROFILE" ]; then
+            echo "::error::配置了证书却没配 PROFILE_APP_BASE64。entitlements 里有 iCloud 和 aps-environment，没有描述文件签不出能用的包。"
+            exit 1
+          fi
+          umask 077
+          # macOS 的描述文件扩展名是 .provisionprofile，不是 iOS 那个 .mobileprovision
+          profile="$RUNNER_TEMP/app.provisionprofile"
+          printf '%s' "$PROFILE" | base64 --decode > "$profile"
+          security cms -D -i "$profile" > "$RUNNER_TEMP/profile.plist"
+          uuid=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/profile.plist")
+          # 把名字和有效期打进日志：排查「装是装上了，但过期了」这类问题时这是最快的线索
+          echo "描述文件：$(/usr/libexec/PlistBuddy -c 'Print :Name' "$RUNNER_TEMP/profile.plist")"
+          echo "有效期至：$(/usr/libexec/PlistBuddy -c 'Print :ExpirationDate' "$RUNNER_TEMP/profile.plist")"
+          rm -f "$RUNNER_TEMP/profile.plist"
+
+          # Xcode 16+ 只读写第一个目录，部分工具链仍读旧的那个，两边都放一份。
+          # 文件名用 UUID，避免重名互相覆盖。
+          for dir in "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles" \
+                     "$HOME/Library/MobileDevice/Provisioning Profiles"; do
+            mkdir -p "$dir"
+            cp "$profile" "$dir/$uuid.provisionprofile"
+          done
+          rm -f "$profile"
+          # 用 UUID 而不是名字，对开发者后台上的改名免疫
+          echo "CI_PROVISIONING_PROFILE=$uuid" >> "$GITHUB_ENV"
+
+      - name: 准备公证密钥
+        if: steps.ctx.outputs.notarize == 'true'
+        env:
+          ASC_KEY: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          umask 077
+          printf '%s' "$ASC_KEY" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
+          {
+            echo "NOTARY_KEY_PATH=$RUNNER_TEMP/AuthKey.p8"
+            echo "NOTARY_KEY_ID=$ASC_KEY_ID"
+            echo "NOTARY_ISSUER_ID=$ASC_ISSUER_ID"
+          } >> "$GITHUB_ENV"
+
+      - name: 构建、签名、公证、打包
+        if: steps.ctx.outputs.signed == 'true'
+        env:
+          LOG_DIR: build/logs
+        run: ./scripts/ci-release.sh
+
+      # 零 secret 时也让这个 workflow 能完整跑一遍：至少验证 checkout、Xcode、编译链路，
+      # 免得它变成一个要等配齐六个 secret 才第一次执行的黑盒。
+      - name: 未签名构建校验
+        if: steps.ctx.outputs.signed != 'true'
+        run: |
+          set -o pipefail
+          mkdir -p build/logs
+          xcodebuild build \
+            -project Copyo.xcodeproj \
+            -scheme Copyo \
+            -configuration Release \
+            -destination 'platform=macOS,arch=arm64' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            "CODE_SIGN_IDENTITY[sdk=macosx*]=" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            2>&1 | tee build/logs/unsigned-release.log
+          test -d build/Build/Products/Release/Copyo.app \
+            || { echo '::error::xcodebuild 返回 0 但没产出 Copyo.app'; exit 1; }
+
+      - name: 清理证书与密钥
+        if: always()
+        run: |
+          # 全部 || true：清理失败不该把一次成功的发布变成红的
+          if [ -n "${CI_KEYCHAIN:-}" ]; then
+            security delete-keychain "$CI_KEYCHAIN" || true
+          fi
+          rm -f "$RUNNER_TEMP"/AuthKey.p8 "$RUNNER_TEMP"/cert.p12 \
+                "$RUNNER_TEMP"/app.provisionprofile "$RUNNER_TEMP"/profile.plist || true
+          if [ -n "${CI_PROVISIONING_PROFILE:-}" ]; then
+            rm -f "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$CI_PROVISIONING_PROFILE.provisionprofile" \
+                  "$HOME/Library/MobileDevice/Provisioning Profiles/$CI_PROVISIONING_PROFILE.provisionprofile" || true
+          fi
+
+      # 失败时日志能拿得到 —— 这正是本地脚本把日志写进 mktemp（随 runner 一起蒸发）的反面
+      - name: 上传产物与日志
+        if: always()
+        # 这一步纯粹是为了事后能拿到日志，不该左右发布结果。
+        # 不加这行的话：不含状态函数的 if: 会被隐式加上 success()，
+        # artifact 服务抖一下就会让下面的「创建 Release」被跳过 ——
+        # 归档、签名、公证全做完了，最后什么都没发。
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          # 带上 run_attempt：v4 的 artifact 不可变，同名上传直接 409。
+          # 少了它，「Re-run failed jobs」必然在这一步失败。
+          name: release-${{ steps.ctx.outputs.version }}-${{ github.run_attempt }}
+          path: |
+            dist/
+            build/logs/
+            build/Build/Products/Release/Copyo.app
+            build/Copyo-CI.xcarchive/dSYMs
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: 创建 Release
+        if: steps.ctx.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.ctx.outputs.tag }}
+        run: |
+          # gh 是镜像预装的，用它就少一个第三方 action 依赖。
+          # --verify-tag：确认 tag 真的存在，避免打错字凭空造出一个 tag。
+          # 注意：用 GITHUB_TOKEN 创建的 Release 不会触发别的 workflow 的 release 事件。
+          # 只附 DMG / ZIP / 校验和；.pkg 是上架专用（沙盒 + installer 证书），
+          # 混在一起只会让用户装错。
+          gh release create "$TAG" \
+            "dist/Copyo-$VERSION.dmg" \
+            "dist/Copyo-$VERSION.zip" \
+            dist/SHA256SUMS.txt \
+            --title "Copyo $VERSION" \
+            --generate-notes \
+            --verify-tag
