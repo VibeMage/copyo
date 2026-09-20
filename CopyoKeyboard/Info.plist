@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionAttributes</key>
+		<dict>
+			<!-- 不声明自己能打 ASCII。声明 true 的后果是系统会把这块键盘用在密码与密码锁一类的
+			     安全输入框上——一块开着「完全访问」、以读剪贴板历史为生的键盘出现在密码框里，
+			     是我们主动不要的。用户在那种输入框里会拿到系统键盘。 -->
+			<key>IsASCIICapable</key>
+			<false/>
+			<key>PrefersRightToLeft</key>
+			<false/>
+			<!-- `mul` = multiple languages。这块键盘重新送出的是用户当初复制的内容，
+			     那可能是任何语言，绑定到某一种语言会让系统在切换键盘时把它排到错误的语言组里。 -->
+			<key>PrimaryLanguage</key>
+			<string>mul</string>
+			<!-- 非开不可。没有「允许完全访问」，这个进程连 App Group 容器都够不着：
+			     `FileManager.containerURL(forSecurityApplicationGroupIdentifier:)` 返回 nil，
+			     `CopyoStore.appGroupStoreURL()` 抛 `appGroupUnavailable`。
+			     `UserDefaults(suiteName:)` 也一样失败，而 `CopyoAppGroup.defaults` 会**静默**
+			     退回 `.standard`——那时键盘读到的是一份自己私有的空设置域，不报错，只是什么都没有。 -->
+			<key>RequestsOpenAccess</key>
+			<true/>
+		</dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.keyboard-service</string>
+		<!-- 改这里要同步改 `KeyboardViewController` 的类名，反之亦然。
+		     对不上的表现是切到本键盘时宿主只出现一块空白，控制台没有任何提示。 -->
+		<key>NSExtensionPrincipalClass</key>
+		<string>$(PRODUCT_MODULE_NAME).KeyboardViewController</string>
+	</dict>
+</dict>
+</plist>
