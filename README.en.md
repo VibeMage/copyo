@@ -3,7 +3,7 @@
 [简体中文](README.md)
 
 Copyo (formerly Paster) is an open-source clipboard manager for macOS: it lives in the menu bar, `⇧⌘V` brings up a card panel at the bottom of the screen, and you search your history as you type.
-All data stays on this Mac only (`~/Library/Application Support/Copyo/`), with no network requests whatsoever, which makes it a fit for workplaces that do not allow third-party closed-source tools.
+Data lives on this Mac (`~/Library/Application Support/Copyo/`) and syncing is off by default; there are no third-party SDKs, no analytics and no crash reporting, which makes it a fit for workplaces that do not allow third-party closed-source tools.
 
 ## Features
 
@@ -92,11 +92,21 @@ Your history lives in `~/Library/Application Support/Copyo/` and is left untouch
 
 ## Icon
 
-The master icon is `art/icon-master.png` (1024×1024). After replacing it with your own design, run:
+The two platforms have separate icons, so changing the icon means running **both** commands:
 
 ```bash
-./scripts/make-icon.sh          # regenerate every size in the asset catalog
+./scripts/make-icon.sh          # macOS: scale art/icon-master.png into the 10 sizes in the asset catalog
+./scripts/make-icon.sh --ios    # iOS: redraw the light / dark / tinted variants from art/icon/paster-icon-spec.md
 ```
+
+The macOS run reads `art/icon-master.png` (1024×1024); replace that file with your own design.
+The iOS run takes no input image — an iOS icon has to be full-bleed with no alpha and needs three
+appearance variants, none of which can be derived from a single raster master, so the script draws it
+from the spec; changing the iOS icon means editing the geometry and color tables inside the script.
+The iOS path needs Pillow (`python3 -m pip install --user Pillow`); the macOS path only uses the
+system's own `sips`.
+
+Run the bare command alone and the iOS AppIcon keeps the old artwork, so the build ships a stale icon.
 
 Then rebuild to pick it up. The repository currently ships a programmatically drawn placeholder icon.
 

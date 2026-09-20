@@ -3,7 +3,7 @@
 [English](README.en.md)
 
 Copyo（曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜单栏常驻，`⇧⌘V` 呼出底部卡片面板，历史即输即搜。
-所有数据仅保存在本机（`~/Library/Application Support/Copyo/`），无任何网络请求，适合不允许安装第三方闭源工具的办公环境。
+数据保存在本机（`~/Library/Application Support/Copyo/`），同步默认关闭；不含任何第三方 SDK、统计或崩溃上报，适合不允许安装第三方闭源工具的办公环境。
 
 ## 功能
 
@@ -92,11 +92,19 @@ xcrun notarytool store-credentials copyo-notary \
 
 ## 图标
 
-主图标是 `art/icon-master.png`（1024×1024）。替换成你自己的设计后执行：
+两个平台的图标是分开生成的，换图标时**两条都要跑**：
 
 ```bash
-./scripts/make-icon.sh          # 重新生成资产目录里的全部尺寸
+./scripts/make-icon.sh          # macOS：把 art/icon-master.png 缩成资产目录里的 10 个规格
+./scripts/make-icon.sh --ios    # iOS：按 art/icon/paster-icon-spec.md 重画浅色 / 深色 / 单色三份
 ```
+
+macOS 那条读 `art/icon-master.png`（1024×1024），换成你自己的设计即可。iOS 那条不吃输入
+图片——iOS 图标必须满幅且不带 alpha，还要三个外观变体，没法从一张栅格主图派生，所以是
+脚本按 spec 现画的；改 iOS 图标要改脚本里的几何与配色表。iOS 这条路需要 Pillow
+（`python3 -m pip install --user Pillow`），macOS 那条只用系统自带的 sips。
+
+只跑不带参数的那条，iOS 的 AppIcon 会停在旧版本，构建出来的包里就是一个过期的图标。
 
 再重新构建即可生效。当前仓库内置一个程序化绘制的占位图标。
 
