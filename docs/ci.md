@@ -1,6 +1,6 @@
 # GitHub Actions 持续集成与自动发布
 
-创建日期：2026-09-20 · 最后更新：2026-09-20
+创建日期：2026-09-20 · 最后更新：2026-09-21
 
 ## 一、两个 workflow 各做什么
 
@@ -34,7 +34,44 @@ README 向用户承诺「官方发布均已使用 Developer ID 签名并通过 A
 `.github/dependabot.yml` 是配套的一小份配置：让 dependabot 每月检查一次这两个 workflow 里引用的
 action 有没有新版本，有就自动提 PR。它不参与构建，删掉也不影响 CI 跑。
 
-## 二、需要配置的 secret（你来操作）
+## 二、当前决定：签名留在本地，不配 secret（2026-09-21）
+
+**结论**：`ci.yml` 保留；`release.yml` 只用手动演练；正式包继续用 `scripts/build-release.sh`
+在本机签名公证，手动上传到 Releases。**第三节那六个 secret 不要配**，第五节的开发者后台准备、
+第七节的第②③步演练也随之不必做。
+
+决定性的理由只有一条：**在 CI 里签名，必须把 Developer ID 证书的私钥导成 `.p12` 放进
+GitHub Secrets。** 那把私钥目前只存在于本机钥匙串里，进了 GitHub 就多出一个不受本人控制的
+副本——仓库或账号一旦失守，对方能以本人身份签任何东西。这个风险本身不可接受，不与便利性权衡。
+（供应链面也在扩大：2026-09-21 刚把四处 action 引用升到 v7，workflow 能读到 secret 就意味着
+任何一个被投毒的 action 都够得着它。）
+
+放弃掉的东西要说清楚，不假装没有代价：产物与 tag 的强绑定没有了（Releases 上的包来自谁的
+工作区、对应哪个 commit，只能靠自觉）；换机器或多人发版会卡住；`release.yml` 里那条
+tag 与 `MARKETING_VERSION` 的一致性断言也不会再执行。
+
+为什么 `ci.yml` 仍然值得留：这个工程用 `PBXFileSystemSynchronizedRootGroup`（objectVersion 77），
+target 的源文件按磁盘目录同步，不在 pbxproj 里逐个登记。于是一个文件可以存在于开发机上、
+本地编译一切正常、却从没进过 git——**本地构建结构上发现不了这件事，只有干净 checkout 能**。
+2026-09-21 核对 `CopyoWidgets/` 时正是因为这个结构，才必须专门确认磁盘与 git 是否一致。
+加上 Release-AppStore 那条（见第一节末尾），`ci.yml` 覆盖的恰好是本地流程够不着的盲区，
+而且它不碰任何证书，没有上面那个风险。
+
+**直接后果：不要推 `v*` tag。** `release.yml` 的设计是「推 tag = 要一次正式发布，签名或公证
+凑不齐就当场失败」（见第一节）。本地签名这条路下推 tag 只会得到一个红叉。手动 Run workflow
+不受影响，随时可跑，用来验证 checkout / Xcode / 编译链路。
+
+这里留了一个已知的坑：`release.yml` 的 `v*` 触发仍然挂着，哪天手滑 `git push --tags` 就会红一次。
+没有摘掉它，是因为那个红叉是自解释的（日志第一行就写了缺哪个 secret），而摘掉触发器等于
+把将来改回 CI 签名的路也一并拆了。知道它在那儿就行。
+
+**什么情况下该改回来**：需要换机器或多人发版；或者愿意为此专门签发一张**只用于 CI、随时可吊销**
+的证书，把风险限定在那张证书上。那时按第三节配 secret、第七节走三步演练即可，workflow 本身不用改。
+
+## 三、需要配置的 secret（你来操作）
+
+> ⚠️ **按第二节的决定，这一节当前不执行。** 下面的内容保留下来，是为了将来真要把签名搬进 CI
+> 时不用重新查一遍；现在照着配等于把 Developer ID 私钥送进 GitHub，正是第二节拒绝的那件事。
 
 仓库 → Settings → Secrets and variables → Actions → New repository secret。
 
@@ -65,7 +102,7 @@ base64 -i AuthKey_XXXXXXXXXX.p8 -o key.txt
 然后在 `release.yml` 的 `release:` job 下加一行 `environment: release`。这样只有发布作业取得到它们，
 误提交进来的 workflow 改动也偷不走。仓库级 secret 不加这行也能正常工作，所以默认没加。
 
-## 三、明文即可、不要放 secret 的东西
+## 四、明文即可、不要放 secret 的东西
 
 仓库是公开的，下面这些标识符早就提交进库了，Team ID 更是嵌在每一个签名过的 app 里、本来就是公开设计。
 放进 secret 只会让 YAML 难读，换不来任何安全收益：
@@ -75,7 +112,7 @@ base64 -i AuthKey_XXXXXXXXXX.p8 -o key.txt
 - App Group `group.dev.vibemage.Copyo`
 - iCloud 容器 `iCloud.dev.vibemage.Copyo`
 
-## 四、一次性准备（开发者后台侧）
+## 五、一次性准备（开发者后台侧）
 
 1. **App ID 上的能力**：Identifiers → `dev.vibemage.Copyo` 必须已勾选 iCloud（CloudKit，容器
    `iCloud.dev.vibemage.Copyo`）与 Push Notifications。entitlements 里有这两项而 App ID 没开，
@@ -87,7 +124,7 @@ base64 -i AuthKey_XXXXXXXXXX.p8 -o key.txt
    它大约一年过期，到期后 CI 会在签名步失败，日志里打印的「有效期至」是最快的排查线索。
 4. **公证密钥**：App Store Connect → 用户和访问 → 集成 → 密钥。
 
-## 五、本地与 CI 的差别
+## 六、本地与 CI 的差别
 
 |  | 本地 `scripts/build-release.sh` | CI `scripts/ci-release.sh` |
 | --- | --- | --- |
@@ -104,7 +141,9 @@ base64 -i AuthKey_XXXXXXXXXX.p8 -o key.txt
 
 代价是两份脚本要一起维护：**产物命名和 DMG 布局是逐字对齐的，改一边记得改另一边。**
 
-## 六、先演练再推 tag
+## 七、先演练再推 tag
+
+> ⚠️ **按第二节的决定，目前只做第 1 步，并且不推 tag。** 第 2、3 步依赖第三节那些 secret。
 
 仓库至今一个 tag 都没有，`on: push: tags` 这条路径在第一次真推之前完全没被执行过。按这个顺序趟一遍：
 
@@ -125,7 +164,7 @@ git push origin v1.0.1
 版本号刻意以工程为单一事实来源、由 CI 断言 tag 与它一致，而不是反过来让 CI 用 tag 覆盖工程里的版本号：
 否则应用「关于」里显示什么就完全取决于谁推了什么 tag，本地构建和 CI 构建还会给出不同的版本号。
 
-## 七、常见失败与处置
+## 八、常见失败与处置
 
 | 症状 | 多半是 | 怎么办 |
 | --- | --- | --- |
@@ -135,11 +174,11 @@ git push origin v1.0.1
 | 公证状态 Invalid | entitlements、强化运行时或签名有问题 | 下载 artifact 里的 `notary-log.json`，真正的原因在 `issues[]` 里 |
 | `tag 与 MARKETING_VERSION 不一致` | 工程里的版本号没跟着 bump | 改 `project.pbxproj` 提交，删掉旧 tag 重新打 |
 | `找不到 Xcode 26.x*` | 锁了版本而镜像更新把它删了 | 照错误日志里列出的现有版本改 `release.yml` 的 `XCODE_VERSION`，或留空用镜像默认 |
-| 推了 tag，作业几秒就红，报「没配置 ...」 | 这是设计如此：推 tag = 正式发布，secret 不齐时当场失败 | 按第二节配齐 secret，或先用 Run workflow 演练 |
+| 推了 tag，作业几秒就红，报「没配置 ...」 | 这是设计如此：推 tag = 正式发布，secret 不齐时当场失败 | 按第三节配齐 secret，或先用 Run workflow 演练 |
 | fork 里推 tag 也红 | fork 拿不到上游仓库的任何 secret | 正常现象。想在自己的 fork 里发布，就在 fork 上配一套自己的证书 secret |
 | 想让 fork 的 PR 也能签名 | 做不到，也不该做 | fork PR 拿不到 secret、`GITHUB_TOKEN` 也只读，这正是签名/发布与 PR 门禁分成两个 workflow 的原因。**千万别改用 `pull_request_target` 去绕**，那等于在 fork 的代码上下文里交出写权限的 token |
 
-## 八、CI 保证不了的事
+## 九、CI 保证不了的事
 
 免得看见全绿就以为万事大吉：
 
@@ -151,7 +190,7 @@ git push origin v1.0.1
 - **上架流程不在 CI 里**：`scripts/build-appstore.sh` 仍是本地手动跑，它需要 Apple Distribution +
   Mac Installer Distribution 两张证书，还需要人工确认提审。
 
-## 九、后续可做（不在本次范围）
+## 十、后续可做（不在本次范围）
 
 1. **给 DMG 本身也签名 + 公证 + staple**。现在只有 `.app` 被 staple，用户把它从 DMG 里拖出来离线也能过
    Gatekeeper，所以不阻塞；好处是磁盘映像本身也不再被标记为未识别。代价是多一轮公证往返，
