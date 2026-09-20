@@ -21,22 +21,74 @@ struct SettingsView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             GeneralSettingsView()
-                .tabItem { Label("General", systemImage: "gearshape") }
-                .tag(0)
+                .tabItem { SettingsTab.general.label }
+                .tag(SettingsTab.general.rawValue)
             HistorySettingsView()
-                .tabItem { Label("Clipboard", systemImage: "clock.arrow.circlepath") }
-                .tag(1)
+                .tabItem { SettingsTab.clipboard.label }
+                .tag(SettingsTab.clipboard.rawValue)
             SyncSettingsView()
-                .tabItem { Label("Sync", systemImage: "arrow.triangle.2.circlepath.icloud") }
-                .tag(2)
+                .tabItem { SettingsTab.sync.label }
+                .tag(SettingsTab.sync.rawValue)
             ShortcutsSettingsView()
-                .tabItem { Label("Shortcuts", systemImage: "keyboard") }
-                .tag(3)
+                .tabItem { SettingsTab.shortcuts.label }
+                .tag(SettingsTab.shortcuts.rawValue)
             AboutView()
-                .tabItem { Label("About", systemImage: "info.circle") }
-                .tag(4)
+                .tabItem { SettingsTab.about.label }
+                .tag(SettingsTab.about.rawValue)
         }
-        .frame(width: 540, height: 400)
+        .frame(width: SettingsLayout.width, height: SettingsLayout.height)
+    }
+}
+
+// MARK: - 标签页与窗口尺寸
+
+/// 设置窗口的五个标签页。标题只在这里写一遍——窗口宽度要按标题的实际宽度算，
+/// 两边各写一份迟早对不上。
+enum SettingsTab: Int, CaseIterable {
+    case general, clipboard, sync, shortcuts, about
+
+    var title: String {
+        switch self {
+        case .general: String(localized: "General")
+        case .clipboard: String(localized: "Clipboard")
+        case .sync: String(localized: "Sync")
+        case .shortcuts: String(localized: "Shortcuts")
+        case .about: String(localized: "About")
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .general: "gearshape"
+        case .clipboard: "clock.arrow.circlepath"
+        case .sync: "arrow.triangle.2.circlepath.icloud"
+        case .shortcuts: "keyboard"
+        case .about: "info.circle"
+        }
+    }
+
+    var label: some View { Label(title, systemImage: systemImage) }
+}
+
+enum SettingsLayout {
+    /// 英文 / 中文下的窗口尺寸。商店截图是按这个尺寸拍的，别随手改。
+    static let baseWidth: CGFloat = 540
+    static let height: CGFloat = 400
+
+    /// 标签页栏一行放不下时，SwiftUI 会把整条栏折叠成一个 » 溢出按钮，
+    /// 五个标签页就全藏进那个菜单里。窗口不可缩放，所以只能预先开够宽。
+    ///
+    /// 下面几个常数是在 macOS 26 上实测的：标签页会被拉成同宽（按最长的那个标题算），
+    /// 标签栏两端另有约 106pt 留白，窗口左右还要给红绿灯留约 103pt。
+    /// 算出来英文 504pt、简中 403pt，都在 540 以内，尺寸不变；
+    /// 法语最长的 Synchronisation 把窗口顶到 707pt——这正是它原先被折叠的原因。
+    static var width: CGFloat {
+        let font = NSFont.systemFont(ofSize: 13)
+        let widest = SettingsTab.allCases
+            .map { $0.title.size(withAttributes: [.font: font]).width }
+            .max() ?? 0
+        let tabBar = CGFloat(SettingsTab.allCases.count) * widest + 106
+        return max(baseWidth, ceil(tabBar + 103 + 12))   // 12pt 余量，留给系统字体的版本差异
     }
 }
 

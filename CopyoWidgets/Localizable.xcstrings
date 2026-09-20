@@ -10,6 +10,12 @@
             "value": "%lld characters · Plain text"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld caractères · Texte brut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -25,6 +31,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld characters · Rich text"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld caractères · Texte enrichi"
           }
         },
         "zh-Hans": {
@@ -44,6 +56,12 @@
             "value": "1 character · Plain text"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 caractère · Texte brut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -59,6 +77,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "1 character · Rich text"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 caractère · Texte enrichi"
           }
         },
         "zh-Hans": {
@@ -78,6 +102,12 @@
             "value": "Cancel"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuler"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -93,6 +123,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Clipboard"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presse-papiers"
           }
         },
         "zh-Hans": {
@@ -112,6 +148,12 @@
             "value": "Color"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couleur"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -127,6 +169,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copyo can't open its library right now."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo ne peut pas ouvrir sa bibliothèque pour le moment."
           }
         },
         "zh-Hans": {
@@ -146,6 +194,12 @@
             "value": "Copyo couldn't read that image."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo n’a pas pu lire cette image."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -161,6 +215,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copyo couldn't read what you shared."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo n’a pas pu lire ce que vous avez partagé."
           }
         },
         "zh-Hans": {
@@ -180,6 +240,12 @@
             "value": "Couldn't save"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec de l’enregistrement"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -195,6 +261,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Don't pin"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne pas épingler"
           }
         },
         "zh-Hans": {
@@ -214,6 +286,12 @@
             "value": "File"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichier"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -231,6 +309,12 @@
             "value": "Give Save Content some text, a link, or an image."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Enregistrer le contenu » a besoin d’un texte, d’un lien ou d’une image."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -243,6 +327,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image"
+          }
+        },
+        "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Image"
@@ -265,6 +355,12 @@
             "value": "Link"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lien"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -280,6 +376,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "No pinboards"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun Pinboard"
           }
         },
         "zh-Hans": {
@@ -299,6 +401,12 @@
             "value": "Nothing to save"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien à enregistrer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -316,6 +424,12 @@
             "value": "Now"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À l’instant"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -328,6 +442,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "OK"
@@ -350,6 +470,12 @@
             "value": "Opens Copyo and saves whatever is on the clipboard right now."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvre Copyo et enregistre le contenu actuel du presse-papiers."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -365,6 +491,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pin to Pinboard"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingler à un Pinboard"
           }
         },
         "zh-Hans": {
@@ -384,6 +516,12 @@
             "value": "Rich"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enrichi"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -399,6 +537,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Save"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer"
           }
         },
         "zh-Hans": {
@@ -418,6 +562,12 @@
             "value": "Save Clipboard"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer le presse-papiers"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -433,6 +583,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Save Content"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer le contenu"
           }
         },
         "zh-Hans": {
@@ -452,6 +608,12 @@
             "value": "Save to Copyo"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer dans Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -467,6 +629,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Saved"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistré"
           }
         },
         "zh-Hans": {
@@ -486,6 +654,12 @@
             "value": "Saves text, a link, or an image to Copyo without opening the app."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistre un texte, un lien ou une image dans Copyo sans ouvrir l’app."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -501,6 +675,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Saves what's on the clipboard to Copyo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistre dans Copyo le contenu actuel du presse-papiers."
           }
         },
         "zh-Hans": {
@@ -520,6 +700,12 @@
             "value": "Text"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texte"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -535,6 +721,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "There's nothing to save here."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il n’y a rien à enregistrer ici."
           }
         },
         "zh-Hans": {
@@ -554,6 +746,12 @@
             "value": "This iPhone"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet iPhone"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -566,6 +764,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL"
+          }
+        },
+        "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "URL"
@@ -588,6 +792,12 @@
             "value": "clip"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "élément"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -603,6 +813,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "clipboard"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "presse-papiers"
           }
         },
         "zh-Hans": {
@@ -622,6 +838,12 @@
             "value": "paste"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "coller"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -637,6 +859,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "save"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "enregistrer"
           }
         },
         "zh-Hans": {

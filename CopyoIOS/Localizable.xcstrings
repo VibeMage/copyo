@@ -10,6 +10,12 @@
             "value": "%lld"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -25,6 +31,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld characters"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld caractères"
           }
         },
         "zh-Hans": {
@@ -44,6 +56,12 @@
             "value": "%lld characters · Plain text"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld caractères · Texte brut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -59,6 +77,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld characters · Rich text"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld caractères · Texte enrichi"
           }
         },
         "zh-Hans": {
@@ -78,6 +102,12 @@
             "value": "%lld files"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fichiers"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -93,6 +123,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld items"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld éléments"
           }
         },
         "zh-Hans": {
@@ -112,6 +148,12 @@
             "value": "%lld result"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld résultat"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -127,6 +169,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld results"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld résultats"
           }
         },
         "zh-Hans": {
@@ -146,6 +194,12 @@
             "value": "%lldd"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld j"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -161,6 +215,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lldh"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld h"
           }
         },
         "zh-Hans": {
@@ -180,6 +240,12 @@
             "value": "%lldm"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -195,6 +261,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "1 character"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 caractère"
           }
         },
         "zh-Hans": {
@@ -214,6 +286,12 @@
             "value": "1 character · Plain text"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 caractère · Texte brut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -229,6 +307,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "1 character · Rich text"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 caractère · Texte enrichi"
           }
         },
         "zh-Hans": {
@@ -248,6 +332,12 @@
             "value": "1 file"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 fichier"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -263,6 +353,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "1 item"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 élément"
           }
         },
         "zh-Hans": {
@@ -282,6 +378,12 @@
             "value": "About"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À propos"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -297,6 +399,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Action Button"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bouton Action"
           }
         },
         "zh-Hans": {
@@ -316,6 +424,12 @@
             "value": "Action Button, Back Tap or Control Center"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bouton Action, Toucher le dos ou Centre de contrôle"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -331,6 +445,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Add the “Save Clipboard” Shortcut"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter le raccourci « Enregistrer le presse-papiers »"
           }
         },
         "zh-Hans": {
@@ -350,6 +470,12 @@
             "value": "Add “Save Clipboard”"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter « Enregistrer le presse-papiers »"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -365,6 +491,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "After copying, press the Action Button, double-tap the back of your iPhone, or tap the Control Center button. Copyo opens and shows “Saved”."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Après avoir copié, appuyez sur le bouton Action, touchez deux fois le dos de votre iPhone ou touchez le bouton du Centre de contrôle. Copyo s’ouvre et affiche « Enregistré »."
           }
         },
         "zh-Hans": {
@@ -384,6 +516,12 @@
             "value": "All"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -399,6 +537,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Allow"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoriser"
           }
         },
         "zh-Hans": {
@@ -418,6 +562,12 @@
             "value": "Allow Paste from Other Apps"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Coller depuis d’autres apps »"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -433,6 +583,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Already saved"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déjà enregistré"
           }
         },
         "zh-Hans": {
@@ -452,6 +608,12 @@
             "value": "An open-source clipboard manager. Mac, iPhone and iPad share one history through your own iCloud account."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un gestionnaire de presse-papiers open source. Mac, iPhone et iPad partagent un même historique via votre propre compte iCloud."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -467,6 +629,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Anything you copy on your Mac needs no action at all — it arrives here through iCloud."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout ce que vous copiez sur votre Mac arrive ici via iCloud, sans aucune action de votre part."
           }
         },
         "zh-Hans": {
@@ -486,6 +654,12 @@
             "value": "Anything you copy on your Mac shows up here through iCloud. To keep something from this iPhone, use Share or Quick Save."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout ce que vous copiez sur votre Mac apparaît ici via iCloud. Pour conserver quelque chose depuis cet iPhone, utilisez « Partager » ou « Enregistrement rapide »."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -501,6 +675,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ask"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demander"
           }
         },
         "zh-Hans": {
@@ -520,6 +700,12 @@
             "value": "Back Tap"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toucher le dos"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -535,6 +721,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Back Tap can only run a shortcut, which is why this one needs the shortcut above."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le toucher du dos ne peut lancer qu’un raccourci : c’est pourquoi cette méthode a besoin du raccourci ci-dessus."
           }
         },
         "zh-Hans": {
@@ -554,6 +746,12 @@
             "value": "By Date Created"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par date de création"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -569,6 +767,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "By Item Count"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par nombre d’éléments"
           }
         },
         "zh-Hans": {
@@ -588,6 +792,12 @@
             "value": "By Name"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par nom"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -603,6 +813,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "By Pin Time"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par date d’épinglage"
           }
         },
         "zh-Hans": {
@@ -622,6 +838,12 @@
             "value": "By Source"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par source"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -637,6 +859,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "By Time"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par date"
           }
         },
         "zh-Hans": {
@@ -656,6 +884,12 @@
             "value": "By Type"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par type"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -671,6 +905,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cancel"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuler"
           }
         },
         "zh-Hans": {
@@ -690,6 +930,12 @@
             "value": "Characters"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caractères"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -705,6 +951,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Choose “Allow”"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez « Autoriser »"
           }
         },
         "zh-Hans": {
@@ -724,6 +976,12 @@
             "value": "Clear"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effacer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -739,6 +997,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Clear History"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effacer l’historique"
           }
         },
         "zh-Hans": {
@@ -758,6 +1022,12 @@
             "value": "Clear History?"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effacer l’historique ?"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -773,6 +1043,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Clear Search"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effacer la recherche"
           }
         },
         "zh-Hans": {
@@ -792,6 +1068,12 @@
             "value": "Clipboard"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presse-papiers"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -807,6 +1089,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Color"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couleur"
           }
         },
         "zh-Hans": {
@@ -826,6 +1114,12 @@
             "value": "Colors"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couleurs"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -841,6 +1135,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Continue"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuer"
           }
         },
         "zh-Hans": {
@@ -860,6 +1160,12 @@
             "value": "Control Center"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Centre de contrôle"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -875,6 +1181,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copied"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copié"
           }
         },
         "zh-Hans": {
@@ -894,6 +1206,12 @@
             "value": "Copied as plain text"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copié en texte brut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -909,6 +1227,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copy"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier"
           }
         },
         "zh-Hans": {
@@ -928,6 +1252,12 @@
             "value": "Copy All as Plain Text"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout copier en texte brut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -943,6 +1273,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copy as Plain Text"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier en texte brut"
           }
         },
         "zh-Hans": {
@@ -962,6 +1298,12 @@
             "value": "Copyo can't open its library right now."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo ne peut pas ouvrir sa bibliothèque pour le moment."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -977,6 +1319,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copyo can't read the current value of this setting"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo ne peut pas lire la valeur actuelle de ce réglage"
           }
         },
         "zh-Hans": {
@@ -996,6 +1344,12 @@
             "value": "Copyo couldn't read that image."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo n’a pas pu lire cette image."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1011,6 +1365,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copyo couldn't read what you shared."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo n’a pas pu lire ce que vous avez partagé."
           }
         },
         "zh-Hans": {
@@ -1030,6 +1390,12 @@
             "value": "Couldn't save"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec de l’enregistrement"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1045,6 +1411,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Create"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Créer"
           }
         },
         "zh-Hans": {
@@ -1064,6 +1436,12 @@
             "value": "Default pinboard"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinboard par défaut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1079,6 +1457,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Delete"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer"
           }
         },
         "zh-Hans": {
@@ -1098,6 +1482,12 @@
             "value": "Delete Pinboard"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer le Pinboard"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1113,6 +1503,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Delete this clip?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer cet élément ?"
           }
         },
         "zh-Hans": {
@@ -1132,6 +1528,12 @@
             "value": "Delete “%@”?"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer « %@ » ?"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1147,6 +1549,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deleted"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimé"
           }
         },
         "zh-Hans": {
@@ -1166,6 +1574,12 @@
             "value": "Deny"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refuser"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1178,6 +1592,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimensions"
+          }
+        },
+        "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Dimensions"
@@ -1200,6 +1620,12 @@
             "value": "Dismiss"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1215,6 +1641,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Don't pin"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne pas épingler"
           }
         },
         "zh-Hans": {
@@ -1234,6 +1666,12 @@
             "value": "Done"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminé"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1249,6 +1687,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Every time you open or come back to Copyo it reads the current clipboard and saves it to your history. “Paste from Other Apps” has to be set to Allow."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque fois que vous ouvrez Copyo ou y revenez, il lit le presse-papiers et l’enregistre dans votre historique. « Coller depuis d’autres apps » doit être réglé sur « Autoriser »."
           }
         },
         "zh-Hans": {
@@ -1268,6 +1712,12 @@
             "value": "Everything you copy on your Mac arrives here through iCloud. Search anytime, tap to copy."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout ce que vous copiez sur votre Mac arrive ici via iCloud. Recherchez à tout moment, touchez pour copier."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1283,6 +1733,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "File"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichier"
           }
         },
         "zh-Hans": {
@@ -1302,6 +1758,12 @@
             "value": "File contents stay on your Mac. Copyo keeps the name so you can find it there."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le contenu des fichiers reste sur votre Mac. Copyo en conserve le nom pour que vous puissiez le retrouver."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1317,6 +1779,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Files"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichiers"
           }
         },
         "zh-Hans": {
@@ -1336,6 +1804,12 @@
             "value": "Get Started"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commencer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1351,6 +1825,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Give Save Content some text, a link, or an image."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Enregistrer le contenu » a besoin d’un texte, d’un lien ou d’une image."
           }
         },
         "zh-Hans": {
@@ -1370,6 +1850,12 @@
             "value": "Go to Settings"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir les Réglages"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1385,6 +1871,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "History"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Historique"
           }
         },
         "zh-Hans": {
@@ -1404,6 +1896,12 @@
             "value": "History Limit"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Limite de l’historique"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1419,6 +1917,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "History cleared"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Historique effacé"
           }
         },
         "zh-Hans": {
@@ -1438,6 +1942,12 @@
             "value": "How Copyo Saves Clips"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comment Copyo enregistre les éléments"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1453,6 +1963,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "How to save clipboard"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comment enregistrer le presse-papiers"
           }
         },
         "zh-Hans": {
@@ -1472,6 +1988,12 @@
             "value": "Icon"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Icône"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1484,6 +2006,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image"
+          }
+        },
+        "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Image"
@@ -1506,6 +2034,12 @@
             "value": "Images"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Images"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1521,6 +2055,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "In iOS Settings"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages iOS"
           }
         },
         "zh-Hans": {
@@ -1540,6 +2080,12 @@
             "value": "It syncs to the Pinboard tab on your Mac."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il se synchronise avec l’onglet Pinboard de votre Mac."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1555,6 +2101,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "It syncs to the Pinboard tags on your Mac."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il se synchronise avec les tags Pinboard de votre Mac."
           }
         },
         "zh-Hans": {
@@ -1574,6 +2126,12 @@
             "value": "It will be removed from Copyo on all your devices."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il sera supprimé de Copyo sur tous vos appareils."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1589,6 +2147,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Its clips go back to History and are not deleted."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses éléments retournent dans l’historique et ne sont pas supprimés."
           }
         },
         "zh-Hans": {
@@ -1608,6 +2172,12 @@
             "value": "Just now"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À l’instant"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1623,6 +2193,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Last week"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semaine dernière"
           }
         },
         "zh-Hans": {
@@ -1642,6 +2218,12 @@
             "value": "Link"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lien"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1657,6 +2239,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Links"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liens"
           }
         },
         "zh-Hans": {
@@ -1676,6 +2264,12 @@
             "value": "Mac only"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac uniquement"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1691,6 +2285,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Maybe Later"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus tard"
           }
         },
         "zh-Hans": {
@@ -1710,6 +2310,12 @@
             "value": "More"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1725,6 +2331,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Name"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom"
           }
         },
         "zh-Hans": {
@@ -1744,6 +2356,12 @@
             "value": "New Pinboard"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveau Pinboard"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1759,6 +2377,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "New Pinboard…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveau Pinboard…"
           }
         },
         "zh-Hans": {
@@ -1778,6 +2402,12 @@
             "value": "New clipboard content"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveau contenu dans le presse-papiers"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1793,6 +2423,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "No clips yet"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun élément pour l’instant"
           }
         },
         "zh-Hans": {
@@ -1812,6 +2448,12 @@
             "value": "No pinboards"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun Pinboard"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1827,6 +2469,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "No results"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun résultat"
           }
         },
         "zh-Hans": {
@@ -1846,6 +2494,12 @@
             "value": "Not pinned"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non épinglé"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1861,6 +2515,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Not synced"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non synchronisé"
           }
         },
         "zh-Hans": {
@@ -1880,6 +2540,12 @@
             "value": "Nothing pinned yet"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien d’épinglé pour l’instant"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1895,6 +2561,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nothing to save"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien à enregistrer"
           }
         },
         "zh-Hans": {
@@ -1914,6 +2586,12 @@
             "value": "Now"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À l’instant"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1926,6 +2604,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "OK"
@@ -1948,6 +2632,12 @@
             "value": "Off"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivée"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1963,6 +2653,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "One press saves whatever is on the clipboard right now. Copyo opens and shows “Saved”."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une seule pression enregistre le contenu actuel du presse-papiers. Copyo s’ouvre et affiche « Enregistré »."
           }
         },
         "zh-Hans": {
@@ -1982,6 +2678,12 @@
             "value": "Only needed once"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À faire une seule fois"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1997,6 +2699,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open Control Center and press and hold an empty spot"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez le Centre de contrôle et maintenez le doigt sur une zone vide"
           }
         },
         "zh-Hans": {
@@ -2016,6 +2724,12 @@
             "value": "Open Copyo's Settings"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir les réglages de Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2031,6 +2745,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open Settings › Accessibility › Touch › Back Tap"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages › Accessibilité › Toucher › Toucher le dos de l’appareil"
           }
         },
         "zh-Hans": {
@@ -2050,6 +2770,12 @@
             "value": "Open Settings › Action Button"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages › Bouton Action"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2065,6 +2791,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open Settings › Apps › Copyo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages › Apps › Copyo"
           }
         },
         "zh-Hans": {
@@ -2084,6 +2816,12 @@
             "value": "Open Source · GitHub"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code source · GitHub"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2099,6 +2837,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open in Safari"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir dans Safari"
           }
         },
         "zh-Hans": {
@@ -2118,6 +2862,12 @@
             "value": "Opens Copyo and saves whatever is on the clipboard right now."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvre Copyo et enregistre le contenu actuel du presse-papiers."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2133,6 +2883,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Paste to save it to your history"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collez pour l’enregistrer dans votre historique"
           }
         },
         "zh-Hans": {
@@ -2152,6 +2908,12 @@
             "value": "Pick “Save Clipboard” under Copyo"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez « Enregistrer le presse-papiers » sous Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2167,6 +2929,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pin"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingler"
           }
         },
         "zh-Hans": {
@@ -2186,6 +2954,12 @@
             "value": "Pin a clip to keep it out of the history limit."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épinglez un élément pour l’exclure de la limite de l’historique."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2201,6 +2975,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pin to Pinboard"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingler à un Pinboard"
           }
         },
         "zh-Hans": {
@@ -2220,6 +3000,12 @@
             "value": "Pin to…"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingler à…"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2232,6 +3018,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinboard"
+          }
+        },
+        "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Pinboard"
@@ -2254,6 +3046,12 @@
             "value": "Pinboard created"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinboard créé"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2269,6 +3067,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pinboard deleted"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinboard supprimé"
           }
         },
         "zh-Hans": {
@@ -2288,6 +3092,12 @@
             "value": "Pinboards are shared with your Mac. Swiping a card right pins it to the first pinboard; long-press to pick another."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les Pinboards sont partagés avec votre Mac. Balayez une carte vers la droite pour l’épingler au premier Pinboard ; appui long pour en choisir un autre."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2303,6 +3113,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pinned"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épinglé"
           }
         },
         "zh-Hans": {
@@ -2322,6 +3138,12 @@
             "value": "Plain Text"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texte brut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2337,6 +3159,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Press and hold the Action Button to save"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maintenez le bouton Action pour enregistrer"
           }
         },
         "zh-Hans": {
@@ -2356,6 +3184,12 @@
             "value": "Preview"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aperçu"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2371,6 +3205,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Privacy"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confidentialité"
           }
         },
         "zh-Hans": {
@@ -2390,6 +3230,12 @@
             "value": "Quick Save"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrement rapide"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2405,6 +3251,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Read Clipboard Automatically"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lire le presse-papiers automatiquement"
           }
         },
         "zh-Hans": {
@@ -2424,6 +3276,12 @@
             "value": "Reads the current clipboard"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lit le presse-papiers actuel"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2439,6 +3297,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Released under the MIT License."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Distribué sous licence MIT."
           }
         },
         "zh-Hans": {
@@ -2458,6 +3322,12 @@
             "value": "Remove from Pinboard"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retirer du Pinboard"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2473,6 +3343,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Rename"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Renommer"
           }
         },
         "zh-Hans": {
@@ -2492,6 +3368,12 @@
             "value": "Rename Pinboard"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Renommer le Pinboard"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2507,6 +3389,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Renamed"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Renommé"
           }
         },
         "zh-Hans": {
@@ -2526,6 +3414,12 @@
             "value": "Rich"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enrichi"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2541,6 +3435,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Running in local-only mode"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fonctionne en mode local uniquement"
           }
         },
         "zh-Hans": {
@@ -2560,6 +3460,12 @@
             "value": "Save"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2575,6 +3481,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Save Clipboard"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer le presse-papiers"
           }
         },
         "zh-Hans": {
@@ -2594,6 +3506,12 @@
             "value": "Save Content"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer le contenu"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2609,6 +3527,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Save to Copyo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer dans Copyo"
           }
         },
         "zh-Hans": {
@@ -2628,6 +3552,12 @@
             "value": "Saved"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistré"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2643,6 +3573,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Saves text, a link, or an image to Copyo without opening the app."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistre un texte, un lien ou une image dans Copyo sans ouvrir l’app."
           }
         },
         "zh-Hans": {
@@ -2662,6 +3598,12 @@
             "value": "Saves what's on the clipboard to Copyo."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistre dans Copyo le contenu actuel du presse-papiers."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2677,6 +3619,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Search"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechercher"
           }
         },
         "zh-Hans": {
@@ -2696,6 +3644,12 @@
             "value": "Search history"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechercher dans l’historique"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2711,6 +3665,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Select text or an image in any app, tap Share, then tap “Save to Copyo”. You can pick a Pinboard on the way in."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sélectionnez du texte ou une image dans n’importe quelle app, touchez « Partager », puis « Enregistrer dans Copyo ». Vous pouvez choisir un Pinboard au passage."
           }
         },
         "zh-Hans": {
@@ -2730,6 +3690,12 @@
             "value": "Set Up Quick Save"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configurer l’enregistrement rapide"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2745,6 +3711,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Set as Default"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Définir par défaut"
           }
         },
         "zh-Hans": {
@@ -2764,6 +3736,12 @@
             "value": "Set it to Allow and Copyo reads the clipboard the moment it opens, with no prompt. This is an iOS privacy setting, so it can only be changed in Settings."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglez-le sur « Autoriser » et Copyo lit le presse-papiers dès son ouverture, sans aucune demande. C’est un réglage de confidentialité iOS : il ne peut être modifié que dans les Réglages."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2779,6 +3757,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Set it to Allow, no more prompts"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglé sur « Autoriser » : plus aucune demande"
           }
         },
         "zh-Hans": {
@@ -2798,6 +3782,12 @@
             "value": "Settings"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2813,6 +3803,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Share"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partager"
           }
         },
         "zh-Hans": {
@@ -2832,6 +3828,12 @@
             "value": "Share one history with your Mac"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un seul historique avec votre Mac"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2847,6 +3849,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Share sheet"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feuille de partage"
           }
         },
         "zh-Hans": {
@@ -2866,6 +3874,12 @@
             "value": "Shortcut link not published yet"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lien du raccourci pas encore publié"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2881,6 +3895,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Show History"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher l’historique"
           }
         },
         "zh-Hans": {
@@ -2900,6 +3920,12 @@
             "value": "Show Pinboards"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les Pinboards"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2915,6 +3941,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Show Settings"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les réglages"
           }
         },
         "zh-Hans": {
@@ -2934,6 +3966,12 @@
             "value": "Sign in to iCloud to sync with your Mac"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connectez-vous à iCloud pour synchroniser avec votre Mac"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2949,6 +3987,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sign in to the same Apple Account on your Mac and iPhone. Your clips travel through iCloud only, never through a third-party server."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connectez-vous au même compte Apple sur votre Mac et votre iPhone. Vos éléments passent uniquement par iCloud, jamais par un serveur tiers."
           }
         },
         "zh-Hans": {
@@ -2968,6 +4012,12 @@
             "value": "Skip"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ignorer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2983,6 +4033,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sort"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trier"
           }
         },
         "zh-Hans": {
@@ -3002,6 +4058,12 @@
             "value": "Sort By"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trier par"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3014,6 +4076,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source"
+          }
+        },
+        "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Source"
@@ -3036,6 +4104,12 @@
             "value": "Space"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espace"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3051,6 +4125,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Status"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "État"
           }
         },
         "zh-Hans": {
@@ -3070,6 +4150,12 @@
             "value": "Swipe a card right in History, or long-press it and pick this pinboard."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balayez une carte vers la droite dans l’historique, ou appuyez longuement dessus pour choisir ce Pinboard."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3085,6 +4171,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Swipe to “Controls”, then tap “Choose a Control”"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allez à « Commandes », puis touchez « Choisir une commande »"
           }
         },
         "zh-Hans": {
@@ -3104,6 +4196,12 @@
             "value": "Sync"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisation"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3119,6 +4217,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Synced"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisé"
           }
         },
         "zh-Hans": {
@@ -3138,6 +4242,12 @@
             "value": "Synced · %@"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisé · %@"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3153,6 +4263,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Syncing…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisation…"
           }
         },
         "zh-Hans": {
@@ -3172,6 +4288,12 @@
             "value": "Takes effect after you reopen Copyo"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prend effet après la relance de Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3187,6 +4309,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tap the back of your iPhone twice to save"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez deux fois le dos de votre iPhone pour enregistrer"
           }
         },
         "zh-Hans": {
@@ -3206,6 +4334,12 @@
             "value": "Tap the button above to add the shortcut"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez le bouton ci-dessus pour ajouter le raccourci"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3221,6 +4355,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tap “Add a Control” and search for Copyo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez « Ajouter une commande » et recherchez Copyo"
           }
         },
         "zh-Hans": {
@@ -3240,6 +4380,12 @@
             "value": "Tap “Double Tap” and choose the shortcut"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez « Toucher deux fois » et choisissez le raccourci"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3255,6 +4401,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tap “Paste from Other Apps”"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez « Coller depuis d’autres apps »"
           }
         },
         "zh-Hans": {
@@ -3274,6 +4426,12 @@
             "value": "Text"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texte"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3289,6 +4447,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "The Lock Screen buttons work the same way"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les boutons de l’écran verrouillé fonctionnent de la même façon"
           }
         },
         "zh-Hans": {
@@ -3308,6 +4472,12 @@
             "value": "The control comes with Copyo, so there is nothing to add first."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La commande est fournie avec Copyo : il n’y a rien à ajouter au préalable."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3323,6 +4493,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "The shortcut ships with the App Store release. Until then use the Action Button or Control Center — neither one needs a shortcut."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le raccourci sera fourni avec la version de l’App Store. En attendant, utilisez le bouton Action ou le Centre de contrôle : aucun des deux n’a besoin de raccourci."
           }
         },
         "zh-Hans": {
@@ -3342,6 +4518,12 @@
             "value": "There's nothing to save here."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il n’y a rien à enregistrer ici."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3357,6 +4539,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "This build is not signed for iCloud sync"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette version n’est pas signée pour la synchronisation iCloud"
           }
         },
         "zh-Hans": {
@@ -3376,6 +4564,12 @@
             "value": "This deletes every clip that isn't pinned to a Pinboard. It can't be undone."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cela supprime tous les éléments qui ne sont pas épinglés à un Pinboard. Cette action est irréversible."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3391,6 +4585,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "This iPhone"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet iPhone"
           }
         },
         "zh-Hans": {
@@ -3410,6 +4610,12 @@
             "value": "Three ways to save from this iPhone"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trois façons d’enregistrer depuis cet iPhone"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3425,6 +4631,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Time"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Date"
           }
         },
         "zh-Hans": {
@@ -3444,6 +4656,12 @@
             "value": "Toggle Sidebar"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher ou masquer la barre latérale"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3459,6 +4677,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Try another keyword or filter."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Essayez un autre mot-clé ou un autre filtre."
           }
         },
         "zh-Hans": {
@@ -3478,6 +4702,12 @@
             "value": "Turn on iCloud Sync"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activer la synchronisation iCloud"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3495,6 +4725,12 @@
             "value": "Two switches and you're set"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deux réglages et c’est prêt"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3507,6 +4743,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL"
+          }
+        },
+        "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "URL"
@@ -3529,6 +4771,12 @@
             "value": "Unlimited"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Illimité"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3544,6 +4792,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unpin"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne plus épingler"
           }
         },
         "zh-Hans": {
@@ -3563,6 +4817,12 @@
             "value": "Unpinned"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingle retirée"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3580,6 +4840,12 @@
             "value": "Until you allow it, History shows a “New clipboard content” banner at the top — use the system paste button there to save by hand."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tant que vous ne l’autorisez pas, une bannière « Nouveau contenu dans le presse-papiers » apparaît en haut de l’historique : utilisez son bouton de collage système pour enregistrer à la main."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3592,6 +4858,12 @@
       "extractionState": "manual",
       "localizations": {
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@"
+          }
+        },
+        "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Version %@"
@@ -3614,6 +4886,12 @@
             "value": "When you open Copyo"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À l’ouverture de Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3629,6 +4907,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "With this off, Copyo won't read the clipboard when it opens — use the banner at the top of History to paste and save by hand."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Si ce réglage est désactivé, Copyo ne lit pas le presse-papiers à son ouverture : utilisez la bannière en haut de l’historique pour coller et enregistrer à la main."
           }
         },
         "zh-Hans": {
@@ -3648,6 +4932,12 @@
             "value": "You can change both later in Settings."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vous pourrez modifier les deux plus tard dans les réglages."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3663,6 +4953,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your Mac clipboard, in your pocket"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le presse-papiers de votre Mac, dans votre poche"
           }
         },
         "zh-Hans": {
@@ -3682,6 +4978,12 @@
             "value": "clip"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "élément"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3697,6 +4999,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "clipboard"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "presse-papiers"
           }
         },
         "zh-Hans": {
@@ -3716,6 +5024,12 @@
             "value": "iCloud Sync"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisation iCloud"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3731,6 +5045,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "iCloud sync failed"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec de la synchronisation iCloud"
           }
         },
         "zh-Hans": {
@@ -3750,6 +5070,12 @@
             "value": "iCloud sync is turned off"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisation iCloud désactivée"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3765,6 +5091,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "iOS asks every time"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS demande à chaque fois"
           }
         },
         "zh-Hans": {
@@ -3784,6 +5116,12 @@
             "value": "iOS won't let apps read the clipboard in the background, so Copyo only saves at these three moments."
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS n’autorise pas les apps à lire le presse-papiers en arrière-plan : Copyo n’enregistre donc qu’à ces trois moments."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3799,6 +5137,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "iPhone 15 Pro and later"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone 15 Pro et modèles ultérieurs"
           }
         },
         "zh-Hans": {
@@ -3818,6 +5162,12 @@
             "value": "now"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "< 1 min"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3833,6 +5183,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "paste"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "coller"
           }
         },
         "zh-Hans": {
@@ -3852,6 +5208,12 @@
             "value": "save"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "enregistrer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3869,6 +5231,12 @@
             "value": "“%@” is now the default"
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » est désormais par défaut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3884,6 +5252,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "“Save to Copyo” in any app"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Enregistrer dans Copyo » depuis n’importe quelle app"
           }
         },
         "zh-Hans": {

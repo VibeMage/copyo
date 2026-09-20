@@ -5,7 +5,8 @@ import SwiftUI
 @MainActor
 final class SettingsWindowController: NSWindowController {
     convenience init(container: ModelContainer) {
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 540, height: 440),
+        // 宽度跟着标签页标题走，理由见 SettingsLayout
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: SettingsLayout.width, height: 440),
                               styleMask: [.titled, .closable],
                               backing: .buffered,
                               defer: false)

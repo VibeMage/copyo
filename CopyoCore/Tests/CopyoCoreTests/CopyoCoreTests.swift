@@ -79,8 +79,12 @@ final class CopyoCoreTests: XCTestCase {
         let container = try ModelContainer(for: schema, configurations: config)
         let context = ModelContext(container)
 
+        // 空库和「读不出来」是两回事：刚装上、或刚清过历史的机器上这个库就是空的，
+        // 那种情况下没什么兼容性可验，跳过——否则 swift test 在干净机器上必然失败。
         let count = try context.fetchCount(FetchDescriptor<ClipItem>())
-        XCTAssertGreaterThan(count, 0, "现有数据库里应当能读出条目")
+        guard count > 0 else {
+            throw XCTSkip("本机数据库是空的，跳过兼容性检查")
+        }
 
         var descriptor = FetchDescriptor<ClipItem>(sortBy: [SortDescriptor(\.createdAt, order: .reverse)])
         descriptor.fetchLimit = 1
