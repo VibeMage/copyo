@@ -2,7 +2,16 @@ import CopyoCore
 import SwiftUI
 
 /// ClipKind 的界面表达：本地化名、SF Symbol、筛选顺序。
-/// 放在 App 侧而不进 CopyoCore，是因为本地化字符串表属于各自的 target。
+///
+/// 不进 `CopyoCore`，是因为本地化字符串表属于各自的 target：`String(localized:)` 默认从
+/// `Bundle.main` 取译文，而扩展进程里的 `Bundle.main` 就是扩展自己的 bundle。
+/// 这也正是那六个键（`Text` / `Rich` / `Link` / `Color` / `Image` / `File`）在
+/// `CopyoIOS` / `CopyoShareExtension` / `CopyoWidgets` 三份 `Localizable.xcstrings` 里
+/// 各存了一份的原因——**加新 kind 时三处都要补**，漏一处那个进程就把英文键名当译文显示出来。
+///
+/// 文件本身放在 `CopyoShared/`：三个 target 的同步组都含它，一份代码配三份译文。
+/// 此前分享面板因为够不着主应用而在 `SharePreviewCard` 里另抄了一份 `ShareKindPresentation`，
+/// 名字与符号得靠人工对齐；那份副本已删。
 enum KindPresentation {
 
     static func label(_ kind: ClipKind) -> String {

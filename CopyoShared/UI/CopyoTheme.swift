@@ -5,6 +5,14 @@ import UIKit
 ///
 /// 颜色一律用 `UIColor(dynamicProvider:)` 构造，浅深两套值同时给出：
 /// 这样系统外观切换时颜色自己会变，界面代码不必到处传 `ColorScheme`。
+///
+/// 放在 `CopyoShared/` 而不是 `CopyoIOS/UI/`：分享扩展与 Widget 编译不到主应用的 target，
+/// 此前的办法是在 `CopyoShared/Share/ShareTheme.swift` 里按 design-spec 第二节重抄一份，
+/// 于是改一个 token 要记得改两处——漏一处的表现是同一张设计稿在应用里和在分享面板里颜色对不上。
+/// `CopyoShared` 是三个 target 的同步组，本文件在三个进程里是**同一份值**，那份手抄稿已删。
+///
+/// 全文件只碰 `UIColor` / `Color` / `Font` / `Animation`，不碰 `UIApplication`，
+/// 因此在扩展的 `APPLICATION_EXTENSION_API_ONLY = YES` 下也能编译。
 enum CopyoTheme {
 
     // MARK: - 构造工具
@@ -68,6 +76,12 @@ enum CopyoTheme {
     static let menuSeparator = dynamic(light: rgb(0x3C3C43, 0.12), dark: rgb(0xFFFFFF, 0.08))
     static let sheet = dynamic(light: rgb(0xF2F2F7), dark: rgb(0x1C1C1E))
     static let switchOn = dynamic(light: rgb(0x34C759), dark: rgb(0x30D158))
+    /// 贴在面板 / 卡片上的**实心**行底色（分享面板的「固定到 Pinboard」那行）。
+    ///
+    /// 与 `menu` 的区别是这一档没有透明度：`menu` 画的是浮在内容之上的菜单，带 0.86 alpha，
+    /// 套在实心行上会把面板底色透上来。也不能用 `bgCard`——深色下它与 `sheet` 同为 `#1C1C1E`，
+    /// 整行在深色里会完全看不见，点不出来这是个可点的控件。
+    static let rowOpaque = dynamic(light: rgb(0xFFFFFF), dark: rgb(0x2C2C2E))
     static let sidebarBg = dynamic(light: rgb(0xEBEBF0), dark: rgb(0x141416))
     static let lockFill = dynamic(light: rgb(0x000000, 0.08), dark: rgb(0xFFFFFF, 0.18))
     static let tintBlue = dynamic(light: rgb(0x0A84FF, 0.12), dark: rgb(0x0A84FF, 0.22))
@@ -166,6 +180,27 @@ enum CopyoTheme {
 
     // MARK: - 字号
 
+    /// 一律走系统文本样式，**不要**写 `.font(.system(size: 11))`。
+    ///
+    /// SwiftUI 里 `Font.system(size:)` 是死值，用户在「设置 → 辅助功能 → 显示与文字大小」
+    /// 把字号调大时它纹丝不动。此前卡片正文用 `.subheadline` 会放大、而角标与元信息行写死 11pt，
+    /// 于是放大档位下正文撑满、上面那行还是蚂蚁大小，整张卡片看着像坏了。
+    ///
+    /// 好在设计稿给的点数几乎都正好落在系统样式的默认值上，换过去**默认字号下逐像素不变**：
+    ///
+    /// | 设计点数 | 样式 | | 设计点数 | 样式 |
+    /// | --- | --- | --- | --- | --- |
+    /// | 11 | `caption2` | | 17 | `body` |
+    /// | 12 | `caption` | | 20 | `title3` |
+    /// | 13 | `footnote` | | 22 | `title2` |
+    /// | 15 | `subheadline` | | 28 | `title` |
+    /// | 16 | `callout` | | 34 | `largeTitle` |
+    ///
+    /// 落不到表上的零散点数（10 / 14 / 18 / 24 / 44…）在视图里用
+    /// `@ScaledMetric(relativeTo:)` 声明，见 `KindBadge.fontSize` 的写法。
+    ///
+    /// 分享面板走的是同一份契约——它是宿主 App 里一闪而过的系统面板，字看不清就只能放弃这次保存，
+    /// 没有第二个入口可退，所以那边尤其不能漏掉动态字体。
     enum Fonts {
         static let largeTitle = Font.largeTitle.bold()
         static let title1 = Font.title.bold()
@@ -180,15 +215,12 @@ enum CopyoTheme {
         static func cardBody(dense: Bool) -> Font { dense ? .footnote : .subheadline }
         /// 卡片等宽 13/18（dense 11/15）
         static func cardMono(dense: Bool) -> Font {
-            .system(size: dense ? 11 : 13, weight: .regular, design: .monospaced)
+            .system(dense ? .caption2 : .footnote, design: .monospaced)
         }
-        /// 角标 11 Semibold
-        static let badge = Font.system(size: 11, weight: .semibold)
         /// 「来源 · 相对时间」11
-        static let meta = Font.system(size: 11)
+        static let meta = Font.caption2
         /// 链接域名 12
-        static let linkDomain = Font.system(size: 12)
-        static let tabLabel = Font.system(size: 10, weight: .semibold)
+        static let linkDomain = Font.caption
     }
 
     /// 卡片正文的行距（设计稿给的是行高，SwiftUI 用行距表达）
