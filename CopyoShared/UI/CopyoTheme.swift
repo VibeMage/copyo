@@ -104,6 +104,38 @@ enum CopyoTheme {
     static let sourceLocalUI = rgb(0x8E8E93)
     static let sourceLocal = Color(uiColor: sourceLocalUI)
 
+    // MARK: - 键盘
+
+    /// 键盘扩展那四档颜色（design-spec 2.2 的 `kb` / `key` / `keyDark` / `keySh`）。
+    ///
+    /// 与本文件其余颜色不同，这四个**按外观显式取值**，不走 `UIColor(dynamicProvider:)`——
+    /// 键盘的深浅不由系统外观决定，而由宿主输入框的 `keyboardAppearance` 决定：
+    /// 浅色 App 里放一个 `.dark` 的输入框，系统键盘就是深色的，我们也必须是深色的。
+    /// `dynamic(light:dark:)` 只认 trait collection，在那种组合下会给出整整反过来的一套键帽色，
+    /// 表现是键盘在深色输入框上白得刺眼、并且与紧挨着的系统键盘明显不是一套。
+    /// 取值形状照 `ClipItem+Display.tintColor(for:)`：由调用方把 scheme 传进来。
+    ///
+    /// 放在这里而不是在 `CopyoKeyboard/` 下另起一份 token 表：上一次「分享面板抄一份」的代价
+    /// 见本文件开头那段，这四个值同样是设计稿的一部分，不该有第二个副本。
+    static func keyboardBackground(for scheme: ColorScheme) -> Color {
+        scheme == .dark ? Color(uiColor: rgb(0x2A2A2C)) : Color(uiColor: rgb(0xD1D3D9))
+    }
+
+    /// 字母键帽（`key`）
+    static func keyCap(for scheme: ColorScheme) -> Color {
+        scheme == .dark ? Color(uiColor: rgb(0x6B6B6F)) : Color(uiColor: rgb(0xFFFFFF))
+    }
+
+    /// 功能键帽（`keyDark`）：地球、上档、删除、换行、面板切换
+    static func keyCapFunction(for scheme: ColorScheme) -> Color {
+        scheme == .dark ? Color(uiColor: rgb(0x464649)) : Color(uiColor: rgb(0xABB0BA))
+    }
+
+    /// 键帽底下那 1pt 硬边（`keySh`，设计写作 `box-shadow: 0 1px 0 keySh`）
+    static func keyShadow(for scheme: ColorScheme) -> Color {
+        scheme == .dark ? Color(uiColor: rgb(0x000000, 0.5)) : Color(uiColor: rgb(0x000000, 0.3))
+    }
+
     // MARK: - 来源淡染
 
     /// 卡片底色：浅色把来源色按 12% 混进白，深色按 20% 混进 #1C1C1E。
