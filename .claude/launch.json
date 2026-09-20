@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "ios-design",
+      "name": "design",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4173", "--directory", "art/ios-design/2026-09-05"],
+      "runtimeArgs": ["-m", "http.server", "4173", "--directory", "art"],
       "port": 4173
     }
   ]
