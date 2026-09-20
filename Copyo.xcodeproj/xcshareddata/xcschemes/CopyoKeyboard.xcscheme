@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   键盘扩展自己的 scheme。两个扩展（CopyoShareExtension / CopyoWidgets）都没有签进仓库的
+   scheme，靠 Xcode 自动创建——它们是 `Copyo iOS` 的依赖，跟着宿主一起被构建，不需要单独跑。
+
+   键盘不一样：它**不是** `Copyo iOS` 的依赖（iOS 首个版本不随包发布，见 docs/ios-plan.md 3.6），
+   所以构建宿主时根本不会碰它。少了这个文件，CI 在干净检出上 `-scheme CopyoKeyboard` 要靠
+   Xcode 自动生成 scheme，而那是一项 Xcode 偏好设置、不是工程的一部分，不保证存在。
+   于是这块键盘会在无人察觉的情况下烂掉——直到真要发它的那一版才发现。
+
+   Launch 用 runnableDebuggingMode = "2"：扩展不能独立启动，要由宿主 App 带起来，
+   MacroExpansion 指的就是那个宿主。
+-->
+<Scheme
+   LastUpgradeVersion = "1600"
+   version = "1.7">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AB0000000000000000000055"
+               BuildableName = "CopyoKeyboard.appex"
+               BlueprintName = "CopyoKeyboard"
+               ReferencedContainer = "container:Copyo.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "2">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "AB0000000000000000000055"
+            BuildableName = "CopyoKeyboard.appex"
+            BlueprintName = "CopyoKeyboard"
+            ReferencedContainer = "container:Copyo.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "AB0000000000000000000032"
+            BuildableName = "Copyo.app"
+            BlueprintName = "Copyo iOS"
+            ReferencedContainer = "container:Copyo.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "2">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "AB0000000000000000000055"
+            BuildableName = "CopyoKeyboard.appex"
+            BlueprintName = "CopyoKeyboard"
+            ReferencedContainer = "container:Copyo.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release-AppStore"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>
