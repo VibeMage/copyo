@@ -323,7 +323,7 @@ jobs:
         # artifact 服务抖一下就会让下面的「创建 Release」被跳过 ——
         # 归档、签名、公证全做完了，最后什么都没发。
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           # 带上 run_attempt：v4 的 artifact 不可变，同名上传直接 409。
           # 少了它，「Re-run failed jobs」必然在这一步失败。
