@@ -57,7 +57,7 @@ struct LetterPlane: View {
             VStack(spacing: rowSpacing) {
                 row(rows.top, keyWidth: keyWidth)
                 row(rows.middle, keyWidth: keyWidth)
-                bottomRow(keyWidth: keyWidth)
+                bottomRow(keyWidth: keyWidth, width: proxy.size.width)
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
         }
@@ -80,8 +80,15 @@ struct LetterPlane: View {
     /// 同一块键盘上出现两颗删除键，人会先花一秒钟猜它们是不是不一样的东西。
     /// 空位仍然占满 46，是为了让 `zxcvbnm` 的落点与系统键盘第三排一致——
     /// 去掉它这一排会整体右移半颗键，打字的人立刻会打错。
-    private func bottomRow(keyWidth: CGFloat) -> some View {
-        HStack(spacing: spacing) {
+    private func bottomRow(keyWidth: CGFloat, width: CGFloat) -> some View {
+        // 底排的键数与上面两排不同（字母面 7、数字面 5），而传进来的 `keyWidth` 是按上面那排的
+        // 10 颗算出来的，两端还各有一颗 46 的功能位。直接套用就会溢出：440 机身上 9 颗字符键
+        // 需要 46×2 + 9×36 + 10×6 = 476，而可用宽只有 424。
+        // 溢出不是「挤一点」——`VStack` 没有 `clipped()`，这一排会居中后从两边各探出去二三十点，
+        // 而 UIKit 的命中测试**不越过父视图边界**，最外侧那两颗于是画得出来、点不到。
+        // 所以按本排实际占用重算一次上限：放不下就整排一起缩，宁可窄也不要有点不到的键。
+        let capped = bottomKeyWidth(keyWidth, count: rows.bottom.count, width: width)
+        return HStack(spacing: spacing) {
             if showsSymbols {
                 // 数字面没有上档可言，但左右两个空位要留着，`.,?!'` 那一排才落在中间
                 Color.clear.frame(width: functionWidth, height: keyHeight)
@@ -98,11 +105,18 @@ struct LetterPlane: View {
             }
 
             ForEach(rows.bottom, id: \.self) { key in
-                characterKey(key, keyWidth: keyWidth)
+                characterKey(key, keyWidth: capped)
             }
 
             Color.clear.frame(width: functionWidth, height: keyHeight)
         }
+    }
+
+    /// 底排放得下的键宽上限。两端的功能位与每个间隙都是固定开销，先扣掉再按键数等分。
+    private func bottomKeyWidth(_ keyWidth: CGFloat, count: Int, width: CGFloat) -> CGFloat {
+        guard count > 0 else { return keyWidth }
+        let fixed = functionWidth * 2 + spacing * CGFloat(count + 1)
+        return min(keyWidth, max(0, (width - fixed) / CGFloat(count)))
     }
 
     private func characterKey(_ key: String, keyWidth: CGFloat) -> some View {
@@ -140,7 +154,7 @@ struct LetterPlane: View {
         if showsSymbols {
             return (top: characters("1234567890"),
                     middle: ["-", "/", ":", ";", "(", ")", "$", "&", "@", "\""],
-                    bottom: [".", ",", "?", "!", "'", "\"", "#", "%", "+"])
+                    bottom: [".", ",", "?", "!", "'"])
         }
         return (top: characters("qwertyuiop"),
                 middle: characters("asdfghjkl"),

@@ -10,8 +10,16 @@ import Observation
 /// `KeyboardViewController.refresh()` 那道 `Inputs` 闸门在挡的同一件事，
 /// 只不过那边挡的是宿主变化，这边是自己打字。
 ///
-/// 放成 `@Observable` 之后，读 `query` 的只有搜索行自己（连命中条数也在它那儿算），
-/// 根视图的 `body` 一个字都不读，于是打字时只有那 36pt 的一行在重画。
+/// 放成 `@Observable` 之后，打字时重画的只有那 36pt 的搜索行。
+///
+/// **但根视图的 `body` 并非完全不读 `query`**：`.clips` 那一面要拿 `query` 去筛卡片条
+/// （`KeyboardRootView.clipsArea`），所以那一面挂着的时候，根视图确实订阅了这个值。
+/// 之所以不出问题，是因为 `isEditingQuery` 要求 `plane.showsTypingKeys`——
+/// 卡片条上没有字符键，`query` 在那一面**不可能被改**，订阅了也永远不会被触发。
+/// 也就是说这条性能保证是由「卡片条上改不了查询」撑着的，不是由「根视图不读」撑着的。
+/// 哪天让查询在卡片条上也能变（比如做一个不收起卡片条的搜索、或进场时恢复上次的查询），
+/// 每敲一颗键就会把整棵树连同三十来颗 `KeyCap` 一起重新求值——那时候就得把筛选结果
+/// 挪出根视图的 `body`（例如让 `ClipStrip` 自己读 `query`）。
 @MainActor
 @Observable
 final class KeyboardSearch {

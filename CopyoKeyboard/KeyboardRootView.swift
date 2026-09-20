@@ -42,8 +42,10 @@ struct KeyboardRootView: View {
     var noticeDuration: Duration = .seconds(2.4)
 
     @State private var plane: KeyboardPlane = .clips
-    /// 查询单独放一个 `@Observable`，理由见 `KeyboardSearch`——**根视图的 `body`
-    /// 一个字都不读 `query`**，否则每敲一颗键都会把三排键全部重新求值
+    /// 查询单独放一个 `@Observable`，理由见 `KeyboardSearch`。
+    /// 注意 `clipsArea` 确实读了 `query`（要拿它筛卡片条），所以「打字不会重画整棵树」
+    /// 靠的是卡片条那一面根本改不了查询（`isEditingQuery` 要求有字符键），
+    /// 不是靠根视图不读——这条前提写在 `KeyboardSearch` 的文档注释里，改动前先看一眼
     @State private var search = KeyboardSearch()
     /// 长按弹出的预览；nil = 没有
     @State private var preview: KeyboardClip?
