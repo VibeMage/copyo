@@ -12,20 +12,37 @@ struct PasteBanner: View {
     var onPaste: ([NSItemProvider]) -> Void
     var onDismiss: () -> Void
 
+    /// 24 与 28 都不在系统文本样式的默认点数上。两者按**同一个** title2 缩——
+    /// 只缩图标不缩它那 28 的留白，字号调大后图标就会撑出留白、顶进右边的文案里。
+    @ScaledMetric(relativeTo: .title2) private var leadingSymbolSize: CGFloat = 24
+    @ScaledMetric(relativeTo: .title2) private var leadingSymbolWidth: CGFloat = 28
+
+    /// 系统粘贴按钮的标题（「粘贴」/「Paste」/「Coller」）是 UIKit 按当前语言和动态字体自己画的，
+    /// 外面这只盒子写死 92 × 34 就跟不上：按钮会画到盒子外面，压住旁边的关闭键。
+    /// 按 subheadline（按钮文字的量级）一起放大。
+    @ScaledMetric(relativeTo: .subheadline) private var pasteButtonWidth: CGFloat = 92
+    @ScaledMetric(relativeTo: .subheadline) private var pasteButtonHeight: CGFloat = 34
+
+    /// 设计 3.5 的 18pt 叉 + 28 圆底：圆底要跟着叉一起长，否则叉会戳出圆外
+    @ScaledMetric(relativeTo: .body) private var dismissSymbolSize: CGFloat = 18
+    @ScaledMetric(relativeTo: .body) private var dismissDiameter: CGFloat = 28
+
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: saved ? "checkmark.circle.fill" : "doc.on.clipboard")
-                .font(.system(size: 24))
+                .font(.system(size: leadingSymbolSize))
                 .foregroundStyle(saved ? CopyoTheme.success : CopyoTheme.accent)
-                .frame(width: 28)
+                .frame(width: leadingSymbolWidth)
+                // 右边那行字已经把状态说完了，旁白不必在这枚图标上停一次
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(saved ? String(localized: "Saved") : String(localized: "New clipboard content"))
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(.subheadline, weight: .semibold))
                     .foregroundStyle(CopyoTheme.label)
                 if !saved {
                     Text(String(localized: "Paste to save it to your history"))
-                        .font(.system(size: 12))
+                        .font(.caption)
                         .foregroundStyle(CopyoTheme.labelSecondary)
                 }
             }
@@ -33,13 +50,13 @@ struct PasteBanner: View {
 
             if !saved {
                 PasteControlButton(onPaste: onPaste)
-                    .frame(width: 92, height: 34)
+                    .frame(width: pasteButtonWidth, height: pasteButtonHeight)
                 Button(action: onDismiss) {
                     // 设计 3.5：28 × 28 的 fill 圆底 + 18pt 的 ×，不是一个裸叉
                     Image(systemName: "xmark")
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(.system(size: dismissSymbolSize, weight: .semibold))
                         .foregroundStyle(CopyoTheme.labelSecondary)
-                        .frame(width: 28, height: 28)
+                        .frame(width: dismissDiameter, height: dismissDiameter)
                         .background(CopyoTheme.fill, in: Circle())
                         .contentShape(Rectangle())
                 }

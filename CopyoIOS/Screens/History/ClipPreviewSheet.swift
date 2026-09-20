@@ -46,6 +46,8 @@ struct ClipPreviewSheet: View {
                     .resizable()
                     .scaledToFit()
                     .clipShape(RoundedRectangle(cornerRadius: CopyoTheme.Radius.inner, style: .continuous))
+                    // 没有标签的 `Image` 旁白会整个跳过，这一屏就只剩标题可读了
+                    .accessibilityLabel(String(localized: "Image"))
                 if let meta = item.imageMetadata {
                     Text(meta)
                         .font(CopyoTheme.Fonts.footnote)
@@ -55,14 +57,18 @@ struct ClipPreviewSheet: View {
         case .color:
             RoundedRectangle(cornerRadius: CopyoTheme.Radius.inner, style: .continuous)
                 .fill(item.colorValue ?? CopyoTheme.fill)
+                // 纯色块，不是文字盒子，160 保持写死
                 .frame(height: 160)
             Text(item.displayBody)
-                .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                .font(.system(.subheadline, design: .monospaced, weight: .semibold))
                 .foregroundStyle(CopyoTheme.label)
         default:
-            Text(item.displayBody)
+            // 和详情页同一套分块：这一屏同样是普通 `ScrollView`，一条十万字的条目
+            // 按空格就是一次整串排版。不改成「只取前 N 字」的截断——
+            // 快速预览是用来判断「是不是这一条」的，悄悄少掉后半段而又不告诉用户，
+            // 比多写一行分块糟得多。
+            ChunkedText(text: item.displayBody)
                 .font(item.isMono ? CopyoTheme.Fonts.cardMono(dense: false) : CopyoTheme.Fonts.body)
-                .lineSpacing(4)
                 .foregroundStyle(CopyoTheme.label)
                 .textSelection(.enabled)
         }

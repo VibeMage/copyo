@@ -47,6 +47,11 @@ enum PinboardAppearance {
 }
 
 /// 设计 3.7 的图标砖：32 × 32、radius 8、底色 = 主题色 15%、内含 18pt 彩色图标。
+///
+/// 砖和图标都**不跟随辅助功能字号**，这是有意的：它是一块装饰色砖，不是文字盒子，
+/// 里面的图标既不承载信息（旁边就是板名），放大也不会更好认；
+/// 真让它按字号长到 96pt，`PinboardRow` 的板名和条目数就没地方站了。
+/// 对应地，整块砖对旁白隐藏，免得光标在每一行上多停一次读出符号名。
 struct PinboardIconTile: View {
     let board: Pinboard
     var size: CGFloat = 32
@@ -62,5 +67,6 @@ struct PinboardIconTile: View {
                     .font(.system(size: size * 0.5625, weight: .medium))
                     .foregroundStyle(color)
             }
+            .accessibilityHidden(true)
     }
 }

@@ -22,6 +22,14 @@ struct SettingsScreen: View {
     /// 截图参数只在第一次出现时生效，从二级页返回后不能再自动推一次
     @State private var didApplyDemoRoute = false
 
+    /// 设计 3.8 的 52 行高与同步子行的 44 都不在样式表上，按各自行内文字的样式缩：
+    /// 主行是 17pt（`.body`），同步子行是 15pt（`.subheadline`）。
+    /// 这里跟 `SettingsRowLabel` 一样要用 `minHeight`——写死高度会把折行的标题切掉。
+    /// 开关那两行的标题要跟开关抢宽度，**默认字号就会折**：英文
+    /// 「Read Clipboard Automatically」折两行，这一行是 56 而不是 52，属实，别按截图改回去。
+    @ScaledMetric(relativeTo: .body) private var rowMinHeight: CGFloat = 52
+    @ScaledMetric(relativeTo: .subheadline) private var statusRowMinHeight: CGFloat = 44
+
     enum SettingsRoute: Hashable {
         case quickSave
         case howToSave
@@ -60,10 +68,11 @@ struct SettingsScreen: View {
                 HStack(spacing: 12) {
                     SettingsIconTile(symbol: "icloud.fill", color: SettingsTint.cloud)
                     Text(String(localized: "iCloud Sync"))
-                        .font(.system(size: 17))
+                        .font(.body)
                         .foregroundStyle(CopyoTheme.label)
                 }
-                .frame(height: 52)
+                .padding(.vertical, 8)
+                .frame(minHeight: rowMinHeight)
             }
             .tint(CopyoTheme.switchOn)
             .settingsRow()
@@ -75,20 +84,29 @@ struct SettingsScreen: View {
 
             HStack(spacing: 8) {
                 Text(String(localized: "Status"))
-                    .font(.system(size: 15))
+                    .font(.subheadline)
                     .foregroundStyle(CopyoTheme.label)
                 Spacer(minLength: 8)
                 HStack(spacing: 5) {
                     Image(systemName: syncSymbol)
-                        .font(.system(size: 15))
+                        .font(.subheadline)
+                        // 图标与右边的文字说的是同一件事，读屏再念一遍符号名是纯噪音
+                        .accessibilityHidden(true)
                     Text(syncStatusText)
-                        .font(.system(size: 15))
+                        .font(.subheadline)
                         .multilineTextAlignment(.trailing)
                         .lineLimit(2)
+                        // 「未登录 iCloud」这类原因本来就顶着两行的上限，放大后必然溢出；
+                        // 缩到 0.8 仍读得出问题出在哪，截断了就等于没提示
+                        .minimumScaleFactor(0.8)
                 }
                 .foregroundStyle(CopyoTheme.labelSecondary)
             }
-            .frame(minHeight: 44)
+            // 本来就是 minHeight，文字折行时自己长高；只把 44 换成跟着字号缩的值
+            .frame(minHeight: statusRowMinHeight)
+            // 这一行不在 Button 里，系统不会替它合并：不合的话读屏要停三次才说完
+            // 「状态」「同步图标」「已同步 · 5 分钟前」
+            .accessibilityElement(children: .combine)
             // 设计 3.8：子行左内距 58，正好让文字与上一行的标题对齐
             .settingsRow(leading: 58)
         } header: {
@@ -173,10 +191,11 @@ struct SettingsScreen: View {
                 HStack(spacing: 12) {
                     SettingsIconTile(symbol: "arrow.clockwise", color: SettingsTint.autoRead)
                     Text(String(localized: "Read Clipboard Automatically"))
-                        .font(.system(size: 17))
+                        .font(.body)
                         .foregroundStyle(CopyoTheme.label)
                 }
-                .frame(height: 52)
+                .padding(.vertical, 8)
+                .frame(minHeight: rowMinHeight)
             }
             .tint(CopyoTheme.switchOn)
             .settingsRow()
@@ -215,10 +234,12 @@ struct SettingsScreen: View {
                 showsClearConfirm = true
             } label: {
                 Text(String(localized: "Clear History"))
-                    .font(.system(size: 17))
+                    .font(.body)
                     .foregroundStyle(CopyoTheme.destructive)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .frame(height: 52)
+                    // 默认档 20 的行高 + 28 内距 = 48 < 52，这一行仍是 52
+                    .padding(.vertical, 14)
+                    .frame(minHeight: rowMinHeight)
             }
             .settingsRow()
             // 确认框挂在这一行上：iOS 26 会把它从触发的视图弹出，挂在 List 上锚点会飘
@@ -254,14 +275,18 @@ struct SettingsScreen: View {
                     SettingsIconTile(symbol: "chevron.left.forwardslash.chevron.right",
                                      color: SettingsTint.code)
                     Text(String(localized: "Open Source · GitHub"))
-                        .font(.system(size: 17))
+                        .font(.body)
                         .foregroundStyle(CopyoTheme.label)
                     Spacer(minLength: 8)
                     Image(systemName: "arrow.up.forward.app")
-                        .font(.system(size: 15))
+                        .font(.subheadline)
                         .foregroundStyle(CopyoTheme.labelTertiary)
+                        // 「会跳出去」这件事由 Link 自带的 link 特征说，读屏不必再念符号名
+                        .accessibilityHidden(true)
                 }
-                .frame(height: 52)
+                .padding(.vertical, 8)
+                .frame(minHeight: rowMinHeight)
+                .accessibilityElement(children: .combine)
             }
             .settingsRow()
 
@@ -269,14 +294,17 @@ struct SettingsScreen: View {
                 HStack(spacing: 12) {
                     SettingsIconTile(symbol: "hand.raised.fill", color: SettingsTint.hand)
                     Text(String(localized: "Privacy"))
-                        .font(.system(size: 17))
+                        .font(.body)
                         .foregroundStyle(CopyoTheme.label)
                     Spacer(minLength: 8)
                     Image(systemName: "arrow.up.forward.app")
-                        .font(.system(size: 15))
+                        .font(.subheadline)
                         .foregroundStyle(CopyoTheme.labelTertiary)
+                        .accessibilityHidden(true)
                 }
-                .frame(height: 52)
+                .padding(.vertical, 8)
+                .frame(minHeight: rowMinHeight)
+                .accessibilityElement(children: .combine)
             }
             .settingsRow()
 

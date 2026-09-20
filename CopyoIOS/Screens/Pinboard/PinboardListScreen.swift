@@ -183,6 +183,9 @@ private struct PinboardRow: View {
     let board: Pinboard
     var isDefault: Bool
 
+    /// chevron 的 14pt 不在系统样式表上，按行文字的 body 缩，两者才会一起长
+    @ScaledMetric(relativeTo: .body) private var chevronSize: CGFloat = 14
+
     var body: some View {
         HStack(spacing: 12) {
             PinboardIconTile(board: board)
@@ -190,23 +193,37 @@ private struct PinboardRow: View {
                 .font(CopyoTheme.Fonts.body)
                 .foregroundStyle(CopyoTheme.label)
                 .lineLimit(1)
+                // 板名是用户自己起的，长度没有上限；放大档位下让它缩回来，
+                // 而不是把右边的条目数和 chevron 挤出行外
+                .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if isDefault {
                 // 「设为默认」是右滑动作，行上不给标记的话用户看不出改没改
                 Image(systemName: "pin.fill")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(.caption2, weight: .semibold))
                     .foregroundStyle(CopyoTheme.accent)
                     .accessibilityLabel(String(localized: "Default pinboard"))
             }
-            Text("\(board.items?.count ?? 0)")
+            let count = board.items?.count ?? 0
+            Text("\(count)")
                 .font(CopyoTheme.Fonts.body)
                 .foregroundStyle(CopyoTheme.labelSecondary)
                 .monospacedDigit()
+                // 光一个数字读出来是「照片，6」，听不出 6 指的是什么。
+                // 复用内容页副行的同一套单复数文案
+                .accessibilityLabel(count == 1
+                                    ? String(localized: "1 item")
+                                    : String(format: String(localized: "%lld items"), count))
             Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: chevronSize, weight: .semibold))
                 .foregroundStyle(CopyoTheme.labelTertiary)
+                // 展开指示符：整行已经是 `Button`，旁白会自己报「按钮」
+                .accessibilityHidden(true)
         }
-        .frame(height: 56)
+        // 内距 + minHeight：这一行装着板名和条目数两处文字，写死 56 会在放大档位下把它们切掉。
+        // 默认档位下 17pt 行高 22 连内距才 38，仍然被 56 顶成 56，逐像素不变
+        .padding(.vertical, 8)
+        .frame(minHeight: 56)
         .contentShape(Rectangle())
     }
 }

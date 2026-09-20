@@ -6,6 +6,9 @@ import SwiftUI
 struct HistoryFilterChips: View {
     @Binding var selection: ClipKind?
 
+    @ScaledMetric(relativeTo: .subheadline) private var fontSize: CGFloat = 14
+    @ScaledMetric(relativeTo: .subheadline) private var height: CGFloat = 32
+
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
@@ -36,10 +39,13 @@ struct HistoryFilterChips: View {
             withAnimation(CopyoTheme.springAnimation) { selection = kind }
         } label: {
             Text(title)
-                .font(.system(size: 14, weight: isSelected ? .semibold : .medium))
+                // 设计给的 14pt 落在 footnote(13) 与 subheadline(15) 之间，没有对应样式，
+                // 用 @ScaledMetric 按 subheadline 缩：chips 与它下面的卡片正文同档放大才不打架。
+                .font(.system(size: fontSize, weight: isSelected ? .semibold : .medium))
                 .foregroundStyle(isSelected ? Color.white : CopyoTheme.label)
                 .padding(.horizontal, 14)
-                .frame(height: 32)
+                .padding(.vertical, 6)
+                .frame(minHeight: height)
                 .background(isSelected ? CopyoTheme.accent : CopyoTheme.fill, in: Capsule())
         }
         .buttonStyle(.plain)

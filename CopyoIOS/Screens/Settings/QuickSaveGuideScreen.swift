@@ -131,6 +131,9 @@ struct QuickSaveGuideScreen: View {
 }
 
 /// 设计 04b 步骤 2 右侧的示意图：64 × 100 的机身 + 左侧一段橙色（#FF9F0A）操作按钮。
+///
+/// 整张图定尺不跟随辅助功能字号：机身、听筒条、按钮三段是按比例摆出来的一幅画，
+/// 各自缩放只会把手机画歪。它整块 `accessibilityHidden`，放大也不带来任何信息。
 private struct ActionButtonPhoneArt: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -162,6 +165,10 @@ private struct ActionButtonPhoneArt: View {
 private struct QuickSaveSegmentedControl: View {
     @Binding var selection: QuickSaveGuideScreen.QuickSaveEntry
 
+    /// 控件高 36 不在样式表上，按段内文字的 `.footnote`（13pt）缩——不跟着长会把放大后的文字上下切掉。
+    /// 段内图标的 12 **在**表上（`.caption`），就走样式：`@ScaledMetric` 只留给落不到表上的尺寸。
+    @ScaledMetric(relativeTo: .footnote) private var controlMinHeight: CGFloat = 36
+
     var body: some View {
         HStack(spacing: 0) {
             ForEach(QuickSaveGuideScreen.QuickSaveEntry.allCases) { entry in
@@ -171,11 +178,16 @@ private struct QuickSaveSegmentedControl: View {
                 } label: {
                     HStack(spacing: 5) {
                         Image(systemName: entry.symbol)
-                            .font(.system(size: 12, weight: selected ? .semibold : .regular))
+                            .font(.system(.caption, weight: selected ? .semibold : .regular))
+                            // 图标只是段标题的装饰，标题就在它右边
+                            .accessibilityHidden(true)
                         Text(entry.title)
-                            .font(.system(size: 13, weight: selected ? .semibold : .regular))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.85)
+                            .font(.system(.footnote, weight: selected ? .semibold : .regular))
+                            // 三段平分一屏，「Control Center」在放大档位下单行放不下：
+                            // 只靠 0.85 的缩放会被截成「Control Ce…」，读不出这一段是什么。
+                            // 允许折成两行，再配上全局统一的 0.8 下限，控件靠 minHeight 跟着长高。
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
                     }
                     .foregroundStyle(CopyoTheme.label)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -193,7 +205,7 @@ private struct QuickSaveSegmentedControl: View {
             }
         }
         .padding(2)
-        .frame(height: 36)
+        .frame(minHeight: controlMinHeight)
         .background(CopyoTheme.fill, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
     }
 }

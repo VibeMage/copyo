@@ -11,6 +11,9 @@ struct ClipDetailInfoGroup: View {
     var onPin: (Pinboard) -> Void
     var onUnpin: () -> Void
 
+    /// 来源图标的 14pt 不在系统样式表上，按行文字的 subheadline 缩，两者才会一起长
+    @ScaledMetric(relativeTo: .subheadline) private var sourceSymbolSize: CGFloat = 14
+
     var body: some View {
         VStack(spacing: 0) {
             if let measurement {
@@ -24,7 +27,9 @@ struct ClipDetailInfoGroup: View {
             InfoRow(title: String(localized: "Source")) {
                 HStack(spacing: 5) {
                     Image(systemName: isFromMac ? "desktopcomputer" : "iphone")
-                        .font(.system(size: 14))
+                        .font(.system(size: sourceSymbolSize))
+                        // 旁边的值已经写了「… · Mac」，这枚图标只是重复一遍
+                        .accessibilityHidden(true)
                     Text(sourceValue)
                 }
                 .foregroundStyle(CopyoTheme.labelSecondary)
@@ -44,8 +49,10 @@ struct ClipDetailInfoGroup: View {
                     HStack(spacing: 4) {
                         Text(item.pinboard?.name ?? String(localized: "Not pinned"))
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.system(.footnote, weight: .semibold))
                             .foregroundStyle(CopyoTheme.labelTertiary)
+                            // 展开指示符：这一行本来就是 `Menu`，旁白已经会报「按钮」
+                            .accessibilityHidden(true)
                     }
                     .foregroundStyle(CopyoTheme.labelSecondary)
                 }
@@ -141,17 +148,42 @@ private struct InfoRow<Value: View>: View {
     let title: String
     @ViewBuilder var value: () -> Value
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     var body: some View {
-        HStack(spacing: 12) {
+        // 辅助功能档位下左右并排必然互相挤：`Pinboard` 和一个中文板名各分半行，
+        // 两边一起被截成两三个字。改成上下排，标题和值都能用满整行宽度。
+        let layout = typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 2))
+            : AnyLayout(HStackLayout(spacing: 12))
+        layout {
             Text(title)
                 .foregroundStyle(CopyoTheme.label)
-            Spacer(minLength: 8)
+                .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : nil, alignment: .leading)
+            // `Spacer` 在竖排里会撑高整行，只在横排时放
+            if !typeSize.isAccessibilitySize {
+                Spacer(minLength: 8)
+            }
             value()
+                // **必须是单行**：这一行的高度是设计稿定死的 44，折成两行连同上下内距就是 56，
+                // `minHeight: 44` 再也说了不算，同一组里有的行 44 有的行 56。
+                // 而默认档位下就能溢出的是板名（用户自己起的，没有长度上限）和长一点的来源名，
+                // 不是只有放大档位才会碰到的事。
+                // 这两个值头尾都认得出来（「工作 · 需求文档」掐成「工作 …」就只剩前半句），
+                // 所以掐中间比掐尾巴留得多。
                 .lineLimit(1)
                 .truncationMode(.middle)
+                // 先缩到 0.8 再截断：放大档位下宁可小一号，也好过少给几个字。
+                // 0.8 是全项目统一的下限
+                .minimumScaleFactor(0.8)
+                .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : nil,
+                       alignment: typeSize.isAccessibilitySize ? .leading : .trailing)
         }
         .font(.subheadline)
         .padding(.horizontal, 16)
+        // 上下各 8：默认档位下 15pt 文字连内距才 36，仍然被 minHeight 44 顶成 44（逐像素不变），
+        // 放大档位下撑开之后文字才不会贴着分隔线
+        .padding(.vertical, 8)
         .frame(minHeight: 44)
         .contentShape(Rectangle())
     }

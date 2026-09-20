@@ -63,8 +63,17 @@ struct ClipDetailScreen: View {
 
     // MARK: - 右上更多菜单
 
+    /// 顺序与底部工具栏一致（复制 / 复制为纯文本 / 分享 / 固定 / 删除）。
+    /// 这里必须是那五个动作的**完整**一份：工具栏在 AX2 以上把字号封顶了（见 `ClipDetailActionBar`），
+    /// 放大字号的用户只能从这个系统菜单里拿到全尺寸的它们。少一个，那边的封顶就没了退路。
     @ViewBuilder
     private var menuContent: some View {
+        Button {
+            model.copy(item)
+        } label: {
+            Label(String(localized: "Copy"), systemImage: "doc.on.doc")
+        }
+
         Button {
             model.copyPlainText(item)
         } label: {

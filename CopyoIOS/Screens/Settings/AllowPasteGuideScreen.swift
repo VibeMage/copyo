@@ -8,6 +8,11 @@ import SwiftUI
 struct AllowPasteGuideScreen: View {
     @Environment(\.openURL) private var openURL
 
+    /// 示意行的 40 行高与 14 的勾都不在样式表上，按行内 15pt 文字的 `.subheadline` 缩，
+    /// 两者用同一把尺子才不会一个长一个不长
+    @ScaledMetric(relativeTo: .subheadline) private var optionRowMinHeight: CGFloat = 40
+    @ScaledMetric(relativeTo: .subheadline) private var checkmarkSize: CGFloat = 14
+
     var body: some View {
         GuideScroll {
             statusCard
@@ -46,10 +51,10 @@ struct AllowPasteGuideScreen: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "iOS asks every time"))
-                    .font(.system(size: 15))
+                    .font(.subheadline)
                     .foregroundStyle(CopyoTheme.label)
                 Text(String(localized: "Copyo can't read the current value of this setting"))
-                    .font(.system(size: 13))
+                    .font(.footnote)
                     .foregroundStyle(CopyoTheme.labelSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -59,6 +64,8 @@ struct AllowPasteGuideScreen: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(CopyoTheme.bgCard,
                     in: RoundedRectangle(cornerRadius: CopyoTheme.Radius.group, style: .continuous))
+        // 状态与它的解释是一句话，分两次读的话「Copyo 读不到当前值」会跟上一条脱钩
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - 系统选项示意
@@ -80,16 +87,21 @@ struct AllowPasteGuideScreen: View {
     private func optionRow(_ title: String, checked: Bool) -> some View {
         HStack {
             Text(title)
-                .font(.system(size: 15))
+                .font(.subheadline)
                 .foregroundStyle(CopyoTheme.label)
             Spacer(minLength: 8)
             if checked {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: checkmarkSize, weight: .semibold))
                     .foregroundStyle(CopyoTheme.accent)
+                    // 这是画出来的系统界面，不是可操作的选项；合并后读屏念出「checkmark」
+                    // 只会让人以为自己已经选好了
+                    .accessibilityHidden(true)
             }
         }
         .padding(.horizontal, 14)
-        .frame(height: 40)
+        // 默认档 20 的行高 + 16 内距 = 36 < 40，示意行仍是 40；放大后自己长高，不切字
+        .padding(.vertical, 8)
+        .frame(minHeight: optionRowMinHeight)
     }
 }

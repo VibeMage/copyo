@@ -6,17 +6,22 @@ struct HistoryEmptyState: View {
     var onEnableSync: () -> Void
     var onHowToSave: () -> Void
 
+    /// 两颗胶囊按钮里装的是整句译文（法语的「Comment enregistrer le presse-papiers」最长）。
+    /// 50 写死会在放大档位下把文字上下切掉，所以它只当下限：
+    /// 默认档是 body 行高 22 + 2 × 14 的内距 = 50，逐像素不变。
+    @ScaledMetric(relativeTo: .body) private var buttonMinHeight: CGFloat = 50
+
     var body: some View {
         VStack(spacing: 14) {
             illustration
                 .padding(.bottom, 8)
 
             Text(String(localized: "No clips yet"))
-                .font(.system(size: 22, weight: .bold))
+                .font(CopyoTheme.Fonts.title2)
                 .foregroundStyle(CopyoTheme.label)
 
             Text(String(localized: "Anything you copy on your Mac shows up here through iCloud. To keep something from this iPhone, use Share or Quick Save."))
-                .font(.system(size: 15))
+                .font(CopyoTheme.Fonts.subheadline)
                 .lineSpacing(6)
                 .foregroundStyle(CopyoTheme.labelSecondary)
                 .multilineTextAlignment(.center)
@@ -25,23 +30,27 @@ struct HistoryEmptyState: View {
                 Button(action: onEnableSync) {
                     HStack(spacing: 6) {
                         Image(systemName: "icloud.fill")
-                            .font(.system(size: 17, weight: .semibold))
+                            .font(.system(.body, weight: .semibold))
                         Text(String(localized: "Turn on iCloud Sync"))
-                            .font(.system(size: 17, weight: .semibold))
+                            .font(.system(.body, weight: .semibold))
+                            .multilineTextAlignment(.center)
                     }
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 50)
+                    .padding(.vertical, 14)
+                    .frame(minHeight: buttonMinHeight)
                     .background(CopyoTheme.accent, in: Capsule())
                 }
                 .buttonStyle(.plain)
 
                 Button(action: onHowToSave) {
                     Text(String(localized: "How to save clipboard"))
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(.system(.body, weight: .semibold))
                         .foregroundStyle(CopyoTheme.accent)
+                        .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 50)
+                        .padding(.vertical, 14)
+                        .frame(minHeight: buttonMinHeight)
                         .background(CopyoTheme.fill, in: Capsule())
                 }
                 .buttonStyle(.plain)
@@ -75,6 +84,8 @@ struct HistoryEmptyState: View {
         .frame(width: 96, height: 96)
         // 套印用 multiply，混合范围锁在这张插画里，别影响背后的分组底色
         .compositingGroup()
+        // 纯装饰的品牌插画：尺寸逐字取自设计稿、不跟随字号，也没有旁白能读的信息
+        .accessibilityHidden(true)
     }
 
     private func bar(width: CGFloat, color: Color) -> some View {

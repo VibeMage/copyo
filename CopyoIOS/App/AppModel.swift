@@ -62,8 +62,23 @@ final class AppModel {
 
     // MARK: - 历史页共享状态
 
-    /// 顶部搜索词
-    var searchText = ""
+    /// 顶部搜索框直接绑的关键词。**这一条不做任何延迟**——输入框必须跟手，
+    /// 慢半拍用户会以为字没打进去。真正驱动取数的是下面防抖过的 `debouncedSearchText`。
+    var searchText = "" {
+        didSet { scheduleSearchDebounce(from: oldValue) }
+    }
+
+    /// 防抖之后的搜索词（首尾空白已去掉）。历史页的 `@Query` predicate 用它来建：
+    /// 直接拿 `searchText` 建的话，条目上万时每敲一个字母就重建一次 predicate 并重扫一遍库，
+    /// 打字会明显顿住——ROADMAP 与 docs/ios-plan.md §3.2 记的就是这条缺陷。
+    private(set) var debouncedSearchText = ""
+
+    @ObservationIgnored private var searchDebounceTask: Task<Void, Never>?
+
+    /// 防抖窗口。250ms 是分界：再短挡不住连打，再长则按下最后一个字母到列表刷新之间
+    /// 会出现肉眼可见的停顿，读起来像卡了一下，而不像「在等你打完」。
+    private static let searchDebounceDelay: Duration = .milliseconds(250)
+
     /// iPad 侧栏搜索框的关键词。regular 宽度下 ⌘F 由侧栏接管，
     /// 输入时同步写进 `searchText`，历史页不必关心关键词是从侧栏还是自己的搜索栏来的。
     var sidebarSearchText = "" {
@@ -177,6 +192,39 @@ final class AppModel {
     @discardableResult
     func consumePendingQuickSave() -> Bool {
         QuickSaveCoordinator.consume(with: capture)
+    }
+
+    // MARK: - 搜索防抖
+
+    /// 程序写入关键词的场景（`-demoScreen history-search` 写完下一帧就截图）走这条：
+    /// 写完立刻生效，不能让截图撞上一个还没落地的防抖任务、拍到筛选前的满屏列表。
+    func applySearchText(_ text: String) {
+        searchText = text
+        // 上一行的 didSet 已经排了一次防抖，这里把它取消掉再直接落值
+        searchDebounceTask?.cancel()
+        searchDebounceTask = nil
+        debouncedSearchText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// 取消上一个再起一个——与 `ToastCenter.show` 同一套写法。
+    private func scheduleSearchDebounce(from oldValue: String) {
+        guard searchText != oldValue else { return }
+        searchDebounceTask?.cancel()
+        searchDebounceTask = nil
+        let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        // 只补了空格、或者防抖值本来就等于它：别惊动界面，那是一次白重建 @Query
+        guard trimmed != debouncedSearchText else { return }
+        // 清空必须**立刻**生效：点了搜索框上的 ✕ 就是要马上看回整个列表，
+        // 这一下再压 250ms 会被读成卡顿，而不是防抖。
+        guard !trimmed.isEmpty else {
+            debouncedSearchText = ""
+            return
+        }
+        searchDebounceTask = Task { [trimmed] in
+            try? await Task.sleep(for: Self.searchDebounceDelay)
+            guard !Task.isCancelled else { return }
+            self.debouncedSearchText = trimmed
+        }
     }
 
     // MARK: - 采集结果 → 提示

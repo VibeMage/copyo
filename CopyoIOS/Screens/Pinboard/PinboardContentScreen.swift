@@ -1,6 +1,7 @@
 import CopyoCore
 import SwiftData
 import SwiftUI
+import UIKit
 
 /// 单个 Pinboard 的内容页（设计 03b）。
 /// 标题 = 名称 + chevron，点开是重命名 / 图标 / 颜色 / 排序 / 全部复制 / 删除；
@@ -22,6 +23,25 @@ struct PinboardContentScreen: View {
     /// 返回动画的两三百毫秒里视图还在树上，body 会重算，而那时对象可能已经失效。
     @State private var isDeleting = false
     @State private var deletingName = ""
+    /// 旁白的「分享」动作准备好的载荷（`nil` = 没在分享）。见 `ShareSheet` 上面的说明。
+    /// 存**算好的** activityItems 而不是条目本身：拼载荷要写临时文件，
+    /// 那次 I/O 属于「用户点了分享」这一下，不能留在 `.sheet` 的内容闭包里跟着视图更新反复跑
+    @State private var sharePayload: SharePayload?
+
+    /// 旁白「分享」的载荷。`.sheet(item:)` 要一个 `Identifiable`，就拿条目自己的标识当 id
+    private struct SharePayload: Identifiable {
+        let id: PersistentIdentifier
+        let items: [Any]
+
+        init(item: ClipItem) {
+            id = item.persistentModelID
+            items = PinboardContentScreen.activityItems(for: item)
+        }
+    }
+
+    /// 当前动态字体相对默认档的倍率，交给 `ClipCard.estimatedHeight` 修正估高。
+    /// 卡片里的字会跟着辅助功能字号放大，估高还按默认档算的话两列会一高一矮
+    @ScaledMetric(relativeTo: .subheadline) private var typeScale: CGFloat = 1
 
     init(board: Pinboard) {
         self.board = board
@@ -100,6 +120,9 @@ struct PinboardContentScreen: View {
         } message: {
             Text(String(localized: "Its clips go back to History and are not deleted."))
         }
+        .sheet(item: $sharePayload) { payload in
+            ShareSheet(activityItems: payload.items)
+        }
     }
 
     /// 与 `ClipDetailScreen` 的删除对齐：先退出、等返回动画走完再删。
@@ -121,11 +144,37 @@ struct PinboardContentScreen: View {
 
     private var grid: some View {
         MasonryGrid(items: items,
-                    estimatedHeight: { ClipCard.estimatedHeight(for: $0, width: columnWidth, dense: false) }) { item in
-            ClipCard(item: item)
-                // 与历史页一致：轻点即复制
-                .onTapGesture { model.copy(item) }
-                .contextMenu { cardMenu(for: item) }
+                    estimatedHeight: { ClipCard.estimatedHeight(for: $0,
+                                                                width: columnWidth,
+                                                                dense: false,
+                                                                typeScale: typeScale) }) { item in
+            // 与历史页一致：轻点即复制。
+            //
+            // 必须是**真按钮**，不能像原来那样往 `ClipCard` 上挂一个 `.onTapGesture`：
+            // 裸手势不会给这张卡任何可激活性，旁白读完卡片内容就滑过去了，
+            // 于是 Pinboard 里一条都复制不出来——这一屏对旁白用户是只读的。
+            Button {
+                model.copy(item)
+            } label: {
+                ClipCard(item: item)
+            }
+            .buttonStyle(.plain)
+            .contextMenu { cardMenu(for: item) }
+            // 长按菜单靠不住：`ClipCard` 已经是一个合成好的旁白元素，菜单项不一定会
+            // 冒成转子里的自定义动作。把菜单里几条**不带子菜单**的动作原样挂一遍，
+            // 转子里就点得到了。移到别的板要选板，只有子菜单能表达，仍然留给长按菜单。
+            .accessibilityAction(named: String(localized: "Copy as Plain Text")) {
+                model.copyPlainText(item)
+            }
+            .accessibilityAction(named: String(localized: "Share")) {
+                sharePayload = SharePayload(item: item)
+            }
+            .accessibilityAction(named: String(localized: "Unpin")) {
+                model.unpin(item)
+            }
+            .accessibilityAction(named: String(localized: "Delete")) {
+                model.delete(item)
+            }
         }
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
@@ -165,6 +214,64 @@ struct PinboardContentScreen: View {
             model.delete(item)
         } label: {
             Label(String(localized: "Delete"), systemImage: "trash")
+        }
+    }
+
+    // MARK: - 旁白的分享
+
+    /// 分享面板的载荷。优先级必须和 `ClipTransferable.transferRepresentation`
+    /// （`CopyoIOS/UI/ClipDragPayload.swift`）逐条对上：**PNG → RTF → URL → 纯文本**。
+    /// 长按菜单的「分享」走那份声明，转子的「分享」走这里。两边不一致的后果是
+    /// 同一条富文本条目时而带格式、时而不带——而且只有旁白用户会踩到，没人会来报这个。
+    ///
+    /// 图片与富文本都写成临时文件再递 URL，而不是直接递 `UIImage` / `Data`：
+    /// `UIActivityViewController` 的 activityItems 里没有地方声明「这段 Data 是 RTF」，
+    /// 不说类型的话接收方只当它是一团字节，格式照样丢。文件 URL 靠扩展名带类型，
+    /// 顺手把文件名也带上了——`ClipTransferable` 的 PNG 表示正是用 `.suggestedFileName` 起的名，
+    /// 而原来这里递的是 `UIImage`，存进「文件」App 会拿到一个系统随手起的名字。
+    ///
+    /// **仅剩的一处差别是富文本的文件名。** `ClipTransferable` 的 RTF 表示没有 `.suggestedFileName`，
+    /// 名字由系统定；这里按标题起。两边的内容和类型一致，只有名字不同——
+    /// 为了对齐这一点而把名字也交回给系统，不值当。
+    ///
+    /// 写不成就退回原来的 `UIImage` / 纯文本——少一层格式，总好过分享面板弹不出来。
+    private static func activityItems(for item: ClipItem) -> [Any] {
+        if item.kind == .image, let data = item.imageData {
+            if let url = temporaryFile(data, named: shareFileName(for: item), pathExtension: "png") {
+                return [url]
+            }
+            if let image = item.thumbnail { return [image] }
+        }
+        if item.kind == .richText, let rtf = item.rtfData,
+           let url = temporaryFile(rtf, named: shareFileName(for: item), pathExtension: "rtf") {
+            return [url]
+        }
+        if let url = item.linkURL { return [url] }
+        return [item.plainText ?? item.displayTitle]
+    }
+
+    /// 与 `ClipTransferable.suggestedName` 同一套：标题前 40 字，空标题（图片就是空串）回落 `Copyo`。
+    /// 多一步换掉 `/` 与 `:`——它们在文件名里是路径分隔符，在剪贴板正文里却随处可见（URL、时刻）；
+    /// `ClipTransferable` 不必管这个，CoreTransferable 自己会处理。
+    private static func shareFileName(for item: ClipItem) -> String {
+        let title = item.displayTitle.isEmpty ? "Copyo" : String(item.displayTitle.prefix(40))
+        let cleaned = title.components(separatedBy: CharacterSet(charactersIn: "/:\n\r"))
+            .joined(separator: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return cleaned.isEmpty ? "Copyo" : cleaned
+    }
+
+    /// 写进 tmp 并交出 URL。同名直接覆盖：反复分享同一条只会留下一个文件，
+    /// tmp 目录本来就归系统回收，不必自己排清理。
+    private static func temporaryFile(_ data: Data, named name: String, pathExtension: String) -> URL? {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent(name)
+            .appendingPathExtension(pathExtension)
+        do {
+            try data.write(to: url, options: .atomic)
+            return url
+        } catch {
+            return nil
         }
     }
 
@@ -264,6 +371,18 @@ struct PinboardContentScreen: View {
     }
 }
 
+/// 系统分享面板。旁白的「分享」动作只能走它：`ShareLink` 必须被点一下才会弹，
+/// 辅助功能自定义动作点不了它，只能自己把 `UIActivityViewController` 端出来。
+private struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
+}
+
 /// 标题菜单的文案。真菜单与截图用的静态菜单共用同一份，改文案不会只改到一边。
 enum PinboardMenuLabels {
     static var rename: String { String(localized: "Rename") }
@@ -277,6 +396,9 @@ enum PinboardMenuLabels {
 #if DEBUG
 /// 设计 3.11 的上下文菜单外观（宽 230、radius 14、行高 44、破坏项前 8pt 分隔块）。
 /// 只在 `-demoMenu` 截图时出现，正常运行永远走系统 `Menu`。
+///
+/// 这里的字号与行高**故意**写死、不跟随动态字体：它是设计稿那张图的复刻，
+/// 存在的意义就是逐像素对稿。真菜单是系统 `Menu`，字号该怎么放大怎么放大。
 private struct PinboardMenuPreview: View {
     let board: Pinboard
 

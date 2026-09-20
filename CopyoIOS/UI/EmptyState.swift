@@ -13,12 +13,16 @@ struct EmptyState: View {
 
     var body: some View {
         VStack(spacing: 10) {
+            // 44pt 的符号纯装饰：它要说的话下面的标题已经写全了。跟着辅助功能字号一起长大，
+            // 只会把正文和按钮顶出屏幕，所以尺寸留死；留死就要让旁白跳过，
+            // 否则光标会停在一个读不出信息的图形上。
             Image(systemName: symbol)
                 .font(.system(size: 44, weight: .light))
                 .foregroundStyle(CopyoTheme.labelTertiary)
                 .padding(.bottom, 6)
+                .accessibilityHidden(true)
             Text(title)
-                .font(.system(size: 17, weight: .semibold))
+                .font(.system(.body, weight: .semibold))
                 .foregroundStyle(CopyoTheme.label)
             if let message {
                 Text(message)
@@ -29,7 +33,7 @@ struct EmptyState: View {
             }
             if let actionTitle, let action {
                 Button(actionTitle, action: action)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(.subheadline, weight: .semibold))
                     .buttonStyle(.borderedProminent)
                     .buttonBorderShape(.capsule)
                     .padding(.top, 4)
