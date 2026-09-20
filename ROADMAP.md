@@ -26,12 +26,17 @@
 ## 计划中
 
 - [ ] iOS / iPadOS 版（详见 docs/ios-plan.md）
+  - **下一步是真机验证，按 docs/ios-plan.md 3.7 的顺序走。** 代码 Phase 1 + Phase 2 都完成了，
+    但至今**所有** iOS 构建都是 `CODE_SIGNING_ALLOWED=NO`，entitlements 一次都没展开过——
+    App Group 共库、CloudKit、一键保存这三条核心链路在物理上不可能执行过。
+    3.7 按「失败暴露得早不早」排序，不是按功能分组：第 1 步就是用最小实验验 App Group，
+    它不通的话分享扩展、小组件、扩展侧的 Spotlight 索引全部失去意义
   - 定位：Mac 剪贴板历史的口袋入口 + 手机侧收集器，同一应用记录组成 Universal Purchase
   - Phase 0：抽出共享 `CopyoCore` 包，Mac 接入 CloudKit（已完成）
   - Phase 1：历史 / 搜索 / Pinboard / 复制，三条保存通道（前台自动读取、分享扩展、一键保存：
     操作按钮 / 敲击背面 / 控制中心），iPad 侧栏与拖放。2026-09-05 代码完成，
     **开发者后台配置已于 2026-09-19 完成**（三个 App ID、App Group、iCloud 容器），
-    剩真机验证与提审，清单见 docs/ios-plan.md 3.2
+    剩真机验证与提审（顺序见上）
   - **Phase 2 代码已于 2026-09-21 全部完成**：Core Spotlight 索引（默认关，见 ios-plan 3.4）、
     主屏小组件（小 / 中，见 3.5）、键盘扩展（见 3.6）。但**键盘刻意不随 iOS 首版一起发**——
     它要申请「允许完全访问」、会把整个 iOS 版拖进审核指南 4.4.1 的审视范围，
