@@ -86,23 +86,16 @@ public enum CopyoStore {
                                  url: url,
                                  allowsSave: allowsSave,
                                  cloudKitDatabase: .private(cloudKitContainerIdentifier))
-            : ModelConfiguration(schema: schema, url: url, allowsSave: allowsSave)
+            // cloudKitDatabase 必须显式写 .none。它的默认值是 .automatic，意思是
+            // 「签了 CloudKit entitlement 就开镜像」——而上架版正是签了的。不写的话
+            // 用户把同步设成「关闭」，SwiftData 照样把整个库镜像到他的 iCloud，
+            // 而且本地删掉的条目几秒后就从云端回来。实测：全新的空库启动 8 秒后
+            // 自己长出 6 条旧记录，syncMode 全程是 off。
+            : ModelConfiguration(schema: schema,
+                                 url: url,
+                                 allowsSave: allowsSave,
+                                 cloudKitDatabase: .none)
         return try ModelContainer(for: schema, configurations: configuration)
-    }
-
-    /// 这份数据库是不是被 CloudKit 镜像打开过。
-    ///
-    /// 「删除所有数据」必须知道这件事：用过 iCloud 同步、现在关掉了的用户，这次会话
-    /// 推不动云端的删除，也不能把库文件删掉——服务器变更令牌就在里面，删掉之后再打开
-    /// iCloud 同步，容器会当成全新的库，把整个 zone 原样导回来。
-    ///
-    /// 靠目录认：`<主文件名>_ckAssets` 只有在容器以 `.private` 建起来之后才会出现。
-    /// 不是万无一失（开过 iCloud 但从没同步过图片的库可能没有它），所以调用方要和
-    /// UserDefaults 里的标记一起看。
-    public static func hasCloudKitArtifacts(at url: URL, fileManager: FileManager = .default) -> Bool {
-        let directory = url.deletingLastPathComponent()
-        let base = (url.lastPathComponent as NSString).deletingPathExtension
-        return fileManager.fileExists(atPath: directory.appendingPathComponent("\(base)_ckAssets").path)
     }
 
     /// 把这份数据库连同外部存储、CloudKit 资产暂存一起从磁盘上删掉。

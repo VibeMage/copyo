@@ -33,6 +33,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 同步方式决定容器怎么建，必须在建库之前定下来（老配置的迁移也在这里发生）
         let syncMode = SyncMode.migrateIfNeeded()
+        // 迁移之后立刻记「这份库镜像过 CloudKit」。「删除所有数据」靠它判断能不能删
+        // 库文件——删掉的同时也会删掉服务器变更令牌，而云端那份还在。
+        DataEraser.markMirroredIfNeeded()
         // 上一次启动留下的 iCloud 错误到此为止，这一轮的真实结果在下面重新记录；
         // 不清的话用户换回 iCloud 时会看到一条早就修好的旧错误
         CloudSyncStatus.clearErrors()
