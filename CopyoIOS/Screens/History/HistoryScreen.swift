@@ -212,6 +212,9 @@ private struct HistoryContent: View {
             if regular { gridFocused = true }
         }
         .task { await applyDemoRouteIfNeeded() }
+        // 用 `task(id:)` 而不是 `onChange`：冷启动时这条请求可能在本视图出现**之前**就写好了
+        // （系统把 Spotlight 的 activity 交给场景，通常早于首次布局），那样 onChange 一次都不会触发。
+        .task(id: model.pendingDetailItemID) { await openPendingDetailIfNeeded() }
     }
 
     // MARK: - 布局
@@ -483,6 +486,29 @@ private struct HistoryContent: View {
         }
         let target = min(max(index + delta, 0), list.count - 1)
         focusedItemID = list[target].persistentModelID
+    }
+
+    // MARK: - 系统搜索直达
+
+    /// 把 `AppModel.pendingDetailItemID`（系统搜索点进来的那一条）变成一次详情页推入。
+    ///
+    /// 详情页挂在本视图私有的 `@State detailItem` 上，应用外面够不着，所以沿用截图路由
+    /// 已经用过的形状：`AppModel` 只放一个请求，界面自己读走并清空。
+    private func openPendingDetailIfNeeded() async {
+        guard let id = model.pendingDetailItemID else { return }
+        // 与截图路由同一个坑：`.searchable` 在首次布局时会把绑定回写一遍，这之前写进去的
+        // 导航状态会被吞掉。从 Spotlight 冷启动正好撞在那一帧上，所以同样先让 400ms。
+        try? await Task.sleep(for: .milliseconds(400))
+        guard !Task.isCancelled, model.pendingDetailItemID == id else { return }
+        model.pendingDetailItemID = nil
+        // `items` 带着当前的类型与关键词条件，那一条未必在里面——一律走上下文按标识符取回
+        guard let item = model.clip(with: id) else {
+            // 索引里还留着、库里已经没了：Mac 上删掉后镜像过来，或者是还没到 30 天过期的孤儿
+            model.toast.show(String(localized: "That clip is no longer in Copyo."),
+                             symbol: "questionmark.circle")
+            return
+        }
+        detailItem = item
     }
 
     // MARK: - 截图路由

@@ -34,6 +34,9 @@ enum IOSSettings {
         static let lastPasteboardChangeCount = "lastPasteboardChangeCount"
         /// SaveClipboardIntent 写下的时间戳（timeIntervalSince1970），主应用激活时消费
         static let pendingQuickSaveAt = "pendingQuickSaveAt"
+        /// Core Spotlight 索引开关。与 `CopyoAppGroup.Key.spotlightIndexing` **逐字一致**，
+        /// 两边写岔的表现是设置页开了、扩展进程读到的还是关（或反过来），不报错、不崩溃
+        static let spotlightIndexing = "spotlightIndexing"
     }
 
     /// 历史上限的可选值，与 Mac 设置页一致（0 = 不限）
@@ -46,6 +49,9 @@ enum IOSSettings {
             Key.autoReadOnForeground: true,
             Key.historyLimit: 500,
             Key.onboardingCompleted: false,
+            // 默认关是这条功能的底线：历史里有验证码和密码，索引等于把它们摊到系统搜索
+            // 与锁屏上。写在这里只是把「默认关」摆明，读取端一律另带 `?? false` 兜底。
+            Key.spotlightIndexing: false,
         ])
     }
 
@@ -62,6 +68,11 @@ enum IOSSettings {
     static var historyLimit: Int {
         get { defaults.object(forKey: Key.historyLimit) as? Int ?? 500 }
         set { defaults.set(newValue, forKey: Key.historyLimit) }
+    }
+
+    static var spotlightIndexingEnabled: Bool {
+        get { defaults.object(forKey: Key.spotlightIndexing) as? Bool ?? false }
+        set { defaults.set(newValue, forKey: Key.spotlightIndexing) }
     }
 
     static var onboardingCompleted: Bool {

@@ -143,13 +143,18 @@ final class PasteboardCapture {
         return finish(save(imagePNG: png))
     }
 
+    /// 通道 A / C 的入库出口。Core Spotlight 索引挂在这里而不是 `ClipSaver`：
+    /// `CopyoCore` 是跨平台代码，Mac 端不做系统索引。
+    /// `.refreshed`（命中去重）也照样重索引——那一支原地改了 `createdAt` 与富文本表示。
     private func save(text: String, rtfData: Data?) -> Outcome {
         do {
             let result = try ClipSaver.save(text: text,
                                             rtfData: rtfData,
                                             source: .local,
                                             historyLimit: IOSSettings.historyLimit,
-                                            in: context)
+                                            in: context,
+                                            onEvicted: { SpotlightIndexer.remove($0) })
+            SpotlightIndexer.index(result.item)
             return outcome(for: result)
         } catch ClipSaverError.emptyContent {
             return .empty
@@ -163,7 +168,9 @@ final class PasteboardCapture {
             let result = try ClipSaver.save(imagePNG: imagePNG,
                                             source: .local,
                                             historyLimit: IOSSettings.historyLimit,
-                                            in: context)
+                                            in: context,
+                                            onEvicted: { SpotlightIndexer.remove($0) })
+            SpotlightIndexer.index(result.item)
             return outcome(for: result)
         } catch ClipSaverError.emptyContent {
             return .empty

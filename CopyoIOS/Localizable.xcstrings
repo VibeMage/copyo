@@ -484,6 +484,29 @@
         }
       }
     },
+    "Adding clips to system search": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adding clips to system search"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajout à la recherche système"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在加入系统搜索"
+          }
+        }
+      }
+    },
     "After copying, press the Action Button, double-tap the back of your iPhone, or tap the Control Center button. Copyo opens and shows “Saved”.": {
       "extractionState": "manual",
       "localizations": {
@@ -1059,6 +1082,29 @@
         }
       }
     },
+    "Clip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clip"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Élément"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "条目"
+          }
+        }
+      }
+    },
     "Clipboard": {
       "extractionState": "manual",
       "localizations": {
@@ -1262,6 +1308,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "全部复制为纯文本"
+          }
+        }
+      }
+    },
+    "Copy Clip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Clip"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier l’élément"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制这一条"
           }
         }
       }
@@ -2669,6 +2738,29 @@
         }
       }
     },
+    "Off by default. Turn it on and your clips become searchable from the Home Screen, the Lock Screen and Siri Suggestions — including the verification codes, passwords and private messages that end up in a clipboard history. Turning it off deletes everything Copyo put in the index.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off by default. Turn it on and your clips become searchable from the Home Screen, the Lock Screen and Siri Suggestions — including the verification codes, passwords and private messages that end up in a clipboard history. Turning it off deletes everything Copyo put in the index."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivé par défaut. Une fois activé, vos éléments deviennent accessibles depuis la recherche de l’écran d’accueil, l’écran verrouillé et les suggestions Siri — y compris les codes de validation, les mots de passe et les messages privés qui atterrissent dans un historique de presse-papiers. Le désactiver supprime tout ce que Copyo a placé dans l’index."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "默认关闭。打开后，你的条目会出现在主屏下拉搜索、锁屏搜索和 Siri 建议里——剪贴板历史里的验证码、密码和私人消息也一样。关掉会把 Copyo 放进索引的内容全部删除。"
+          }
+        }
+      }
+    },
     "One press saves whatever is on the clipboard right now. Copyo opens and shows “Saved”.": {
       "extractionState": "manual",
       "localizations": {
@@ -3382,6 +3474,29 @@
         }
       }
     },
+    "Removed from system search": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Removed from system search"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retiré de la recherche système"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已从系统搜索中移除"
+          }
+        }
+      }
+    },
     "Rename": {
       "extractionState": "manual",
       "localizations": {
@@ -3934,6 +4049,29 @@
         }
       }
     },
+    "Show Clips in System Search": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Clips in System Search"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les éléments dans la recherche système"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在系统搜索中显示条目"
+          }
+        }
+      }
+    },
     "Show History": {
       "extractionState": "manual",
       "localizations": {
@@ -4325,6 +4463,29 @@
         }
       }
     },
+    "System Search": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System Search"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recherche système"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系统搜索"
+          }
+        }
+      }
+    },
     "Takes effect after you reopen Copyo": {
       "extractionState": "manual",
       "localizations": {
@@ -4482,6 +4643,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "文本"
+          }
+        }
+      }
+    },
+    "That clip is no longer in Copyo.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That clip is no longer in Copyo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet élément n’est plus dans Copyo."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这条内容已不在 Copyo 中。"
           }
         }
       }
