@@ -1,0 +1,134 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-20T03:45:00Z"
+  },
+  "title": "Copyo Mac 设计稿",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 520,
+      "title": "A · 面板 · 浅色"
+    },
+    "A-panel-dark.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 520,
+      "title": "A · 面板 · 深色"
+    },
+    "A-hover-toast.dc.html": {
+      "x": 0,
+      "y": 900,
+      "w": 1360,
+      "h": 452,
+      "title": "A · 悬停 + 已复制"
+    },
+    "A-search.dc.html": {
+      "x": 1440,
+      "y": 900,
+      "w": 1360,
+      "h": 452,
+      "title": "A · 搜索中"
+    },
+    "A-empty.dc.html": {
+      "x": 2880,
+      "y": 900,
+      "w": 1360,
+      "h": 452,
+      "title": "A · 空态"
+    },
+    "B-window-light.dc.html": {
+      "x": 0,
+      "y": 1732,
+      "w": 1180,
+      "h": 800,
+      "title": "B · 主窗口 · 浅色"
+    },
+    "B-window-dark.dc.html": {
+      "x": 1260,
+      "y": 1732,
+      "w": 1180,
+      "h": 800,
+      "title": "B · 主窗口 · 深色"
+    },
+    "Card.dc.html": {
+      "x": 0,
+      "y": 2912,
+      "w": 1760,
+      "h": 1180,
+      "title": "ClipCard · dense"
+    },
+    "Tokens.dc.html": {
+      "x": 1840,
+      "y": 2912,
+      "w": 1760,
+      "h": 1000,
+      "title": "Tokens"
+    },
+    "Settings.dc.html": {
+      "x": 3680,
+      "y": 2912,
+      "w": 1240,
+      "h": 600,
+      "title": "设置 · 换肤"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "A-panel-dark.dc.html",
+    "A-hover-toast.dc.html",
+    "A-search.dc.html",
+    "A-empty.dc.html",
+    "B-window-light.dc.html",
+    "B-window-dark.dc.html",
+    "Card.dc.html",
+    "Tokens.dc.html",
+    "Settings.dc.html"
+  ],
+  "notes": {
+    "t1": {
+      "x": 0,
+      "y": -260,
+      "text": "A 版 · 悬浮面板（已定稿）",
+      "kind": "title1",
+      "maxW": 2960
+    },
+    "t2": {
+      "x": 0,
+      "y": 640,
+      "text": "A 版 · 状态",
+      "kind": "title1",
+      "maxW": 4240
+    },
+    "t3": {
+      "x": 0,
+      "y": 1472,
+      "text": "B 版 · 主窗口（未采纳 · 顺延到 1.2）",
+      "kind": "title1",
+      "maxW": 2440
+    },
+    "t4": {
+      "x": 0,
+      "y": 2652,
+      "text": "组件与 Tokens",
+      "kind": "title1",
+      "maxW": 4920
+    },
+    "n1": {
+      "x": 2560,
+      "y": 1732,
+      "w": 440,
+      "color": "gray",
+      "text": "2026-09-20 拍板：A 版定稿，本轮只做「面板重做 + 设置换肤」。\n\nB 版不采纳，顺延到 1.2 —— 它承载的是「我上周复制的那个东西在哪」的浏览姿态，和 A 版的 3 秒快取姿态不同，塞进同一个表面会两头不讨好。\n\nMasonryGrid.swift 完全跨平台，1.2 再做的增量成本很低。这两张稿留档。"
+    }
+  },
+  "designSystems": []
+}
