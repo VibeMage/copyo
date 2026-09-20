@@ -4,6 +4,10 @@
 
 ## 一、App Store Connect 建应用（你来操作）
 
+> ⚠️ 下面这张表是 2026-09-01 建第一条应用记录时填的。**那条记录已于 2026-09-19 删除**，
+> 新记录已于 2026-09-19 建好，实际填的值见第十三节（名称 `Copyo - Clipboard History`、套装 ID
+> `dev.vibemage.Copyo`、SKU `copyo`、Apple ID `6813955206`）。
+
 appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
 | 字段 | 填写 |
@@ -29,10 +33,10 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
 | 字段 | 填写 |
 | --- | --- |
-| 名称 | `Copyo: Clipboard History`（1.0.1 起，中英文商店同名，不设中文名） |
+| 名称 | `Copyo - Clipboard History`（英文，主要语言）／**`Copyo`**（简体中文本地化名称，见第十七节） |
 | 技术支持网址 | `https://vibemage.github.io/copyo/support/`（仓库 2026-09-16 已改名为 copyo，旧地址随之 404，见第十二节） |
 | 营销网址 | 留空 |
-| 版本 | 1.0.1（与构建的 MARKETING_VERSION 一致） |
+| 版本 | 1.0（新应用记录从 1.0 重新开始，与构建的 MARKETING_VERSION 一致） |
 | 版权 | `© 2026 Copyo Contributors` |
 
 ### 推广文本（170 字符内，可随时改无需审核）
@@ -44,15 +48,17 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
 ### 副标题（30 字符内）
 
-- zh：剪贴板历史，一按即达
-- en：Clipboard history, one key away
+- zh：`剪贴板历史，一按即达`（10 字，已填）
+- en：**留空**。原稿那句 `Clipboard history, one key away` 是 **31 字符，超上限填不进去**；
+  而且英文名已经是 `Copyo - Clipboard History`，再写一遍 clipboard history 也是重复。
+  要填的话建议 `Your clipboard, one key away`（28 字符，不与名称重复）。
 
 ### 描述（简体中文）
 
 ```
 按下 ⇧⌘V，你复制过的一切从屏幕底部滑出。
 
-Copyo（曾用名 Paster）是一款开源的剪贴板管理工具：
+Copyo 是一款开源的剪贴板管理工具：
 • 自动记录复制过的文本、富文本、链接、颜色、图片和文件
 • 底部卡片面板，即输即搜，全键盘操作
 • 选中回车，内容立刻回到剪贴板，⌘V 即可粘贴
@@ -69,7 +75,7 @@ Copyo（曾用名 Paster）是一款开源的剪贴板管理工具：
 ```
 Press ⇧⌘V and everything you've ever copied slides up from the bottom of your screen.
 
-Copyo (formerly Paster) is an open-source clipboard manager:
+Copyo is an open-source clipboard manager:
 • Automatically captures text, rich text, links, colors, images and files
 • Bottom card panel — type to search, fully keyboard-driven
 • Hit Return and it's back on your clipboard, ready to paste with ⌘V
@@ -83,15 +89,15 @@ No telemetry, no analytics, no network requests. Fully open source.
 
 ### 关键词（100 字符内）
 
-- zh：`剪贴板,粘贴,历史,剪切板,效率,复制,clipboard,paste,copyo,paster`
-- en：`clipboard,paste,history,copy,manager,productivity,snippets,pasteboard,copyo,paster`
+- zh：`剪贴板,粘贴,历史,剪切板,效率,复制,clipboard,paste,copyo,clip`
+- en：`clipboard,paste,history,copy,manager,productivity,snippets,pasteboard,copyo,clip`
 
 ## 四、审核备注（App Review Notes，重点！）
 
 菜单栏工具是审核重点对象，把这段贴进「审核备注」能少一轮拒审：
 
 ```
-Copyo (formerly Paster) is a menu bar app (LSUIElement) with no Dock icon or main window.
+Copyo is a menu bar app (LSUIElement) with no Dock icon and no main window.
 
 How to use:
 1. On first launch a welcome dialog explains the basics.
@@ -131,6 +137,9 @@ main 已经带上 iCloud（CloudKit）同步和推送 entitlements，归档时�
 Mac App Development 描述文件，而这要求团队里注册过 Mac；`release/1.0` 是提审
 commit c7dd41f 加上「移除自动粘贴」，entitlements 只有沙盒，和 1.0 (3) 一样不需要描述文件，
 商店描述里「零网络请求」的说法也仍然成立。iCloud 版本留给 1.1。
+
+（`release/1.0` 分支没有跟进 2026-09-19 的第二轮改名，那边仍然是 `Paster.xcodeproj` / scheme `Paster`，
+脚本照旧能跑；main 上的工程已改名为 `Copyo.xcodeproj`，见第十三节。）
 
 ```bash
 git worktree add ../Paster-release-1.0 release/1.0   # 已存在则跳过
@@ -212,7 +221,7 @@ This build was tested on a physical MacBook running macOS 26.6.1 before submissi
 
 | 条款 | 审核说法 | 事实 |
 | --- | --- | --- |
-| 2.4.5 | 应用用辅助功能（Accessibility）来实现热键，属于把无障碍功能挪作他用 | 全局快捷键走 Carbon `RegisterEventHotKey`（`Paster/Services/HotkeyManager.swift`），不需要任何权限。辅助功能只在自动粘贴时用于向目标应用发送 ⌘V（当时的 `PasteService.sendCmdV`，现已删除）。审核员把两者混为一谈，欢迎对话框和设置页当时的文案也确实没把两者分开 |
+| 2.4.5 | 应用用辅助功能（Accessibility）来实现热键，属于把无障碍功能挪作他用 | 全局快捷键走 Carbon `RegisterEventHotKey`（当时的 `Paster/Services/HotkeyManager.swift`，现在是 `Copyo/Services/HotkeyManager.swift`），不需要任何权限。辅助功能只在自动粘贴时用于向目标应用发送 ⌘V（当时的 `PasteService.sendCmdV`，现已删除）。审核员把两者混为一谈，欢迎对话框和设置页当时的文案也确实没把两者分开 |
 | 1.5 | 支持网址（Gist）不是一个可以提问、求助的网页 | Gist 里只写了「仓库发布后公开」，而仓库当时是私有的，用户没有任何联系渠道 |
 
 ### 1.0 (4) 的改动
@@ -316,6 +325,7 @@ tmp=$(mktemp -d) && cp docs/support/index.html "$tmp/" && cd "$tmp" \
 
 - 产品文件名 `Copyo.app`（PRODUCT_NAME = Copyo），显示名 `Copyo`，用户可见文案全部改名（欢迎对话框、菜单栏菜单、设置窗口标题、关于页、iOS 引导与分享扩展）。
 - **不动的**：bundle ID `dev.vibemage.Paster`、数据目录 `Application Support/Paster/`、沙盒容器路径、同步文件夹里的 `Paster/` 子目录、CloudKit 容器、PasterCore 模块名、target/scheme 名、工程文件名。老用户升级后数据原地保留。
+  （这份「不动的」清单在 2026-09-19 的第二轮改名里几乎全部改掉了，只有 bundle ID 与沙盒容器路径仍然保留，见第十三节。）
 - release/1.0 的 MARKETING_VERSION 升到 1.0.1；上架包 `Copyo-1.0.1-appstore.pkg`。
 - 仓库当时暂未改名（Pages 项目站地址不随仓库改名跳转，线上 1.0 的支持网址会失效）。**这条后来没有守住**：仓库于 2026-09-16 改名为 `copyo`，预言的后果照样发生，详见第十二节。
 
@@ -368,8 +378,430 @@ GitHub 仓库从 `VibeMage/Paster` 改名为 `VibeMage/copyo`。GitHub 会为 gi
 因此 **1.0.1 要尽快提交**：窗口期长短就等于 1.0.1 的提审到上架时间。提交时务必把版本页的技术支持网址
 改成 `https://vibemage.github.io/copyo/support/`，这是本次改动里最关键的一个字段。
 
+> 后续：2026-09-19 旧应用记录被整条删除，商店里已经没有那个页面，这条 404 也就无从点起了。
+> 新记录从第一版起就填 `https://vibemage.github.io/copyo/support/`。
+
 ### 长期根治
 
 注册 `copyo.app`，在 copyo 仓库 `docs/` 下放 CNAME 并在 Pages 设置里绑定，支持网址改用
 `https://copyo.app/support/`。此后再改仓库名也不会断。注意这**不能**修复旧的 `/Paster/` 路径，
 那个路径只能靠方案 A 的跳转仓库兜底。
+
+## 十三、第二轮改名：把 Paster 从工程里清干净（2026-09-19，仅 main）
+
+第十一节那次改名只动了产品名与用户可见文案，工程内部——目录、target、模块、类型名、数据路径、
+bundle ID、容器标识——原封不动留着 Paster。这一轮把它们全部改掉。
+
+前提变了：**2026-09-19 旧的 App Store Connect 应用记录（`dev.vibemage.Paster`，商店里的 Paster）已被删除，
+改名不再是「换个名字发新版」，而是以 Copyo 的身份重新建记录、从 1.0 重新提审。** Apple 不允许复用已删除应用的
+bundle ID，所以 bundle ID 必须换，正好与改名一起做完。
+
+### 改了什么
+
+- 源码目录：`Paster/` → `Copyo/`、`PasterCore/` → `CopyoCore/`、`PasterIOS/` → `CopyoIOS/`、
+  `PasterShared/` → `CopyoShared/`、`PasterShareExtension/` → `CopyoShareExtension/`、
+  `PasterWidgets/` → `CopyoWidgets/`
+- 工程：`Paster.xcodeproj` → `Copyo.xcodeproj`；target `Paster` → `Copyo`、`Paster iOS` → `Copyo iOS`、
+  `PasterShareExtension` → `CopyoShareExtension`、`PasterWidgets` → `CopyoWidgets`；两个共享 scheme 同步改名
+- Swift 模块与类型：`PasterCore` → `CopyoCore`、`PasterStore` → `CopyoStore`、`PasterSchema` → `CopyoSchema`、
+  `PasterTheme` → `CopyoTheme`、`PasterTab` → `CopyoTab` 等
+- **bundle ID：`dev.vibemage.Paster` → `dev.vibemage.Copyo`**，两个扩展同步改成
+  `dev.vibemage.Copyo.ShareExtension` / `dev.vibemage.Copyo.Widgets`
+- Control 的 `kind`：`dev.vibemage.Copyo.saveClipboard`（跟着 bundle ID 走）
+- App Group：`group.dev.vibemage.Paster` → `group.dev.vibemage.Copyo`
+- iCloud 容器：`iCloud.dev.vibemage.Paster` → `iCloud.dev.vibemage.Copyo`
+- 本地数据库：`Application Support/Paster/Paster.store` → `Application Support/Copyo/Copyo.store`
+- 文件夹同步的子目录：`<共享目录>/Paster/` → `<共享目录>/Copyo/`
+- 公证钥匙串配置名的示例：`paster-notary` → `copyo-notary`（只是示例，已经配好的旧 profile
+  传 `NOTARY_PROFILE=paster-notary` 照样能用）
+
+### 没改
+
+- `art/`、`specs/` 下的设计稿与设计说明，以及本文件第八至十二节的历史记录：都是带日期的存档，原样留着。
+- **`release/1.0` 分支没动。** 那条分支仍然是 `Paster.xcodeproj` / scheme `Paster` / bundle ID
+  `dev.vibemage.Paster`，现在已经没有用武之地了——新的应用记录是新的 bundle ID，上架包只能从 main 出。
+  留着当 1.0 的存档即可。
+
+### 你要在开发者后台 / ASC 做的
+
+1. Certificates, Identifiers & Profiles → Identifiers → ➕ App IDs：`dev.vibemage.Copyo`（主应用）、
+   `dev.vibemage.Copyo.ShareExtension`、`dev.vibemage.Copyo.Widgets`。
+2. Identifiers → App Groups → ➕ `group.dev.vibemage.Copyo`，三个 App ID 都勾上。
+3. Identifiers → iCloud Containers → ➕ `iCloud.dev.vibemage.Copyo`；主应用 App ID 勾选
+   iCloud (CloudKit) 选中该容器，并勾上 Push Notifications。
+4. CloudKit Console：在新容器里跑一遍 Development schema，确认 `ClipItem` / `Pinboard` 两张表齐全后
+   部署到 Production（正式版发布前必须做完）。
+5. ASC → 我的 App → ➕ 新建 App：平台 macOS，名称 `Copyo - Clipboard History`，套装 ID `dev.vibemage.Copyo`，
+   SKU `copyo`（旧记录的 SKU `paster` 随记录一起没了）。版本号 **1.0**，构建号从 **1** 开始——新记录没有
+   历史构建，`CURRENT_PROJECT_VERSION` 已经重置为 1。商店文案、关键词、审核备注见第三、四节。
+6. 描述文件：自动签名会按新 App ID 重新生成；Developer ID 那张要包含新的 iCloud 容器与 App Group，
+   否则 `build-release.sh` 归档会失败。
+
+### 老用户升级后会发生什么
+
+- **直发版（Developer ID，未沙盒）**：数据库自动从 `Application Support/Paster/` 搬到 `Copyo/`，
+  `Paster.store` 三件套连同外部图片目录 `.Paster_SUPPORT` 一起改名。外部图片目录的名字是 Core Data 从
+  store 文件名推导的，不一起改等于把所有图片藏起来，所以搬迁必须成对做（`LegacyStoreMigration`，
+  `CopyoCore` 里有对应测试）。搬不动时（权限、文件被占用）继续用旧位置打开，绝不丢数据。
+- **App Store 版（沙盒）**：bundle ID 变了，沙盒容器也跟着变成
+  `~/Library/Containers/dev.vibemage.Copyo/`。**旧容器里的历史读不到**——沙盒不允许新应用访问
+  另一个 bundle ID 的容器，没有官方迁移途径。商店里的 1.0 只活了 8 天（2026-09-11 上架，
+  2026-09-19 删除），受影响的用户极少；真要照顾他们，只能在新版里加一个「从旧版导入」的
+  `NSOpenPanel` 让用户手动选中旧容器目录，目前没做。
+- **文件夹同步**：本机把共享目录里的 `Paster/` 整体改名成 `Copyo/`。还没升级的其他 Mac 会把 `Paster/`
+  重新建出来并继续往里写，升级后的这台会继续只读合并那个目录，所以改名窗口期里两边的条目都不会丢。
+- **iCloud 同步**：容器换了，等于重新上云。CloudKit 同步从未随正式版发布，线上没有用户受影响；
+  开发机上旧容器里的数据作废，本地库不受影响。
+
+## 十四、重建记录的实际结果（2026-09-19 当天完成）
+
+### 开发者后台（全部建好）
+
+| 标识 | 值 | 配置 |
+| --- | --- | --- |
+| App ID（主应用） | `dev.vibemage.Copyo` | 全平台；App Groups ✓、iCloud + CloudKit（1 个容器）✓、Push ✓ |
+| App ID（分享扩展） | `dev.vibemage.Copyo.ShareExtension` | App Groups ✓ |
+| App ID（小组件） | `dev.vibemage.Copyo.Widgets` | App Groups ✓ |
+| App Group | `group.dev.vibemage.Copyo` | 三个 App ID 都已勾选 |
+| iCloud 容器 | `iCloud.dev.vibemage.Copyo` | 主应用 App ID 已选中 |
+
+### ASC 应用记录
+
+| 字段 | 值 |
+| --- | --- |
+| 名称（英语 美国，主要语言） | `Copyo - Clipboard History`（25 字符） |
+| 名称（简体中文本地化） | `Copyo - 剪贴板历史`（13 字符） |
+| 平台 | macOS（iOS 待 Phase 1 就绪后「添加平台」） |
+| 套装 ID | `dev.vibemage.Copyo` |
+| SKU | `copyo` |
+| Apple ID | `6813955206` |
+| 状态 | 1.0 准备提交 |
+
+### 商店名为什么不是光秃秃的「Copyo」
+
+ASC 拒绝了裸名 `Copyo`：「你输入的 App 名称已被使用」。查证结果：
+
+- **不是被上架应用占用**。iTunes Search API（美区 + 中国区 × Mac + iOS）对 `copyo` 的精确匹配为零，
+  中国区 resultCount 直接是 0。
+- 也**不是我们自己的旧记录攥着**：旧记录从建立到删除，App 信息里的名称一直是 `Paster`，
+  第十一节计划的 `Copyo: Clipboard History` 那一步从未执行。
+- 结论：**第三方在 App Store Connect 里预留了这个字符串**。预留名不出现在商店里，但会挡住新记录，
+  且等不到自动释放，支持请求也需要证明名称使用权。
+
+ASC 锁的是精确名称字符串，Apple 官方给的解法就是加限定词；这个品类本来也人人都加
+（货架邻居 `CopyClip - Clipboard History`，连 Paste 本尊都是 `Paste – Limitless Clipboard`），
+所以加后缀在品牌上零损失。**不要再尝试把商店名改回裸名 `Copyo`。**
+
+评估过的替代品牌全部否掉，主要死因是同品类撞名——**Pinza** 与 **Magpie** 各有一个正在上架的
+macOS 菜单栏剪贴板管理器，重蹈 Paster / pasterapp.com 的覆辙；Twofold、Clipo / Clippo、ClipDeck、
+Cardo、Roneo、Inkyo 等十余个也都撞了在架应用或踩了发音雷。
+
+### 旧 App ID 删不掉（Apple 拒绝）
+
+尝试删除 `dev.vibemage.Paster` 时 Apple 返回：
+
+> The App ID '9A94W79V84.dev.vibemage.Paster' appears to be in use by the App Store,
+> so it can not be removed at this time.
+
+说明已删除的应用记录在 Apple 侧仍与该 bundle ID 绑定（同样的原因，它也不出现在新建记录的套装 ID
+下拉里）。**这不是操作失误，是 Apple 的限制**，过一段时间可以再试；删不掉也无害，闲置而已。
+`iCloud.dev.vibemage.Paster` 容器同理——iCloud 容器详情页只有 Description 与 Save，**压根没有删除入口**
+（对比 App ID 详情页是 Remove + Save），列表筛选器里那个 Hidden 档也没有对应的操作控件。
+
+### 待办（按紧急程度）
+
+1. **注册 `copyo.app` / `copyo.io` / `copyo.dev`**。第十一节写的是「可注册」，至今仍然**没有注册**——
+   RDAP 权威查询（带对照组）对三个域名均返回 not found。谁都能抢，尽快拿下。
+   `copyo.com` 自 2012 年被人持有（GoDaddy 锁定，空页面），放弃。
+2. **递交美国第 9 类 COPYO 商标申请**。我们对 ASC 里那个预留者、以及一家同拼写的孟菲斯 AI 文案 SaaS
+   「Copyo」都是在后方；有申请在手 + GitHub 提交这类带日期的首次使用证据，将来遇到 App 名称争议才有得打。
+   ⚠️ USPTO 注册库**未能核实**（Justia 403、无公开 API、WIPO 有反爬验证），「商标干净」属未证实而非已证实。
+3. **DSA 交易者状态**。ASC 首页横幅：不提供交易商状态则无法提交新 App 或更新以在欧盟分发。
+   路径见第十节，个人账号选「非交易者」即可。
+4. ~~商店文案、关键词、截图、隐私问卷~~ 已填完，见第十五、十七节。
+
+## 十五、1.0 版本页填写进度（2026-09-19）
+
+### 已填好并保存
+
+| 项目 | 状态 |
+| --- | --- |
+| 英文：推广文本 / 描述 / 关键词 / 技术支持网址 / 版权 | ✅ |
+| 简体中文：推广文本 / 描述 / 关键词 / 技术支持网址 | ✅ |
+| 审核备注（英文） | ✅ |
+| 「需要登录」勾选 | ✅ 已取消（ASC 默认勾上，Copyo 不需要登录账号，勾着且账号为空会卡验证） |
+| 截图 | ✅ 2 张（`01-panel-en` / `02-search-en`）。ASC 默认一套截图用于所有本地化版本，要分语言得用「媒体管理」 |
+| 隐私政策网址 | ✅ 指向公开 Gist |
+| 数据收集问卷 | ✅ 已答「不会从此 App 中收集数据」并保存 |
+| 类别 | ✅ 主要 = 效率 |
+
+### 对第三节原稿做的三处修改（已同步回本文档）
+
+1. **删掉「曾用名 Paster」/「formerly Paster」**（描述与审核备注各一处）。
+   pasterapp.com 的 Paster 是别家公司仍在售的产品，在商店文案里写「曾用名 Paster」
+   容易被读成与对方有关联；而且旧记录已删，商店里没有任何连续性需要交代。
+2. **关键词里的 `paster` 换成 `clip`**（中英文各一处）。拿竞品名当关键词违反 App Store 规则，
+   而且那正是我们要摆脱的名字。
+3. **⇧⌘V 一律写成 `Shift+Command+V`**。第三节本来就警告过 ASC 的推广文本/关键词字段
+   不接受按键符号；为保持一致，描述与审核备注里也用了展开写法。
+
+### 还没做（需要你本人）
+
+1. **发布隐私答复**。App 隐私页右上角「发布」，弹窗要你确认「答复准确无误且遵守《App Store 审核指南》
+   和适用的法律」——这是一条以你名义作出的合规声明，我没有代你点。答案已经存好，点一下即可。
+2. **价格与销售范围**：定价时间表与供应情况都还是空的，提审前必须设置（免费 + 选国家/地区）。
+   欧盟那部分与 DSA 交易者状态绑在一起。
+3. **DSA 交易者状态**（见第十节）。
+4. **构建版本**：还没有可上传的包。2026-09-19 在本机跑 `./scripts/build-appstore.sh` 归档失败，
+   根因是 **Xcode 里一个 Apple ID 都没登录**（`error: No Accounts: Add a new account in Accounts settings.`），
+   连带没有任何证书与描述文件（`security find-identity` 返回 0，描述文件目录为空）。按顺序补：
+
+   1. Xcode → Settings → Accounts → ➕ 登录 Apple ID，选中团队 `9A94W79V84`
+   2. Manage Certificates… → ➕ 建 **Apple Distribution** 与 **Mac Installer Distribution**
+   3. 用 Xcode 打开 `Copyo.xcodeproj` → target Copyo → Signing & Capabilities，勾上
+      Automatically manage signing 并选团队——**这一步会把本机注册进账号**。归档用的是
+      Apple Development 身份，要一张 Mac App Development 描述文件，而这类描述文件
+      必须账号里至少注册过一台 Mac，`xcodebuild` 自己不会注册设备
+   4. 重跑 `./scripts/build-appstore.sh`
+
+   脚本列的另外两条前置（ASC 里有 `dev.vibemage.Copyo` 的应用记录、App ID 开好 iCloud+Push
+   与容器）**今天都已经满足**，见第十四节。
+5. ~~截图 03 / 04 要重拍~~ **已重拍**，见第十六节。
+
+## 十六、商店截图重拍（2026-09-19）
+
+### 为什么必须重拍
+
+初版四张是 Paster 1.0 时代拍的，其中两张仍在宣传 **1.0 (4) 已经移除的自动粘贴**：
+
+- `03-preview-*`：副标题「Preview text, images and files — then ↩ **to paste**」／「↩ **直接粘贴**」
+- `04-shortcuts-*`：设置页截图里是「**Paste** selected item」「**Paste** selected item as plain text」，
+  这两条文案在移除自动粘贴时就改成了 Copy / 复制
+
+拿去提审等于截图展示一个会自动粘贴的应用，而审核备注写的是「本应用不粘贴、不使用辅助功能」，
+自相矛盾——2.4.5 正是 2026-09-08 那次拒审的条款。
+
+### 做了什么
+
+四张**全部重拍**，而不是只补两张：初版面板高 564px，本机采集出来是 507px（屏幕宽高比不同），
+只换两张会让卡片大小对不上。
+
+新增 `scripts/make-store-shots.py`，把这件事变成可复现的管线：统一的渐变背景板
+（`art/store/_background-plate.png`，从初版反推）+ 应用图标 + 标题 + 副标题 + 真实 UI 截图。
+版式参数（图标位置与尺寸、标题/副标题基线与字号、设置窗口贴图位置）都由初版实测标定，
+新图与初版逐像素对齐（图标包围盒 1218–1340 × 204–329，完全一致）。
+
+`AppDelegate` 新增 `-showPanel` 启动开关（与既有的 `-forceDark`、`-demoPreview`、
+`-settingsTab` 同类），启动即拉起面板，省得靠模拟 ⇧⌘V——全局快捷键走 Carbon，
+模拟按键要给控制方开辅助功能权限。
+
+演示数据用一个一次性 Swift 包灌进库里再拍，**不要拿自己的真实剪贴板去拍**，
+那会把私人内容发到 App Store 上。拍完记得删掉 `~/Library/Application Support/Copyo/`。
+
+### 改掉的文案
+
+| 截图 | 旧（作废） | 新 |
+| --- | --- | --- |
+| 03 en | Preview text, images and files — then ↩ to paste | Preview text, images and files without leaving the panel |
+| 03 zh | 大图预览文本、图片和文件，↩ 直接粘贴 | 大图预览文本、图片和文件，不用离开面板 |
+| 04 en | Summon, search, **paste**, preview — and ⇧⌘V is yours to remap | Summon, search, **copy**, preview — and ⇧⌘V is yours to remap |
+| 04 zh | 呼出、导航、**粘贴**、预览，全程快捷键；⇧⌘V 可自定义 | 呼出、导航、**复制**、预览，全程快捷键；⇧⌘V 可自定义 |
+
+01 与 02 的文案原样保留，只是重新采集了 UI。
+
+## 十七、本地化名称不受名称预留限制（2026-09-19 实测）
+
+**裸名 `Copyo` 在简体中文的本地化名称字段里可以用**，保存无报错。
+
+ASC 的名称唯一性检查只卡**主要语言那一个名称字符串**（建记录时填的那个，就是它撞上了第三方的预留）；
+其他语言的本地化名称不走同一个检查。所以：
+
+| 语言 | 名称 | 副标题 |
+| --- | --- | --- |
+| 英语（美国，主要语言） | `Copyo - Clipboard History` | 留空（见第三节） |
+| 简体中文 | **`Copyo`** | `剪贴板历史，一按即达` |
+
+中国区商店里显示的就是干净的「Copyo」加一行中文副标题，品牌词不必带后缀。英文区仍然受预留所限，
+只能用带限定词的形式——这不是可以绕开的，别再去试改主要语言的名称。
+
+### 截图按语言分开配置
+
+ASC 默认一套截图通用于所有本地化版本。要给中文单独一套：
+**版本页 →「在"媒体管理"中查看所有尺寸」→ 切到简体中文 → 点「使用英语（美国）的 Mac 文件」旁边的
+「编辑」解除继承 → 再上传。** 解除继承不影响英文那套。
+
+两套都已配好，各 4 张，顺序为 01 面板 → 02 搜索 → 03 预览 → 04 快捷键。
+
+⚠️ 上传多张时**必须一张一张传、等上一张处理完再传下一张**——一次选多个文件，ASC 落盘顺序是乱的
+（实测传 4 张得到的顺序是 03、02、01、04）。
+
+## 十八、1.0 构建版本出包成功（2026-09-20）
+
+### 签名前置（本机一次性）
+
+初次在本机构建时 `security find-identity` 返回 0、描述文件目录为空，`build-appstore.sh` 依次报了
+`No Accounts` → `no devices from which to generate a provisioning profile`。补齐顺序：
+
+1. Xcode → Settings → Accounts 登录，选团队 `9A94W79V84`
+2. Manage Certificates… → ➕ 新建三张（私钥只存在于创建它的那台机器，旧 Mac 上的证书在
+   Xcode 里显示 **Not in Keychain**，下载不下来，只能新建或从旧机导出 `.p12`）：
+   `Apple Development` / `Apple Distribution` / `Mac Installer Distribution`
+3. Xcode 打开工程 → target Copyo → Signing & Capabilities → **Register Device**
+   （归档用 Apple Development 身份，需要 Mac App Development 描述文件，
+   而这类描述文件要求账号里至少有一台已注册的 Mac；`xcodebuild` 自己不会注册设备）
+
+Xcode 随之重写了 `project.pbxproj`，顺带补上了 Copyo 的 Release-AppStore 一直缺失的
+`DEVELOPMENT_TEAM`（见 commit fae79f8）。
+
+### 产物核验
+
+`build/appstore/Copyo-1.0-appstore.pkg`（1.9 MB），展开后逐项核过：
+
+| 项目 | 值 |
+| --- | --- |
+| .app 签名 | `Apple Distribution: NING YUAN (9A94W79V84)` |
+| .pkg 签名 | `3rd Party Mac Developer Installer: NING YUAN (9A94W79V84)` |
+| aps-environment | `production` |
+| iCloud 容器 / 环境 | `iCloud.dev.vibemage.Copyo` / `Production` |
+| 沙盒 | `com.apple.security.app-sandbox: true` |
+| Bundle ID / 版本 | `dev.vibemage.Copyo` / 1.0 (1) |
+| LSUIElement | true |
+| 最低系统 | macOS 14.0 |
+| 出口合规 | `ITSAppUsesNonExemptEncryption: false` |
+| 图标 / 本地化 | `AppIcon.icns` ✓ / `en.lproj` + `zh-Hans.lproj` ✓ |
+
+归档阶段那份是 Apple Development 签名、`aps-environment: development`，**这是正常的**——
+`-exportArchive` 会重签成 Apple Distribution 并切到 production。要核验的是导出后的 `.pkg`，不是归档。
+
+### 商务页面新冒出来的两条阻塞
+
+1. **法律实体合规筛查**（带移除警告，优先级最高）：横幅「请立即查看"NING YUAN"的相关信息。
+   如未能提交补充文稿，你的内容可能会从 App Store 移除」。要求上传显示**英文法律实体名称**与
+   出生日期的政府证件。**用护照身份信息页，不要用中国大陆身份证**——身份证既无英文姓名也无
+   英文格式。护照拼音姓名要与账号登记的 `NING YUAN` 完全一致（含顺序）。
+   受此影响，**免费 App 协议的状态从「有效」变成了「等待用户信息」**，协议不恢复有效会挡提审与上架。
+2. **DSA 交易商状态**：另一条横幅「完成合规要求」，个人账号选「非交易商」即可（见第十节）。
+   不做只影响欧盟可售，不挡审核。
+
+上传构建版本不依赖协议状态，可以与补材料并行。
+
+## 十九、提审前全量核查（2026-09-20）
+
+逐页核对的结果，**当时还不能提交**。
+
+### 本次补齐
+
+| 项目 | 结果 |
+| --- | --- |
+| 年龄分级 | **4+**，覆盖 172 个国家或地区（巴西「全部」、韩国「00+」）。七步问卷全部答「否 / 无」：无家长控制、无年龄保证、无不受限网页访问、无用户生成内容、无社交、无信息聊天、无广告、无成人主题、无医疗、无性或裸体、无暴力、无基于概率的活动。「年龄类别和覆盖」保持**不适用**——选「面向儿童」会归进儿童类目，那有一整套额外合规要求 |
+| 内容版权 | **否，此 App 不包含、显示或访问第三方内容**。面板里显示的是用户自己设备上的剪贴板数据，开发者既不提供也不访问；选「是」等于无中生有地声称拥有某些内容的版权 |
+
+答「无不受限的网页访问」前核过代码：全工程没有任何 `WKWebView`，唯一的
+`NSWorkspace.shared.open` 是跳系统设置的 Apple ID 面板，不涉及网页内容。
+
+### 仍然缺的（按阻塞程度）
+
+1. **构建版本** —— 版本页「构建版本」区域仍是「添加构建版本」，即尚无任何构建。
+   `build/appstore/Copyo-1.0-appstore.pkg` 已就绪，待用 Transporter 上传并等处理完成后选中。
+2. **价格与销售范围** —— 定价时间表与 App 供应情况**都还是空的**，两项提审必填。
+3. **发布隐私答复** —— App 隐私页右上角「发布」按钮仍可点，说明答复尚未发布。
+   这是一条以开发者名义作出的合规声明，需本人确认。
+4. **免费 App 协议：正在验证** / **数字服务法：正在审核**（27 个国家或地区）——
+   法律实体材料与 DSA 声明均已提交，等 Apple 处理，不是自己能推进的。
+   协议不恢复「有效」会挡上架。
+5. **CloudKit schema 未部署到 Production** —— 不挡审核，但包里
+   `icloud-container-environment` 是 Production，新容器 `iCloud.dev.vibemage.Copyo`
+   的 schema 从未部署，上架后用户开 iCloud 同步会直接失败。
+
+### 一条需要确认的选择
+
+App 信息页显示「**该开发者已表明是此 App 的交易商**」。选交易商意味着地址、电话、
+电子邮件会公开显示在欧盟区产品页上。第十节与本文档此前的建议是：个人账号、免费、
+无内购、无广告可选「非交易商」，等真的上内购再改。若这不是有意为之，趁 DSA 仍在
+「正在审核」时可以在 App 信息页的「数字服务法 → 编辑」改回。
+
+## 二十、1.0 已提交审核（2026-09-20）
+
+| 项目 | 值 |
+| --- | --- |
+| 版本状态 | 正在等待审核 |
+| 构建版本 | 1.0 (1)，2026-09-20 00:32 上传，包含 App 图标 |
+| 免费 App 协议 | 正在验证 |
+| 数字服务法 | 正在审核（27 个国家或地区，交易商） |
+
+第十九节列的三个硬缺口（构建版本、价格与销售范围、发布隐私答复）均已由维护者补齐并提交。
+
+### 提交后仍未处理的风险：CloudKit schema 未部署
+
+提交的包里 `icloud-container-environment` 为 `Production`，而 `iCloud.dev.vibemage.Copyo`
+是 2026-09-19 新建的容器，**schema 从未部署**——容器里没有 `ClipItem` / `Pinboard` 两张表。
+
+此前记为「不挡审核」，更准确的说法是**也可能挡审核**：同步默认关闭，但审核员若在设置页
+把同步方式切到 iCloud 试功能，会直接失败，构成 2.1（App 完整性）的拒审理由；即便审核员
+没试，上架后第一个开启 iCloud 同步的用户也会撞上。
+
+处理步骤：
+
+1. 在已登录 iCloud 的 Mac 上跑一次带 iCloud 同步的构建，设置页把同步方式切到 iCloud，
+   让 SwiftData 把表结构推到 Development 环境（会往自己的 iCloud 账号写入若干记录）
+2. CloudKit Console → 选中 `iCloud.dev.vibemage.Copyo` → Deploy Schema Changes → 部署到 Production
+
+### 另一条需要盯的
+
+**免费 App 协议仍是「正在验证」**。即便审核通过，协议不恢复「有效」也会挡住发布上架。
+1.0 那次从提交到过审用了 3 天（2026-09-08 拒审 → 09-11 通过）。
+
+## 二十一、CloudKit schema 已部署到 Production（2026-09-20）
+
+容器 `iCloud.dev.vibemage.Copyo` 的 schema 已部署：`CD_ClipItem`（22 字段）与
+`CD_Pinboard`（12 字段），含 34 + 16 个索引。Production 环境逐字段核验通过。
+
+### 做法
+
+1. 用一次性 Swift 包把**每个属性都填满**的种子记录写进本地库（属性为 nil 的字段，
+   CloudKit 不会建出来）
+2. `defaults write dev.vibemage.Copyo syncMode -string icloud`，跑**真实签名的** Debug 构建
+   （`CODE_SIGNING_ALLOWED=NO` 不展开 entitlements，CloudKit 根本连不上），
+   让 SwiftData 把表结构推到 Development
+3. CloudKit Console → Deploy Schema Changes → Production
+
+### 坑一：新建容器第一次连接会被拒
+
+首次启动报：
+
+```
+CKModifyRecordZonesOperation → CKError "Partial Failure" (2/1011)
+  com.apple.coredata.cloudkit.zone → "Server Rejected Request" (15/2000)
+→ Failed to set up CloudKit integration for store
+```
+
+账号本身是通的（`fetch-user-record-id` 成功）。**重启一次应用即恢复**——容器是几小时前
+刚建的，服务端还没完全就绪。遇到别急着怀疑 entitlements 或账号。
+
+### 坑二（重要）：二进制属性有两个字段，BYTES 与 ASSET
+
+CoreData+CloudKit 对二进制属性建**两个**字段：数据小的时候写 `CD_x`（BYTES），
+超过阈值时写 `CD_x_ckAsset`（ASSET）。**字段是按写入的记录惰性创建的**，所以：
+
+> 只用小数据做种子 → Development schema 里只有 BYTES 那一个 → 部署到 Production 之后，
+> 第一个复制大图的用户同步就会失败，而 **Production schema 只能加不能改**。
+
+本次实测：先用 50 KB 的图标，schema 里只有 `CD_imageData`（BYTES）；再写入一条 5.9 MB
+的噪声图，`CD_imageData_ckAsset`（ASSET）才出现。
+
+因此部署前额外写入了大号 `rtfData`（3.4 MB）与 `filePaths`（22000 条路径），把三个
+asset 变体全部逼出来。**最终部署的 Production schema 含：**
+
+```
+CD_filePaths BYTES + CD_filePaths_ckAsset ASSET
+CD_imageData BYTES + CD_imageData_ckAsset ASSET
+CD_rtfData   BYTES + CD_rtfData_ckAsset   ASSET
+```
+
+**以后给模型加任何二进制属性，都必须在部署前用一大一小两条记录各写一次**，否则
+Production 会缺 asset 字段。
+
+### 收尾
+
+探针记录（3 条 ClipItem + 1 个 Pinboard，含噪声图与假路径）已删除，删除经同步传播到
+私有数据库；本机 `~/Library/Application Support/Copyo/` 与应用偏好一并清除。

@@ -11,11 +11,11 @@
 #   2. 该团队下创建两张证书:
 #        Apple Distribution         —— 给 Copyo.app 签名
 #        Mac Installer Distribution —— 给导出的 .pkg 签名
-#   3. App Store Connect 里建好 bundle id 为 dev.vibemage.Paster 的 App 记录
-#   4. 开发者后台 → Identifiers → dev.vibemage.Paster 勾选 iCloud (CloudKit)
-#      与 Push Notifications，容器选 iCloud.dev.vibemage.Paster
+#   3. App Store Connect 里建好 bundle id 为 dev.vibemage.Copyo 的 App 记录
+#   4. 开发者后台 → Identifiers → dev.vibemage.Copyo 勾选 iCloud (CloudKit)
+#      与 Push Notifications，容器选 iCloud.dev.vibemage.Copyo
 #      （sandbox 版的 entitlements 里带这两项，App ID 上没开就申请不到描述文件）
-#   5. 在 Xcode 里打开本工程 → target Paster → Signing & Capabilities，
+#   5. 在 Xcode 里打开本工程 → target Copyo → Signing & Capabilities，
 #      勾上 Automatically manage signing 并选团队 9A94W79V84，
 #      让 Xcode 把本机注册进账号：归档用的 Apple Development 身份需要一张
 #      Mac App Development 描述文件，而这类描述文件要求账号里至少有一台
@@ -32,14 +32,14 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 TEAM_ID=9A94W79V84
-BUNDLE_ID=dev.vibemage.Paster
+BUNDLE_ID=dev.vibemage.Copyo
 ARCHIVE=build/Copyo.xcarchive
 
 # 版本号必须取自真正被归档的那份配置。project.pbxproj 里三个 target 配置各有一行
 # MARKETING_VERSION / CURRENT_PROJECT_VERSION，按文件顺序 sed 到的第一行是 Debug 的值；
 # 只把 Release-AppStore 的构建号 +1（正确做法）时，脚本就会印出并校验一个陈旧的号。
 echo "==> 读取 Release-AppStore 构建设置"
-if ! BUILD_SETTINGS=$(xcodebuild -project Paster.xcodeproj -scheme Paster \
+if ! BUILD_SETTINGS=$(xcodebuild -project Copyo.xcodeproj -scheme Copyo \
      -configuration Release-AppStore -showBuildSettings 2>/dev/null); then
   echo "无法读取 Release-AppStore 构建设置" >&2
   exit 1
@@ -82,7 +82,7 @@ print_signing_help() {
   5. 若报「no devices from which to generate a provisioning profile」：
      归档用的是 Apple Development 身份，要一张 Mac App Development
      描述文件，而这类描述文件必须账号里至少注册过一台 Mac。用 Xcode 打开
-     Paster.xcodeproj → target Paster → Signing & Capabilities，勾上
+     Copyo.xcodeproj → target Copyo → Signing & Capabilities，勾上
      Automatically manage signing 并选团队 ${TEAM_ID}，Xcode 会把本机注册
      进账号；也可以在开发者后台 Devices 里手工添加本机的 Provisioning UDID
      （系统信息 → 硬件 → 预置 UDID）。xcodebuild 自己不会注册设备
@@ -96,7 +96,7 @@ matches_signing_error() {
 echo "==> 归档 Copyo ${VERSION} (build ${BUILD_NUMBER}, Release-AppStore)"
 rm -rf "$ARCHIVE"
 ARCHIVE_LOG=$(mktemp)
-if ! xcodebuild -project Paster.xcodeproj -scheme Paster -configuration Release-AppStore \
+if ! xcodebuild -project Copyo.xcodeproj -scheme Copyo -configuration Release-AppStore \
      -archivePath "$ARCHIVE" \
      -allowProvisioningUpdates \
      CODE_SIGN_STYLE=Automatic \

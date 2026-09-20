@@ -11,9 +11,9 @@
 # 用法:
 #   ./scripts/build-release.sh
 #     - 自动签名，描述文件由 -allowProvisioningUpdates 自动申请
-#   NOTARY_PROFILE=paster-notary ./scripts/build-release.sh
+#   NOTARY_PROFILE=copyo-notary ./scripts/build-release.sh
 #     - 导出后提交 Apple 公证并 staple。需先做一次性配置:
-#       xcrun notarytool store-credentials paster-notary \
+#       xcrun notarytool store-credentials copyo-notary \
 #         --apple-id <AppleID邮箱> --team-id <TEAMID> --password <App专用密码>
 #   SIGN_IDENTITY="Developer ID Application: Name (TEAMID)" ./scripts/build-release.sh
 #     - 可选覆盖：钥匙串里有多张 Developer ID 证书时指定用哪一张，
@@ -22,10 +22,10 @@
 # 前置条件（一次性，在 Xcode 里完成）:
 #   1. Xcode → Settings → Accounts 登录 Apple ID 并选中团队 9A94W79V84
 #   2. Manage Certificates… → + 号创建 Developer ID Application 证书
-#   3. 开发者后台 → Identifiers → dev.vibemage.Paster 勾选 iCloud (CloudKit)
-#      与 Push Notifications，容器选 iCloud.dev.vibemage.Paster；
+#   3. 开发者后台 → Identifiers → dev.vibemage.Copyo 勾选 iCloud (CloudKit)
+#      与 Push Notifications，容器选 iCloud.dev.vibemage.Copyo；
 #      App ID 上没开这两项，带 iCloud entitlements 的描述文件申请不下来
-#   4. 在 Xcode 里打开本工程 → target Paster → Signing & Capabilities，
+#   4. 在 Xcode 里打开本工程 → target Copyo → Signing & Capabilities，
 #      勾上 Automatically manage signing 并选团队 9A94W79V84。
 #      归档这一步是用 Apple Development 身份签的，需要一张 Mac App
 #      Development 描述文件，而这类描述文件要求账号里至少注册过一台 Mac；
@@ -34,11 +34,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 TEAM_ID=9A94W79V84
-BUNDLE_ID=dev.vibemage.Paster
+BUNDLE_ID=dev.vibemage.Copyo
 # 上架脚本用的是 build/Copyo.xcarchive，这里另起一个名字，两个脚本互不覆盖
 ARCHIVE=build/Copyo-Release.xcarchive
 
-VERSION=$(sed -n 's/.*MARKETING_VERSION = "\{0,1\}\([0-9][0-9.A-Za-z-]*\)"\{0,1\};.*/\1/p' Paster.xcodeproj/project.pbxproj | head -1)
+VERSION=$(sed -n 's/.*MARKETING_VERSION = "\{0,1\}\([0-9][0-9.A-Za-z-]*\)"\{0,1\};.*/\1/p' Copyo.xcodeproj/project.pbxproj | head -1)
 if [[ -z "$VERSION" ]]; then
   echo "无法从 project.pbxproj 解析 MARKETING_VERSION" >&2
   exit 1
@@ -57,8 +57,8 @@ print_signing_help() {
      entitlements 里有这两项而 App ID 没开，描述文件申请不下来
   4. 若报「no devices from which to generate a provisioning profile」：
      自动签名归档要一张 Mac App Development 描述文件，而这类描述文件
-     必须至少有一台已注册的 Mac。用 Xcode 打开 Paster.xcodeproj →
-     target Paster → Signing & Capabilities，勾上 Automatically manage
+     必须至少有一台已注册的 Mac。用 Xcode 打开 Copyo.xcodeproj →
+     target Copyo → Signing & Capabilities，勾上 Automatically manage
      signing 并选团队 ${TEAM_ID}，Xcode 会把本机注册进账号并生成描述文件；
      也可以在开发者后台 Devices 里手工添加本机的 Provisioning UDID
      （系统信息 → 硬件 → 预置 UDID）
@@ -73,8 +73,8 @@ echo "==> 归档 Copyo $VERSION (Release)"
 rm -rf "$ARCHIVE"
 ARCHIVE_LOG=$(mktemp)
 ARCHIVE_ARGS=(
-  -project Paster.xcodeproj
-  -scheme Paster
+  -project Copyo.xcodeproj
+  -scheme Copyo
   -configuration Release
   -archivePath "$ARCHIVE"
   -derivedDataPath build
