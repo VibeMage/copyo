@@ -49,7 +49,7 @@ jobs:
       # 仓库是公开的，这两个标识符早就提交进库了，Team ID 更是嵌在每个签名 app 里、
       # 本来就是公开设计。放进 secret 只会让 YAML 难读，没有任何安全收益。
       TEAM_ID: 9A94W79V84
-      BUNDLE_ID: dev.vibemage.Paster
+      BUNDLE_ID: dev.vibemage.Copyo
       # 留空 = 用镜像默认的 Xcode（并把版本打进日志）。
       # 想锁定就填前缀，比如 "26.4"；镜像上带补丁号和不带补丁号的命名并不规则，
       # 所以这里按前缀匹配后取最高版本，而不是写死一个完整路径。
@@ -106,7 +106,7 @@ jobs:
           # 末尾的 || true 不能省：本步骤跑在 `bash -e -o pipefail` 下，xcodebuild 失败
           # （或 awk 提前 exit 让它收到 SIGPIPE）会让整个命令替换失败并当场退出脚本，
           # 下面那句友好的报错就永远打不出来，日志里只剩一个光秃秃的退出码。
-          proj_version=$(xcodebuild -project Paster.xcodeproj -target Paster \
+          proj_version=$(xcodebuild -project Copyo.xcodeproj -target Copyo \
             -configuration Release -showBuildSettings 2>/dev/null \
             | awk '/ MARKETING_VERSION = /{print $3; exit}') || true
           if [ -z "$proj_version" ]; then
@@ -285,14 +285,15 @@ jobs:
           set -o pipefail
           mkdir -p build/logs
           xcodebuild build \
-            -project Paster.xcodeproj \
-            -scheme Paster \
+            -project Copyo.xcodeproj \
+            -scheme Copyo \
             -configuration Release \
             -destination 'platform=macOS,arch=arm64' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            "CODE_SIGN_IDENTITY[sdk=macosx*]=" \
             CODE_SIGN_ENTITLEMENTS="" \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \

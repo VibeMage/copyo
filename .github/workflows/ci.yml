@@ -1,4 +1,4 @@
-# PR / push 门禁：不碰任何证书，只做无签名编译和 PasterCore 单元测试。
+# PR / push 门禁：不碰任何证书，只做无签名编译和 CopyoCore 单元测试。
 # 刻意与 release.yml 分开：fork 发起的 PR 取不到任何 secret、GITHUB_TOKEN 也只读，
 # 签名和发布放进同一个 workflow 只会让外部贡献者的 PR 永远是红的。
 name: CI
@@ -63,19 +63,20 @@ jobs:
           set -o pipefail
           mkdir -p build/logs
           prettify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
-          # 六个签名设置一个都不能少：工程里写死了 CODE_SIGN_IDENTITY="Apple Development"
+          # 这组签名设置一个都不能少：工程里写死了 CODE_SIGN_IDENTITY（含 sdk 限定版）= "Apple Development"
           # 和 DEVELOPMENT_TEAM=9A94W79V84，只给 CODE_SIGNING_ALLOWED=NO 时，
           # 带受限 entitlements（iCloud / aps-environment）的 target 仍会因为申请不到描述文件而失败。
           # destination 必须写具体的 arch：用 generic 时 Debug 的 ONLY_ACTIVE_ARCH=YES 不生效，白编一倍架构。
           xcodebuild build \
-            -project Paster.xcodeproj \
-            -scheme Paster \
+            -project Copyo.xcodeproj \
+            -scheme Copyo \
             -configuration Debug \
             -destination 'platform=macOS,arch=arm64' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            "CODE_SIGN_IDENTITY[sdk=macosx*]=" \
             CODE_SIGN_ENTITLEMENTS="" \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
@@ -93,8 +94,8 @@ jobs:
           # 代码里那些 `#if APPSTORE` 分支别的配置根本编不到。
           # 不编它，沙盒版的编译错误要等到维护者本地打上架包时才暴露。
           xcodebuild build \
-            -project Paster.xcodeproj \
-            -scheme Paster \
+            -project Copyo.xcodeproj \
+            -scheme Copyo \
             -configuration Release-AppStore \
             -destination 'platform=macOS,arch=arm64' \
             -derivedDataPath build \
@@ -102,6 +103,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            "CODE_SIGN_IDENTITY[sdk=macosx*]=" \
             CODE_SIGN_ENTITLEMENTS="" \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
@@ -116,11 +118,11 @@ jobs:
           prettify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
           # 必须用 generic：写 `name=iPhone 16` 这类具体机型，镜像换代后模拟器消失就会挂。
           # 代价是 generic 默认编双 slice，所以显式 ARCHS=arm64。
-          # 这一条会连带编 PasterShareExtension 与 PasterWidgets（它们内嵌在 iOS app 里），
+          # 这一条会连带编 CopyoShareExtension 与 CopyoWidgets（它们内嵌在 iOS app 里），
           # 和上面两条合起来才覆盖全部四个 target。
           xcodebuild build \
-            -project Paster.xcodeproj \
-            -scheme 'Paster iOS' \
+            -project Copyo.xcodeproj \
+            -scheme 'Copyo iOS' \
             -configuration Debug \
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build \
@@ -129,6 +131,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            "CODE_SIGN_IDENTITY[sdk=macosx*]=" \
             CODE_SIGN_ENTITLEMENTS="" \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
@@ -136,16 +139,16 @@ jobs:
           test -d 'build/Build/Products/Debug-iphonesimulator/Copyo.app' \
             || { echo '::error::xcodebuild 返回 0 但没产出 Copyo.app'; exit 1; }
 
-      - name: 单元测试（PasterCore）
+      - name: 单元测试（CopyoCore）
         run: |
           set -o pipefail
           mkdir -p build/logs
           # 绝对不要写 `xcodebuild test`：两个共享 scheme 的 <Testables> 都是空的，
           # 工程里也没有任何 unit-test 类型的 target，xcodebuild 会直接报
-          # "Scheme Paster is not currently configured for the test action."
-          # 真正的测试全在 PasterCore 这个本地 Swift 包里，只有 swift test 跑得到。
+          # "Scheme Copyo is not currently configured for the test action."
+          # 真正的测试全在 CopyoCore 这个本地 Swift 包里，只有 swift test 跑得到。
           # 包里 import SwiftData / SwiftUI / CryptoKit，所以只能在 macOS runner 上跑。
-          swift test --package-path PasterCore 2>&1 | tee build/logs/swift-test.log
+          swift test --package-path CopyoCore 2>&1 | tee build/logs/swift-test.log
 
       - name: 上传构建日志
         if: always()
