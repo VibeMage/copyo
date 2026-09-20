@@ -110,7 +110,9 @@ CI 只额外多附一份 `SHA256SUMS.txt`。
 正式发布，签名或公证凑不齐就当场失败——这保证了 Release 页面上的 DMG 永远是签过名并
 公证过的。
 
-证书与凭据怎么配、怎么先演练一遍再推 tag，见 [`docs/ci.md`](docs/ci.md)。
+**目前签名仍在本机做**：2026-09-21 决定不把 Developer ID 私钥放进 GitHub Secrets，
+正式包用 `scripts/build-release.sh` 在本地签名公证后手动上传，因此不推 `v*` tag。
+CI 只做编译校验与手动演练。理由与改回条件见 [`docs/ci.md`](docs/ci.md) 第二节。
 
 ### 更新
 

@@ -50,7 +50,8 @@
 - [ ] 应用内更新检查：比对 GitHub Releases，有新版时提示下载（仅直发版启用，
   App Store 版必须屏蔽该入口）
 - [ ] GitHub Actions CI：推送 tag 自动构建并附加 DMG 到 Release
-  （2026-09-20 构建校验与测试已接入，发布流程待配置 secret 并演练，见 docs/ci.md）
+  （2026-09-20 构建校验与测试已接入。2026-09-21 决定签名留在本地、不配 secret，
+  理由见 docs/ci.md 第二节）
 
 ## 已完成
 
