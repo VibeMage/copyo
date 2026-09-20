@@ -66,6 +66,7 @@ public enum CopyoStore {
 
     /// 建立容器。`cloudKit` 为 true 时把这份存储镜像到 CloudKit 私有数据库；
     /// 存储 URL 两种情况完全一致，因此切换同步方式只是换一层镜像，本地数据原样保留。
+    ///
     /// `allowsSave` 默认 true，现有调用方一处都不用改。传 false 是**只读打开**，目前只有
     /// 键盘扩展这么用，理由是那个进程独有的两条约束：
     ///
@@ -87,5 +88,46 @@ public enum CopyoStore {
                                  cloudKitDatabase: .private(cloudKitContainerIdentifier))
             : ModelConfiguration(schema: schema, url: url, allowsSave: allowsSave)
         return try ModelContainer(for: schema, configurations: configuration)
+    }
+
+    /// 这份数据库是不是被 CloudKit 镜像打开过。
+    ///
+    /// 「删除所有数据」必须知道这件事：用过 iCloud 同步、现在关掉了的用户，这次会话
+    /// 推不动云端的删除，也不能把库文件删掉——服务器变更令牌就在里面，删掉之后再打开
+    /// iCloud 同步，容器会当成全新的库，把整个 zone 原样导回来。
+    ///
+    /// 靠目录认：`<主文件名>_ckAssets` 只有在容器以 `.private` 建起来之后才会出现。
+    /// 不是万无一失（开过 iCloud 但从没同步过图片的库可能没有它），所以调用方要和
+    /// UserDefaults 里的标记一起看。
+    public static func hasCloudKitArtifacts(at url: URL, fileManager: FileManager = .default) -> Bool {
+        let directory = url.deletingLastPathComponent()
+        let base = (url.lastPathComponent as NSString).deletingPathExtension
+        return fileManager.fileExists(atPath: directory.appendingPathComponent("\(base)_ckAssets").path)
+    }
+
+    /// 把这份数据库连同外部存储、CloudKit 资产暂存一起从磁盘上删掉。
+    ///
+    /// delete + save 不够：SQLite 不把释放的页清零，删掉的正文仍然能从 .store 里捞出来
+    /// （实测 400 条擦除后 `strings` 还能捞到 83 条，-wal 里另有 240 条）。只有把文件
+    /// 整个删掉重建才算真的抹干净；而容器一旦建起来就没有关闭的 API，所以这件事只能在
+    /// 下次启动、makeContainer 之前做。
+    ///
+    /// 只删名字能算出来的那几样，不做前缀匹配：用户手工放在同目录下的
+    /// `Copyo.store.backup` 之类不该被顺手带走。
+    public static func destroyStore(at url: URL, fileManager: FileManager = .default) {
+        let directory = url.deletingLastPathComponent()
+        let storeName = url.lastPathComponent
+        let base = (storeName as NSString).deletingPathExtension
+        let names = [
+            storeName,                  // Copyo.store
+            storeName + "-wal",
+            storeName + "-shm",
+            storeName + "-journal",     // 回滚日志模式下的那一份
+            ".\(base)_SUPPORT",         // externalStorage 的大块数据
+            "\(base)_ckAssets",         // CloudKit 资产暂存
+        ]
+        for name in names {
+            try? fileManager.removeItem(at: directory.appendingPathComponent(name))
+        }
     }
 }

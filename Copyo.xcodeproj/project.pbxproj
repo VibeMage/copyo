@@ -315,8 +315,8 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				AB0000000000000000000053 /* CopyoKeyboard */,
 				AB000000000000000000002E /* CopyoShared */,
+				AB0000000000000000000053 /* CopyoKeyboard */,
 			);
 			name = CopyoKeyboard;
 			packageProductDependencies = (

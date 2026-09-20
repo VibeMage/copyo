@@ -8,6 +8,9 @@ final class ClipboardMonitor {
     private let context: ModelContext
     private var timer: Timer?
     private var lastChangeCount: Int
+    /// 采集代次。TIFF 转 PNG 在后台线程跑，回到主线程时「删除所有数据」可能早就做完了，
+    /// 那一条插进来就成了空库里唯一的一条——而且正是用户最想抹掉的那条。
+    private var captureGeneration = 0
 
     private static let concealedType = NSPasteboard.PasteboardType("org.nspasteboard.ConcealedType")
     private static let transientType = NSPasteboard.PasteboardType("org.nspasteboard.TransientType")
@@ -36,6 +39,11 @@ final class ClipboardMonitor {
 
     /// PasteService 写回剪贴板后调用。直接把基线对齐到写入后的 changeCount，
     /// 这样写入之后其他应用的真实复制仍会产生增量并被正常记录。
+    /// 擦除前调用：让所有还在后台转码、尚未落库的采集作废
+    func invalidatePendingCaptures() {
+        captureGeneration &+= 1
+    }
+
     func ignoreNextChange() {
         lastChangeCount = NSPasteboard.general.changeCount
     }
@@ -106,10 +114,13 @@ final class ClipboardMonitor {
             insertImage(png, bundleID: bundleID, appName: appName, colorHex: colorHex)
         } else if let tiff = pb.data(forType: .tiff) ?? NSImage(pasteboard: pb)?.tiffRepresentation {
             // monitor 与应用同生命周期，强捕获 self 安全
+            let generation = captureGeneration
             Task.detached(priority: .utility) {
                 guard let rep = NSBitmapImageRep(data: tiff),
                       let png = rep.representation(using: .png, properties: [:]) else { return }
                 await MainActor.run {
+                    // 转码期间擦过一次库，这一条就作废
+                    guard generation == self.captureGeneration else { return }
                     self.insertImage(png, bundleID: bundleID, appName: appName, colorHex: colorHex)
                 }
             }

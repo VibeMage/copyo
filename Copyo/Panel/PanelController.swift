@@ -114,6 +114,15 @@ final class PanelController: NSObject, NSWindowDelegate {
         }
     }
 
+    /// 不带动画地立刻收起。「删除所有数据」要在删之前确保面板不再显示已删对象，
+    /// 而 hide() 是异步动画、而且 `guard panel.isVisible` 会让它在面板没开时直接返回。
+    /// 注意这只是把窗口 orderOut：宿主视图和它的 @State 与进程同寿命，不会重建，
+    /// 所以调用方还要发一次 .copyoDidEraseAll 让面板自己把瞬时状态清掉。
+    func hideImmediately() {
+        isAnimatingOut = false
+        panel.orderOut(nil)
+    }
+
     /// 面板内的 alert 关闭后重新拿回键盘焦点
     func makePanelKey() {
         guard panel.isVisible else { return }
@@ -144,4 +153,5 @@ final class PanelController: NSObject, NSWindowDelegate {
 extension Notification.Name {
     /// 面板每次呼出时发出，供 PanelRootView 重置搜索/选中状态
     static let copyoPanelDidShow = Notification.Name("CopyoPanelDidShow")
+    static let copyoDidEraseAll = Notification.Name("CopyoDidEraseAll")
 }
