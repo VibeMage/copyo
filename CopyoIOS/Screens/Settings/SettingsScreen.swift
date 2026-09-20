@@ -36,6 +36,7 @@ struct SettingsScreen: View {
         case quickSave
         case howToSave
         case allowPaste
+        case keyboard
         case about
     }
 
@@ -57,6 +58,7 @@ struct SettingsScreen: View {
             case .quickSave: QuickSaveGuideScreen()
             case .howToSave: HowToSaveScreen()
             case .allowPaste: AllowPasteGuideScreen()
+            case .keyboard: KeyboardGuideScreen()
             case .about: AboutScreen()
             }
         }
@@ -202,6 +204,34 @@ struct SettingsScreen: View {
             }
             .tint(CopyoTheme.switchOn)
             .settingsRow()
+
+            // 只有包里真的带着键盘扩展时才出现这一行。iOS 首个版本（1.1.0）不随包发布键盘
+            // （见 docs/ios-plan.md 3.6），那一版的包里没有 `CopyoKeyboard.appex`，
+            // 而这一行会一步步教用户去「添加新键盘」里找一个根本不存在的东西。
+            //
+            // 判据取的是**包里到底有没有**，不是一个手动开关：开关要靠人记得翻，
+            // 而忘了翻的两种表现都很难被发现——发键盘时忘了打开，用户找不到入口；
+            // 不发时忘了关掉，设置里多一行教人做不到的事。按 appex 判断则是自洽的，
+            // 哪天把 embed 挂回去，这一行自己就回来了。
+            if KeyboardExtension.isBundled {
+                Button {
+                    route = .keyboard
+                } label: {
+                // 设计 04 这一格的右值是「未启用」。iOS 既不提供读取「键盘是否已添加」的 API，
+                // 也不提供读取「允许完全访问」的 API（键盘进程自己只能靠 `hasFullAccess`
+                // 反推，主应用连那个都拿不到），所以「未启用」在这里只能是编的——
+                // 已经启用的用户每次进设置都会看见一句假的。
+                // 与上面「允许从其他 App 粘贴」同一条先例：右值改成说「这事在系统设置里」。
+                // 那一格是橙色因为它确实还需要用户去处理；这一格读不出状态，
+                // 橙色就成了对所有人不分青红皂白的催促，所以走默认的次级色。
+                SettingsRowLabel(symbol: "keyboard.fill",
+                                 color: SettingsTint.keyboard,
+                                 title: String(localized: "Copyo Keyboard"),
+                                 detail: String(localized: "In iOS Settings"),
+                                 showsDisclosure: true)
+                }
+                .settingsRow()
+            }
 
             Picker(selection: $historyLimit) {
                 ForEach(IOSSettings.historyLimitOptions, id: \.self) { limit in
@@ -368,6 +398,7 @@ struct SettingsScreen: View {
         case .settingsQuickSave: route = .quickSave
         case .settingsHowTo: route = .howToSave
         case .settingsPaste: route = .allowPaste
+        case .settingsKeyboard: route = .keyboard
         default: break
         }
     }

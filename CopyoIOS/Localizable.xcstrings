@@ -369,6 +369,29 @@
         }
       }
     },
+    "331 Caoxi North Rd, Tower B, 12F, Xuhui, Shanghai": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "331 Caoxi North Rd, Tower B, 12F, Xuhui, Shanghai"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "331 Caoxi North Rd, tour B, 12e étage, Xuhui, Shanghai"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上海市徐汇区漕溪北路 331 号中金国际广场 B 座 12 层"
+          }
+        }
+      }
+    },
     "About": {
       "extractionState": "manual",
       "localizations": {
@@ -1354,6 +1377,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "纯文本复制"
+          }
+        }
+      }
+    },
+    "Copyo Keyboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo Keyboard"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clavier Copyo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 键盘"
           }
         }
       }
@@ -3957,6 +4003,29 @@
         }
       }
     },
+    "Settings › General › Keyboard › Keyboards": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings › General › Keyboard › Keyboards"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages › Général › Clavier › Claviers"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「设置 › 通用 › 键盘 › 键盘」"
+          }
+        }
+      }
+    },
     "Share": {
       "extractionState": "manual",
       "localizations": {
@@ -4371,6 +4440,29 @@
         }
       }
     },
+    "Switch to the Copyo keyboard in any text field and tap a card to type it — no jumping between apps.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch to the Copyo keyboard in any text field and tap a card to type it — no jumping between apps."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans n’importe quel champ de saisie, passez au clavier Copyo et touchez une carte pour l’insérer, sans changer d’app."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在任何输入框里切换到 Copyo 键盘，点卡片直接输入内容，不用来回切 App。"
+          }
+        }
+      }
+    },
     "Sync": {
       "extractionState": "manual",
       "localizations": {
@@ -4555,6 +4647,29 @@
         }
       }
     },
+    "Tap “Add New Keyboard…” and choose Copyo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap “Add New Keyboard…” and choose Copyo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez « Ajouter un clavier… », puis choisissez Copyo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点「添加新键盘…」，选择 Copyo"
+          }
+        }
+      }
+    },
     "Tap “Add a Control” and search for Copyo": {
       "extractionState": "manual",
       "localizations": {
@@ -4712,6 +4827,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "这个控件由 Copyo 自带，不需要先添加任何东西。"
+          }
+        }
+      }
+    },
+    "The keyboard extension needs it to read your history. The Copyo keyboard never goes online, and never records what you type.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The keyboard extension needs it to read your history. The Copyo keyboard never goes online, and never records what you type."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’extension de clavier en a besoin pour lire votre historique. Le clavier Copyo ne se connecte jamais à Internet et n’enregistre jamais ce que vous tapez."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "键盘扩展需要它才能读取历史。Copyo 键盘不联网，也不记录你的输入。"
           }
         }
       }
@@ -4942,6 +5080,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "开启 iCloud 同步"
+          }
+        }
+      }
+    },
+    "Turn on “Allow Full Access”": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on “Allow Full Access”"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activez « Accès complet »"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开「允许完全访问」"
           }
         }
       }
@@ -5195,6 +5356,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac 剪贴板，随身带着"
+          }
+        }
+      }
+    },
+    "Your verification code is 482913. It expires in 5 minutes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your verification code is 482913. It expires in 5 minutes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre code de vérification est 482913. Il expire dans 5 minutes."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "【抖音】验证码 482913，5 分钟内有效，请勿泄露给他人。"
           }
         }
       }

@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// 设置页与三个说明页共用的零件（设计 3.8）。
+/// 设置页与四个说明页共用的零件（设计 3.8）。
 ///
-/// 这些形状在四个界面里重复出现，散着写必然会在圆角、行高、图标尺寸上走形——
+/// 这些形状在五个界面里重复出现，散着写必然会在圆角、行高、图标尺寸上走形——
 /// 设计稿把「图标砖 30×30 / 行高 52 / 步骤序号圆 28」定得很死，集中一处才好对齐。
 enum SettingsTint {
     /// 设计 04 里图标砖的底色，顺序与设计帧一致
@@ -10,12 +10,14 @@ enum SettingsTint {
     static let question = Color(uiColor: CopyoTheme.rgb(0xFF9F0A))
     static let bolt = Color(uiColor: CopyoTheme.rgb(0xFF2D55))
     static let clipboard = Color(uiColor: CopyoTheme.rgb(0x8E8E93))
-    /// 「自动读取剪贴板」是设计 04 里没有的一行（04e 的「Copyo 键盘」留给 Phase 2）。
-    /// 原来借用了键盘那格的 #5856D6，会跟 04 的图标序列撞色；换成不在序列里的青色。
+    /// 「自动读取剪贴板」是设计 04 里没有的一行。原来借用了键盘那格的 #5856D6，
+    /// 会跟 04 的图标序列撞色；换成不在序列里的青色。
     static let autoRead = Color(uiColor: CopyoTheme.rgb(0x30B0C7))
+    /// 设计 04 序列里键盘那一格的紫色，现在归「Copyo 键盘」行（04e）所有
+    static let keyboard = Color(uiColor: CopyoTheme.rgb(0x5856D6))
     static let clock = Color(uiColor: CopyoTheme.rgb(0x34C759))
-    /// 系统搜索索引同样是设计 04 里没有的一行。刻意避开 #5856D6——那是 04e 留给
-    /// 「Copyo 键盘」的紫色，占掉它等于把后面那一行的颜色先用了；这里取序列外的洋红紫。
+    /// 系统搜索索引同样是设计 04 里没有的一行。刻意避开 #5856D6——那是上面「Copyo 键盘」
+    /// 那一格的紫色，占掉它就得让真正属于设计序列的那一行改色；这里取序列外的洋红紫。
     static let spotlight = Color(uiColor: CopyoTheme.rgb(0xAF52DE))
     static let code = Color(uiColor: CopyoTheme.rgb(0x48484A))
     static let hand = Color(uiColor: CopyoTheme.rgb(0x0A84FF))
@@ -113,7 +115,7 @@ extension View {
 
 // MARK: - 说明页容器
 
-/// 三个说明页（04b / 04c / 04d）共用的滚动容器：页边距 20、顶部 8、inline 标题。
+/// 四个说明页（04b / 04c / 04d / 04e）共用的滚动容器：页边距 20、顶部 8、inline 标题。
 struct GuideScroll<Content: View>: View {
     var spacing: CGFloat = 20
     @ViewBuilder var content: () -> Content
