@@ -11,7 +11,8 @@
   - Phase 2：键盘扩展、小组件、Spotlight 索引
 - [ ] 法语本地化（英文/中文已完成，String Catalog 就绪，添加语言即可）
 - [ ] 应用内更新检查：比对 GitHub Releases，有新版时提示下载
-- [ ] GitHub Actions CI：推送 tag 自动构建并附加 DMG 到 Release
+- [ ] GitHub Actions CI：推送 tag 自动构建并附加 DMG 到 Release（2026-09-20 构建校验与
+  PasterCore 测试已接入，发布流程待配置签名 / 公证 secret 并演练，见 docs/ci.md）
 - [ ] 单元测试：剪贴板内容分类、去重、同步合并逻辑
 - [ ] 英文版 README
 - [ ] 构建号随版本递增（`CURRENT_PROJECT_VERSION`）
