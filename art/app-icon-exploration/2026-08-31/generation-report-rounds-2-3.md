@@ -1,4 +1,4 @@
-# Paster App Icon Generation Report — Rounds 2 and 3
+# Copyo App Icon Generation Report — Rounds 2 and 3
 
 - Generation provider: built-in ImageGen
 - Model identifier: not exposed by the runtime tool schema

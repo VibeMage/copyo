@@ -2,7 +2,7 @@
 
 [简体中文](README.md)
 
-Copyo (formerly Paster) is an open-source clipboard manager for macOS: it lives in the menu bar, `⇧⌘V` brings up a card panel at the bottom of the screen, and you search your history as you type.
+Copyo is an open-source clipboard manager for macOS: it lives in the menu bar, `⇧⌘V` brings up a card panel at the bottom of the screen, and you search your history as you type.
 Data lives on this Mac (`~/Library/Application Support/Copyo/`) and syncing is off by default; there are no third-party SDKs, no analytics and no crash reporting, which makes it a fit for workplaces that do not allow third-party closed-source tools.
 
 ## Features
@@ -26,7 +26,7 @@ Data lives on this Mac (`~/Library/Application Support/Copyo/`) and syncing is o
 
 ## Installation
 
-The Mac App Store build is back in review under the name Copyo (the old Paster record was taken down and deleted). The new link will go here once it is approved.
+The Mac App Store build is in review. The link will go here once it is approved.
 
 For now, grab the DMG from [Releases](https://github.com/VibeMage/copyo/releases), open it and drag Copyo
 into Applications. Official releases are signed with a Developer ID and notarized by Apple, so a double-click is all it takes —
@@ -88,7 +88,7 @@ xcrun notarytool store-credentials copyo-notary \
 ### Updating
 
 Official releases always carry the same signing identity, so installing a new DMG over the old version (drag it into Applications and replace) is all you need.
-Your history lives in `~/Library/Application Support/Copyo/` and is left untouched (the `Paster/` directory from 1.0 is moved over automatically on first launch).
+Your history lives in `~/Library/Application Support/Copyo/` and is left untouched.
 
 ## Icon
 
@@ -96,7 +96,7 @@ The two platforms have separate icons, so changing the icon means running **both
 
 ```bash
 ./scripts/make-icon.sh          # macOS: scale art/icon-master.png into the 10 sizes in the asset catalog
-./scripts/make-icon.sh --ios    # iOS: redraw the light / dark / tinted variants from art/icon/paster-icon-spec.md
+./scripts/make-icon.sh --ios    # iOS: redraw the light / dark / tinted variants from art/icon/copyo-icon-spec.md
 ```
 
 The macOS run reads `art/icon-master.png` (1024×1024); replace that file with your own design.

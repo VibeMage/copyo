@@ -2,7 +2,7 @@
 
 [English](README.en.md)
 
-Copyo（曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜单栏常驻，`⇧⌘V` 呼出底部卡片面板，历史即输即搜。
+Copyo 是一款开源的 macOS 剪贴板管理工具：菜单栏常驻，`⇧⌘V` 呼出底部卡片面板，历史即输即搜。
 数据保存在本机（`~/Library/Application Support/Copyo/`），同步默认关闭；不含任何第三方 SDK、统计或崩溃上报，适合不允许安装第三方闭源工具的办公环境。
 
 ## 功能
@@ -26,7 +26,7 @@ Copyo（曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜�
 
 ## 安装
 
-Mac App Store 版本正在以 Copyo 的身份重新提审（旧的 Paster 记录已下架删除），过审后这里会放上新链接。
+Mac App Store 版本正在审核中，过审后这里会放上链接。
 
 目前请从 [Releases](https://github.com/VibeMage/copyo/releases) 下载 DMG，打开后把 Copyo
 拖进 Applications 即可。官方发布均已使用 Developer ID 签名并通过 Apple 公证——双击即可打开，
@@ -115,7 +115,7 @@ CI 只额外多附一份 `SHA256SUMS.txt`。
 ### 更新
 
 官方发布签名身份固定：新版 DMG 覆盖安装（拖进 Applications 替换）即可，历史数据在
-`~/Library/Application Support/Copyo/`，不受影响（1.0 的 `Paster/` 目录会在首次启动时自动搬过去）。
+`~/Library/Application Support/Copyo/`，不受影响。
 
 ## 图标
 
@@ -123,7 +123,7 @@ CI 只额外多附一份 `SHA256SUMS.txt`。
 
 ```bash
 ./scripts/make-icon.sh          # macOS：把 art/icon-master.png 缩成资产目录里的 10 个规格
-./scripts/make-icon.sh --ios    # iOS：按 art/icon/paster-icon-spec.md 重画浅色 / 深色 / 单色三份
+./scripts/make-icon.sh --ios    # iOS：按 art/icon/copyo-icon-spec.md 重画浅色 / 深色 / 单色三份
 ```
 
 macOS 那条读 `art/icon-master.png`（1024×1024），换成你自己的设计即可。iOS 那条不吃输入

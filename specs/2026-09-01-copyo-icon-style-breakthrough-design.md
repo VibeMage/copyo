@@ -1,4 +1,4 @@
-# Paster App Icon Style Breakthrough Exploration
+# Copyo App Icon Style Breakthrough Exploration
 
 ## Goal
 
@@ -60,5 +60,5 @@ Save Round 7 and Round 8 in separate project-local directories under the dated i
 
 Present the eight candidates in a single visual comparison grouped into four style cards. Each style card shows its Round 7 and Round 8 candidates side by side with 32-pixel previews. The user can select or reference any full label such as R7-S or R8-M.
 
-Do not modify art/icon-master.png or Paster/Assets.xcassets/AppIcon.appiconset during this exploration.
+Do not modify art/icon-master.png or Copyo/Assets.xcassets/AppIcon.appiconset during this exploration.
 

@@ -39,7 +39,7 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 ### 2.1 同步：CloudKit 私有数据库（SwiftData 原生）
 
 - `ModelConfiguration(cloudKitDatabase: .private("iCloud.dev.vibemage.Copyo"))`，Mac 与 iOS 共用同一容器。
-  容器标识在 2026-09-19 随改名从 `iCloud.dev.vibemage.Paster` 换成了现在这个。旧容器从未随正式版发布过，直接弃用即可；已经拿旧容器同步过的开发机，本地库照常在，云端那份不要了。
+  旧容器从未随正式版发布过，直接弃用即可；已经拿旧容器同步过的开发机，本地库照常在，云端那份不要了。
 - 现有 `ClipItem` / `Pinboard` 模型已满足 CloudKit 要求（全部属性有默认值或可选、关系可选、无 unique 约束），**不需要改模型**。`externalStorage` 的图片会自动作为 CKAsset 上传。
 - 与现有文件夹快照同步的关系：**并存，二选一**。公司 Mac 常被 MDM 禁用 iCloud，文件夹同步（含自定义目录）仍是这类环境的唯一出路；CloudKit 是个人设备之间的默认选项。iOS 只做 CloudKit。
 - 行为差异要写进设置页说明：快照同步不传播删除，CloudKit 会——一台设备删了，处处都删；Mac 的「历史上限」清理也会同步生效。
@@ -59,7 +59,7 @@ iOS 10 起后台进程读剪贴板一律拿不到内容，iOS 14 加了读取横
 ### 2.3 工程与商店
 
 - 同一 `Copyo.xcodeproj` 增加 `Copyo iOS` target（Bundle ID **同为** `dev.vibemage.Copyo`，这是通用购买的硬性要求），扩展用 `dev.vibemage.Copyo.ShareExtension` 等后缀。
-- App Store Connect：在现有应用记录里「添加平台 → iOS」，自动成为 Universal Purchase，SKU `paster` 不变。Mac 1.0 审核期间做这件事不影响审核。
+- App Store Connect：在现有应用记录里「添加平台 → iOS」，自动成为 Universal Purchase，SKU `copyo` 不变。Mac 1.0 审核期间做这件事不影响审核。
 - 隐私问卷维持「不收集数据」：私有 iCloud 数据库里的内容开发者无法访问，按 Apple 的定义不算收集。
 - 最低系统：**iOS 18 / iPadOS 18**（控制中心控件、SwiftData 成熟度），用 Xcode 26 编译自动获得 iOS 26 的 Liquid Glass 外观。Mac 版维持 macOS 14。
 
@@ -160,7 +160,7 @@ xcrun simctl launch --terminate-running-process "iPhone 17 Pro" dev.vibemage.Cop
 **逐字节相同**——iOS 直接用了 macOS 的母图。实测 RGBA、1 048 576 个像素里 398 384 个全透明，
 不透明包围盒 (100, 100, 924, 924)，即一张内缩约 10% 的 824×824 圆角方——那是 **macOS 的图标网格**。
 iOS 要的是满幅 1024×1024 且**不带 alpha**（自己会套超椭圆遮罩），装到手机上是「小一圈 + 二次圆角」，
-带 alpha 还可能在上传时触发 `ITMS-90717`。现已按 `art/icon/paster-icon-spec.md` 的几何重新生成满幅无 alpha 版，
+带 alpha 还可能在上传时触发 `ITMS-90717`。现已按 `art/icon/copyo-icon-spec.md` 的几何重新生成满幅无 alpha 版，
 并补上 dark 与 tinted 两个 `appearances` 变体（tinted 必须是刻意设计的单色还原——系统会盖上用户的色调，
 红蓝错位这个品牌标记在那里存活不下来）。`scripts/make-icon.sh --ios` 可复现。
 
@@ -365,7 +365,7 @@ store 文件内稳定，重装 / 重建库由 store 令牌兜住。
 ### 4.1 参考资料（一并上传）
 
 - `art/store/01-panel-zh.png`、`02-search-zh.png`、`03-preview-zh.png`：Mac 版卡片面板的现状，卡片结构（顶部来源色条、类型角标、来源应用 + 时间、内容预览、圆角 12）是品牌识别的一部分，移动端要延续
-- `art/icon/icon-master-1024.png` + `art/icon/paster-icon-spec.md`：图标与配色语言
+- `art/icon/icon-master-1024.png` + `art/icon/copyo-icon-spec.md`：图标与配色语言
 - 本文第一节的能力对照表：设计不能出现 iOS 做不到的交互（比如「自动粘贴」按钮）
 
 ### 4.2 Claude Design 提示词（可直接粘贴，配合 4.1 的参考图上传）
