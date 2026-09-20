@@ -26,11 +26,17 @@
 ## 计划中
 
 - [ ] iOS / iPadOS 版（详见 docs/ios-plan.md）
-  - **下一步是真机验证，按 docs/ios-plan.md 3.7 的顺序走。** 代码 Phase 1 + Phase 2 都完成了，
-    但至今**所有** iOS 构建都是 `CODE_SIGNING_ALLOWED=NO`，entitlements 一次都没展开过——
-    App Group 共库、CloudKit、一键保存这三条核心链路在物理上不可能执行过。
-    3.7 按「失败暴露得早不早」排序，不是按功能分组：第 1 步就是用最小实验验 App Group，
-    它不通的话分享扩展、小组件、扩展侧的 Spotlight 索引全部失去意义
+  - **2026-09-21：第一次签名出包成功，跨进程链路已验通**（见 docs/ios-plan.md 3.8）。
+    产出 `build/appstore-ios/Copyo.ipa`（1.1.0 (2)，Apple Distribution 签名，
+    entitlements / 构建号 / 图标 / 出口合规逐项核过），出包脚本
+    `scripts/build-appstore-ios.sh`。entitlements 一展开，模拟器就能验掉一大半：
+    App Group 共享库、分享扩展端到端（Safari → 分享面板 → 扩展进程 → 共享库 → 主应用）、
+    通道 A 与 iOS 16 粘贴授权弹窗、小组件小 / 中两个尺寸的**实际渲染**、
+    以及「点按复制不会把条目顶到历史最前面」
+  - **仍然缺 CloudKit 的实测**——模拟器没有 iCloud 账号，而那是 iOS 版最大的价值所在。
+    连同一键保存、Spotlight、触摸手势、VoiceOver 一起，需要一台真机；顺序见 3.7
+  - **上传还缺一步（你来做）**：App Store Connect 的应用记录「添加平台 → iOS」。
+    不做也能出包，但上传会被拒
   - 定位：Mac 剪贴板历史的口袋入口 + 手机侧收集器，同一应用记录组成 Universal Purchase
   - Phase 0：抽出共享 `CopyoCore` 包，Mac 接入 CloudKit（已完成）
   - Phase 1：历史 / 搜索 / Pinboard / 复制，三条保存通道（前台自动读取、分享扩展、一键保存：
