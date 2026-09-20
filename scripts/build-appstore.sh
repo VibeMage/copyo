@@ -38,6 +38,15 @@ ARCHIVE=build/Copyo.xcarchive
 # 版本号必须取自真正被归档的那份配置。project.pbxproj 里三个 target 配置各有一行
 # MARKETING_VERSION / CURRENT_PROJECT_VERSION，按文件顺序 sed 到的第一行是 Debug 的值；
 # 只把 Release-AppStore 的构建号 +1（正确做法）时，脚本就会印出并校验一个陈旧的号。
+# 构建号自动递增。以前要手动去 project.pbxproj 里 +1，忘了就会上传失败
+# （App Store Connect 不接受重复的构建号）。NO_BUMP=1 可跳过——重试一次失败的
+# 构建时用，构建号只要递增即可，跳号无害。
+if [[ "${NO_BUMP:-0}" != "1" ]]; then
+  echo "==> 递增上架构建号"
+  ./scripts/bump-build-number.sh | sed 's/^/    CURRENT_PROJECT_VERSION /'
+  echo "    （这会改动 project.pbxproj，记得连同本次发布一起提交）"
+fi
+
 echo "==> 读取 Release-AppStore 构建设置"
 if ! BUILD_SETTINGS=$(xcodebuild -project Copyo.xcodeproj -scheme Copyo \
      -configuration Release-AppStore -showBuildSettings 2>/dev/null); then
@@ -141,6 +150,12 @@ write_export_plist() {
 	<string>automatic</string>
 	<key>uploadSymbols</key>
 	<true/>
+	<!-- 不让 Xcode 自作主张改版本号与构建号。这个键缺省时 Xcode 会把构建号抬成
+	     「App Store Connect 上已有的最大值 + 1」，于是出包的号和 project.pbxproj
+	     里的号对不上，脚本打印的构建号就是假的（1.0 那次：配置里是 4，实际出包是 5）。
+	     设成 false 之后，出的包就是仓库里记着的那个号，可复现、可追溯。 -->
+	<key>manageAppVersionAndBuildNumber</key>
+	<false/>
 </dict>
 </plist>
 PLIST
@@ -198,6 +213,25 @@ fi
 mv "$EXPORTED" "$PKG"
 rm -rf "$EXPORT_DIR"
 
+# 核对包里的真实构建号。manageAppVersionAndBuildNumber=false 之后两者应当一致；
+# 不一致说明导出选项没生效，此时打印出来的构建号会误导后续的上传判断。
+VERIFY_DIR=$(mktemp -d)
+if pkgutil --expand-full "$PKG" "$VERIFY_DIR/pkg" >/dev/null 2>&1; then
+  PKG_APP=$(find "$VERIFY_DIR/pkg" -maxdepth 6 -name "Copyo.app" -type d | head -1)
+  if [[ -n "$PKG_APP" ]]; then
+    PKG_BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PKG_APP/Contents/Info.plist" 2>/dev/null || true)
+    PKG_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PKG_APP/Contents/Info.plist" 2>/dev/null || true)
+    if [[ -n "$PKG_BUILD" && "$PKG_BUILD" != "$BUILD_NUMBER" ]]; then
+      echo "包里的构建号（${PKG_BUILD}）与配置（${BUILD_NUMBER}）不一致——" >&2
+      echo "多半是导出选项里的 manageAppVersionAndBuildNumber 没生效，Xcode 又自己改了号。" >&2
+      rm -rf "$VERIFY_DIR"
+      exit 1
+    fi
+    echo "==> 包内版本核对通过：${PKG_VERSION} (${PKG_BUILD})"
+  fi
+fi
+rm -rf "$VERIFY_DIR"
+
 echo ""
 ls -lh "$PKG"
 echo ""
@@ -242,6 +276,6 @@ echo "     那份没有沙盒权限，上传必被拒——认准时间戳）"
 echo ""
 echo "上传前确认：App Store Connect 已有 ${BUNDLE_ID} 的 App 记录，"
 echo "且构建号 ${BUILD_NUMBER} 大于上一次上传过的构建号"
-echo "（下次上传前，只需把 project.pbxproj 里 Release-AppStore 配置"
-echo " AB0000000000000000000011 的 CURRENT_PROJECT_VERSION +1，"
-echo " Debug / Release 两个配置不要动——那是直分发版的构建号）。"
+echo "（构建号由本脚本自动递增，无需手动改 project.pbxproj；"
+echo " 只想看或指定构建号用 ./scripts/bump-build-number.sh --show / <数字>，"
+echo " 重试失败的构建时加 NO_BUMP=1 跳过递增）。"
