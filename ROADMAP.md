@@ -16,8 +16,10 @@
     **开发者后台配置已于 2026-09-19 完成**（三个 App ID、App Group、iCloud 容器），
     剩真机验证与提审，清单见 docs/ios-plan.md 3.2
   - Phase 2：键盘扩展、小组件、Spotlight 索引
-  - Phase 1 遗留缺陷（见 ios-plan.md 3.2 末尾）：搜索无 predicate 下推与防抖，条目上万时
-    每敲一字全表扫描；动态字体放大时角标与筛选胶囊不跟随；VoiceOver 未验证
+  - **Phase 1 遗留缺陷已于 2026-09-20 全部清掉**（动态字体、搜索防抖与 predicate 下推、
+    超长正文、`isSelected`、VoiceOver、AppIcon），过程与取舍见 docs/ios-plan.md 3.3。
+    顺带查出 iOS 的 AppIcon 与 macOS 母图逐字节相同——带 alpha、内缩 10%，那是 Mac 的图标网格，
+    已重新生成满幅无 alpha 版并补上 dark / tinted 变体
 - [ ] 同步合并逻辑的单元测试。这是目前**唯一没有测试保护的复杂逻辑**，而它直接决定
   用户数据会不会丢。前提是先把 `Copyo/Services/SyncService.swift` 里的快照导入导出、
   游标推进、identity 去重下沉到 `CopyoCore`——留在 app target 里测不了
@@ -27,6 +29,7 @@
 - [ ] 应用内更新检查：比对 GitHub Releases，有新版时提示下载（仅直发版启用，
   App Store 版必须屏蔽该入口）
 - [ ] GitHub Actions CI：推送 tag 自动构建并附加 DMG 到 Release
+  （2026-09-20 构建校验与测试已接入，发布流程待配置 secret 并演练，见 docs/ci.md）
 
 ## 已完成
 
