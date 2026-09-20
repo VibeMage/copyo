@@ -164,6 +164,12 @@ struct HistorySettingsView: View {
                 Button("Clear History…", role: .destructive) {
                     showClearConfirm = true
                 }
+                Button("Delete All Data…", role: .destructive) {
+                    // 确认和结果都交给 AppDelegate 里那套 NSAlert：菜单栏和这里必须是
+                    // 同一个流程，而且擦除失败要再弹一个 alert——SwiftUI 在一个 alert 的
+                    // 动作里弹第二个会被直接吞掉，那正好是「什么都没删，却什么都不显示」。
+                    AppDelegate.shared?.deleteAllData()
+                }
             }
         }
         .formStyle(.grouped)
@@ -171,7 +177,7 @@ struct HistorySettingsView: View {
             Button("Clear", role: .destructive) { clearHistory() }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("This deletes every clipboard entry that isn’t pinned to a Pinboard. This action cannot be undone.")
+            Text("This deletes every clipboard entry that isn’t pinned to a Pinboard. Pinned entries and Pinboards are kept — use Delete All Data to remove those too. This action cannot be undone.")
         }
     }
 
@@ -193,8 +199,12 @@ struct HistorySettingsView: View {
 /// 但容器是启动时按方式建好的，所以改了方式要重启才换得过来。
 struct SyncSettingsView: View {
     @AppStorage(SyncMode.defaultsKey) private var syncModeRaw = SyncMode.off.rawValue
+    @AppStorage(CloudSyncStatus.containerErrorKey) private var containerError = ""
+    @AppStorage(DataEraser.cloudWipePendingKey) private var cloudWipePending = false
+    @AppStorage(DataEraser.icloudCopyMayRemainKey) private var icloudCopyMayRemain = false
 
     private var mode: SyncMode { SyncMode(rawValue: syncModeRaw) ?? .off }
+    private var cloudKitActive: Bool { AppDelegate.shared?.cloudKitActive ?? false }
 
     var body: some View {
         Form {
@@ -204,9 +214,21 @@ struct SyncSettingsView: View {
                     Text("Shared Folder").tag(SyncMode.folder.rawValue)
                     Text(verbatim: "iCloud").tag(SyncMode.icloud.rawValue)
                 }
-                .onChange(of: syncModeRaw) { _, _ in
+                .onChange(of: syncModeRaw) { oldValue, newValue in
                     // 文件夹同步的计时器立刻跟着起停；iCloud 那一路要等重启才换容器
                     AppDelegate.shared?.syncService.updateActivation()
+                    // 从 iCloud 切走是唯一一个「界面已经改了、字节还在往外走」的方向。
+                    // 挂一行灰字等于默许它继续传，所以当场拦下：要么重启（真的停了），
+                    // 要么把选择器退回去（界面重新说真话）。绝不能停在
+                    // 「显示关闭 / 共享文件夹，而 CloudKit 还在上传」这个状态上。
+                    //
+                    // 切到共享文件夹也必须拦：SyncService 的注释明令两套同步不能同时跑，
+                    // 否则快照导入会把 iCloud 刚删掉的条目又写回来。
+                    guard oldValue == SyncMode.icloud.rawValue,
+                          newValue != SyncMode.icloud.rawValue,
+                          cloudKitActive else { return }
+                    // 让 SwiftUI 把这次更新走完再开模态循环
+                    DispatchQueue.main.async { confirmStopCloudKit() }
                 }
             } footer: {
                 Text(modeDescription)
@@ -224,25 +246,92 @@ struct SyncSettingsView: View {
                 CloudKitSyncSections()
             }
 
-            if needsRestart {
+            if needsRestartToStart {
                 Section {
                     HStack {
                         Text("Changing the sync method takes effect after you restart Copyo.")
                             .font(.system(size: 12))
                             .foregroundStyle(.secondary)
                         Spacer()
-                        Button("Restart Copyo") { PasteService.relaunch() }
+                        Button("Restart Copyo") { AppDelegate.shared?.restartForSyncChange() }
                     }
+                }
+            }
+
+            if cloudWipePending {
+                // 唯一一种「删除真的会到 iCloud」的情况，也是唯一一种没法观测进度的情况。
+                // 不挂这一行的话，确认框里那句「保持打开」用户根本没法照着做。
+                Section {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Image(systemName: "arrow.triangle.2.circlepath.icloud")
+                            .foregroundStyle(.orange)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Copyo is sending the deletion to your iCloud private database. Keep Copyo open and signed in to iCloud. Copyo cannot tell you when this has finished.")
+                            Button("Finish Erasing This Mac") { AppDelegate.shared?.finishErasing() }
+                        }
+                        .font(.system(size: 12))
+                        Spacer()
+                    }
+                }
+            }
+
+            if icloudCopyMayRemain {
+                // 在 iCloud 同步关着的时候擦过一次：云端那份没动。用户一旦把 iCloud
+                // 打开，整份历史有可能被导回来——这句话必须在选 iCloud 之前就看得到。
+                Section {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
+                        Text("Copyo erased this Mac while iCloud sync was off, so the iCloud copy was never removed. Turning iCloud sync on can bring those entries back.")
+                    }
+                    .font(.system(size: 12))
                 }
             }
         }
         .formStyle(.grouped)
     }
 
+    /// 从 iCloud 切走时当场拦一下。用 NSAlert 而不是 SwiftUI 的 .alert：这里要在
+    /// 动作里再弹第二个 alert（重启失败），SwiftUI 会把第二个吞掉，结果就是
+    /// 「界面说关了、CloudKit 还在传、一个字都不说」——正是这次要修掉的那一格。
+    private func confirmStopCloudKit() {
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Restart Copyo to stop iCloud sync?")
+        alert.informativeText = cloudWipePending
+            // 刚用「删除所有数据」擦过、删除还在往 iCloud 推：这一重启就等于把没推完的
+            // 那部分永远留在云端。绝不能拿「什么都不会丢」糊过去——恰恰是删除会丢。
+            ? String(localized: "Until Copyo restarts, this Mac keeps sending your clipboard history to your iCloud private database. Copyo is also still sending the entries you deleted; whatever has not been sent when Copyo restarts stays in iCloud.")
+            : String(localized: "Until Copyo restarts, this Mac keeps sending your clipboard history to your iCloud private database. If you don’t restart now, Copyo keeps using iCloud sync for the rest of this session.")
+        alert.addButton(withTitle: String(localized: "Restart Copyo"))
+        alert.addButton(withTitle: String(localized: "Not Now"))
+        // 关掉对话框不该顺手把应用退掉：Return 给「稍后」
+        alert.buttons[0].keyEquivalent = ""
+        alert.buttons[1].keyEquivalent = "\r"
+        NSApp.activate(ignoringOtherApps: true)
+        let wantsRestart = alert.runModal() == .alertFirstButtonReturn
+        if wantsRestart, AppDelegate.shared?.restartForSyncChange() == true { return }
+        // 「稍后」，或者重启没派出去：把选择器退回 iCloud。界面上绝不允许出现
+        // 「显示关闭，而 CloudKit 还在上传」。回退会再触发一次 onChange，
+        // 但那一次的 oldValue 不是 icloud，拦截条件不成立，不会循环弹框。
+        syncModeRaw = SyncMode.icloud.rawValue
+        AppDelegate.shared?.syncService.updateActivation()
+    }
+
     /// 容器是启动时按当时的方式建好的，CloudKit 镜像开不开只能靠重启换。
-    /// 从 iCloud 切走时尤其要提示：不重启的话这次会话仍然在往 iCloud 上传。
-    private var needsRestart: Bool {
-        (mode == .icloud) != (AppDelegate.shared?.cloudKitActive ?? false)
+    ///
+    /// 只在「选了 iCloud、这次会话还没挂上」这一个方向提示：一个字节都还没传出去，
+    /// 等重启就行。反方向已经在 onChange 里当场拦下并回退，不存在需要挂提示的残留状态。
+    ///
+    /// 两个闸门：
+    /// - 没签 entitlement 的构建重启多少次也挂不上（AppDelegate.swift:41），
+    ///   那条说明归 CloudKitSyncSections，这里别再挂一行自相矛盾的；
+    /// - 这次启动建容器失败时，CloudKitSyncSections 已经在说「修好上面的问题再重启
+    ///   Copyo」，重启按钮跟着那句话走（见下一处改动），这里不重复。
+    private var needsRestartToStart: Bool {
+        mode == .icloud
+            && !cloudKitActive
+            && CloudSyncStatus.hasCloudKitEntitlement
+            && containerError.isEmpty
     }
 
     private var modeDescription: LocalizedStringKey {
@@ -301,9 +390,15 @@ private struct CloudKitSyncSections: View {
                     Text("iCloud sync could not start: \(containerError)")
                 }
                 .font(.system(size: 12))
-                Text("Copyo is using the local database only, so nothing was lost. Fix the problem above and restart Copyo.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                HStack {
+                    Text("Copyo is using the local database only, so nothing was lost. Fix the problem above and restart Copyo.")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    // 这句话让用户重启，就得给他一个按得到的按钮。新建的 CloudKit 容器
+                    // 首次连接被拒是已知坑，重启一次就恢复。
+                    Button("Restart Copyo") { AppDelegate.shared?.restartForSyncChange() }
+                }
             } else if !pushError.isEmpty {
                 Text("Push notifications are unavailable on this Mac, so changes made on your other devices only arrive when Copyo starts.")
                     .font(.system(size: 12))

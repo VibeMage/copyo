@@ -182,6 +182,23 @@
         }
       }
     },
+    "(no change)": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(aucun changement)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(无变化)"
+          }
+        }
+      }
+    },
     "100 items": {
       "extractionState": "manual",
       "localizations": {
@@ -692,6 +709,108 @@
         }
       }
     },
+    "Copyo could not delete your clipboard history.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo n’a pas pu supprimer votre historique du presse-papiers."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 无法删除你的剪贴板历史。"
+          }
+        }
+      }
+    },
+    "Copyo could not reach your sync folder, so the copy there was not deleted. Choose the folder again in Settings, or delete it yourself.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo n’a pas pu accéder à votre dossier de synchronisation : la copie qui s’y trouve n’a pas été supprimée. Resélectionnez ce dossier dans les Réglages, ou supprimez-le vous-même."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 够不着你的同步文件夹，那里的副本没有被删除。请在「设置」里重新选一次那个文件夹，或者自己把它删掉。"
+          }
+        }
+      }
+    },
+    "Copyo could not restart itself.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo n’a pas pu se relancer."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 无法自行重启。"
+          }
+        }
+      }
+    },
+    "Copyo deletes the snapshots and images it put in your sync folder, and turns Shared Folder sync off: folder sync has no way to tell your other Macs to delete anything, so leaving it on would copy their history straight back. What those Macs put in the folder stays until you delete it yourself.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo supprime les instantanés et les images qu’il a placés dans votre dossier de synchronisation, et désactive la synchronisation par dossier : celle-ci n’a aucun moyen de demander à vos autres Mac de supprimer quoi que ce soit, donc la laisser active y recopierait aussitôt leur historique. Ce que ces Mac ont placé dans le dossier y reste jusqu’à ce que vous le supprimiez vous-même."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 会删掉自己写进同步文件夹的快照和图片，并把「共享文件夹」同步关掉：文件夹同步没有办法告诉其他 Mac 删除内容，继续开着的话它们的历史会原样灌回来。其他 Mac 放进那个文件夹的东西会一直留着，需要的话请自己删掉。"
+          }
+        }
+      }
+    },
+    "Copyo erased this Mac while iCloud sync was off, so the iCloud copy was never removed. Turning iCloud sync on can bring those entries back.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo a effacé ce Mac alors que la synchronisation iCloud était désactivée : la copie iCloud n’a jamais été supprimée. Réactiver la synchronisation iCloud peut faire revenir ces éléments."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 是在 iCloud 同步关闭时擦除这台 Mac 的，iCloud 上那份副本从未被删除。重新打开 iCloud 同步有可能把那些条目带回来。"
+          }
+        }
+      }
+    },
+    "Copyo is sending the deletion to your iCloud private database. Keep Copyo open and signed in to iCloud. Copyo cannot tell you when this has finished.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo envoie cette suppression vers votre base de données privée iCloud. Laissez Copyo ouvert et restez connecté à iCloud. Copyo ne peut pas vous dire quand l’envoi est terminé."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 正在把这次删除发送到你的 iCloud 私有数据库。请让 Copyo 保持打开并保持 iCloud 登录状态。Copyo 无法告诉你它什么时候发送完。"
+          }
+        }
+      }
+    },
     "Copyo is using the local database only, so nothing was lost. Fix the problem above and restart Copyo.": {
       "extractionState": "manual",
       "localizations": {
@@ -756,6 +875,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copyo 已失去对同步文件夹的访问权限。请在下方重新选择该文件夹以恢复同步。"
+          }
+        }
+      }
+    },
+    "Copyo restarts and clears the database file, so the entries you deleted cannot be recovered from this Mac. Anything the deletion has not reached in your iCloud private database stays there and will come back to this Mac.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo se relance et efface le fichier de base de données : les éléments supprimés ne pourront plus être récupérés depuis ce Mac. Ce que la suppression n’a pas atteint dans votre base de données privée iCloud y reste et reviendra sur ce Mac."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 会重启并清除数据库文件，这样被删掉的条目就无法再从这台 Mac 上恢复。删除还没触及到的那部分会留在你的 iCloud 私有数据库里，并且会重新回到这台 Mac 上。"
+          }
+        }
+      }
+    },
+    "Copyo will restart itself to finish clearing the database file.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo se relancera tout seul pour terminer l’effacement du fichier de base de données."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 会自行重启，以便把数据库文件彻底清除干净。"
           }
         }
       }
@@ -828,6 +981,57 @@
         }
       }
     },
+    "Delete All": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout supprimer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部删除"
+          }
+        }
+      }
+    },
+    "Delete All Data?": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer toutes les données ?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除所有数据？"
+          }
+        }
+      }
+    },
+    "Delete All Data…": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer toutes les données…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除所有数据…"
+          }
+        }
+      }
+    },
     "Delete Pinboard": {
       "extractionState": "manual",
       "localizations": {
@@ -879,6 +1083,23 @@
         }
       }
     },
+    "Everything on this Mac was deleted.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toutes les données de ce Mac ont été supprimées."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 Mac 上的数据已全部删除。"
+          }
+        }
+      }
+    },
     "File": {
       "extractionState": "manual",
       "localizations": {
@@ -892,6 +1113,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "文件"
+          }
+        }
+      }
+    },
+    "Finish Erasing This Mac": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminer l’effacement de ce Mac"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成这台 Mac 的擦除"
+          }
+        }
+      }
+    },
+    "Finish erasing this Mac?": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminer l’effacement de ce Mac ?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成这台 Mac 的擦除？"
           }
         }
       }
@@ -1219,6 +1474,23 @@
         }
       }
     },
+    "Not Now": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus tard"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "稍后"
+          }
+        }
+      }
+    },
     "Nothing matches “%@”": {
       "extractionState": "manual",
       "localizations": {
@@ -1232,6 +1504,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "没有匹配「%@」的内容"
+          }
+        }
+      }
+    },
+    "Nothing was deleted. Try again, and if it keeps failing, quit Copyo from the menu bar icon and open it again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien n’a été supprimé. Réessayez ; si l’échec persiste, quittez Copyo depuis l’icône de la barre des menus puis relancez-le."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有删除任何内容。请再试一次；如果一直失败，请从菜单栏图标退出 Copyo 再重新打开。"
           }
         }
       }
@@ -1440,6 +1729,40 @@
         }
       }
     },
+    "Quit Copyo from the menu bar icon and open it again — it finishes clearing the database file on the next launch.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quittez Copyo depuis l’icône de la barre des menus puis relancez-le — il terminera l’effacement du fichier de base de données au prochain démarrage."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请从菜单栏图标退出 Copyo 再重新打开——它会在下次启动时把数据库文件清除干净。"
+          }
+        }
+      }
+    },
+    "Quit Copyo from the menu bar icon and open it again. Your new sync setting is already saved.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quittez Copyo depuis l’icône de la barre des menus puis relancez-le. Votre nouvelle méthode de synchronisation est déjà enregistrée."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请从菜单栏图标退出 Copyo 再重新打开。你新选的同步方式已经保存好了。"
+          }
+        }
+      }
+    },
     "Reset": {
       "extractionState": "manual",
       "localizations": {
@@ -1470,6 +1793,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "重启 Copyo"
+          }
+        }
+      }
+    },
+    "Restart Copyo to stop iCloud sync?": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relancer Copyo pour arrêter la synchronisation iCloud ?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重启 Copyo 以停止 iCloud 同步？"
           }
         }
       }
@@ -1763,6 +2103,23 @@
         }
       }
     },
+    "The copy in your iCloud private database was not touched, because iCloud sync is off. Set Sync to iCloud, reopen Copyo and delete again to remove it too.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La copie présente dans votre base de données privée iCloud n’a pas été touchée, car la synchronisation iCloud est désactivée. Réglez « Synchronisation » sur iCloud, relancez Copyo et supprimez à nouveau pour l’effacer aussi."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你 iCloud 私有数据库里的那份副本没有被动过，因为 iCloud 同步是关着的。把「同步」设为 iCloud、重新打开 Copyo 再删一次，才能把它也删掉。"
+          }
+        }
+      }
+    },
     "The parent directory of the custom sync folder does not exist. Please check the path.": {
       "extractionState": "manual",
       "localizations": {
@@ -1780,6 +2137,40 @@
         }
       }
     },
+    "The same deletion is queued for your iCloud private database and your other Macs. Keep Copyo open and signed in to iCloud until it finishes — Copyo cannot tell you when that is.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La même suppression est mise en file d’attente pour votre base de données privée iCloud et vos autres Mac. Laissez Copyo ouvert et restez connecté à iCloud jusqu’à la fin — Copyo ne peut pas vous dire quand ce sera fait."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同样的删除已经排进队列，会发往你的 iCloud 私有数据库和你的其他 Mac。请让 Copyo 保持打开并保持 iCloud 登录状态直到发送完成——Copyo 无法告诉你那是什么时候。"
+          }
+        }
+      }
+    },
+    "This Mac has synced with iCloud before. Copyo cannot touch the iCloud copy while sync is off — set Sync to iCloud, reopen Copyo and delete again to remove that copy too.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce Mac a déjà été synchronisé avec iCloud. Copyo ne peut pas toucher à la copie iCloud tant que la synchronisation est désactivée — réglez « Synchronisation » sur iCloud, relancez Copyo et supprimez à nouveau pour effacer cette copie aussi."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 Mac 以前用过 iCloud 同步。同步关着的时候 Copyo 碰不到 iCloud 上那份副本——把「同步」设为 iCloud、重新打开 Copyo 再删一次，才能把那份也删掉。"
+          }
+        }
+      }
+    },
     "This copy of Copyo is not signed for iCloud sync.": {
       "extractionState": "manual",
       "localizations": {
@@ -1793,6 +2184,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "这份 Copyo 的签名不包含 iCloud 同步授权。"
+          }
+        }
+      }
+    },
+    "This deletes every clipboard entry and every Pinboard, including everything pinned to them. This action cannot be undone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tous les éléments du presse-papiers et tous les Pinboards seront supprimés, y compris ce qui y est épinglé. Cette action est irréversible."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将删除所有剪贴板记录和所有 Pinboard，包括固定在里面的内容。此操作不可撤销。"
+          }
+        }
+      }
+    },
+    "This deletes every clipboard entry that isn’t pinned to a Pinboard. Pinned entries and Pinboards are kept — use Delete All Data to remove those too. This action cannot be undone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tous les éléments du presse-papiers non épinglés à un Pinboard seront supprimés. Les éléments épinglés et les Pinboards sont conservés — utilisez « Supprimer toutes les données » pour les supprimer aussi. Cette action est irréversible."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将删除所有未固定到 Pinboard 的剪贴板记录。固定的内容和 Pinboard 会保留——要把它们一并删除，请用「删除所有数据」。此操作不可撤销。"
           }
         }
       }
@@ -1895,6 +2320,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "取消固定"
+          }
+        }
+      }
+    },
+    "Until Copyo restarts, this Mac keeps sending your clipboard history to your iCloud private database. Copyo is also still sending the entries you deleted; whatever has not been sent when Copyo restarts stays in iCloud.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tant que Copyo n’a pas redémarré, ce Mac continue d’envoyer votre historique du presse-papiers vers votre base de données privée iCloud. Copyo est aussi encore en train d’envoyer les éléments que vous avez supprimés ; ce qui n’aura pas été envoyé au moment du redémarrage restera dans iCloud."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Copyo 重启之前，这台 Mac 仍会把你的剪贴板历史发送到你的 iCloud 私有数据库。Copyo 同时还在发送你删掉的那些条目；重启时还没发出去的部分会留在 iCloud 里。"
+          }
+        }
+      }
+    },
+    "Until Copyo restarts, this Mac keeps sending your clipboard history to your iCloud private database. If you don’t restart now, Copyo keeps using iCloud sync for the rest of this session.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tant que Copyo n’a pas redémarré, ce Mac continue d’envoyer votre historique du presse-papiers vers votre base de données privée iCloud. Si vous ne redémarrez pas maintenant, Copyo continuera d’utiliser la synchronisation iCloud pendant tout le reste de cette session."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Copyo 重启之前，这台 Mac 仍会把你的剪贴板历史发送到你的 iCloud 私有数据库。如果现在不重启，本次会话余下的时间里 Copyo 会继续使用 iCloud 同步。"
           }
         }
       }

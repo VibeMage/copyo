@@ -14,6 +14,7 @@ final class SyncService {
 
     private static let deviceIDKey = "syncDeviceID"
     private static let cursorsKey = "syncCursors"
+    private static let pastDeviceIDsKey = "syncPastDeviceIDs"
 
 #if APPSTORE
     /// 当前计时器正在同步的目录，用于识别「用户中途换了文件夹」
@@ -22,6 +23,27 @@ final class SyncService {
 
     init(context: ModelContext) {
         self.context = context
+        // 每次启动把当前标识记进「本机用过的标识」，理由见 knownDeviceIDs
+        Self.registerCurrentDeviceID()
+    }
+
+    /// 本机用过的所有设备标识。syncDeviceID 丢了就会重新生成一个（配置被重置、换了
+    /// 用户账户、偏好文件只恢复了一半），而旧的 device-<id>.json 是本机写进去的、
+    /// 装着上限 500 条的明文。自跳过是文件名子串判断，换了 UUID 之后那份就不再被认成
+    /// 「自己的」：导入时会把本机刚删掉的历史原样读回来，擦除时也漏掉不删。
+    static var knownDeviceIDs: Set<String> {
+        var ids = Set(UserDefaults.standard.stringArray(forKey: pastDeviceIDsKey) ?? [])
+        ids.insert(deviceID)
+        return ids
+    }
+
+    private static func registerCurrentDeviceID() {
+        let defaults = UserDefaults.standard
+        var ids = defaults.stringArray(forKey: pastDeviceIDsKey) ?? []
+        let current = deviceID
+        guard !ids.contains(current) else { return }
+        ids.append(current)
+        defaults.set(ids, forKey: pastDeviceIDsKey)
     }
 
     // MARK: - 目录与设备标识
@@ -115,7 +137,14 @@ final class SyncService {
 
     /// 只有「文件夹」这一种同步方式会用到本服务；关闭与 iCloud 方式下计时器必须停住，
     /// 否则 iCloud 同步的删除刚生效就会被快照重新导入回来。
-    var isEnabled: Bool { SyncMode.current == .folder }
+    ///
+    /// cloudKitActive 也要看：容器是启动时建的，从 iCloud 切到文件夹又没重启时，方式
+    /// 已经是 folder，而这次会话的容器仍然挂着 CloudKit 镜像——两套同步一起跑正是
+    /// 上面那句要避免的。设置页现在会在这种切换时当场拦下并回退选择器，所以这个状态
+    /// 正常走不到；这一条留着，因为它才是这个不变式本身。
+    var isEnabled: Bool {
+        SyncMode.current == .folder && AppDelegate.shared?.cloudKitActive != true
+    }
 
     // MARK: - 生命周期
 
@@ -276,6 +305,86 @@ final class SyncService {
         try? data.write(to: target, options: .atomic)
     }
 
+    /// 「删除所有数据」对同步文件夹的收尾结果
+    enum EraseResult {
+        /// 当前不是文件夹同步，没有要清的东西
+        case notApplicable
+        /// 本机写进去的快照和图片都删掉了
+        case erased
+        /// 够不着同步目录（书签失效、卷没挂载、目录被删、iCloud Drive 没开）。
+        /// 对话框已经说了「会删掉」，所以这个必须报出来，绝不能静默当成成功。
+        case noAccess
+    }
+
+    /// 删掉本机写进同步文件夹的快照，以及这些快照引用到的图片。
+    ///
+    /// 只删本机自己的那几份（当前标识 + 用过的旧标识）：别的设备的 device-*.json 是
+    /// 人家的数据，删了对方下一轮还会原样写回来。所以同步文件夹永远不可能被这个按钮
+    /// 清干净，确认框必须照实说。
+    ///
+    /// 图片哈希取自快照文件本身而不是本地行：被 trimHistory 清掉过的老图片在库里
+    /// 已经没有对应条目，只有快照里还记着它们的哈希——只按本地行算会漏掉绝大多数。
+    /// assets/ 是按内容哈希命名、多台设备共用的，所以这里可能删掉别的设备也引用着的
+    /// 那一份；对方下一轮 exportSnapshot 的 fileExists 判断会把它重新写出来，而导入端的
+    /// 游标已经改成「资产缺失就不前进」，所以不会有设备因此永久丢图。
+    func eraseExportedSnapshot(extraImageHashes: Set<String>) -> EraseResult {
+        guard SyncMode.current == .folder else { return .notApplicable }
+        let fileManager = FileManager.default
+        let roots: [URL]
+#if APPSTORE
+        guard let picked = Self.syncRoot, picked.startAccessingSecurityScopedResource() else {
+            Self.recordFailure(.noAccess)
+            return .noAccess
+        }
+        defer { picked.stopAccessingSecurityScopedResource() }
+        // 用 root(in:) 而不是 prepareRoot(in:)：擦除的时候不该顺手把目录建出来
+        roots = [SyncFolderLayout.root(in: picked),
+                 SyncFolderLayout.legacyRoot(in: picked)].compactMap { $0 }
+#else
+        if let container = Self.syncContainer {
+            roots = [SyncFolderLayout.root(in: container),
+                     SyncFolderLayout.legacyRoot(in: container)].compactMap { $0 }
+        } else if let custom = Self.syncRoot {
+            roots = [custom]
+        } else {
+            return .noAccess
+        }
+#endif
+        let mine = Self.knownDeviceIDs
+        var reachedAll = true
+        for root in roots {
+            // 目录压根不存在 = 没什么可删的，不算失败
+            guard fileManager.fileExists(atPath: root.path) else { continue }
+            guard let files = try? fileManager.contentsOfDirectory(at: root, includingPropertiesForKeys: nil) else {
+                reachedAll = false
+                continue
+            }
+            var hashes = extraImageHashes
+            let assets = root.appendingPathComponent("assets", isDirectory: true)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            for file in files where file.lastPathComponent.hasPrefix("device-") && file.pathExtension == "json" {
+                let name = file.lastPathComponent
+                guard mine.contains(where: { name.contains($0) }) else { continue }
+                if let data = try? Data(contentsOf: file),
+                   let snapshot = try? decoder.decode(SyncSnapshot.self, from: data) {
+                    hashes.formUnion(snapshot.items.compactMap(\.imageHash))
+                }
+                try? fileManager.removeItem(at: file)
+            }
+            for hash in hashes {
+                try? fileManager.removeItem(at: assets.appendingPathComponent("\(hash).png"))
+            }
+        }
+        guard reachedAll else {
+#if APPSTORE
+            Self.recordFailure(.noAccess)
+#endif
+            return .noAccess
+        }
+        return .erased
+    }
+
     // MARK: - 导入合并
 
     private func importSnapshots(from root: URL, assets: URL) {
@@ -285,9 +394,12 @@ final class SyncService {
 
         var cursors = (UserDefaults.standard.dictionary(forKey: Self.cursorsKey) as? [String: Double]) ?? [:]
         var localIdentities: Set<String>? // 惰性构建，多数轮询没有新内容
+        // 不只跳过当前标识：本机换过 UUID 时那份孤儿快照也是自己的
+        let mine = Self.knownDeviceIDs
 
         for file in files where file.lastPathComponent.hasPrefix("device-") && file.pathExtension == "json" {
-            guard !file.lastPathComponent.contains(Self.deviceID),
+            let name = file.lastPathComponent
+            guard !mine.contains(where: { name.contains($0) }),
                   let data = try? Data(contentsOf: file),
                   let snapshot = try? decoder.decode(SyncSnapshot.self, from: data) else { continue }
 
@@ -303,11 +415,18 @@ final class SyncService {
                 localIdentities = Set(all.map { Self.identity(of: $0) })
             }
 
+            var oldestSkipped: Date?
             for remote in fresh where localIdentities?.contains(remote.identity) == false {
-                insert(remote, assets: assets)
-                localIdentities?.insert(remote.identity)
+                if insert(remote, assets: assets) {
+                    localIdentities?.insert(remote.identity)
+                } else {
+                    // 图片资产还没同步下来。以前这里写「等下一轮」，其实等不到：游标照样
+                    // 被推到 exportedAt，下一轮 `createdAt > cursor` 就把它滤掉了，这张图
+                    // 永远进不来。游标必须停在它之前。
+                    oldestSkipped = min(oldestSkipped ?? remote.createdAt, remote.createdAt)
+                }
             }
-            advance(&cursors, snapshot)
+            advance(&cursors, snapshot, notBeyond: oldestSkipped)
         }
 
         UserDefaults.standard.set(cursors, forKey: Self.cursorsKey)
@@ -316,18 +435,26 @@ final class SyncService {
 
     /// 游标只许前进。同一台设备的快照可能同时出现在 `Copyo/` 与改名前的 `Paster/` 里，
     /// 旧的那份导出时间更早，直接覆盖会把游标拉回去，下一轮就得白扫一遍全表。
-    private func advance(_ cursors: inout [String: Double], _ snapshot: SyncSnapshot) {
-        let exportedAt = snapshot.exportedAt.timeIntervalSince1970
-        if let existing = cursors[snapshot.deviceID], existing >= exportedAt { return }
-        cursors[snapshot.deviceID] = exportedAt
+    ///
+    /// `notBeyond` 是这一轮因为图片资产缺失而跳过的最早条目：游标要停在它之前，
+    /// 代价是这份快照下一轮还要再扫一遍（上限 500 条，可以接受），换来的是不会永久丢图。
+    private func advance(_ cursors: inout [String: Double], _ snapshot: SyncSnapshot, notBeyond: Date? = nil) {
+        var target = snapshot.exportedAt.timeIntervalSince1970
+        if let notBeyond {
+            target = min(target, notBeyond.timeIntervalSince1970 - 0.001)
+        }
+        if let existing = cursors[snapshot.deviceID], existing >= target { return }
+        cursors[snapshot.deviceID] = target
     }
 
-    private func insert(_ remote: SyncItem, assets: URL) {
+    /// - Returns: false 表示这条依赖的图片资产还不在，本轮没有插入
+    @discardableResult
+    private func insert(_ remote: SyncItem, assets: URL) -> Bool {
         let kind = ClipKind(rawValue: remote.kindRaw) ?? .text
         var imageData: Data?
         if kind == .image, let hash = remote.imageHash {
             imageData = try? Data(contentsOf: assets.appendingPathComponent("\(hash).png"))
-            guard imageData != nil else { return } // 图片资产还没同步下来，等下一轮
+            guard imageData != nil else { return false }
         }
         let item = ClipItem(kind: kind,
                             plainText: remote.plainText,
@@ -342,6 +469,7 @@ final class SyncService {
             item.pinboard = findOrCreatePinboard(named: boardName)
         }
         context.insert(item)
+        return true
     }
 
     private func findOrCreatePinboard(named name: String) -> Pinboard {
