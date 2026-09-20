@@ -607,7 +607,7 @@ struct AboutView: View {
             Text("Version \(version)")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
-            Text("An open-source clipboard manager for macOS.\nAll data stays on this Mac and is never sent to a third-party server.")
+            Text("An open-source clipboard manager for macOS.\nSync is off by default. Turn it on and your history goes only to your own iCloud or a folder you choose — never to a server of ours.")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

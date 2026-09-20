@@ -284,19 +284,19 @@
         }
       }
     },
-    "An open-source clipboard manager for macOS.\nAll data stays on this Mac and is never sent to a third-party server.": {
+    "An open-source clipboard manager for macOS.\nSync is off by default. Turn it on and your history goes only to your own iCloud or a folder you choose — never to a server of ours.": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un gestionnaire de presse-papiers open source pour macOS.\nToutes les données restent sur ce Mac et ne sont jamais envoyées à un serveur tiers."
+            "value": "Un gestionnaire de presse-papiers open source pour macOS.\nLa synchronisation est désactivée par défaut. Une fois activée, votre historique ne va que dans votre propre iCloud ou dans un dossier que vous choisissez — jamais sur un serveur qui nous appartient."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "开源的 macOS 剪贴板管理工具。\n所有数据仅保存在本机，不会发送到任何第三方服务器。"
+            "value": "开源的 macOS 剪贴板管理工具。\n同步默认关闭。开启后，历史也只会进入你自己的 iCloud 或你选定的文件夹——不会经过我们的服务器。"
           }
         }
       }

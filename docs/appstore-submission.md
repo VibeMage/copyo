@@ -24,8 +24,14 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 - **价格**：免费
 - **隐私政策 URL**：`https://gist.github.com/VibeMage/d39d7165d762ecfd0f16f72ad1fc553e`
   （仓库私有期间用这个公开 Gist；仓库恢复公开后可换回 repo 内的 PRIVACY.md 链接）
-- **App 隐私问卷**：全部选择「不收集数据」（Data Not Collected）
-- **出口合规**：不使用加密（应用无任何网络请求）→ 选择"否/豁免"
+- **App 隐私问卷**：全部选择「不收集数据」（Data Not Collected）。
+  **1.0 起带了 CloudKit，这个答案依然成立**，但理由变了，记下来免得下次答不上：
+  Apple 对「收集」的定义是数据离开设备且开发者能访问；Copyo 只用 `.private(...)`
+  私有数据库（`CopyoStore.swift:72`），全仓库没有 publicCloudDatabase / CKShare，
+  我们读不到，所以不构成收集
+- **出口合规**：**答案仍是「否/豁免」不用改**，但理由要改：不是「无任何网络请求」
+  （1.0 起带 CloudKit），而是只通过 Apple 框架使用 HTTPS，属于豁免加密。
+  `ITSAppUsesNonExemptEncryption` 在工程里写死为 NO，随包提交，ASC 无需操作
 
 ## 三、商店文案（可直接粘贴）
 
@@ -41,8 +47,8 @@ appstoreconnect.apple.com → 我的 App → ➕ 新建 App：
 
 ### 推广文本（170 字符内，可随时改无需审核）
 
-- zh：`按下 Shift+Command+V，复制过的文本、链接、图片、文件全部回来。开源、本地存储、零网络请求。`
-- en：`Press Shift+Command+V and everything you've copied comes back — text, links, images, files. Open source, local-only, zero network requests.`
+- zh：`按下 Shift+Command+V，复制过的文本、链接、图片、文件全部回来。开源、数据存在本机、同步默认关闭。`
+- en：`Press Shift+Command+V and everything you've copied comes back — text, links, images, files. Open source, stored on your Mac, sync off by default.`
 
 ⚠️ ASC 的推广文本/关键词字段不接受 ⇧⌘ 等按键符号（报「无效字符」）；描述字段若同样报错，把 ⇧⌘V 改写为 Shift+Command+V。
 
@@ -63,11 +69,12 @@ Copyo 是一款开源的剪贴板管理工具：
 • 底部卡片面板，即输即搜，全键盘操作
 • 选中回车，内容立刻回到剪贴板，⌘V 即可粘贴
 • Pinboard 固定常用内容，不受历史清理影响
-• 可选的文件夹同步（如 iCloud Drive），在多台 Mac 间同步历史
+• 可选同步：共享文件夹或你自己的 iCloud，默认关闭
 • 自动跳过密码管理器等隐藏内容
 
-隐私优先：所有数据只保存在本机或你自己选择的同步文件夹，
-无遥测、无统计、无任何网络请求。代码完全开源。
+隐私优先：同步默认关闭，数据只保存在本机；开启同步后也只进入
+你自己的 iCloud 或你选定的文件夹，不经过我们的服务器。
+无遥测、无统计、无第三方 SDK。代码完全开源。
 ```
 
 ### Description (English)
@@ -80,11 +87,12 @@ Copyo is an open-source clipboard manager:
 • Bottom card panel — type to search, fully keyboard-driven
 • Hit Return and it's back on your clipboard, ready to paste with ⌘V
 • Pin frequently used clips to Pinboards, safe from history cleanup
-• Optional folder sync (e.g. iCloud Drive) across your Macs
+• Optional sync across your Macs: a shared folder, or your own iCloud — off by default
 • Concealed content from password managers is never recorded
 
-Privacy first: everything stays on your Mac or in a sync folder you choose.
-No telemetry, no analytics, no network requests. Fully open source.
+Privacy first: sync is off by default, so everything stays on your Mac. Turn it
+on and your data goes only to your own iCloud or a folder you pick — never to a
+server of ours. No telemetry, no analytics, no third-party SDKs. Fully open source.
 ```
 
 ### 关键词（100 字符内）
@@ -114,7 +122,10 @@ monitoring, and never asks for any privacy permission. The
 Shift+Command+V shortcut is registered with the Carbon
 RegisterEventHotKey API, which needs no permission.
 
-No account, no login, no network. All data is stored locally.
+No account and no login. No third-party services of any kind. Sync is off by
+default; if the user turns it on, data goes only to their own CloudKit private
+database (container iCloud.dev.vibemage.Copyo) or a folder they pick. We operate
+no server and cannot read it.
 ```
 
 ## 五、截图（你来操作）
@@ -137,6 +148,9 @@ main 已经带上 iCloud（CloudKit）同步和推送 entitlements，归档时�
 Mac App Development 描述文件，而这要求团队里注册过 Mac；`release/1.0` 是提审
 commit c7dd41f 加上「移除自动粘贴」，entitlements 只有沙盒，和 1.0 (3) 一样不需要描述文件，
 商店描述里「零网络请求」的说法也仍然成立。iCloud 版本留给 1.1。
+
+> ⚠️ **这段已经作废**：实际提审的 1.0 (1) 是从 main 出的，带 CloudKit 与推送，
+> 「零网络请求」因此不成立。见第二十二、二十三节。
 
 （`release/1.0` 分支没有跟进 2026-09-19 的第二轮改名，那边仍然是 `Paster.xcodeproj` / scheme `Paster`，
 脚本照旧能跑；main 上的工程已改名为 `Copyo.xcodeproj`，见第十三节。）
@@ -174,6 +188,10 @@ UPLOAD=1 ./scripts/build-appstore.sh   # 归档 → 导出 .pkg → 直接上传
 新开发者账号首次提审几乎必收这封信：要一段真机录屏 + 六项说明。回复贴在 App 审核 → 消息里（录屏作附件），同一段文字再粘到「App 审核信息 → 备注」供后续版本复用。
 
 ### 回复正文（英文，可直接粘贴）
+
+> ⚠️ **这份是 2026-09-03 Paster 时期发出的，不要再复用**。其中两处现在是假话：
+> ①「用辅助功能粘贴到前一个应用」——1.0 (4) 已整个移除，现在一个辅助功能 API 都不调；
+> ②「makes no network requests」——1.0 带 CloudKit。重写版见第二十三节。
 
 ```
 Thank you for reviewing Paster. Here is the requested information. A screen recording is attached to this message.
@@ -805,3 +823,80 @@ Production 会缺 asset 字段。
 
 探针记录（3 条 ClipItem + 1 个 Pinboard，含噪声图与假路径）已删除，删除经同步传播到
 私有数据库；本机 `~/Library/Application Support/Copyo/` 与应用偏好一并清除。
+
+## 二十二、「零网络请求」的说法与在审的包已经对不上（2026-09-20 发现，待维护者定夺）
+
+第六节记着「**1.0 的上架包一律从 `release/1.0` 分支构建**……商店描述里『零网络请求』的说法也仍然成立。
+iCloud 版本留给 1.1」。但第十八节核验的 `Copyo-1.0-appstore.pkg` 里写着
+`iCloud 容器 / 环境：iCloud.dev.vibemage.Copyo / Production`、`aps-environment: production`——
+**在审的这个包是从 main 出的，带 CloudKit 与推送**。于是下面这几处的措辞都不再准确：
+
+| 位置 | 现在的说法 |
+| --- | --- |
+| 推广文本 zh / en（第三节） | `零网络请求` / `zero network requests` |
+| 描述 zh / en（第三节） | `无遥测、无统计、无任何网络请求` / `No telemetry, no analytics, no network requests.` |
+| 出口合规（第二节） | 「不使用加密（**应用无任何网络请求**）→ 选择否/豁免」 |
+| 审核备注（第八节） | `Paster makes no network requests and uses no third-party SDKs…` |
+| `PRIVACY.md` 与线上 Gist | `No analytics, no telemetry, no crash reporting, no network requests.` |
+
+几点判断：
+
+- **出口合规的答案本身没错**，错的只是记在这里的理由。CloudKit 用的是系统提供的标准加密，
+  仍然属于豁免；下次填的时候别再写「无任何网络请求」当依据。
+- **描述与推广文本是真要改的那一处**。同步默认关闭不能让「零网络请求」变成真话，
+  而 1.0 (3) 那次正是栽在「商店文案承诺了应用做不到的事」（2.4.5，见第九节）——
+  这回是反过来：文案否认了应用**做得到**的事。同一类问题。
+- 隐私政策要跟着改的是**线上那份 Gist**（`gist.github.com/VibeMage/d39d7165…`），
+  仓库里的 `PRIVACY.md` 只是副本，审核员看的不是它。改的时候要写清两件事：
+  iCloud 同步镜像到的是**用户自己 Apple 账户下的私有数据库**，开发者看不到；
+  以及注册 APNs 只为让 CloudKit 通知「另一台设备改了东西」，是静默推送、从不弹通知。
+- 文案属于维护者自己的口径，这里只记录不一致，不代笔。
+
+## 二十三、把「零网络请求」的口径全部改正（2026-09-20）
+
+第二十二节列出的不一致已按以下方式处理。**判断的基准是送审包里的 entitlements**：
+`network.client` + `CloudKit` + `aps-environment: production`。
+
+### 已改（仓库内，随下一个构建生效）
+
+| 位置 | 改成什么 |
+| --- | --- |
+| `PRIVACY.md` | 重写。写明同步默认关闭、两种可选模式各自做什么、iCloud 镜像进的是**用户自己**的私有数据库、APNs 只做 CloudKit 的静默变更通知 |
+| `Copyo/Settings/SettingsView.swift:610` + 三种语言译文 | 「关于」页那句 "All data stays on this Mac…" 是**无条件为假**的——开了 iCloud 同步就不成立。改为「同步默认关闭；开启后也只进你自己的 iCloud 或你选的文件夹」 |
+| `docs/support/index.html:286` | 「Download on the Mac App Store」指向 `id6807507103`（**已删除的旧记录，实测 404**），而新记录 `6813955206` 未过审同样不存在。先改为 GitHub Releases，过审后换回去 |
+| `README.md` / `README.en.md` 第 6 行 | 去掉「无任何网络请求」，改为「同步默认关闭」 |
+| 本文件第二、三、八节 | 出口合规与 App 隐私的**理由**、推广文本、描述、审核备注一并更正 |
+
+### 核过之后决定**不改**的
+
+- **出口合规答案**仍是「否/豁免」：CloudKit 走的是 Apple 框架提供的 HTTPS，属于豁免加密。
+  错的只是理由，答案本身没错。
+- **App 隐私问卷**仍是「不收集数据」：Apple 对「收集」的定义要求开发者能访问，
+  而 Copyo 只用 `.private(...)` 私有数据库（`CopyoStore.swift:72`），全仓库没有
+  `publicCloudDatabase` / `CKShare`，我们读不到。
+- **`SettingsView.swift:387`**（App Store 版文件夹同步的说明，「数据只经过你自己的存储」）：
+  这条只在同步方式为「共享文件夹」时显示，在那个语境下是真的。
+- **`SettingsView.swift:251`**（「剪贴板历史只保存在这台 Mac 上」）：只在同步关闭时显示，同样为真。
+- **GitHub 上 v0.1.0 的 Release 说明**里写着「自动粘贴」：它描述的是 0.1.0，当时确实有，
+  属于历史记录，改了等于篡改历史。
+
+### 还要在浏览器里做的（需维护者本人操作或授权）
+
+1. **线上 Gist**（`gist.github.com/VibeMage/d39d7165…`）——**优先级最高**。它是商店页
+   直接引用的隐私政策，审核员一点就到，而它和二进制对不上。内容照 `PRIVACY.md` 新版。
+2. **推广文本**（中英各一）——ASC 里推广文本可随时改、不用重新提审。
+3. **描述与审核备注**——属于版本级字段，在「等待审核 / 正在审核」状态下只读。
+   要改必须先把版本撤出审核，代价是重新排队。**建议：不撤**，因为我们本来就要回复
+   2.1 那封信，回信里已经主动写明了这处不一致并说明正在更正；主动披露比被查出来好，
+   也比丢掉排队位置划算。描述随下一个版本改。
+
+### 顺带发现、与文案无关的两件事
+
+- **同步开关关不掉本次会话**：CloudKit 镜像与 APNs 注册都在启动时latch一次
+  （`AppDelegate.swift:41-47`、`:78-84`），用户把同步从 iCloud 切到关闭之后，
+  这次会话仍在上传，要重启才真的停。设置页已经如实提示了，但这意味着每一句隐私
+  承诺都得带上「重启后生效」的尾巴。**正确的修法是改代码，不是改文案。**
+- **没有「全部删除」**：两处「清空历史」都只删未固定的条目
+  （`SettingsView.swift:179`、`AppDelegate.swift:242`），删 Pinboard 也只是解绑
+  （`Pinboard.swift:13` 是 `.nullify`）。想彻底清空要先删 Pinboard 再清历史，顺序错了
+  最敏感的内容还留在 iCloud 里。建议加一个「删除所有数据」。
