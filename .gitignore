@@ -2,6 +2,7 @@
 build/
 dist/
 DerivedData/
+build-demo/
 *.xcuserstate
 xcuserdata/
 *.moved-aside
