@@ -750,3 +750,58 @@ App 信息页显示「**该开发者已表明是此 App 的交易商**」。选�
 
 **免费 App 协议仍是「正在验证」**。即便审核通过，协议不恢复「有效」也会挡住发布上架。
 1.0 那次从提交到过审用了 3 天（2026-09-08 拒审 → 09-11 通过）。
+
+## 二十一、CloudKit schema 已部署到 Production（2026-09-20）
+
+容器 `iCloud.dev.vibemage.Copyo` 的 schema 已部署：`CD_ClipItem`（22 字段）与
+`CD_Pinboard`（12 字段），含 34 + 16 个索引。Production 环境逐字段核验通过。
+
+### 做法
+
+1. 用一次性 Swift 包把**每个属性都填满**的种子记录写进本地库（属性为 nil 的字段，
+   CloudKit 不会建出来）
+2. `defaults write dev.vibemage.Copyo syncMode -string icloud`，跑**真实签名的** Debug 构建
+   （`CODE_SIGNING_ALLOWED=NO` 不展开 entitlements，CloudKit 根本连不上），
+   让 SwiftData 把表结构推到 Development
+3. CloudKit Console → Deploy Schema Changes → Production
+
+### 坑一：新建容器第一次连接会被拒
+
+首次启动报：
+
+```
+CKModifyRecordZonesOperation → CKError "Partial Failure" (2/1011)
+  com.apple.coredata.cloudkit.zone → "Server Rejected Request" (15/2000)
+→ Failed to set up CloudKit integration for store
+```
+
+账号本身是通的（`fetch-user-record-id` 成功）。**重启一次应用即恢复**——容器是几小时前
+刚建的，服务端还没完全就绪。遇到别急着怀疑 entitlements 或账号。
+
+### 坑二（重要）：二进制属性有两个字段，BYTES 与 ASSET
+
+CoreData+CloudKit 对二进制属性建**两个**字段：数据小的时候写 `CD_x`（BYTES），
+超过阈值时写 `CD_x_ckAsset`（ASSET）。**字段是按写入的记录惰性创建的**，所以：
+
+> 只用小数据做种子 → Development schema 里只有 BYTES 那一个 → 部署到 Production 之后，
+> 第一个复制大图的用户同步就会失败，而 **Production schema 只能加不能改**。
+
+本次实测：先用 50 KB 的图标，schema 里只有 `CD_imageData`（BYTES）；再写入一条 5.9 MB
+的噪声图，`CD_imageData_ckAsset`（ASSET）才出现。
+
+因此部署前额外写入了大号 `rtfData`（3.4 MB）与 `filePaths`（22000 条路径），把三个
+asset 变体全部逼出来。**最终部署的 Production schema 含：**
+
+```
+CD_filePaths BYTES + CD_filePaths_ckAsset ASSET
+CD_imageData BYTES + CD_imageData_ckAsset ASSET
+CD_rtfData   BYTES + CD_rtfData_ckAsset   ASSET
+```
+
+**以后给模型加任何二进制属性，都必须在部署前用一大一小两条记录各写一次**，否则
+Production 会缺 asset 字段。
+
+### 收尾
+
+探针记录（3 条 ClipItem + 1 个 Pinboard，含噪声图与假路径）已删除，删除经同步传播到
+私有数据库；本机 `~/Library/Application Support/Copyo/` 与应用偏好一并清除。
