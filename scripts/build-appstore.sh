@@ -41,9 +41,12 @@ ARCHIVE=build/Copyo.xcarchive
 # 构建号自动递增。以前要手动去 project.pbxproj 里 +1，忘了就会上传失败
 # （App Store Connect 不接受重复的构建号）。NO_BUMP=1 可跳过——重试一次失败的
 # 构建时用，构建号只要递增即可，跳号无害。
+# 显式传 --macos：bump-build-number.sh 现在按平台成组地改，iOS 那三个 target
+# 与本脚本无关（本脚本只归档 macOS）。不写平台虽然也是 macOS，但那是默认值，
+# 哪天默认值变了，这里就会悄悄去动 iOS 的构建号。
 if [[ "${NO_BUMP:-0}" != "1" ]]; then
-  echo "==> 递增上架构建号"
-  ./scripts/bump-build-number.sh | sed 's/^/    CURRENT_PROJECT_VERSION /'
+  echo "==> 递增 macOS 上架构建号"
+  ./scripts/bump-build-number.sh --macos | sed 's/^/    CURRENT_PROJECT_VERSION /'
   echo "    （这会改动 project.pbxproj，记得连同本次发布一起提交）"
 fi
 
@@ -277,5 +280,9 @@ echo ""
 echo "上传前确认：App Store Connect 已有 ${BUNDLE_ID} 的 App 记录，"
 echo "且构建号 ${BUILD_NUMBER} 大于上一次上传过的构建号"
 echo "（构建号由本脚本自动递增，无需手动改 project.pbxproj；"
-echo " 只想看或指定构建号用 ./scripts/bump-build-number.sh --show / <数字>，"
+echo " 只想看或指定构建号用 ./scripts/bump-build-number.sh --macos --show / --macos <数字>，"
 echo " 重试失败的构建时加 NO_BUMP=1 跳过递增）。"
+echo ""
+echo "注意：这里的构建号只属于 macOS 平台。iOS 在同一条 App Store Connect 记录下"
+echo "单独记构建号，由 ./scripts/bump-build-number.sh --ios 递增（会把 Copyo iOS 与"
+echo "两个扩展一起改——嵌入的 .appex 与宿主 App 的构建号不一致，整个提交会被退回）。"
