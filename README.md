@@ -85,8 +85,8 @@ xcrun notarytool store-credentials paster-notary \
 
 ### 自动构建（GitHub Actions）
 
-每个 PR 和推送到 main 都会跑 `.github/workflows/ci.yml`：无签名编译 macOS Debug、
-macOS Release-AppStore、iOS 模拟器三条，外加 `swift test --package-path PasterCore`。
+每个 PR 和推送到 main（纯文档改动除外）都会跑 `.github/workflows/ci.yml`：无签名编译
+macOS Debug、macOS Release-AppStore、iOS 模拟器三条，外加 `swift test --package-path PasterCore`。
 不需要任何证书，fork 出去的 PR 也能跑绿。
 
 推送 `v<版本>` 形式的 tag 触发 `.github/workflows/release.yml`：校验 tag 与工程里的
@@ -100,11 +100,13 @@ git tag v1.0.1 && git push origin v1.0.1
 
 CI 跑的不是上面那条 `build-release.sh`，而是 `scripts/ci-release.sh`：无人值守的 runner
 既没有 Xcode 里登录的 Apple ID，也没有已注册的 Mac，自动签名那条路在它上面走不通，
-所以 CI 改走手动签名 + 预装的 Developer ID 描述文件。两个脚本的产物完全一致。
+所以 CI 改走手动签名 + 预装的 Developer ID 描述文件。两边产出的 .app 与 DMG 完全一致，
+CI 只额外多附一份 `SHA256SUMS.txt`。
 
-仓库里没配签名 secret 时（比如你 fork 了一份），发布流程会自动退化成未签名构建校验，
-产物只作为 workflow artifact 提供、不会挂到 Release 上——这保证了 Release 页面上的 DMG
-永远是签过名并公证过的。
+在 Actions 页面手动触发（Run workflow）是演练：缺哪一环就降级到哪一步，没配任何 secret
+时也能跑完，产物只作为 workflow artifact 提供、不会挂到 Release 上。推 tag 则是在要一次
+正式发布，签名或公证凑不齐就当场失败——这保证了 Release 页面上的 DMG 永远是签过名并
+公证过的。
 
 证书与凭据怎么配、怎么先演练一遍再推 tag，见 [`docs/ci.md`](docs/ci.md)。
 

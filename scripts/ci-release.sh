@@ -62,6 +62,13 @@ run_logged() {
 
 mkdir -p "$LOG_DIR"
 
+# 所有临时产物都挂在同一个目录下，用 trap 统一收尾。
+# 原先散落的几个 mktemp -d 在脚本任何一次提前退出时都会留在磁盘上 ——
+# 一次性 runner 上无所谓，但这个脚本也支持在本机复现，那里就是实打实的垃圾。
+WORK_TMP=$(mktemp -d)
+cleanup() { rm -rf "$WORK_TMP"; }
+trap cleanup EXIT
+
 echo "==> 归档 Copyo $VERSION (Release, 手动签名)"
 rm -rf "$ARCHIVE"
 # -configuration Release 不可省：scheme 的 ArchiveAction 绑的是 Release-AppStore，
@@ -100,7 +107,8 @@ if [[ ! -d "$ARCHIVE/Products/Applications/Copyo.app" ]]; then
 fi
 
 echo "==> 导出 Developer ID 应用"
-EXPORT_DIR=$(mktemp -d)
+EXPORT_DIR="$WORK_TMP/export"
+mkdir -p "$EXPORT_DIR"
 EXPORT_PLIST="$EXPORT_DIR/exportOptions.plist"
 # method 的合法值是小写连字符标识符：直分发是 developer-id。
 # Organizer 界面上那个带空格的「Developer ID」是按钮文案，写进 plist 会直接报错。
@@ -153,7 +161,24 @@ codesign --verify --strict --verbose=2 "$APP" 2>&1 | tee "$LOG_DIR/verify.log"
 # 把实际签名标志（要含 runtime，即强化运行时）和实际 entitlements 打进日志，
 # 出问题时这是唯一能事后核对「签进去的到底是哪一份」的证据。
 codesign -dv --verbose=4 "$APP" 2>&1 | tee -a "$LOG_DIR/verify.log"
-codesign -d --entitlements :- "$APP" 2>&1 | tee -a "$LOG_DIR/verify.log"
+codesign -d --entitlements :- "$APP" 2>&1 | tee "$LOG_DIR/entitlements.log"
+# 下面三条断言防的是同一类事故：配置选错了，但每一步都返回 0，一路全绿地发出去。
+# 强化运行时是公证的硬前提，签名标志里必须能看到 runtime。
+if ! grep -q 'flags=.*runtime' "$LOG_DIR/verify.log"; then
+  echo "签名里没有强化运行时（hardened runtime），公证一定会被拒" >&2
+  exit 1
+fi
+# 直分发版用的是 Paster.entitlements（不带沙盒）。如果这里出现了 app-sandbox，
+# 说明归档跑的是 Release-AppStore 配置 —— 那是上架包，装到用户机器上行为完全不同。
+if grep -q 'com.apple.security.app-sandbox' "$LOG_DIR/entitlements.log"; then
+  echo "产物带了 app-sandbox，说明归档用错了配置（应为 Release 而非 Release-AppStore）" >&2
+  exit 1
+fi
+# 反过来，iCloud 容器必须在，否则同步功能会在用户机器上静默失效
+if ! grep -q 'iCloud.dev.vibemage.Paster' "$LOG_DIR/entitlements.log"; then
+  echo "产物的 entitlements 里没有 iCloud 容器，同步会失效" >&2
+  exit 1
+fi
 # 受限 entitlements（iCloud / aps-environment）必须靠包里这份描述文件授权，
 # 缺了它应用在用户机器上会被系统直接终止，而 CI 这边一路全绿。
 if [[ ! -f "$APP/Contents/embedded.provisionprofile" ]]; then
@@ -171,7 +196,8 @@ case "$APP_ARCHS" in *x86_64*) ;; *) echo "产物缺 x86_64：$APP_ARCHS" >&2; e
 if [[ -n "${NOTARY_KEY_PATH:-}" && -n "${NOTARY_KEY_ID:-}" && -n "${NOTARY_ISSUER_ID:-}" ]]; then
   echo "==> 提交 Apple 公证（通常 1-5 分钟）"
   NOTARY_ARGS=(--key "$NOTARY_KEY_PATH" --key-id "$NOTARY_KEY_ID" --issuer "$NOTARY_ISSUER_ID")
-  NOTARY_TMP=$(mktemp -d)
+  NOTARY_TMP="$WORK_TMP/notary"
+  mkdir -p "$NOTARY_TMP"
   ditto -c -k --keepParent "$APP" "$NOTARY_TMP/Copyo.zip"
 
   # 从 notarytool 的 JSON 里取一个顶层字段。刻意不引入 python/jq 依赖：
@@ -180,11 +206,15 @@ if [[ -n "${NOTARY_KEY_PATH:-}" && -n "${NOTARY_KEY_ID:-}" && -n "${NOTARY_ISSUE
     sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" | head -1
   }
 
+  # 不要写成 `X=$(... | tee ...)`：set -e + pipefail 下 notarytool 一失败，
+  # 整个命令替换就失败并当场退出脚本，下面那几行错误处理永远执行不到。
   SUBMIT_JSON=$(xcrun notarytool submit "$NOTARY_TMP/Copyo.zip" \
-    "${NOTARY_ARGS[@]}" --output-format json | tee "$LOG_DIR/notary-submit.json")
+    "${NOTARY_ARGS[@]}" --output-format json 2>&1) || SUBMIT_JSON=""
+  printf '%s\n' "$SUBMIT_JSON" > "$LOG_DIR/notary-submit.json"
   SUBMISSION_ID=$(printf '%s' "$SUBMIT_JSON" | json_field id)
   if [[ -z "$SUBMISSION_ID" ]]; then
-    echo "没能从 notarytool 的返回里解析出提交 ID，原始输出见 $LOG_DIR/notary-submit.json" >&2
+    echo "提交公证失败，没能解析出提交 ID。notarytool 的输出：" >&2
+    cat "$LOG_DIR/notary-submit.json" >&2
     exit 1
   fi
   echo "提交 ID：$SUBMISSION_ID"
@@ -211,9 +241,16 @@ if [[ -n "${NOTARY_KEY_PATH:-}" && -n "${NOTARY_KEY_ID:-}" && -n "${NOTARY_ISSUE
       Accepted) break ;;
       Invalid|Rejected)
         # 真正的原因永远在 log 的 issues[] 里，submit/info 只会告诉你「不行」
-        xcrun notarytool log "$SUBMISSION_ID" "${NOTARY_ARGS[@]}" "$LOG_DIR/notary-log.json" || true
-        echo "公证被拒，详情：" >&2
-        cat "$LOG_DIR/notary-log.json" >&2 || true
+        echo "公证被拒（状态 $NOTARY_STATUS），详情：" >&2
+        if xcrun notarytool log "$SUBMISSION_ID" "${NOTARY_ARGS[@]}" "$LOG_DIR/notary-log.json"; then
+          cat "$LOG_DIR/notary-log.json" >&2
+        else
+          # 日志偶尔要等几十秒才生成得出来。取不到就别让唯一的诊断信息也一起没了，
+          # 至少把 info 的原始返回留下，以及怎么自己补查。
+          echo "（取不到 notarytool log，下面是 info 的原始返回）" >&2
+          printf '%s\n' "$INFO_JSON" >&2
+          echo "稍后可手工补查：xcrun notarytool log $SUBMISSION_ID --key ... --key-id ... --issuer ..." >&2
+        fi
         exit 1
         ;;
       *) ;;
@@ -221,7 +258,21 @@ if [[ -n "${NOTARY_KEY_PATH:-}" && -n "${NOTARY_KEY_ID:-}" && -n "${NOTARY_ISSUE
   done
 
   echo "==> Staple 公证票据"
-  xcrun stapler staple "$APP"
+  # 公证刚判 Accepted 时票据未必已经全网可取，头一两次 staple 偶发失败。
+  # 这时重试的代价是几十秒，不重试的代价是刚等完的那 30 分钟公证全白费。
+  staple_ok=0
+  for attempt in 1 2 3; do
+    if xcrun stapler staple "$APP"; then
+      staple_ok=1
+      break
+    fi
+    echo "stapler 第 $attempt 次失败，30 秒后重试" >&2
+    [[ "$attempt" -lt 3 ]] && sleep 30
+  done
+  if [[ "$staple_ok" -ne 1 ]]; then
+    echo "stapler 连续三次失败，提交 ID $SUBMISSION_ID 已公证但票据没贴上" >&2
+    exit 1
+  fi
   xcrun stapler validate "$APP"
 else
   echo "==> 跳过公证（NOTARY_KEY_PATH / NOTARY_KEY_ID / NOTARY_ISSUER_ID 未设齐）"
@@ -233,7 +284,8 @@ mkdir -p dist
 
 echo "==> 生成 DMG"
 # 顺序和本地脚本一致：先 staple 好 .app 再做 DMG，Gatekeeper 查的是映像里的那个 .app。
-STAGING=$(mktemp -d)
+STAGING="$WORK_TMP/staging"
+mkdir -p "$STAGING"
 cp -R "$APP" "$STAGING/"
 ln -s /Applications "$STAGING/Applications"
 # 不加 -quiet：runner 上 hdiutil 偶发 "Resource busy"，-quiet 会把原因一起藏掉。
@@ -244,10 +296,9 @@ for attempt in 1 2 3; do
     dmg_ok=1
     break
   fi
-  echo "::warning::hdiutil 第 $attempt 次失败，10 秒后重试"
-  sleep 10
+  echo "::warning::hdiutil 第 $attempt 次失败"
+  [[ "$attempt" -lt 3 ]] && sleep 10
 done
-rm -rf "$STAGING"
 if [[ "$dmg_ok" -ne 1 ]]; then
   echo "hdiutil 连续三次失败" >&2
   exit 1
@@ -258,8 +309,6 @@ ditto -c -k --keepParent "$APP" "dist/Copyo-$VERSION.zip"
 
 echo "==> 生成校验和"
 ( cd dist && shasum -a 256 "Copyo-$VERSION.dmg" "Copyo-$VERSION.zip" > SHA256SUMS.txt )
-
-rm -rf "$EXPORT_DIR"
 
 echo ""
 ls -lh dist/

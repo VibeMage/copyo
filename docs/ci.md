@@ -1,4 +1,4 @@
-# GitHub Actions CI
+# GitHub Actions 持续集成与自动发布
 
 创建日期：2026-09-20 · 最后更新：2026-09-20
 
@@ -6,17 +6,33 @@
 
 | workflow | 触发 | 需要 secret | 产出 |
 | --- | --- | --- | --- |
-| `.github/workflows/ci.yml` | 每个 PR、推送 main、手动 | 否 | 绿灯而已，外加构建日志 artifact |
-| `.github/workflows/release.yml`（签名路径） | 推送 `v*` tag、手动 | 是 | Release 上附 DMG / ZIP / SHA256SUMS.txt |
-| `.github/workflows/release.yml`（未签名路径） | 没配 secret 或手动演练时自动走这条 | 否 | 只有 workflow artifact，**不创建 Release** |
+| `ci.yml` | 每个 PR、推送 main（纯文档改动除外）、手动 | 否 | 绿灯而已，外加构建日志 artifact |
+| `release.yml`：推 tag | 推送 `v*` tag | 是，缺了就**当场失败** | Release 上附 DMG / ZIP / SHA256SUMS.txt |
+| `release.yml`：手动演练 | Actions 页面 Run workflow | 否，配了多少就走多远 | 只有 workflow artifact，**不创建 Release** |
 
-`ci.yml` 跑四件事：无签名编译 macOS Debug、无签名编译 macOS Release-AppStore（只有这份配置带 `APPSTORE`
-编译条件，不编它那些 `#if APPSTORE` 分支要等你本地打上架包才暴露）、无签名编译 iOS 模拟器（连带编两个扩展），
-以及 `swift test --package-path PasterCore`。不碰任何证书，所以 fork 出去的 PR 也能跑绿。
+这两条路径的区别是刻意的：**推 tag 是在要一次正式发布**，签名或公证凑不齐就红给你看，
+而不是全绿地什么都不发（那样你会以为已经发了）；**手动触发是演练**，配了什么就跑到哪一步，
+一个 secret 都没有时也能完整跑一遍。手动触发默认勾着 `dry_run`，在分支上跑时也一律按演练处理。
 
-未签名路径存在的理由：这个 workflow 在你配齐 secret 之前也能完整跑一遍，用来验证 checkout、Xcode、
+唯一的例外是「在一个已有的 tag 上手动触发、并且取消勾选 `dry_run`」——那等同于重推一次这个 tag，
+会照常创建 Release。这是留给「发布作业挂在半路、想重来一次」的口子，不是误触能撞上的路径。
+
+`ci.yml` 的 push 触发带 `paths-ignore`：只改 `art/`、`docs/`、`specs/` 或任何 `.md` 时不会跑。
+这个过滤刻意只加在 push 上、没加在 `pull_request` 上——被路径过滤跳过的作业永远不会变成
+success，将来若把 `ci.yml` 设成 required check，纯文档 PR 会永远卡在 pending 无法合并。
+
+`ci.yml` 跑四件事：无签名编译 macOS Debug、无签名编译 macOS Release-AppStore、无签名编译 iOS 模拟器
+（连带编两个扩展），以及 `swift test --package-path PasterCore`。不碰任何证书，所以 fork 出去的 PR 也能跑绿。
+
+为什么要单独编一遍 Release-AppStore：只有这份配置带 `APPSTORE` 编译条件，代码里那些 `#if APPSTORE`
+分支别的配置根本编不到。不编它，沙盒版的编译错误要等到你本地打上架包时才暴露。
+
+演练路径存在的理由：这个 workflow 在你配齐 secret 之前也能完整跑一遍，用来验证 checkout、Xcode、
 编译链路，而不是一个要等六个 secret 都就位才第一次执行的黑盒。它刻意不往 Release 上挂东西——
 README 向用户承诺「官方发布均已使用 Developer ID 签名并通过 Apple 公证」，挂未签名的包会当场让这句话变成假的。
+
+`.github/dependabot.yml` 是配套的一小份配置：让 dependabot 每月检查一次这两个 workflow 里引用的
+action 有没有新版本，有就自动提 PR。它不参与构建，删掉也不影响 CI 跑。
 
 ## 二、需要配置的 secret（你来操作）
 
@@ -96,7 +112,8 @@ base64 -i AuthKey_XXXXXXXXXX.p8 -o key.txt
 2. **配齐证书和描述文件后**：Run workflow，`dry_run` 勾上、`skip_notarize` 也勾上。验证钥匙串导入、
    描述文件安装、手动签名归档导出这一整条链路，不花公证的等待时间。
 3. **配齐 ASC 密钥后**：Run workflow，只勾 `dry_run`。这一步会真的走一遍公证，看看 notarytool 通不通。
-4. 三步都绿了，再真发布：
+4. 三步都绿了，再真发布。注意这一步和前三步不同：**推 tag 时若 secret 没配齐，作业会在头几秒就失败**，
+   不会悄悄产出一个空的 Release。
 
 ```bash
 # 先把 project.pbxproj 里的 MARKETING_VERSION 改成要发的版本号并提交，
@@ -118,7 +135,9 @@ git push origin v1.0.1
 | 公证状态 Invalid | entitlements、强化运行时或签名有问题 | 下载 artifact 里的 `notary-log.json`，真正的原因在 `issues[]` 里 |
 | `tag 与 MARKETING_VERSION 不一致` | 工程里的版本号没跟着 bump | 改 `project.pbxproj` 提交，删掉旧 tag 重新打 |
 | `找不到 Xcode 26.x*` | 锁了版本而镜像更新把它删了 | 照错误日志里列出的现有版本改 `release.yml` 的 `XCODE_VERSION`，或留空用镜像默认 |
-| fork 的 PR 发布作业红了 | fork PR 拿不到任何 secret，`GITHUB_TOKEN` 也只读 | 正常现象。签名/发布与 PR 门禁本来就分成两个 workflow；**千万别改用 `pull_request_target` 去绕**，那等于在 fork 的代码上下文里交出写权限的 token |
+| 推了 tag，作业几秒就红，报「没配置 ...」 | 这是设计如此：推 tag = 正式发布，secret 不齐时当场失败 | 按第二节配齐 secret，或先用 Run workflow 演练 |
+| fork 里推 tag 也红 | fork 拿不到上游仓库的任何 secret | 正常现象。想在自己的 fork 里发布，就在 fork 上配一套自己的证书 secret |
+| 想让 fork 的 PR 也能签名 | 做不到，也不该做 | fork PR 拿不到 secret、`GITHUB_TOKEN` 也只读，这正是签名/发布与 PR 门禁分成两个 workflow 的原因。**千万别改用 `pull_request_target` 去绕**，那等于在 fork 的代码上下文里交出写权限的 token |
 
 ## 八、CI 保证不了的事
 
