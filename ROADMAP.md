@@ -24,7 +24,11 @@
     操作按钮 / 敲击背面 / 控制中心），iPad 侧栏与拖放。2026-09-05 代码完成，
     **开发者后台配置已于 2026-09-19 完成**（三个 App ID、App Group、iCloud 容器），
     剩真机验证与提审，清单见 docs/ios-plan.md 3.2
-  - Phase 2：键盘扩展、小组件、Spotlight 索引
+  - **Phase 2 代码已于 2026-09-21 全部完成**：Core Spotlight 索引（默认关，见 ios-plan 3.4）、
+    主屏小组件（小 / 中，见 3.5）、键盘扩展（见 3.6）。但**键盘刻意不随 iOS 首版一起发**——
+    它要申请「允许完全访问」、会把整个 iOS 版拖进审核指南 4.4.1 的审视范围，
+    而 iOS 版本身还有一整条从未在签名真机上跑通过的链路。target 留在工程里、CI 照编，
+    只是不在包里；要发时把 project.pbxproj 里两处引用加回去即可
   - **Phase 1 遗留缺陷已于 2026-09-20 全部清掉**（动态字体、搜索防抖与 predicate 下推、
     超长正文、`isSelected`、VoiceOver、AppIcon），过程与取舍见 docs/ios-plan.md 3.3。
     顺带查出 iOS 的 AppIcon 与 macOS 母图逐字节相同——带 alpha、内缩 10%，那是 Mac 的图标网格，
