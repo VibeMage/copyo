@@ -1,38 +1,5 @@
 import SwiftUI
 
-/// 键盘正文区当前显示哪一面。
-///
-/// 设计 07 画的是第三种状态——横向剪贴卡片条；它要读 App Group 里的库，属于下一阶段。
-/// 本阶段只有能打字的这两面，`KeyRow` 的面板切换键在它们之间来回。
-enum KeyboardPlane {
-    /// 紧凑 QWERTY
-    case letters
-    /// 数字与标点
-    case symbols
-
-    /// 切到另一面。第三种状态进来时这里要改成显式的状态机，别在这上面继续加 `toggle`
-    mutating func toggle() {
-        self = self == .letters ? .symbols : .letters
-    }
-
-    /// 面板切换键的键面。系统键盘的规矩是**键面写的是去处**，不是现在在哪儿，
-    /// 所以字母面上写 `123`、数字面上写 `ABC`——设计 07 画的 `ABC` 正是卡片条那一面该有的样子。
-    /// 两个标签都不本地化：iOS 各语言下这两颗键一律是这四个拉丁字符，翻过去反而认不出来
-    var switchKeyTitle: String {
-        switch self {
-        case .letters: "123"
-        case .symbols: "ABC"
-        }
-    }
-
-    var switchKeyAccessibilityLabel: String {
-        switch self {
-        case .letters: String(localized: "Numbers and punctuation")
-        case .symbols: String(localized: "Letters")
-        }
-    }
-}
-
 /// 能真正打字的那三排键——**这是 4.4.1 的合规面，不是锦上添花。**
 ///
 /// 审核指南 4.4.1 要求键盘扩展「提供键盘输入功能（例如输入字符）」，并且「在没有完全网络访问、
@@ -42,10 +9,21 @@ enum KeyboardPlane {
 /// 于是第二条也一并满足——没开「允许完全访问」时，这块键盘退化成一块普通的拉丁键盘，仍然能用。
 ///
 /// **范围：只有拉丁 / ASCII。** 在这里塞一个中文输入法不在讨论范围内。
-/// 由此留下一个真实的缺口：将来键盘自己的搜索框只能输入拉丁字符，而它要搜的内容大量是中文——
-/// 这需要一个产品决定（例如搜索时改走宿主键盘、或只按来源与类型筛选），不是能在代码里糊过去的事。
+/// 由此留下的缺口现在已经是实打实的了：搜索行的查询就是由这三排键敲出来的
+/// （见 `KeyboardRootView.typingActions`），而库里的内容大量是中文——
+/// 中文条目只能靠它里面夹带的拉丁字符与数字被搜到（验证码、命令行、域名恰好都是），
+/// 纯中文的那几条在这块键盘上**搜不出来**。这需要一个产品决定
+/// （例如搜索时改走宿主键盘、或只按来源与类型筛选），不是能在代码里糊过去的事。
+///
+/// 字符落到哪儿由调用方决定：根视图在搜索进行中会换一套写进查询的 `KeyboardActions`，
+/// 本视图对此一无所知——它只知道「插入一个字符」。
 struct LetterPlane: View {
-    let plane: KeyboardPlane
+    /// true = 数字与标点面，false = 字母面。
+    ///
+    /// 刻意**不收 `KeyboardPlane`**：那个枚举有第三档（剪贴卡片条），而本视图在那一档
+    /// 根本不会被渲染。收枚举就得在两处 `switch` 里各写一个永远走不到的分支，
+    /// 而写不出真话的分支正是注释开始说谎的地方。
+    let showsSymbols: Bool
     let actions: KeyboardActions
     /// 外观。理由见 `CopyoTheme.keyCap(for:)`
     let scheme: ColorScheme
@@ -104,8 +82,10 @@ struct LetterPlane: View {
     /// 去掉它这一排会整体右移半颗键，打字的人立刻会打错。
     private func bottomRow(keyWidth: CGFloat) -> some View {
         HStack(spacing: spacing) {
-            switch plane {
-            case .letters:
+            if showsSymbols {
+                // 数字面没有上档可言，但左右两个空位要留着，`.,?!'` 那一排才落在中间
+                Color.clear.frame(width: functionWidth, height: keyHeight)
+            } else {
                 KeyCap(width: functionWidth,
                        height: keyHeight,
                        fill: .function,
@@ -115,9 +95,6 @@ struct LetterPlane: View {
                         .font(.title3)
                 }
                 .accessibilityLabel(String(localized: "Shift"))
-            case .symbols:
-                // 数字面没有上档可言，但左右两个空位要留着，`.,?!'` 那一排才落在中间
-                Color.clear.frame(width: functionWidth, height: keyHeight)
             }
 
             ForEach(rows.bottom, id: \.self) { key in
@@ -160,16 +137,14 @@ struct LetterPlane: View {
     /// 数字面没有做系统那种 `#+=` 第三面，而是把它常用的几个符号并进第三排——
     /// 多一面就要多一颗切换键，而底排五颗键的位置已经被设计 07 占满了。
     private var rows: (top: [String], middle: [String], bottom: [String]) {
-        switch plane {
-        case .letters:
-            (top: characters("qwertyuiop"),
-             middle: characters("asdfghjkl"),
-             bottom: characters("zxcvbnm"))
-        case .symbols:
-            (top: characters("1234567890"),
-             middle: ["-", "/", ":", ";", "(", ")", "$", "&", "@", "\""],
-             bottom: [".", ",", "?", "!", "'", "\"", "#", "%", "+"])
+        if showsSymbols {
+            return (top: characters("1234567890"),
+                    middle: ["-", "/", ":", ";", "(", ")", "$", "&", "@", "\""],
+                    bottom: [".", ",", "?", "!", "'", "\"", "#", "%", "+"])
         }
+        return (top: characters("qwertyuiop"),
+                middle: characters("asdfghjkl"),
+                bottom: characters("zxcvbnm"))
     }
 
     private func characters(_ string: String) -> [String] {
