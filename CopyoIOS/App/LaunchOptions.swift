@@ -72,6 +72,7 @@ enum DemoRoute: String, CaseIterable {
     case settingsQuickSave = "settings-quicksave"
     case settingsHowTo = "settings-howto"
     case settingsPaste = "settings-paste"
+    case settingsKeyboard = "settings-keyboard"
     case onboarding1 = "onboarding-1"
     case onboarding2 = "onboarding-2"
     case onboarding3 = "onboarding-3"
@@ -86,7 +87,7 @@ enum DemoRoute: String, CaseIterable {
             return .history
         case .pinboards, .pinboardContent, .pinboardNew:
             return .pinboard
-        case .settings, .settingsQuickSave, .settingsHowTo, .settingsPaste:
+        case .settings, .settingsQuickSave, .settingsHowTo, .settingsPaste, .settingsKeyboard:
             return .settings
         case .onboarding1, .onboarding2, .onboarding3:
             return .history
