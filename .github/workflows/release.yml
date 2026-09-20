@@ -57,7 +57,7 @@ jobs:
 
     steps:
       - name: 检出代码
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
           # 这个 job 的 token 有 contents: write。默认 checkout 会把它写进
