@@ -47,14 +47,19 @@ struct ClipCard: View {
 
     private var header: some View {
         HStack(spacing: 6) {
+            // 角标本身没有降级手段，被挤窄就直接截成「Cou…」（法语的 Couleur 就会这样）。
+            // 右边那行有缩放和截断兜底，让它先让位。
             KindBadge(item: item, dense: dense)
+                .fixedSize(horizontal: true, vertical: false)
             Text(verbatim: "\(item.sourceDisplayName) · \(item.relativeTime)")
                 .font(CopyoTheme.Fonts.meta)
                 .foregroundStyle(CopyoTheme.labelSecondary)
                 .lineLimit(1)
                 // 设计稿按 440pt 画布画的列宽 194，真机 iPhone 只有 171——
-                // 英文的 `This iPhone · now` 在原字号下放不下，宁可缩到 9.4pt 也要把时间显示全
-                .minimumScaleFactor(0.85)
+                // 英文的 `This iPhone · now` 在原字号下放不下，宁可缩小也要把时间显示全。
+                // 下限按最长的语言定：法语的 `Cet iPhone · 3 min` 比英文还长一截，
+                // 0.85 会把时间截成 `3…`，反而把这一行里最有用的信息丢了
+                .minimumScaleFactor(0.8)
                 .allowsTightening(true)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)

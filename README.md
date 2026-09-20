@@ -1,5 +1,7 @@
 # Copyo
 
+[English](README.en.md)
+
 Copyo（曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜单栏常驻，`⇧⌘V` 呼出底部卡片面板，历史即输即搜。
 所有数据仅保存在本机（`~/Library/Application Support/Copyo/`），无任何网络请求，适合不允许安装第三方闭源工具的办公环境。
 
@@ -20,7 +22,7 @@ Copyo（曾用名 Paster）是一款开源的 macOS 剪贴板管理工具：菜�
 - **自定义快捷键**：默认 `⇧⌘V`，可在设置中录制任意组合键
 - **历史上限**：100/300/500/1000/无限制，超限自动清理最旧的未固定记录
 - **开机自启**、纯文本模式等设置
-- **中英双语界面**：跟随系统语言（简体中文 / English），基于 String Catalog
+- **多语言界面**：跟随系统语言（简体中文 / English / Français），基于 String Catalog
 
 ## 安装
 

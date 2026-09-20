@@ -32,6 +32,34 @@
             }
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$#@count@"
+          },
+          "substitutions": {
+            "count": {
+              "argNum": 2,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg caractère"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg caractères"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -71,6 +99,34 @@
             }
           }
         },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$#@count@"
+          },
+          "substitutions": {
+            "count": {
+              "argNum": 2,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg fichier"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg fichiers"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -100,6 +156,24 @@
             }
           }
         },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld fichier"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld fichiers"
+                }
+              }
+            }
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -111,6 +185,12 @@
     "100 items": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "100 éléments"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -122,6 +202,12 @@
     "1000 items": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 000 éléments"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -133,6 +219,12 @@
     "300 items": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "300 éléments"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -144,6 +236,12 @@
     "500 items": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "500 éléments"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -155,6 +253,12 @@
     "About": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À propos"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -166,6 +270,12 @@
     "Always copy as plain text": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toujours copier en texte brut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -177,6 +287,12 @@
     "An open-source clipboard manager for macOS.\nAll data stays on this Mac and is never sent to a third-party server.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un gestionnaire de presse-papiers open source pour macOS.\nToutes les données restent sur ce Mac et ne sont jamais envoyées à un serveur tiers."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -188,6 +304,12 @@
     "Any folder all of your devices share works — for example a folder inside iCloud Drive, or a company drive. Copyo keeps its files in its own subfolder and can only reach the folder you pick here.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "N’importe quel dossier partagé par tous vos appareils convient — par exemple un dossier dans iCloud Drive ou un disque d’entreprise. Copyo place ses fichiers dans son propre sous-dossier et n’a accès qu’au dossier que vous choisissez ici."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -199,6 +321,12 @@
     "Anything you copy shows up here automatically": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout ce que vous copiez apparaît ici automatiquement"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -210,6 +338,12 @@
     "Applies when you press Return. ⌥↩ always copies as plain text.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "S’applique lorsque vous appuyez sur Retour. ⌥↩ copie toujours en texte brut."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -221,6 +355,12 @@
     "By default your clipboard history and Pinboards sync between your Macs through iCloud Drive (iCloud Drive/Copyo/). The data only ever passes through your own iCloud — Copyo never touches a third-party server. Deletions are not propagated across devices.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par défaut, votre historique du presse-papiers et vos Pinboards se synchronisent entre vos Mac via iCloud Drive (iCloud Drive/Copyo/). Les données ne passent que par votre propre iCloud : Copyo ne touche jamais à un serveur tiers. Les suppressions ne sont pas propagées entre les appareils."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -232,6 +372,12 @@
     "Cancel": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuler"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -243,6 +389,12 @@
     "Changing the sync method takes effect after you restart Copyo.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le changement de méthode de synchronisation prend effet après le redémarrage de Copyo."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -254,6 +406,12 @@
     "Checking iCloud status…": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vérification de l’état iCloud…"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -265,6 +423,12 @@
     "Choose": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisir"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -276,6 +440,12 @@
     "Choose Sync Folder…": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisir un dossier de synchronisation…"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -287,6 +457,12 @@
     "Choose a folder that all of your Macs can read and write.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez un dossier auquel tous vos Mac ont accès en lecture et en écriture."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -298,6 +474,12 @@
     "Choose a sync folder below to turn on syncing.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez un dossier de synchronisation ci-dessous pour activer la synchronisation."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -309,6 +491,12 @@
     "Clear": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effacer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -320,6 +508,12 @@
     "Clear History?": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effacer l’historique ?"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -331,6 +525,12 @@
     "Clear History…": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effacer l’historique…"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -342,6 +542,12 @@
     "Clear search / Close panel": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effacer la recherche / Fermer le panneau"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -353,6 +559,12 @@
     "Click the shortcut to customize it. The default is ⇧⌘V.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cliquez sur le raccourci pour le modifier. Par défaut : ⇧⌘V."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -364,6 +576,12 @@
     "Clipboard": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presse-papiers"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -375,6 +593,12 @@
     "Color": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couleur"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -386,6 +610,12 @@
     "Copy": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -397,6 +627,12 @@
     "Copy as Plain Text": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier en texte brut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -408,6 +644,12 @@
     "Copy selected item": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier l’élément sélectionné"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -419,6 +661,12 @@
     "Copy selected item as plain text": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier l’élément sélectionné en texte brut"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -430,6 +678,12 @@
     "Copyo Settings": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages de Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -441,6 +695,12 @@
     "Copyo is using the local database only, so nothing was lost. Fix the problem above and restart Copyo.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo utilise uniquement la base de données locale : rien n’a été perdu. Corrigez le problème ci-dessus, puis relancez Copyo."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -452,6 +712,12 @@
     "Copyo lives in the menu bar (the clipboard icon in the top-right corner).\n\n• Press %@ anytime to bring up the clipboard panel\n• Everything you copy is saved automatically — type to search\n• Select an item and press Return to put it back on the clipboard, then paste it with ⌘V\n• Open Settings by right-clicking the menu bar icon": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo réside dans la barre des menus (l’icône de presse-papiers en haut à droite).\n\n• Appuyez sur %@ à tout moment pour faire apparaître le panneau\n• Tout ce que vous copiez est enregistré automatiquement — saisissez pour rechercher\n• Sélectionnez un élément et appuyez sur Retour pour le replacer dans le presse-papiers, puis collez-le avec ⌘V\n• Ouvrez les réglages en cliquant avec le bouton droit sur l’icône de la barre des menus"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -463,6 +729,12 @@
     "Copyo lives in the menu bar (the clipboard icon in the top-right corner).\n\n• Press %@ anytime to bring up the clipboard panel\n• Everything you copy is saved automatically — type to search\n• Select an item and press Return to put it back on the clipboard, then paste it with ⌘V\n• Open Settings from the gear in the panel, or by right-clicking the menu bar icon": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo réside dans la barre des menus (l’icône de presse-papiers en haut à droite).\n\n• Appuyez sur %@ à tout moment pour faire apparaître le panneau\n• Tout ce que vous copiez est enregistré automatiquement — saisissez pour rechercher\n• Sélectionnez un élément et appuyez sur Retour pour le replacer dans le presse-papiers, puis collez-le avec ⌘V\n• Ouvrez les réglages depuis la roue dentée du panneau ou en cliquant avec le bouton droit sur l’icône de la barre des menus"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -474,6 +746,12 @@
     "Copyo lost access to the sync folder. Choose it again below to resume syncing.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo n’a plus accès au dossier de synchronisation. Choisissez-le à nouveau ci-dessous pour reprendre la synchronisation."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -485,6 +763,12 @@
     "Could not determine the iCloud status": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de déterminer l’état iCloud"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -496,6 +780,12 @@
     "Create": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Créer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -507,6 +797,12 @@
     "Custom Sync Folder (Optional)": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dossier de synchronisation personnalisé (facultatif)"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -518,6 +814,12 @@
     "Delete": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -529,6 +831,12 @@
     "Delete Pinboard": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer le Pinboard"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -540,6 +848,12 @@
     "Delete selected item": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer l’élément sélectionné"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -551,6 +865,12 @@
     "Enter any directory all of your devices can read and write (a company NAS, another cloud-sync folder, and so on) to use it instead of iCloud Drive.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indiquez n’importe quel répertoire accessible en lecture et en écriture depuis tous vos appareils (un NAS d’entreprise, un autre dossier de synchronisation cloud, etc.) pour l’utiliser à la place d’iCloud Drive."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -562,6 +882,12 @@
     "File": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichier"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -573,6 +899,12 @@
     "General": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Général"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -584,6 +916,12 @@
     "Got It": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "J’ai compris"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -595,6 +933,12 @@
     "History": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Historique"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -606,6 +950,12 @@
     "History Limit": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Limite de l’historique"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -617,6 +967,12 @@
     "Ignored Apps": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps ignorées"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -628,6 +984,12 @@
     "Image": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -639,6 +1001,12 @@
     "Just type": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir du texte"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -650,6 +1018,12 @@
     "Key %lld": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touche %lld"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -661,6 +1035,12 @@
     "Last synced %@": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dernière synchronisation : %@"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -672,6 +1052,12 @@
     "Launch at login": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir à la session"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -683,6 +1069,12 @@
     "Leave empty to use iCloud Drive, e.g. ~/Shared/Copyo": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laisser vide pour utiliser iCloud Drive, par exemple ~/Shared/Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -694,6 +1086,12 @@
     "Link": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lien"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -705,6 +1103,12 @@
     "Move between cards": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naviguer entre les cartes"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -716,6 +1120,12 @@
     "Name": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -727,6 +1137,12 @@
     "New Pinboard": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveau Pinboard"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -738,6 +1154,12 @@
     "New Pinboard…": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveau Pinboard…"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -749,6 +1171,12 @@
     "No clipboard history yet": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun historique pour l’instant"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -760,6 +1188,12 @@
     "No folder selected": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun dossier sélectionné"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -771,6 +1205,12 @@
     "No iCloud account is signed in on this Mac": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun compte iCloud n’est connecté sur ce Mac"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -782,6 +1222,12 @@
     "Nothing matches “%@”": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun résultat pour « %@ »"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -793,6 +1239,12 @@
     "Off": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivée"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -804,6 +1256,12 @@
     "One bundle ID per line (for example com.1password.1password). Copies made in these apps are never recorded. Content that password managers mark as concealed is always skipped.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un bundle ID par ligne (par exemple com.1password.1password). Ce qui est copié dans ces apps n’est jamais enregistré. Le contenu que les gestionnaires de mots de passe marquent comme masqué est toujours ignoré."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -815,6 +1273,12 @@
     "Open / Close panel": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir / Fermer le panneau"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -826,6 +1290,12 @@
     "Open Copyo": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -837,6 +1307,12 @@
     "Open System Settings": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir Réglages Système"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -848,6 +1324,12 @@
     "Pin to": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingler à"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -859,6 +1341,12 @@
     "Pin to Pinboard…": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingler à un Pinboard…"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -870,6 +1358,12 @@
     "Pinboards keep the clips you use most within reach": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les Pinboards gardent à portée de main les éléments que vous utilisez le plus"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -881,6 +1375,12 @@
     "Press the new shortcut…": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appuyez sur la nouvelle combinaison…"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -892,6 +1392,12 @@
     "Preview selected item (when search is empty)": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prévisualiser l’élément sélectionné (si la recherche est vide)"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -903,6 +1409,12 @@
     "Push notifications are unavailable on this Mac, so changes made on your other devices only arrive when Copyo starts.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les notifications push ne sont pas disponibles sur ce Mac : les modifications faites sur vos autres appareils n’arrivent donc qu’au lancement de Copyo."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -914,6 +1426,12 @@
     "Quit Copyo": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quitter Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -925,6 +1443,12 @@
     "Reset": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réinitialiser"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -936,6 +1460,12 @@
     "Restart Copyo": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relancer Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -947,6 +1477,12 @@
     "Rich Text": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texte enrichi"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -958,6 +1494,12 @@
     "Search": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechercher"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -969,6 +1511,12 @@
     "Settings": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -980,6 +1528,12 @@
     "Settings…": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages…"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -991,6 +1545,12 @@
     "Shared Folder": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dossier partagé"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1002,6 +1562,12 @@
     "Shortcuts": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccourcis"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1013,6 +1579,12 @@
     "Signed in to iCloud": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecté à iCloud"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1024,6 +1596,12 @@
     "Snapshot sync through a folder every device can reach. Deletions are not propagated: an entry you delete on one Mac stays on the others.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisation par instantanés via un dossier accessible à tous vos appareils. Les suppressions ne sont pas propagées : un élément supprimé sur un Mac reste présent sur les autres."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1035,6 +1613,12 @@
     "Space": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espace"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1046,6 +1630,12 @@
     "Sync": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisation"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1057,6 +1647,12 @@
     "Sync Folder": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dossier de synchronisation"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1068,6 +1664,12 @@
     "Sync Method": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Méthode de synchronisation"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1079,6 +1681,12 @@
     "Sync Now": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchroniser"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1090,6 +1698,12 @@
     "Sync clipboard history": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchroniser l’historique"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1101,6 +1715,12 @@
     "Sync through your iCloud account. Every Mac signed in to the same Apple Account sees the same history, and deleting an entry removes it everywhere.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisation via votre compte iCloud. Chaque Mac connecté au même compte Apple voit le même historique, et la suppression d’un élément s’applique partout."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1112,6 +1732,12 @@
     "Text": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Texte"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1123,6 +1749,12 @@
     "The combination must include at least one of ⌘, ⌥ or ⌃. Press Esc to cancel.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La combinaison doit contenir au moins ⌘, ⌥ ou ⌃. Appuyez sur Esc pour annuler."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1134,6 +1766,12 @@
     "The parent directory of the custom sync folder does not exist. Please check the path.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le répertoire parent du dossier de synchronisation personnalisé n’existe pas. Vérifiez le chemin d’accès."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1145,6 +1783,12 @@
     "This copy of Copyo is not signed for iCloud sync.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette copie de Copyo n’est pas signée pour la synchronisation iCloud."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1156,6 +1800,12 @@
     "This deletes every clipboard entry that isn’t pinned to a Pinboard. This action cannot be undone.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tous les éléments du presse-papiers non épinglés à un Pinboard seront supprimés. Cette action est irréversible."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1167,6 +1817,12 @@
     "Try It Now": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Essayer"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1178,6 +1834,12 @@
     "Type to search": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez pour rechercher"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1189,6 +1851,12 @@
     "Unknown Source": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source inconnue"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1200,6 +1868,12 @@
     "Unlimited": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Illimité"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1211,6 +1885,12 @@
     "Unpin": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne plus épingler"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1222,6 +1902,12 @@
     "Version %@": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1233,6 +1919,12 @@
     "Welcome to Copyo": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bienvenue dans Copyo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1244,6 +1936,12 @@
     "When the limit is exceeded, the oldest unpinned entries are removed automatically. Anything pinned to a Pinboard is unaffected.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Au-delà de la limite, les éléments non épinglés les plus anciens sont supprimés automatiquement. Les éléments épinglés à un Pinboard ne sont pas concernés."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1255,6 +1953,12 @@
     "Your clipboard history and Pinboards sync between your Macs through the folder you chose. The data only ever passes through your own storage — Copyo never touches a third-party server. Deletions are not propagated across devices.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre historique du presse-papiers et vos Pinboards se synchronisent entre vos Mac via le dossier que vous avez choisi. Les données ne passent que par votre propre stockage : Copyo ne touche jamais à un serveur tiers. Les suppressions ne sont pas propagées entre les appareils."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1266,6 +1970,12 @@
     "Your clipboard history stays on this Mac only.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre historique du presse-papiers reste uniquement sur ce Mac."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1277,6 +1987,12 @@
     "iCloud Account": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compte iCloud"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1288,6 +2004,12 @@
     "iCloud Drive is not enabled on this Mac. Turn it on in System Settings → click your name → iCloud, or point Copyo at a custom sync folder below.": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Drive n’est pas activé sur ce Mac. Activez-le dans Réglages Système → cliquez sur votre nom → iCloud, ou indiquez à Copyo un dossier de synchronisation personnalisé ci-dessous."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1299,6 +2021,12 @@
     "iCloud is restricted on this Mac": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud est restreint sur ce Mac"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1310,6 +2038,12 @@
     "iCloud is temporarily unavailable": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud est temporairement indisponible"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1321,6 +2055,12 @@
     "iCloud sync could not start: %@": {
       "extractionState": "manual",
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de démarrer la synchronisation iCloud : %@"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
