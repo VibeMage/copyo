@@ -37,7 +37,7 @@ Mac App Store 版本正在以 Copyo 的身份重新提审（旧的 Paster 记录
 需要 Xcode 16+、macOS 14+。
 
 ```bash
-git clone <repo-url> && cd copyo
+git clone https://github.com/VibeMage/copyo.git && cd copyo
 xcodebuild -project Copyo.xcodeproj -scheme Copyo -configuration Release -derivedDataPath build build
 open build/Build/Products/Release/Copyo.app   # 或拷贝到 /Applications
 ```

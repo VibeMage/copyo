@@ -37,7 +37,7 @@ you only get the standard "app downloaded from the Internet" confirmation dialog
 Requires Xcode 16+ and macOS 14+.
 
 ```bash
-git clone <repo-url> && cd copyo
+git clone https://github.com/VibeMage/copyo.git && cd copyo
 xcodebuild -project Copyo.xcodeproj -scheme Copyo -configuration Release -derivedDataPath build build
 open build/Build/Products/Release/Copyo.app   # or copy it to /Applications
 ```
