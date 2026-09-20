@@ -202,19 +202,14 @@ final class SyncService {
         // 用户可能选的是 iCloud Drive 根目录或公司共享盘，绝不能把 device-*.json
         // 和 assets/ 直接摊在别人的目录里。安全作用域覆盖子路径，无需第二个书签。
         let root = SyncFolderLayout.prepareRoot(in: picked)
-        let legacyRoot = SyncFolderLayout.legacyRoot(in: picked)
 #else
         let root: URL
-        let legacyRoot: URL?
         if let container = Self.syncContainer {
-            // 先改名再找旧目录，顺序颠倒的话 legacyRoot 指的是刚被改掉的那个
             root = SyncFolderLayout.prepareRoot(in: container)
-            legacyRoot = SyncFolderLayout.legacyRoot(in: container)
         } else {
             // 设置里填了自定义目录：那个路径本身就是同步目录，名字由用户定，不改
             guard let custom = Self.syncRoot else { return }
             root = custom
-            legacyRoot = nil
             try? FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         }
 #endif
@@ -222,12 +217,6 @@ final class SyncService {
         try? FileManager.default.createDirectory(at: assets, withIntermediateDirectories: true)
         exportSnapshot(to: root, assets: assets)
         importSnapshots(from: root, assets: assets)
-        // 还没升级到 Copyo 的 Mac 会把 Paster/ 重新建起来并继续往里写快照，
-        // 这段窗口期里只读地再合并一次，免得那台设备的新条目到不了这边。
-        if let legacyRoot, legacyRoot != root {
-            importSnapshots(from: legacyRoot,
-                            assets: legacyRoot.appendingPathComponent("assets", isDirectory: true))
-        }
 #if APPSTORE
         Self.recordSuccess()
 #endif
@@ -338,12 +327,10 @@ final class SyncService {
         }
         defer { picked.stopAccessingSecurityScopedResource() }
         // 用 root(in:) 而不是 prepareRoot(in:)：擦除的时候不该顺手把目录建出来
-        roots = [SyncFolderLayout.root(in: picked),
-                 SyncFolderLayout.legacyRoot(in: picked)].compactMap { $0 }
+        roots = [SyncFolderLayout.root(in: picked)]
 #else
         if let container = Self.syncContainer {
-            roots = [SyncFolderLayout.root(in: container),
-                     SyncFolderLayout.legacyRoot(in: container)].compactMap { $0 }
+            roots = [SyncFolderLayout.root(in: container)]
         } else if let custom = Self.syncRoot {
             roots = [custom]
         } else {
@@ -433,8 +420,7 @@ final class SyncService {
         try? context.save()
     }
 
-    /// 游标只许前进。同一台设备的快照可能同时出现在 `Copyo/` 与改名前的 `Paster/` 里，
-    /// 旧的那份导出时间更早，直接覆盖会把游标拉回去，下一轮就得白扫一遍全表。
+    /// 游标只许前进：旧快照的导出时间更早，直接覆盖会把游标拉回去，下一轮就得白扫一遍全表。
     ///
     /// `notBeyond` 是这一轮因为图片资产缺失而跳过的最早条目：游标要停在它之前，
     /// 代价是这份快照下一轮还要再扫一遍（上限 500 条，可以接受），换来的是不会永久丢图。

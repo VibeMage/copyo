@@ -10,6 +10,10 @@ public enum CopyoStore {
     /// iOS 主应用与各扩展共享容器的 App Group 标识
     public static let appGroupIdentifier = "group.dev.vibemage.Copyo"
 
+    /// 数据库在容器里的目录名与文件名
+    public static let directoryName = "Copyo"
+    public static let storeName = "Copyo.store"
+
     public enum StoreError: LocalizedError {
         /// 取不到 App Group 容器：capability 没开，或几个 target 里的标识写得不一样
         case appGroupUnavailable(String)
@@ -32,36 +36,25 @@ public enum CopyoStore {
         return try storeURL(in: appSupport)
     }
 
-    /// 在给定的容器目录里解析数据库位置，顺手把 Paster 时代的旧库搬过来。
-    /// 搬不动时返回旧路径继续用——目录名难看好过让用户的历史消失。
+    /// 在给定的容器目录里解析数据库位置，顺带创建所在目录。
     public static func storeURL(in container: URL,
                                fileManager: FileManager = .default) throws -> URL {
-        if case .failed(let legacyStoreURL) = LegacyStoreMigration.migrateIfNeeded(in: container,
-                                                                                  fileManager: fileManager) {
-            return legacyStoreURL
-        }
-        let directory = container.appendingPathComponent(LegacyStoreMigration.directoryName,
-                                                        isDirectory: true)
+        let directory = container.appendingPathComponent(directoryName, isDirectory: true)
         try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
-        return directory.appendingPathComponent(LegacyStoreMigration.storeName)
+        return directory.appendingPathComponent(storeName)
     }
 
     /// App Group 容器内的数据库位置：<group container>/Copyo/Copyo.store
     /// iOS 主应用、分享扩展、Intent 都要打开同一份库，只能放在共享容器里；
     /// 沙盒里的 Application Support 是每个进程各自一份，扩展写进去主应用看不到。
-    ///
-    /// 这里不做旧库搬迁：App Group 标识本身从 `group.dev.vibemage.Paster` 换成了
-    /// `group.dev.vibemage.Copyo`，容器是全新的，而没有旧 entitlement 也读不到旧容器。
-    /// iOS 版从未发布，历史只存在于开发机上。
     public static func appGroupStoreURL(groupIdentifier: String = appGroupIdentifier) throws -> URL {
         guard let container = FileManager.default
             .containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier) else {
             throw StoreError.appGroupUnavailable(groupIdentifier)
         }
-        let directory = container.appendingPathComponent(LegacyStoreMigration.directoryName,
-                                                        isDirectory: true)
+        let directory = container.appendingPathComponent(directoryName, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        return directory.appendingPathComponent(LegacyStoreMigration.storeName)
+        return directory.appendingPathComponent(storeName)
     }
 
     /// 建立容器。`cloudKit` 为 true 时把这份存储镜像到 CloudKit 私有数据库；

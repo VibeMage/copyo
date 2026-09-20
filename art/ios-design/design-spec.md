@@ -1,15 +1,15 @@
-# Paster iOS / iPadOS 设计规格
+# Copyo iOS / iPadOS 设计规格
 
-创建日期：2026-09-05 · 最后更新：2026-09-05 · 来源：Claude Design 项目 Paster iOS Screens
+创建日期：2026-09-05 · 最后更新：2026-09-05 · 来源：Claude Design 项目 Copyo iOS Screens
 
-> 本文是把 `art/ios-design/2026-09-05/Paster iOS Screens.dc.html`（含页尾「规格」节）与 `PasterCard.dc.html`
+> 本文是把 `art/ios-design/2026-09-05/Copyo iOS Screens.dc.html`（含页尾「规格」节）与 `CopyoCard.dc.html`
 > 整理成的实现依据。数值逐字取自设计稿，未做取整或推断。设计稿里没有的内容不在此文档中，
 > 含糊之处集中列在文末「待确认」。
 >
 > 原始文件（只读，不得改动）：
-> - `art/ios-design/2026-09-05/Paster iOS Screens.dc.html` —— 01–10 全部界面 + 页尾规格节
-> - `art/ios-design/2026-09-05/PasterCard.dc.html` —— 卡片组件的精确样式与状态
-> - `art/ios-design/2026-09-05/Paster iOS.dc.html` —— 第一轮的三个方向探索（1a 套印 / 1b 细边 / 1c 染色），**1c 染色为最终方向**
+> - `art/ios-design/2026-09-05/Copyo iOS Screens.dc.html` —— 01–10 全部界面 + 页尾规格节
+> - `art/ios-design/2026-09-05/CopyoCard.dc.html` —— 卡片组件的精确样式与状态
+> - `art/ios-design/2026-09-05/Copyo iOS.dc.html` —— 第一轮的三个方向探索（1a 套印 / 1b 细边 / 1c 染色），**1c 染色为最终方向**
 > - `art/ios-design/2026-09-05/ios-frame.jsx`、`support.js`、`assets/` —— 画布外框与素材
 >
 > 方向定稿（设计稿原文）：iOS 26 大标题 + 浮动 Liquid Glass 标签栏；卡片 = 整卡淡染来源色（浅 12% / 深 20%）
@@ -112,18 +112,18 @@
 | 04b | 一键保存 · 分段选择入口，各给图文步骤 | `04-settings-quicksave-light.png` |
 | 04c | 怎样保存剪贴板 · 三条通道 | `04-settings-howto-light.png` |
 | 04d | 允许从其他 App 粘贴 · 引导 | `04-settings-paste-light.png` |
-| 04e | 启用 Paster 键盘 · 指引 | `04-settings-keyboard-light.png` |
+| 04e | 启用 Copyo 键盘 · 指引 | `04-settings-keyboard-light.png` |
 
 **04 文案**：大标题 `设置`。
 分组一 `同步`：`iCloud 同步`（开关，开）；子行 `状态` → `已同步 · 刚刚`；
 脚注 `Mac 与 iPhone 登录同一 Apple 账户即可。内容只经过 iCloud，不经过任何第三方服务器。`
 分组二 `剪贴板`：`怎样保存剪贴板` ›；`一键保存` → `操作按钮` ›；`允许从其他 App 粘贴` → `询问`（橙色 `#FF9F0A`）›；
-`Paster 键盘` → `未启用` ›；`历史上限` → `500 条` ›。
+`Copyo 键盘` → `未启用` ›；`历史上限` → `500 条` ›。
 分组三（无标题）：`开源 · GitHub` ↗；`隐私说明` ›；`关于` → `1.0 (12)` ›。
 图标砖底色依次：`#0A84FF`（云）、`#FF9F0A`（问号）、`#FF2D55`（闪电）、`#8E8E93`（剪贴板）、`#5856D6`（键盘）、`#34C759`（时钟）、`#48484A`（代码）、`#0A84FF`（手）、`#8E8E93`（信息）。
 
 **04b 文案**：返回 `设置` · 标题 `一键保存` ·
-说明 `按一下就把当前剪贴板存进 Paster。系统会打开 Paster 并显示「已保存」。三种入口都靠同一个快捷指令。` ·
+说明 `按一下就把当前剪贴板存进 Copyo。系统会打开 Copyo 并显示「已保存」。三种入口都靠同一个快捷指令。` ·
 分段控件 `操作按钮`（选中）/ `敲击背面` / `控制中心` ·
 主按钮 `添加「保存剪贴板」快捷指令` ·
 步骤 1 `点上方按钮，在「快捷指令」里确认添加` / `只需一次，三种入口共用`；
@@ -132,25 +132,25 @@
 底部按钮 `打开「操作按钮」设置`。
 
 **04c 文案**：返回 `设置` · 标题 `怎样保存剪贴板` ·
-导语 `iOS 不允许 App 在后台读剪贴板，所以 Paster 只在这三种时刻保存内容。` ·
-卡片一 `打开 Paster 时` / `每次打开或回到 Paster，自动读取当前剪贴板并存入历史。需要把「从其他 App 粘贴」设为允许。` / 行动胶囊 `前往设置` ›；
-卡片二 `分享面板` / `在任何 App 里选中文字或图片，点「分享」，再点「保存到 Paster」。可以顺手选 Pinboard。`；
-卡片三 `一键保存` / `复制后按操作按钮、敲两下手机背面，或点控制中心按钮。Paster 会打开并提示「已保存」。` / 行动胶囊 `设置一键保存` ›（图标为品牌红 `#FF2D55` 闪电，底色 `tintRed`）·
+导语 `iOS 不允许 App 在后台读剪贴板，所以 Copyo 只在这三种时刻保存内容。` ·
+卡片一 `打开 Copyo 时` / `每次打开或回到 Copyo，自动读取当前剪贴板并存入历史。需要把「从其他 App 粘贴」设为允许。` / 行动胶囊 `前往设置` ›；
+卡片二 `分享面板` / `在任何 App 里选中文字或图片，点「分享」，再点「保存到 Copyo」。可以顺手选 Pinboard。`；
+卡片三 `一键保存` / `复制后按操作按钮、敲两下手机背面，或点控制中心按钮。Copyo 会打开并提示「已保存」。` / 行动胶囊 `设置一键保存` ›（图标为品牌红 `#FF2D55` 闪电，底色 `tintRed`）·
 脚注 `Mac 上复制的内容不需要任何操作，会自动通过 iCloud 出现在历史里。`
 
 **04d 文案**：返回 `设置` · 标题 `允许从其他 App 粘贴` ·
 状态卡 橙点 + `当前：每次询问` + `系统每次弹窗确认` ·
-说明 `设为「允许」后，打开 Paster 时自动读取剪贴板，不再弹窗。这是 iOS 的隐私设置，只能在系统「设置」里更改。` ·
-步骤 1 `打开「设置 › App › Paster」`；2 `点「从其他 App 粘贴」`；3 `选择「允许」` +
+说明 `设为「允许」后，打开 Copyo 时自动读取剪贴板，不再弹窗。这是 iOS 的隐私设置，只能在系统「设置」里更改。` ·
+步骤 1 `打开「设置 › App › Copyo」`；2 `点「从其他 App 粘贴」`；3 `选择「允许」` +
 内嵌系统选项示意 `询问` / `拒绝` / `允许 ✓` ·
-主按钮 `打开 Paster 的系统设置` ·
+主按钮 `打开 Copyo 的系统设置` ·
 脚注 `未允许时，历史顶部会显示「剪贴板有新内容」横幅，用系统粘贴按钮手动保存。`
 
-**04e 文案**：返回 `设置` · 标题 `Paster 键盘` ·
+**04e 文案**：返回 `设置` · 标题 `Copyo 键盘` ·
 键盘预览（搜索行 `搜索` + 三张 dense 卡片 `kbCards`）·
-说明 `在任何输入框里切换到 Paster 键盘，点卡片直接输入内容，不用来回切 App。` ·
-步骤 1 `「设置 › 通用 › 键盘 › 键盘」`；2 `「添加新键盘…」，选择 Paster`；
-3 `打开「允许完全访问」` + 附注 `键盘扩展需要它才能读取历史。Paster 不联网、不记录按键。` ·
+说明 `在任何输入框里切换到 Copyo 键盘，点卡片直接输入内容，不用来回切 App。` ·
+步骤 1 `「设置 › 通用 › 键盘 › 键盘」`；2 `「添加新键盘…」，选择 Copyo`；
+3 `打开「允许完全访问」` + 附注 `键盘扩展需要它才能读取历史。Copyo 不联网、不记录按键。` ·
 主按钮 `打开键盘设置`。**（键盘扩展本身是 Phase 2；此设置页可随 Phase 2 一并实现。）**
 
 ### 05 首次启动引导（可跳过）
@@ -166,8 +166,8 @@
 插图：mac 图标 44 → 双向箭头 26（灰 `#8E8E93`）→ iphone 图标 40，均为 `#0A84FF`。
 
 **05b 文案**：`跳过` · 标题 `手机上想留住的，三种方式存进来` ·
-正文 `iOS 不允许 App 在后台读剪贴板，Paster 只在这三种时刻保存。` ·
-三行：`打开 Paster 时` / `自动读取当前剪贴板`；`分享面板` / `任何 App 里「保存到 Paster」`；
+正文 `iOS 不允许 App 在后台读剪贴板，Copyo 只在这三种时刻保存。` ·
+三行：`打开 Copyo 时` / `自动读取当前剪贴板`；`分享面板` / `任何 App 里「保存到 Copyo」`；
 `一键保存` / `操作按钮 / 敲击背面 / 控制中心` · CTA `继续` · 插图 tray 64。
 
 **05c 文案**：跳过按钮 `以后再说` · 标题 `两个开关，打开就好` · 正文 `都可以稍后在「设置」里更改。` ·
@@ -179,9 +179,9 @@ CTA `开始使用` · 插图 cloudCheck 64。
 
 | 帧 | 状态 | 导出文件名 |
 | --- | --- | --- |
-| 06 | 「保存到 Paster」· 内容预览 + 可选 Pinboard + 保存 | `06-share-light.png` |
+| 06 | 「保存到 Copyo」· 内容预览 + 可选 Pinboard + 保存 | `06-share-light.png` |
 
-**文案**：`取消` · 标题 `保存到 Paster`（左侧 26 × 26 App 图标）·
+**文案**：`取消` · 标题 `保存到 Copyo`（左侧 26 × 26 App 图标）·
 预览卡（中性灰淡染）角标 `文本` + `本机 · 现在` + 正文
 `Liquid Glass 是一种动态材质，会根据背后的内容折射光线并实时响应移动。标签栏、工具栏与搜索栏默认采用该材质。`（4 行截断）
 + 脚注 `63 字 · 纯文本` · 行 `固定到 Pinboard` → `不固定` › · 主按钮 `保存`。
@@ -199,7 +199,7 @@ CTA `开始使用` · 插图 cloudCheck 64。
 底排 地球 / `↑` / `空格` / 删除 / `换行`。
 
 **07b 文案**：锁图标 + `需要「允许完全访问」才能显示历史` ·
-`设置 › 通用 › 键盘 › 键盘 › Paster。Paster 不联网，也不记录你的输入。` · 按钮 `打开设置` · 底排同上。
+`设置 › 通用 › 键盘 › 键盘 › Copyo。Copyo 不联网，也不记录你的输入。` · 按钮 `打开设置` · 底排同上。
 
 ### 08 小组件与控件 —— **小 / 中尺寸小组件属 Phase 2；「保存剪贴板」控件（控制中心 / 锁屏）本轮要做**
 
@@ -216,11 +216,11 @@ CTA `开始使用` · 插图 cloudCheck 64。
 
 | 帧 | 状态 | 导出文件名 |
 | --- | --- | --- |
-| 09 | Split View：左 Paster（选中态 · 硬件键盘焦点态 · 拖动中间态）· 右 任意文稿 App 接收拖放 | `09-ipad-grid-light.png` |
+| 09 | Split View：左 Copyo（选中态 · 硬件键盘焦点态 · 拖动中间态）· 右 任意文稿 App 接收拖放 | `09-ipad-grid-light.png` |
 | 10 | Slide Over / 紧凑宽度 → 退化为 iPhone 布局（浮动标签栏、双列流） | `10-ipad-slideover-light.png` |
 
 **09 文案**：状态条 `9:41 · 9 月 5 日 周五` / `iCloud 已同步 · 100%` ·
-侧栏标题 `Paster` + 侧栏图标；搜索 `搜索` + 快捷键提示 `⌘F`；
+侧栏标题 `Copyo` + 侧栏图标；搜索 `搜索` + 快捷键提示 `⌘F`；
 分类行 `历史 1 284`（选中）/ `文本 902` / `链接 211` / `图片 96` / `颜色 41` / `文件 34`；
 分组标题 `PINBOARD` + `+`；四个 Pinboard 行（名称 + 计数）；底部 `设置` ·
 内容区标题 `历史` + `已同步` 胶囊 + 排序按钮；三列网格十张卡片，其中第 2 张 selected、第 3 张 ghost（被拖走的原位）、第 4 张 focused ·
@@ -327,7 +327,7 @@ caption / 角标 → `.caption2`；tab.label → `.caption2` Semibold。字体�
 
 ## 三、组件规格
 
-### 3.1 卡片 PasterCard
+### 3.1 卡片 CopyoCard
 
 组件属性：`item`（ClipItem）、`t`（Theme）、`dense`、`en`、`sel`、`foc`、`lift`、`pressed`、`ghost`。
 
@@ -483,7 +483,7 @@ chips 上距 8；结果计数 13 `label.secondary`、上距 14；结果单列、
 状态条高 24、`padding 0 24`、13 Semibold（09 用 `mix-blend-mode: difference` 压在壁纸上）。
 左窗格固定 880 宽；分栏手柄 5 × 60、radius 3、`rgba(255,255,255,.6)`；右窗格占满剩余。
 **侧栏**：宽 280、底 `sideBg`、右边 `.5px separator`、`padding 44px 14px 0`、行间 `gap 4`；
-标题 `Paster` 22 Bold + 侧栏图标；搜索行高 36、radius 10、`fill` 底、15、右侧 `⌘F` 11 `label.tertiary`（下距 10）；
+标题 `Copyo` 22 Bold + 侧栏图标；搜索行高 36、radius 10、`fill` 底、15、右侧 `⌘F` 11 `label.tertiary`（下距 10）；
 分类行高 38、radius 10、`padding 0 10`、`gap 10`、15；选中 accent 底 + 白字 Semibold + 计数 `opacity .8`；未选 `label` + 计数 `label.secondary`；
 分组标题 `PINBOARD` 13 Semibold `label.secondary`、`padding 22px 10px 6px`、右侧 `+`；
 底部「设置」`margin-top auto`、`padding 0 10px 18px`、15 `label.secondary`。
@@ -683,11 +683,11 @@ text `订单号 SF1364 0027 8891，预计今天 18:00 前送达，请保持电�
 | 页 | id | 跳过 | CTA | 标题 | 正文 | 行 | 插图 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 05a | 跳过 | 继续 | Mac 剪贴板，随身带着 | 在 Mac 上复制过的一切，会通过 iCloud 出现在这里。随时搜，轻点即复制。 | 无 | mac 44 + 双向箭头 26 + iphone 40 |
-| 2 | 05b | 跳过 | 继续 | 手机上想留住的，三种方式存进来 | iOS 不允许 App 在后台读剪贴板，Paster 只在这三种时刻保存。 | 三行（见下） | tray 64 |
+| 2 | 05b | 跳过 | 继续 | 手机上想留住的，三种方式存进来 | iOS 不允许 App 在后台读剪贴板，Copyo 只在这三种时刻保存。 | 三行（见下） | tray 64 |
 | 3 | 05c | 以后再说 | 开始使用 | 两个开关，打开就好 | 都可以稍后在「设置」里更改。 | 两行（见下） | cloudCheck 64 |
 
-第 2 页三行：`打开 Paster 时` / `自动读取当前剪贴板`（clipboard 图标）；
-`分享面板` / `任何 App 里「保存到 Paster」`（share）；`一键保存` / `操作按钮 / 敲击背面 / 控制中心`（bolt）。
+第 2 页三行：`打开 Copyo 时` / `自动读取当前剪贴板`（clipboard 图标）；
+`分享面板` / `任何 App 里「保存到 Copyo」`（share）；`一键保存` / `操作按钮 / 敲击背面 / 控制中心`（bolt）。
 
 第 3 页两行：`iCloud 同步` / `与 Mac 共用同一份历史`（cloud 图标，右侧开关开启）；
 `允许从其他 App 粘贴` / `在系统设置里设为「允许」，不再弹窗`（clipboard 图标，右侧胶囊按钮 `前往设置`）。
@@ -703,7 +703,7 @@ text `订单号 SF1364 0027 8891，预计今天 18:00 前送达，请保持电�
 | 01b 空态 | `ContentUnavailableView` 的自定义 label（插画为自绘 `Canvas`/`ZStack` 矩形，非 SF Symbol）+ 两个按钮 |
 | 01c 横幅 | 列表顶部 `safeAreaInset(edge: .top)` 或首个 section；粘贴按钮用 `UIViewRepresentable` 包 `UIPasteControl` |
 | 01d 轻提示 | `.overlay(alignment: .top)` 的玻璃胶囊 + `withAnimation` 定时 1.2s 收起；新条目 `.transition(.move + .opacity)` + 临时 focused 环 |
-| 01e 长按菜单 | `.contextMenu { … } preview: { PasterCard(item:) }`；固定到 Pinboard 用嵌套 `Menu` 列出 Pinboard |
+| 01e 长按菜单 | `.contextMenu { … } preview: { CopyoCard(item:) }`；固定到 Pinboard 用嵌套 `Menu` 列出 Pinboard |
 | 01f 左右滑 | 瀑布流不是 `List`，`swipeActions` 不可用 → 自定义 `DragGesture` + 底层动作层（红/蓝），阈值触发后 `withAnimation` 移除；搜索态改单列 `LazyVStack` |
 | 02 详情 | `NavigationStack` push；`.navigationTransition(.zoom(sourceID:in:))`（iOS 18+）；底部工具栏用 `.safeAreaInset(edge: .bottom)` 放玻璃胶囊条（非 `.toolbar`，因设计为浮动胶囊） |
 | 03 Pinboard 列表 | `List`（`.insetGrouped`）+ `.toolbar` 放排序与 `+`；新建用 `.alert(_:isPresented:) { TextField … }` |
@@ -712,12 +712,12 @@ text `订单号 SF1364 0027 8891，预计今天 18:00 前送达，请保持电�
 | 04b 一键保存 | `Picker(.segmented)` 切三种入口；「添加快捷指令」跳 iCloud 分享链接；「打开『操作按钮』设置」走系统设置深链 |
 | 04c / 04d / 04e | 纯静态 `ScrollView` + 卡片；步骤条目为自定义 Row |
 | 05 引导 | `TabView(.page)`（隐藏原生指示器，自绘 7pt 圆点）+ 底部固定 CTA；首启动用 `@AppStorage` 判断 |
-| 06 分享扩展 | 独立 Share Extension target，SwiftUI 根视图 + `.presentationDetents`；预览卡复用 `PasterCard` |
+| 06 分享扩展 | 独立 Share Extension target，SwiftUI 根视图 + `.presentationDetents`；预览卡复用 `CopyoCard` |
 | 07 键盘扩展 | **Phase 2**：`UIInputViewController` 承载 SwiftUI；横向 `ScrollView` + dense 卡片；需「允许完全访问」读 App Group |
 | 08 控件 | 本轮做 `ControlWidget` + `ControlWidgetButton(action: SaveClipboardIntent())`（`openAppWhenRun = true`），一次实现操作按钮 / 控制中心 / 锁屏；小 / 中尺寸 `WidgetKit` 小组件为 **Phase 2** |
 | 09 iPad | `NavigationSplitView`（sidebar + detail）；网格 `LazyVGrid(columns: 3)`；卡片 `.draggable`（`Transferable` 提供 text / rtf / url / image / color 多表示）；键盘快捷键用 `.focusable()` + `.onKeyPress` 与 `.keyboardShortcut`（⌘F / ⌘P / ⌘1-3）；空格预览走 `.quickLookPreview` |
 | 10 紧凑宽度 | `@Environment(\.horizontalSizeClass)` 或 `GeometryReader` 宽度 < 600pt → 切回 01 的 iPhone 布局（同一 `HistoryView`，仅列数与 dense 开关不同） |
-| 卡片 | 单个 `PasterCard` 视图，参数对应 `dense` / `isSelected` / `isFocused` / `isDragging` / `isGhost`；淡染用 `Color(sourceColor).mix(with: base, by: 0.88/0.80)`（iOS 18 无 `mix` 时手工按分量插值） |
+| 卡片 | 单个 `CopyoCard` 视图，参数对应 `dense` / `isSelected` / `isFocused` / `isDragging` / `isGhost`；淡染用 `Color(sourceColor).mix(with: base, by: 0.88/0.80)`（iOS 18 无 `mix` 时手工按分量插值） |
 
 **iOS 26 API 与 iOS 18 回退**（最低支持 iOS 18）：
 

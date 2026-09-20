@@ -1,4 +1,4 @@
-# Paster App Icon Generation Report — Round 5
+# Copyo App Icon Generation Report — Round 5
 
 - Date: 2026-08-31
 - Provider: Built-in ImageGen
