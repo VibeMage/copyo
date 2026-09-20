@@ -15,7 +15,7 @@ import SwiftUI
 struct KeyboardSearchRow: View {
     /// 外观。理由见 `CopyoTheme.keyCap(for:)`
     let scheme: ColorScheme
-    /// 查询状态。**这是全键盘唯一读 `query` 的地方**，理由写在 `KeyboardSearch` 的文档注释里：
+    /// 打字时重画的就是这一行（`clipsArea` 也读 `query`，但那一面改不了查询，见 `KeyboardSearch`）
     /// 读它的视图每敲一个字符就要重画一次，所以只能是这 36pt 的一行，不能是根视图
     let search: KeyboardSearch
     /// 当前可筛的全部条目。命中条数在**本视图**里算而不是由上层算好传进来，
