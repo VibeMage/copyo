@@ -118,8 +118,9 @@ jobs:
           prettify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
           # 必须用 generic：写 `name=iPhone 16` 这类具体机型，镜像换代后模拟器消失就会挂。
           # 代价是 generic 默认编双 slice，所以显式 ARCHS=arm64。
-          # 这一条会连带编 CopyoShareExtension 与 CopyoWidgets（它们内嵌在 iOS app 里），
-          # 和上面两条合起来才覆盖全部四个 target。
+          # 这一条会连带编 CopyoShareExtension 与 CopyoWidgets（它们内嵌在 iOS app 里）。
+          # **不包括 CopyoKeyboard**：它不是 iOS app 的依赖（iOS 首版不随包发布，
+          # 见 docs/ios-plan.md 3.6），所以有单独一条在下面。
           xcodebuild build \
             -project Copyo.xcodeproj \
             -scheme 'Copyo iOS' \
@@ -138,6 +139,32 @@ jobs:
             2>&1 | tee build/logs/ios-debug.log | prettify
           test -d 'build/Build/Products/Debug-iphonesimulator/Copyo.app' \
             || { echo '::error::xcodebuild 返回 0 但没产出 Copyo.app'; exit 1; }
+
+      - name: 编译 CopyoKeyboard（模拟器）
+        run: |
+          set -o pipefail
+          mkdir -p build/logs
+          prettify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
+          # 键盘扩展要单独编一次。它**不是** `Copyo iOS` 的依赖——iOS 首个版本不随包发布它
+          # （见 docs/ios-plan.md 3.6），所以上面那条编宿主的命令根本不会碰这 2000 行代码。
+          # 少了这一步，键盘会在无人察觉的情况下烂掉，直到真要发它的那一版才发现。
+          xcodebuild build \
+            -project Copyo.xcodeproj \
+            -scheme CopyoKeyboard \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            2>&1 | tee build/logs/ios-keyboard.log | prettify
+          test -d 'build/Build/Products/Debug-iphonesimulator/CopyoKeyboard.appex' \
+            || { echo '::error::xcodebuild 返回 0 但没产出 CopyoKeyboard.appex'; exit 1; }
 
       - name: 单元测试（CopyoCore）
         run: |

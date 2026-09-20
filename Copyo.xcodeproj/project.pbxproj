@@ -14,7 +14,6 @@
 		AB0000000000000000000023 /* CopyoShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000029 /* CopyoShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AB0000000000000000000024 /* CopyoWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AB000000000000000000002A /* CopyoWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AB000000000000000000004E /* CopyoCore in Frameworks */ = {isa = PBXBuildFile; productRef = AB000000000000000000005D /* CopyoCore */; };
-		AB000000000000000000004F /* CopyoKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000051 /* CopyoKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,13 +31,6 @@
 			remoteGlobalIDString = AB0000000000000000000034;
 			remoteInfo = CopyoWidgets;
 		};
-		AB0000000000000000000050 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AB000000000000000000000A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AB0000000000000000000055;
-			remoteInfo = CopyoKeyboard;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -50,7 +42,6 @@
 			files = (
 				AB0000000000000000000023 /* CopyoShareExtension.appex in Embed Foundation Extensions */,
 				AB0000000000000000000024 /* CopyoWidgets.appex in Embed Foundation Extensions */,
-				AB000000000000000000004F /* CopyoKeyboard.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -240,7 +231,6 @@
 			dependencies = (
 				AB000000000000000000003B /* PBXTargetDependency */,
 				AB000000000000000000003C /* PBXTargetDependency */,
-				AB0000000000000000000058 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				AB000000000000000000002B /* CopyoIOS */,
@@ -450,11 +440,6 @@
 			isa = PBXTargetDependency;
 			target = AB0000000000000000000034 /* CopyoWidgets */;
 			targetProxy = AB0000000000000000000026 /* PBXContainerItemProxy */;
-		};
-		AB0000000000000000000058 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AB0000000000000000000055 /* CopyoKeyboard */;
-			targetProxy = AB0000000000000000000050 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
