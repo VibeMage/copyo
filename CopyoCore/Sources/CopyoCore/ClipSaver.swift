@@ -60,12 +60,14 @@ public enum ClipSaver {
 
     /// 文本 / 富文本 / 链接 / 颜色。类型由 `ClipClassifier` 判定，调用方不需要自己分类。
     /// - Parameter historyLimit: 未固定条目的上限，nil 或 <= 0 表示不限制
+    /// - Parameter onEvicted: 这次保存顺带清掉的旧条目的标识符，见 `enforceHistoryLimit`
     @discardableResult
     public static func save(text: String,
                             rtfData: Data? = nil,
                             source: ClipSource,
                             historyLimit: Int?,
-                            in context: ModelContext) throws -> SaveResult {
+                            in context: ModelContext,
+                            onEvicted: (([PersistentIdentifier]) -> Void)? = nil) throws -> SaveResult {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw ClipSaverError.emptyContent
         }
@@ -75,7 +77,7 @@ public enum ClipSaver {
                             sourceAppBundleID: source.bundleID,
                             sourceAppName: source.appName,
                             sourceColorHex: source.colorHex)
-        return try insert(item, historyLimit: historyLimit, in: context)
+        return try insert(item, historyLimit: historyLimit, in: context, onEvicted: onEvicted)
     }
 
     /// 图片。调用方负责先转成 PNG（iOS 侧用 UIImage.pngData()，Mac 侧用 NSBitmapImageRep）。
@@ -83,7 +85,8 @@ public enum ClipSaver {
     public static func save(imagePNG: Data,
                             source: ClipSource,
                             historyLimit: Int?,
-                            in context: ModelContext) throws -> SaveResult {
+                            in context: ModelContext,
+                            onEvicted: (([PersistentIdentifier]) -> Void)? = nil) throws -> SaveResult {
         guard !imagePNG.isEmpty else { throw ClipSaverError.emptyContent }
         let item = ClipItem(kind: .image,
                             imageData: imagePNG,
@@ -92,33 +95,48 @@ public enum ClipSaver {
                             sourceColorHex: source.colorHex)
         // 去重比的是哈希，避免把 externalStorage 里的整张图读进内存
         item.imageHash = ContentHash.sha256(imagePNG)
-        return try insert(item, historyLimit: historyLimit, in: context)
+        return try insert(item, historyLimit: historyLimit, in: context, onEvicted: onEvicted)
     }
 
     /// 只删未固定条目、按 createdAt 从旧到新删；固定到 Pinboard 的内容不占历史配额。
     /// 真的删掉东西时会自己 save。
-    public static func enforceHistoryLimit(_ limit: Int, in context: ModelContext) throws {
-        guard limit > 0 else { return }
+    ///
+    /// 返回被清掉那批条目的标识符，**必须在 delete 循环之前取**：`try context.save()` 之后
+    /// `persistentModelID` 再也取不回来。调用方拿它去撤掉 Core Spotlight 索引——
+    /// 这里只交出标识符、不自己做索引，因为 `CopyoCore` 是跨平台代码（`Package.swift` 声明了
+    /// `.macOS(.v14)`），不能引入 CoreSpotlight。
+    ///
+    /// **这条路径比看上去危险得多**：它挂在 `insert` 里，也就是说**每一次保存都可能静默清掉
+    /// 若干条旧记录**，漏掉返回值就等于在系统搜索里留下一批点不开的孤儿。
+    @discardableResult
+    public static func enforceHistoryLimit(_ limit: Int,
+                                           in context: ModelContext) throws -> [PersistentIdentifier] {
+        guard limit > 0 else { return [] }
         let unpinned = #Predicate<ClipItem> { $0.pinboard == nil }
         let count = try context.fetchCount(FetchDescriptor<ClipItem>(predicate: unpinned))
-        guard count > limit else { return }
+        guard count > limit else { return [] }
 
         var descriptor = FetchDescriptor<ClipItem>(predicate: unpinned,
                                                    sortBy: [SortDescriptor(\.createdAt, order: .reverse)])
         descriptor.fetchOffset = limit
         let overflow = try context.fetch(descriptor)
-        guard !overflow.isEmpty else { return }
+        guard !overflow.isEmpty else { return [] }
+        let evicted = overflow.map(\.persistentModelID)
         for item in overflow {
             context.delete(item)
         }
         try context.save()
+        return evicted
     }
 
     // MARK: - 内部
 
+    /// `onEvicted` 没有并进 `SaveResult`：那个枚举的两个 case 被调用方与测试直接模式匹配，
+    /// 给它加载荷会波及一堆和索引毫无关系的调用点。回调把「谁被清掉了」同步交出去就够了。
     private static func insert(_ newItem: ClipItem,
                                historyLimit: Int?,
-                               in context: ModelContext) throws -> SaveResult {
+                               in context: ModelContext,
+                               onEvicted: (([PersistentIdentifier]) -> Void)?) throws -> SaveResult {
         if let duplicate = try findDuplicate(of: newItem, in: context) {
             duplicate.createdAt = Date()
             duplicate.sourceAppBundleID = newItem.sourceAppBundleID
@@ -138,7 +156,8 @@ public enum ClipSaver {
         context.insert(newItem)
         try context.save()
         if let historyLimit, historyLimit > 0 {
-            try enforceHistoryLimit(historyLimit, in: context)
+            let evicted = try enforceHistoryLimit(historyLimit, in: context)
+            if !evicted.isEmpty { onEvicted?(evicted) }
         }
         return .inserted(newItem)
     }

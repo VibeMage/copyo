@@ -16,6 +16,8 @@ struct SettingsScreen: View {
     private var autoReadOnForeground = true
     @AppStorage(IOSSettings.Key.historyLimit, store: IOSSettings.defaults)
     private var historyLimit = 500
+    @AppStorage(IOSSettings.Key.spotlightIndexing, store: IOSSettings.defaults)
+    private var spotlightIndexing = false
 
     @State private var route: SettingsRoute?
     @State private var showsClearConfirm = false
@@ -41,6 +43,7 @@ struct SettingsScreen: View {
         List {
             syncSection
             clipboardSection
+            searchSection
             clearSection
             aboutSection
         }
@@ -226,6 +229,37 @@ struct SettingsScreen: View {
         }
     }
 
+    // MARK: - 系统搜索
+
+    /// 单独成一节，不并进「剪贴板」：那一节讲的是 Copyo 怎么**收内容**，这一项决定的是
+    /// 内容会**出现在哪里**。混在一起的话用户会当成又一个采集选项顺手打开，不会停下来读说明。
+    ///
+    /// 说明文案必须把验证码和密码点名说出来——这是整条功能里唯一能让用户判断要不要开的信息，
+    /// 写成「在系统搜索中显示条目以便更快找到内容」就是在回避它。
+    private var searchSection: some View {
+        Section {
+            Toggle(isOn: $spotlightIndexing) {
+                HStack(spacing: 12) {
+                    SettingsIconTile(symbol: "magnifyingglass", color: SettingsTint.spotlight)
+                    Text(String(localized: "Show Clips in System Search"))
+                        .font(.body)
+                        .foregroundStyle(CopyoTheme.label)
+                }
+                .padding(.vertical, 8)
+                .frame(minHeight: rowMinHeight)
+            }
+            .tint(CopyoTheme.switchOn)
+            .settingsRow()
+            .onChange(of: spotlightIndexing) { _, enabled in
+                model.applySpotlightIndexing(enabled)
+            }
+        } header: {
+            Text(String(localized: "System Search"))
+        } footer: {
+            Text(String(localized: "Off by default. Turn it on and your clips become searchable from the Home Screen, the Lock Screen and Siri Suggestions — including the verification codes, passwords and private messages that end up in a clipboard history. Turning it off deletes everything Copyo put in the index."))
+        }
+    }
+
     // MARK: - 清空历史
 
     private var clearSection: some View {
@@ -258,11 +292,15 @@ struct SettingsScreen: View {
     private func clearHistory() {
         let descriptor = FetchDescriptor<ClipItem>(predicate: #Predicate { $0.pinboard == nil })
         guard let items = try? model.modelContext.fetch(descriptor) else { return }
+        // 标识符要在 delete 之前收好：save 之后 `persistentModelID` 取不回来，
+        // 系统索引里这一整批就成了点不开的孤儿，要等 30 天的过期兜底才消失
+        let indexed = items.map(\.persistentModelID)
         for item in items {
             ImageMetadataCache.shared.invalidate(item)
             model.modelContext.delete(item)
         }
         try? model.modelContext.save()
+        SpotlightIndexer.remove(indexed)
         model.toast.show(String(localized: "History cleared"), symbol: "trash.fill")
     }
 

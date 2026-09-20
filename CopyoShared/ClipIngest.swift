@@ -81,11 +81,17 @@ public enum ClipIngest {
     ///
     /// 历史上限从 App Group 的 UserDefaults 读，与主应用设置页的值是同一个——
     /// 否则用户把上限调成 100，分享扩展仍按 500 存，条数对不上。
+    ///
+    /// Core Spotlight 索引也在这里挂：两个调用方都在主应用**没有运行**时写库，
+    /// 等主应用下次启动再补索引的话，用户分享完立刻去系统搜索是搜不到的。
+    /// 主屏小组件的刷新同理，而且更显眼——分享完回到主屏，那一格还停在上一条内容上。
     @discardableResult
     public static func save(_ payload: SharePayload,
                             pinboardID: PersistentIdentifier?,
                             in context: ModelContext) throws -> ClipItem {
         let limit = CopyoAppGroup.historyLimit
+        // 上限清理挂在每一次插入里，被挤掉的旧条目要同步撤索引
+        let onEvicted: ([PersistentIdentifier]) -> Void = { SpotlightIndexer.remove($0) }
         let result: SaveResult
         switch payload {
         case .text(let string, let rtf):
@@ -93,17 +99,20 @@ public enum ClipIngest {
                                         rtfData: rtf,
                                         source: .local,
                                         historyLimit: limit,
-                                        in: context)
+                                        in: context,
+                                        onEvicted: onEvicted)
         case .link(let url, _):
             result = try ClipSaver.save(text: url.absoluteString,
                                         source: .local,
                                         historyLimit: limit,
-                                        in: context)
+                                        in: context,
+                                        onEvicted: onEvicted)
         case .image(let png, _, _):
             result = try ClipSaver.save(imagePNG: png,
                                         source: .local,
                                         historyLimit: limit,
-                                        in: context)
+                                        in: context,
+                                        onEvicted: onEvicted)
         }
 
         let item = result.item
@@ -113,6 +122,14 @@ public enum ClipIngest {
             item.pinboard = board
             try context.save()
         }
+        // 索引排在归属确定之后：板名是索引关键词之一，先索引就得再索引一遍。
+        // 命中去重的 `.refreshed` 也要走这一步——它原地改了 createdAt（文本类还会改 rtfData /
+        // kindRaw），索引里那份已经过期。
+        SpotlightIndexer.index(item)
+        // 命中去重的 `.refreshed` 也要刷：它原地改了 `createdAt`，这条内容刚跳到历史最前面。
+        // 这条路上没法顺带抄同步状态——主应用没运行，`CKContainer` 这个进程也问不了，
+        // 小组件那一格显示的是上一次主应用留下的快照，见 `CopyoAppGroup.widgetSyncState`。
+        WidgetRefresher.reloadRecentClips()
         return item
     }
 }

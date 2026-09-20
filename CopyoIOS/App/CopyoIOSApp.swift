@@ -1,3 +1,4 @@
+import CoreSpotlight
 import CopyoCore
 import SwiftData
 import SwiftUI
@@ -14,6 +15,10 @@ struct CopyoIOSApp: App {
         IOSSettings.registerDefaults()
         let launch = LaunchOptions.current
         self.launch = launch
+        // 演示 / 截图模式的总闸要在**建库之前**合上：`-simulateQuickSave` 会在第一次 active
+        // 就走完整条保存链路，晚一步样例条目（包括那条验证码）就进了开发者本人的
+        // Spotlight 索引，而且截图进程退出后还留在那儿。
+        SpotlightIndexer.isSuspended = launch.useDemoData
         _model = State(initialValue: AppModel(bootstrap: StoreBootstrap.make(launch: launch), launch: launch))
     }
 
@@ -23,6 +28,12 @@ struct CopyoIOSApp: App {
                 .environment(model)
                 .modelContainer(model.container)
                 .preferredColorScheme(launch.demoColorScheme)
+                // 系统搜索结果被点开。冷启动时系统也是把这条 activity 交到这里，
+                // 所以冷启、热启、以及「当前停在别的标签上」三种情况共用同一条路径；
+                // 真正的导航落点由 `HistoryContent` 消费 `model.pendingDetailItemID` 完成。
+                .onContinueUserActivity(CSSearchableItemActionType) { activity in
+                    model.openClipFromSpotlight(activity)
+                }
         }
         .onChange(of: scenePhase) { _, phase in
             // 通道 A：只有回到前台才有机会读剪贴板，iOS 不给后台监听

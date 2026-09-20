@@ -105,6 +105,10 @@ struct PinboardContentScreen: View {
             }
             board.name = newName
             try? model.modelContext.save()
+            // 板名是 Spotlight 的索引关键词之一，改完要把这个板里的条目重新索引一遍——
+            // 不补的话系统搜索里搜旧板名照样能搜到这些条目、搜新板名反而搜不到，
+            // 而且要一直错到下一次整库续期（`SpotlightIndexer.refreshInterval`，两周）
+            SpotlightIndexer.index(board.items ?? [])
             model.toast.show(String(localized: "Renamed"), symbol: "pencil")
         }
         .newPinboardAlert(isPresented: $showsNewPinboard) { name in

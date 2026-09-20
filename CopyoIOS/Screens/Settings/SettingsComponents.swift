@@ -14,6 +14,9 @@ enum SettingsTint {
     /// 原来借用了键盘那格的 #5856D6，会跟 04 的图标序列撞色；换成不在序列里的青色。
     static let autoRead = Color(uiColor: CopyoTheme.rgb(0x30B0C7))
     static let clock = Color(uiColor: CopyoTheme.rgb(0x34C759))
+    /// 系统搜索索引同样是设计 04 里没有的一行。刻意避开 #5856D6——那是 04e 留给
+    /// 「Copyo 键盘」的紫色，占掉它等于把后面那一行的颜色先用了；这里取序列外的洋红紫。
+    static let spotlight = Color(uiColor: CopyoTheme.rgb(0xAF52DE))
     static let code = Color(uiColor: CopyoTheme.rgb(0x48484A))
     static let hand = Color(uiColor: CopyoTheme.rgb(0x0A84FF))
     static let info = Color(uiColor: CopyoTheme.rgb(0x8E8E93))
