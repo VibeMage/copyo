@@ -40,12 +40,30 @@ enum DataEraser {
         var syncFolderUnreachable = false
     }
 
-    /// 这份库有没有被 CloudKit 镜像打开过
-    @MainActor
+    /// 这份库有没有被 CloudKit 镜像打开过。
+    ///
+    /// 只认 UserDefaults 这一个信号。本来想用磁盘上的痕迹兜底，实测行不通：
+    /// `<库名>_ckAssets` 目录、`ANSCKRECORDZONEMETADATA` / `ANSCKDATABASEMETADATA`
+    /// 的行，在一个 syncMode=off、容器压根没带 CloudKit 的全新库里也照样都有，
+    /// 区分不出来——留着只会让擦除文件那条路永远走不到。
+    ///
+    /// 已知缺口：1.0 (1) 时开过 iCloud、在升级到 1.0 (2) **之前**就关掉的用户没有这个
+    /// 标记，擦除会删掉库文件（连同服务器变更令牌）。他们之后再打开 iCloud 同步时，
+    /// 容器会当成新库把整个 zone 导回来。下面的 markMirroredIfNeeded 覆盖了「升级时
+    /// 还开着」的那部分，剩下的窄缝只能认。
     static var hasEverMirrored: Bool {
-        if UserDefaults.standard.bool(forKey: everMirroredKey) { return true }
-        guard let url = AppDelegate.shared?.storeURL else { return false }
-        return CopyoStore.hasCloudKitArtifacts(at: url)
+        UserDefaults.standard.bool(forKey: everMirroredKey)
+    }
+
+    /// 启动时调用：只要这次选的是 iCloud，或者老版本的 `icloudSync` 开关开过，
+    /// 就把「镜像过」记下来。比等容器建成功再记更早、也更保守——容器建失败
+    /// （没登录、没 entitlement）不代表云端那份不存在。
+    static func markMirroredIfNeeded() {
+        let defaults = UserDefaults.standard
+        guard !defaults.bool(forKey: everMirroredKey) else { return }
+        if SyncMode.current == .icloud || defaults.bool(forKey: "icloudSync") {
+            defaults.set(true, forKey: everMirroredKey)
+        }
     }
 
     /// 删完之后能不能删库文件重建。只有「既没有活着的镜像、也没有一份够不着的 iCloud
@@ -117,8 +135,7 @@ enum DataEraser {
             app.monitor.start()
             return Result(outcome: .failed)
         }
-
-        // Pinboard 的 items 是 .nullify，单删 Pinboard 只会取消固定，什么都不会少
+                // Pinboard 的 items 是 .nullify，单删 Pinboard 只会取消固定，什么都不会少
         let boards = (try? context.fetch(FetchDescriptor<Pinboard>())) ?? []
         for board in boards { context.delete(board) }
         do {
@@ -174,7 +191,7 @@ enum DataEraser {
         // justErased 只在真要重启的那条路上置位：另外两条路当场就弹了结果对话框，
         // 再置位的话下次启动会重复弹一遍「已全部删除」。
         defaults.set(true, forKey: justErasedKey)
-        defaults.set(true, forKey: pendingScrubKey)
+                defaults.set(true, forKey: pendingScrubKey)
         guard PasteService.relaunch(arguments: ["-showSettings",
                                                 "-settingsTab", String(SettingsTab.clipboard.rawValue)]) else {
             // 标记留着不清：下次启动——用户自己退出再打开也算——照样把库文件清掉。
