@@ -16,6 +16,10 @@ struct SwipeableCard<Content: View>: View {
     /// 判定「这是横滑不是纵滚」的最小水平位移
     private let engageThreshold: CGFloat = 12
 
+    /// 24 不在系统文本样式的默认点数上（title2 是 22、title 是 28），按 title2 缩；
+    /// 下面那行 12 正好是 `caption`，两者一起跟随辅助功能字号长大。
+    @ScaledMetric(relativeTo: .title2) private var actionSymbolSize: CGFloat = 24
+
     @State private var offset: CGFloat = 0
     @State private var isHorizontal = false
 
@@ -25,6 +29,27 @@ struct SwipeableCard<Content: View>: View {
             content()
                 .offset(x: offset)
                 .gesture(dragGesture)
+                // 左右滑是一条裸 `DragGesture`，旁白用户根本做不出这个手势——
+                // 不补这两条具名动作，删除与固定对他们就只存在于「被包的内容恰好也提供了菜单」里。
+                //
+                // 挂在 `content()` 上而不是外面那个 ZStack 上：卡片是一个合成的无障碍元素，
+                // 挂在它自己身上才一定落到那个停留点。
+                //
+                // 「删除」「固定」这两条具名动作**归这一层所有**：手势是它的，名字也该是它的。
+                // 被包的内容不要再给同名动作——两层合成的是同一个停留点，重一条的效果是
+                // 转子里连着念两次「删除」，名字一样、落点不同，旁白用户无从分辨。
+                // （`HistoryCardView` 因此不给「删除」，它那边的注释也写了归属在这里。）
+                .accessibilityActions { swipeActions }
+        }
+    }
+
+    @ViewBuilder
+    private var swipeActions: some View {
+        if let onDelete {
+            Button(String(localized: "Delete"), action: onDelete)
+        }
+        if pinEnabled, let onPin {
+            Button(String(localized: "Pin"), action: onPin)
         }
     }
 
@@ -47,14 +72,17 @@ struct SwipeableCard<Content: View>: View {
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: CopyoTheme.Radius.card, style: .continuous))
+        // 这一层只是卡片滑开后露出的底色，语义由上面两条具名动作承担；
+        // 不藏起来旁白会在「删除」「固定」两个装饰标签上白停一次
+        .accessibilityHidden(true)
     }
 
     private func actionLabel(symbol: String, title: String) -> some View {
         VStack(spacing: 2) {
             Image(systemName: symbol)
-                .font(.system(size: 24, weight: .semibold))
+                .font(.system(size: actionSymbolSize, weight: .semibold))
             Text(title)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(.caption, weight: .semibold))
         }
         .foregroundStyle(.white)
     }

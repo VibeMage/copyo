@@ -33,6 +33,12 @@ struct HistoryShortcutHints: View {
             Spacer(minLength: 0)
         }
         .font(CopyoTheme.Fonts.footnote)
+        // 五组「键 + 动作」排成一行，放大档位下总宽会超过内容区。
+        // 让它们按房规的 0.8 先缩一档再截断，而不是各自折成两行——
+        // 一条两行高的提示条会把网格顶掉小半张卡片，而它本来只是锦上添花：
+        // 这五个动作每一个都另有入口（轻点、长按菜单、左右滑）。
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
         .padding(.horizontal, CopyoTheme.Metrics.pageInsetPad)
         .padding(.top, 8)
         .padding(.bottom, 22)

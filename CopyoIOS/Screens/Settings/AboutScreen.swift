@@ -4,15 +4,18 @@ import UIKit
 /// 关于（设计稿未画，按 04 的分组风格搭）：应用标识 + 版本 + 许可 + 两条外链。
 struct AboutScreen: View {
 
+    /// 两条外链行的 52 不在样式表上，按行内 17pt 标题的 `.body` 缩
+    @ScaledMetric(relativeTo: .body) private var rowMinHeight: CGFloat = 52
+
     var body: some View {
         GuideScroll(spacing: 24) {
             VStack(spacing: 12) {
                 AppMark()
                 Text(verbatim: "Copyo")
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.system(.title2, weight: .bold))
                     .foregroundStyle(CopyoTheme.label)
                 Text(String(format: String(localized: "Version %@"), AppInfo.versionDisplay))
-                    .font(.system(size: 15))
+                    .font(.subheadline)
                     .foregroundStyle(CopyoTheme.labelSecondary)
             }
             .frame(maxWidth: .infinity)
@@ -38,7 +41,7 @@ struct AboutScreen: View {
             }
 
             Text(String(localized: "Released under the MIT License."))
-                .font(.system(size: 13))
+                .font(.footnote)
                 .foregroundStyle(CopyoTheme.labelTertiary)
                 .frame(maxWidth: .infinity)
         }
@@ -49,15 +52,20 @@ struct AboutScreen: View {
         HStack(spacing: 12) {
             SettingsIconTile(symbol: symbol, color: color)
             Text(title)
-                .font(.system(size: 17))
+                .font(.body)
                 .foregroundStyle(CopyoTheme.label)
             Spacer(minLength: 8)
             Image(systemName: "arrow.up.forward.app")
-                .font(.system(size: 15))
+                .font(.subheadline)
                 .foregroundStyle(CopyoTheme.labelTertiary)
+                // 「会跳出去」由外层 Link 的 link 特征说，读屏不必再念一遍符号名
+                .accessibilityHidden(true)
         }
         .padding(.horizontal, 16)
-        .frame(height: 52)
+        // 标题折行时写死 height 会把第二行切掉；默认档砖的 30 + 16 内距 = 46 < 52，仍是 52
+        .padding(.vertical, 8)
+        .frame(minHeight: rowMinHeight)
+        .accessibilityElement(children: .combine)
     }
 }
 

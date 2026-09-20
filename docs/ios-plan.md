@@ -137,7 +137,38 @@ xcrun simctl launch --terminate-running-process "iPhone 17 Pro" dev.vibemage.Cop
 
 **与设计稿的取舍（需设计拍板）：** 设置总览「允许从其他 App 粘贴」右值显示「系统设置」而非「询问」（iOS 不提供读取该授权的 API）；04b 没有「打开操作按钮设置」按钮（无公开深链）；04e「Copyo 键盘」整行留到 Phase 2；隐私说明是外链而非二级页；颜色详情的三个色值胶囊在 440pt 宽上折成两行；引导页插图符号偏下约 14pt；iOS 26 系统返回按钮不带「历史」文字。
 
-**留到 Phase 2 的已知缺陷：** 动态字体放大时角标 / 元信息 / 筛选胶囊不随正文放大；搜索没有 predicate 下推与防抖，条目上万时每敲一字全表扫描；超长正文详情页整串渲染；`isSelected` 卡片状态未接（轻点已绑定复制）；VoiceOver 未验证；AppIcon 只有一张 1024 universal，没有 tinted / dark 变体。
+#### 3.3 原「留到 Phase 2 的已知缺陷」已全部清掉（2026-09-20）
+
+六条一次做完，模拟器上逐屏核对了默认档与 accessibility-extra-large 两套；四个配置
+（iOS Debug / iOS Release-AppStore / Mac Release-AppStore / CopyoCore）零警告，20 个测试通过。
+
+| 原缺陷 | 处理 |
+| --- | --- |
+| 动态字体放大时角标 / 元信息 / 筛选胶囊不跟随 | 设计稿的点数几乎都正好落在系统文本样式的默认值上（11 = caption2、12 = caption、13 = footnote、15 = subheadline、17 = body、20 = title3、22 = title2、28 = title），换过去**默认档逐像素不变**、放大档才动；落不到表上的零散点数（10 / 14 / 18 / 44…）用 `@ScaledMetric(relativeTo:)`。包字的 `.frame(height:)` 一律改成内距 + `minHeight`——只放大字号不放开盒子是把文字上下切掉，比不跟随更糟 |
+| 搜索没有 predicate 下推与防抖 | `AppModel` 加 250ms 防抖（清空与截图路由立即生效，不等防抖）；`@Query` 改成动态 predicate（`kindRaw` + `plainText` contains）。**没有**给 `ClipItem` 加反规范化的搜索列：那是 CloudKit schema 变更，而 Production schema 已在 2026-09-20 部署、Mac 1.0 正拿它在审核中。文件名那一路（`displayTitle` 不是 `plainText` 的子串）保留一小段内存过滤 |
+| 超长正文详情页整串渲染 | 详情页长文本按行切块进 `LazyVStack`；富文本的 `AttributedString` 不再每帧重解 RTF。卡片上富文本也补上了和纯文本同样的 600 字闸门——原来一条二十万字的富文本每次布局都要全文 split + join |
+| `isSelected` 卡片状态未接 | **删掉**。四个调用点没有一个设过它，而这个应用里点卡片就是复制，没有多选也没有检查器面板，没有任何动作以「当前选中哪张卡」为前提。留一个谁都不设的参数只会让下一个人以为它接好了 |
+| VoiceOver 未验证 | 卡片合成为一个停留点并自带标签；`.highPriorityGesture(TapGesture)` 接不到旁白的「激活」——不改的话旁白用户双击进的是详情，「轻点复制」正好反过来，现在激活即复制、进详情降级为具名动作；瀑布流按原下标给排序优先级（不然旁白先读完左列再读右列）；轻提示补播报 |
+| AppIcon 只有一张 1024 universal | 见下 |
+
+**AppIcon 那条比记录的更严重**：`CopyoIOS/.../AppIcon.png` 与 `art/icon/icon-master-1024.png`
+**逐字节相同**——iOS 直接用了 macOS 的母图。实测 RGBA、1 048 576 个像素里 398 384 个全透明，
+不透明包围盒 (100, 100, 924, 924)，即一张内缩约 10% 的 824×824 圆角方——那是 **macOS 的图标网格**。
+iOS 要的是满幅 1024×1024 且**不带 alpha**（自己会套超椭圆遮罩），装到手机上是「小一圈 + 二次圆角」，
+带 alpha 还可能在上传时触发 `ITMS-90717`。现已按 `art/icon/paster-icon-spec.md` 的几何重新生成满幅无 alpha 版，
+并补上 dark 与 tinted 两个 `appearances` 变体（tinted 必须是刻意设计的单色还原——系统会盖上用户的色调，
+红蓝错位这个品牌标记在那里存活不下来）。`scripts/make-icon.sh --ios` 可复现。
+
+辅助功能字号下还发现一条记录里没有的：卡片头部的角标带 `fixedSize` 优先占位，把「来源 · 时间」
+挤到只剩一个「…」。头部改成在辅助档换两行，判据 `ClipCard.headerStacks(typeScale:)` 与瀑布流估高共用，
+免得两边在边界档位上对不齐、把某一列的高度整体算少一行。
+
+### Phase 2 · 1.1 —— 把内容送进别的 App
+
+- [ ] 键盘扩展：横向卡片条 + 搜索 + 地球键 + 最小打字行（审核指南 4.4.1 要求键盘必须能输入字符）。需要「允许完全访问」才能读共享容器，引导文案要解释清楚
+- [x] 小组件（小 / 中）：最近条目，点按即复制（2026-09-20，见 3.5）
+- [x] Core Spotlight 索引：系统搜索直达条目（2026-09-20，见 3.4）
+
 
 ### Phase 2 · 1.1 —— 把内容送进别的 App
 

@@ -14,44 +14,54 @@ struct SidebarView: View {
     var columnVisibility: Binding<NavigationSplitViewVisibility>?
 
     @Environment(AppModel.self) private var model
-    @Query private var items: [ClipItem]
+    /// 计数的失效源。`@Query` 挂在这儿，库一变 body 就重算，计数随之刷新；
+    /// 而取 1 条还是取全部，对「要不要重算」这件事没有区别——
+    /// 原来这里是一个无条件的 `@Query`，条目上万时侧栏每次 body 都要把上万个
+    /// `ClipItem` 实例化一遍，只为了数六个数。
+    @Query private var changeProbe: [ClipItem]
     @Query(sort: \Pinboard.sortIndex) private var boards: [Pinboard]
 
     @FocusState private var searchFocused: Bool
+
+    /// 标题右侧「收起侧栏」按钮的点击区。跟着按钮里那个 17pt 字形一起放大，
+    /// 否则大字号档位下图标会顶出这个框
+    @ScaledMetric(relativeTo: .body) private var toggleTile: CGFloat = 28
+    /// 搜索框高度（设计 3.14 给的 36）。跟着框里 15pt 的文字走，两者才会同步长高
+    @ScaledMetric(relativeTo: .subheadline) private var searchFieldHeight: CGFloat = 36
+    /// PINBOARD 分组头上 `+` 的点击区，跟着那个 15pt 字形走
+    @ScaledMetric(relativeTo: .subheadline) private var addTile: CGFloat = 28
 
     init(selection: Binding<SidebarSelection?>,
          columnVisibility: Binding<NavigationSplitViewVisibility>? = nil) {
         _selection = selection
         self.columnVisibility = columnVisibility
+        var probe = FetchDescriptor<ClipItem>(sortBy: [SortDescriptor(\ClipItem.createdAt, order: .reverse)])
+        probe.fetchLimit = 1
+        _changeProbe = Query(probe)
     }
 
     // MARK: - 计数
 
-    /// 一次遍历数完所有类型，六个分类各查一次库不值当
-    private var countsByKind: [ClipKind: Int] {
-        var result: [ClipKind: Int] = [:]
-        for item in items {
-            result[item.kind, default: 0] += 1
-        }
-        return result
-    }
-
-    /// 「文本」把富文本一并算进来，口径与 `KindPresentation.matches` 一致
-    private func count(for kind: ClipKind, in counts: [ClipKind: Int]) -> Int {
-        if kind == .text { return (counts[.text] ?? 0) + (counts[.richText] ?? 0) }
-        return counts[kind] ?? 0
+    /// 每个分类一次 `COUNT(*)`，条件与历史页的 `@Query` 同源（`ClipQuery.predicate`）。
+    /// 同源是硬要求：侧栏写「文本 128」而历史页只列出 96 条，用户会以为数据丢了；
+    /// 「富文本算进文本」这条规则只写一遍，就不会有第二处慢慢走偏。
+    ///
+    /// 六次计数查询听起来比「遍历一遍全都数出来」多，但那一遍遍历的前提是先把整库读进内存；
+    /// 计数走的是库内聚合，不实例化任何模型对象。
+    private func count(for kind: ClipKind?) -> Int {
+        let descriptor = FetchDescriptor<ClipItem>(predicate: ClipQuery.predicate(kind: kind, query: ""))
+        return (try? model.modelContext.fetchCount(descriptor)) ?? 0
     }
 
     var body: some View {
         @Bindable var model = model
-        let counts = countsByKind
 
         List(selection: $selection) {
             Section {
                 SidebarRow(symbol: CopyoTab.history.symbol,
                            symbolColor: CopyoTheme.accent,
                            title: CopyoTab.history.title,
-                           count: items.count,
+                           count: count(for: nil),
                            isSelected: isHistoryAllSelected)
                 .tag(SidebarSelection.history(nil))
 
@@ -59,7 +69,7 @@ struct SidebarView: View {
                     SidebarRow(symbol: KindPresentation.symbol(kind),
                                symbolColor: CopyoTheme.accent,
                                title: KindPresentation.label(kind),
-                               count: count(for: kind, in: counts),
+                               count: count(for: kind),
                                isSelected: selection == .history(kind))
                     .tag(SidebarSelection.history(kind))
                 }
@@ -82,6 +92,8 @@ struct SidebarView: View {
         // 选中态由 SidebarRow 自己画 accent 实色底（设计 09），
         // 把系统那层浅灰高亮的色相清成透明，避免两层叠在一起
         .tint(.clear)
+        // 这是行高的**下限**不是定高，行内容自己会把行撑高，
+        // 所以它不必跟着辅助功能字号缩放——真正要缩放的是 `SidebarRow` 里那一条
         .environment(\.defaultMinListRowHeight, SidebarMetrics.rowHeight)
         .scrollContentBackground(.hidden)
         .background(CopyoTheme.sidebarBg)
@@ -120,7 +132,7 @@ struct SidebarView: View {
         return VStack(spacing: 10) {
             HStack(spacing: 8) {
                 Text(verbatim: "Copyo")
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.system(.title2, weight: .bold))
                     .foregroundStyle(CopyoTheme.label)
                 Spacer(minLength: 0)
                 if let columnVisibility {
@@ -130,9 +142,11 @@ struct SidebarView: View {
                         }
                     } label: {
                         Image(systemName: "sidebar.left")
-                            .font(.system(size: 17))
+                            .font(.body)
                             .foregroundStyle(CopyoTheme.labelSecondary)
-                            .frame(width: 28, height: 28)
+                            // 28×28 是点击区的下限而不是上限：写死 `width/height` 的话，
+                            // 辅助功能大字号下字形会长出这个框、压到左边的标题上
+                            .frame(minWidth: toggleTile, minHeight: toggleTile)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(String(localized: "Toggle Sidebar"))
@@ -142,31 +156,34 @@ struct SidebarView: View {
 
             HStack(spacing: 6) {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: 15))
+                    .font(.subheadline)
                     .foregroundStyle(CopyoTheme.labelSecondary)
                 TextField(String(localized: "Search"), text: $model.sidebarSearchText)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 15))
+                    .font(.subheadline)
                     .focused($searchFocused)
                     .submitLabel(.search)
                 if model.sidebarSearchText.isEmpty {
                     // ⌘F 由侧栏接管（regular 宽度下历史页不再自己抢），这里给个提示
                     Text(verbatim: "⌘F")
-                        .font(.system(size: 11))
+                        .font(.caption2)
                         .foregroundStyle(CopyoTheme.labelTertiary)
                 } else {
                     Button {
                         model.sidebarSearchText = ""
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 15))
+                            .font(.subheadline)
                             .foregroundStyle(CopyoTheme.labelTertiary)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(String(localized: "Clear Search"))
                 }
             }
-            .frame(height: 36)
+            // 装文字的盒子只能给下限：字号放大后还钉死 36 就是把输入的字裁掉一截，
+            // 那比「不跟着放大」更像坏了
+            .padding(.vertical, 6)
+            .frame(minHeight: searchFieldHeight)
             .padding(.horizontal, 10)
             .background(CopyoTheme.fill, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
@@ -182,16 +199,16 @@ struct SidebarView: View {
         HStack(spacing: 8) {
             // 「PINBOARD」在中英文设计稿里都是这个大写词，不进本地化
             Text(verbatim: "PINBOARD")
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(.footnote, weight: .semibold))
                 .foregroundStyle(CopyoTheme.labelSecondary)
             Spacer(minLength: 0)
             Button {
                 model.presentsNewPinboard = true
             } label: {
                 Image(systemName: "plus")
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(.subheadline, weight: .medium))
                     .foregroundStyle(CopyoTheme.accent)
-                    .frame(width: 28, height: 28)
+                    .frame(minWidth: addTile, minHeight: addTile)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -276,7 +293,7 @@ private enum SidebarMetrics {
     static let iconTile: CGFloat = 28
 }
 
-/// 一行：裸图标 + 名称 + 右侧计数。高 38、gap 10（设计 3.14）。
+/// 一行：裸图标 + 名称 + 右侧计数。高 38 起、gap 10（设计 3.14）。
 ///
 /// 设计 09 的侧栏里所有行都是**裸的彩色图标**，没有图标砖——砖只出现在 iPhone 的 Pinboard 列表（03）。
 /// 选中态是 accent 实色底 + 白字 Semibold + 计数 80% 白，不是系统那层浅灰高亮。
@@ -288,25 +305,35 @@ private struct SidebarRow: View {
     let isSelected: Bool
     var unselectedTitleColor: Color = CopyoTheme.label
 
+    /// 图标列宽。跟着 17pt 的图标一起放大，否则大字号下图标会挤进标题
+    @ScaledMetric(relativeTo: .body) private var iconTile: CGFloat = SidebarMetrics.iconTile
+    /// 行高（设计 3.14 的 38）。跟标题那档 15pt 一起放大
+    @ScaledMetric(relativeTo: .subheadline) private var rowHeight: CGFloat = SidebarMetrics.rowHeight
+
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: symbol)
-                .font(.system(size: 17))
+                .font(.body)
                 .foregroundStyle(isSelected ? Color.white : symbolColor)
-                .frame(width: SidebarMetrics.iconTile)
+                .frame(width: iconTile)
             Text(title)
-                .font(.system(size: 15, weight: isSelected ? .semibold : .regular))
+                .font(.system(.subheadline, weight: isSelected ? .semibold : .regular))
                 .foregroundStyle(isSelected ? Color.white : unselectedTitleColor)
                 .lineLimit(1)
+                // Pinboard 的名字是用户自己起的，可以很长，而侧栏最宽只有 340pt，大字号下一定放不下。
+                // 缩到 80%（全项目统一的下限，法语那轮定下来的）还读得出，硬截断就只剩开头几个字
+                .minimumScaleFactor(0.8)
             Spacer(minLength: 8)
             if let count {
                 Text(count.formatted())
-                    .font(.system(size: 15))
+                    .font(.subheadline)
                     .monospacedDigit()
                     .foregroundStyle(isSelected ? Color.white.opacity(0.8) : CopyoTheme.labelSecondary)
             }
         }
-        .frame(height: SidebarMetrics.rowHeight)
+        // 装文字的盒子只给下限：钉死 38 的话，字号一放大整行文字就被裁掉上下两截
+        .padding(.vertical, 4)
+        .frame(minHeight: rowHeight)
         .listRowInsets(EdgeInsets(top: 2, leading: SidebarMetrics.rowInset,
                                   bottom: 2, trailing: SidebarMetrics.rowInset))
         .listRowBackground(
