@@ -73,6 +73,18 @@ if [[ ! -d "$ARCHIVE" ]]; then
   exit 1
 fi
 
+# 顺手把归档复制进 Organizer 会扫描的目录。`-archivePath` 指到 build/ 之下是为了让产物
+# 跟着仓库走、好清理，但 Xcode 的 Organizer **只认** ~/Library/Developer/Xcode/Archives，
+# 不复制的话「Distribute App」那条最顺手的上传路径根本看不到这次归档，
+# 而人在 Organizer 里翻不到时，很容易改用 Product → Archive 重新归一次档——
+# 那一次绑的是 Release 配置，出来的包上传必被拒（见本文件开头的注意事项）。
+ORGANIZER_DIR="$HOME/Library/Developer/Xcode/Archives/$(date +%Y-%m-%d)"
+ORGANIZER_ARCHIVE="$ORGANIZER_DIR/Copyo iOS $(date +%Y-%m-%d\ %H.%M).xcarchive"
+mkdir -p "$ORGANIZER_DIR"
+rm -rf "$ORGANIZER_ARCHIVE"
+cp -R "$ARCHIVE" "$ORGANIZER_ARCHIVE"
+echo "    已复制到 Organizer：${ORGANIZER_ARCHIVE/#$HOME/~}"
+
 # 归档阶段的签名是 Apple Development、aps-environment 是 development，**这是正常的**——
 # -exportArchive 会重签成 Apple Distribution 并切到 production。要核验的是导出后的 .ipa，
 # 不是归档。（macOS 那边同一个坑，见 docs/appstore-submission.md 第十八节。）
