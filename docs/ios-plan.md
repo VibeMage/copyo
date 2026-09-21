@@ -491,12 +491,36 @@ App Group 容器在模拟器里是真实存在的（`xcrun simctl get_app_contai
 入库、命中去重的 `.refreshed` 分支并改写 `createdAt`——**用一次就往上跳一格**。这种毛病
 用户不会报障，只会觉得历史顺序莫名其妙。实测没有发生。
 
+##### 验了一半的：Core Spotlight
+
+索引这一侧**确认跑通**：开关打开后 `reconcile` 执行，App Group 里写出了三个账本键
+（`spotlightIndexedIDs` / `spotlightStoreToken` / `spotlightIndexedAt`），而且标识符的
+键顺序是排好序的——
+
+```
+{"implementation":{"entityName":"ClipItem","isTemporary":false,"primaryKey":"p1",
+                   "storeIdentifier":"…","uriRepresentation":"…"}}
+```
+
+即 3.4 记的那个 `.sortedKeys` 修复在真实产物里生效了。
+
+但**系统搜索界面里搜不到**，删除后是否消失也就无从验起。模拟器的 `corespotlightd`
+对 `CSSearchableIndex` 的摄入本来就不可靠，所以这**不构成应用有问题的证据**，
+只能说这一条仍然要留到真机。3.7 第 4 步里「删掉之后必须立刻从系统搜索里消失」那条
+仍然是最要紧的未验项。
+
+##### 一条自动化的坑（不是应用的问题）
+
+设置页的 `Toggle` 对这套模拟器自动化的**点击没有反应，只吃拖动**。一开始我以为是
+系统搜索那一行坏了，做了个对照实验——同一区里本来开着的「自动读取剪贴板」同样点不动，
+才确认是自动化的问题。以后在模拟器上拨开关一律用 `swipe`（在开关上横拖约 30pt）。
+
 ##### 仍然必须真机（或至少一个登录了 iCloud 的环境）
 
 - **CloudKit 同步**：模拟器没有 iCloud 账号，一条都验不了。这是 iOS 版最大的价值所在，
   也是现在最大的未知
 - 一键保存（控制中心 / 操作按钮）的冷热启动时序
-- Core Spotlight：开关、搜到、点开，以及**删除后是否立刻消失**
+- Core Spotlight 的**搜到 / 点开 / 删除后消失**（索引侧已验，见上）
 - 触摸手势（轻点复制的抢占、左右滑、拖放）、iPad 硬件键盘、VoiceOver
 - 键盘扩展（本来也不在包里，见 3.6）
 
