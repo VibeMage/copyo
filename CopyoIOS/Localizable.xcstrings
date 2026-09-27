@@ -456,7 +456,30 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "操作按钮 / 敲击背面 / 控制中心"
+            "value": "操作按钮 / 轻点背面 / 控制中心"
+          }
+        }
+      }
+    },
+    "Add Copyo’s “Save Clipboard” action": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Copyo’s “Save Clipboard” action"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajoutez l’action « Enregistrer le presse-papiers » de Copyo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加 Copyo 的「保存剪贴板」操作"
           }
         }
       }
@@ -755,7 +778,30 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "敲击背面"
+            "value": "轻点背面"
+          }
+        }
+      }
+    },
+    "Back Tap can only run a shortcut, so it needs one that runs “Save Clipboard”.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back Tap can only run a shortcut, so it needs one that runs “Save Clipboard”."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le toucher du dos ne peut lancer qu’un raccourci : il lui en faut un qui exécute « Enregistrer le presse-papiers »."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轻点背面只能触发快捷指令，所以要先做一条运行「保存剪贴板」的快捷指令。"
           }
         }
       }
@@ -2991,6 +3037,29 @@
         }
       }
     },
+    "Open Shortcuts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Shortcuts"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir Raccourcis"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开「快捷指令」"
+          }
+        }
+      }
+    },
     "Open Source · GitHub": {
       "extractionState": "manual",
       "localizations": {
@@ -3842,6 +3911,29 @@
         }
       }
     },
+    "Search for Copyo in the action list": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search for Copyo in the action list"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recherchez Copyo dans la liste des actions"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在操作列表里搜索 Copyo"
+          }
+        }
+      }
+    },
     "Search history": {
       "extractionState": "manual",
       "localizations": {
@@ -4091,29 +4183,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "分享面板"
-          }
-        }
-      }
-    },
-    "Shortcut link not published yet": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shortcut link not published yet"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lien du raccourci pas encore publié"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "快捷指令链接尚未发布"
           }
         }
       }
@@ -4624,6 +4693,29 @@
         }
       }
     },
+    "Tap the button above and create a new shortcut": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the button above and create a new shortcut"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez le bouton ci-dessus et créez un nouveau raccourci"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点上方按钮，新建一条快捷指令"
+          }
+        }
+      }
+    },
     "Tap the button above to add the shortcut": {
       "extractionState": "manual",
       "localizations": {
@@ -4850,29 +4942,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "键盘扩展需要它才能读取历史。Copyo 键盘不联网，也不记录你的输入。"
-          }
-        }
-      }
-    },
-    "The shortcut ships with the App Store release. Until then use the Action Button or Control Center — neither one needs a shortcut.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The shortcut ships with the App Store release. Until then use the Action Button or Control Center — neither one needs a shortcut."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le raccourci sera fourni avec la version de l’App Store. En attendant, utilisez le bouton Action ou le Centre de contrôle : aucun des deux n’a besoin de raccourci."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "快捷指令会随 App Store 版本一起发布。在那之前请用操作按钮或控制中心，这两条通道都不需要快捷指令。"
           }
         }
       }

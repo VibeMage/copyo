@@ -55,7 +55,9 @@ struct SettingsScreen: View {
         .navigationBarTitleDisplayMode(.large)
         .navigationDestination(item: $route) { destination in
             switch destination {
-            case .quickSave: QuickSaveGuideScreen()
+            case .quickSave:
+                QuickSaveGuideScreen(initialEntry: model.demoRoute == .settingsQuickSaveBackTap
+                                     ? .backTap : .actionButton)
             case .howToSave: HowToSaveScreen()
             case .allowPaste: AllowPasteGuideScreen()
             case .keyboard: KeyboardGuideScreen()
@@ -395,7 +397,7 @@ struct SettingsScreen: View {
         guard !didApplyDemoRoute else { return }
         didApplyDemoRoute = true
         switch model.demoRoute {
-        case .settingsQuickSave: route = .quickSave
+        case .settingsQuickSave, .settingsQuickSaveBackTap: route = .quickSave
         case .settingsHowTo: route = .howToSave
         case .settingsPaste: route = .allowPaste
         case .settingsKeyboard: route = .keyboard

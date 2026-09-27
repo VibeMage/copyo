@@ -7,7 +7,8 @@ import Foundation
 /// 不需要用户手工导入任何东西。
 ///
 /// 链接要等快捷指令在「快捷指令」App 里发布后才拿得到，现在是占位：
-/// `isPublished` 为假时界面弹提示而不是打开一个 404 页面。
+/// `isPublished` 为假时界面改走 `createShortcutURL`，引导用户自己搭一条，
+/// 而不是打开一个 404 页面。
 enum ShortcutLinks {
     /// 发布后把这个常量换成真实的 iCloud 分享链接
     static let saveClipboard = "https://www.icloud.com/shortcuts/REPLACE-WITH-PUBLISHED-LINK"
@@ -18,6 +19,11 @@ enum ShortcutLinks {
     static var isPublished: Bool {
         !saveClipboard.contains(placeholderMarker)
     }
+
+    /// 「快捷指令」App 的新建页。`shortcuts://` 是 Apple 文档里公开的 URL scheme
+    /// （Shortcuts User Guide › Run a shortcut from a URL），`openURL` 不需要先声明
+    /// `LSApplicationQueriesSchemes`——那只是 `canOpenURL` 的要求
+    static let createShortcutURL = URL(string: "shortcuts://create-shortcut")!
 
     /// 已发布时给出可打开的 URL，未发布时恒为 nil
     static var saveClipboardURL: URL? {
