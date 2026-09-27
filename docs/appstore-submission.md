@@ -1192,3 +1192,91 @@ Apple 的 2.1 模板要的是**真机**录屏；如果审核员还是要，维�
 - 开机后半分钟左右系统会弹「Apple Intelligence 已就绪」通知，脚本等它弹完再开录；Safari 也先在录像外预热一次。
 - 机器负载高的时候模拟器会整体卡死（开机停在转圈、`simctl bootstatus` 永远不返回），重启 CoreSimulator 也没用，
   过几个小时自己恢复了。卡住时别反复重跑，先看 `uptime`。
+
+## 二十七、Mac 1.2.0 (3) 提交审核（2026-09-27）
+
+1.2.0 按 v2 设计稿重做了面板与设置（`art/macos-design/2026-09-27/`）。当天出 TestFlight 并提审，
+状态 `WAITING_FOR_REVIEW`，发布方式「审核通过后自动发布」。
+
+### 构建与上传
+
+- **只从最新的 `origin/main` 出包**：用一个从 `origin/main`（`cdacd42`）新建的干净 worktree，
+  不用本地可能落后或带着未提交改动的分支。
+- `./scripts/build-appstore.sh` 归档、导出都成功，但最后的上传步骤报
+  `error: exportArchive Failed to Use Accounts`（Xcode 账户登录态的问题，与包无关）。
+  改用 App Store Connect API 密钥上传，一次通过：
+
+  ```bash
+  xcrun altool --upload-package build/appstore/Copyo-1.2.0-appstore.pkg --type macos \
+    --apple-id 6813955206 --bundle-id dev.vibemage.Copyo \
+    --bundle-version 3 --bundle-short-version-string 1.2.0 \
+    --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+  ```
+
+  （`--apple-id` 是 ASC 里的 App ID。密钥 `.p8` 放在 `~/.appstoreconnect/private_keys/`，altool 默认就去那里找；两个 ID 在 `~/.appstoreconnect/copyo.env`，都不入库。）
+- TestFlight：build 3 处理完即进入内部测试（`IN_BETA_TESTING`），Mac 的内部测试不需要 Beta 审核。
+- 归档留在 `~/Library/Developer/Xcode/Archives/2026-09-27/Copyo macOS 1.2.0 (3) AppStore.xcarchive`，符号化崩溃要用。
+
+### 商店截图与预览视频
+
+面板从「满宽贴底」改成了「悬浮在 Dock 上方的玻璃面板」，旧的四张截图全部作废。1.2.0 上架的是下面这一套（第一版；`art/store/` 现在已换成第二版，见本节末）：
+
+| 序号 | en 标题 / 副标题 | zh 标题 / 副标题 |
+| --- | --- | --- |
+| 01-panel | Everything you copied, one key away / Press ⇧⌘V — your history floats right above the Dock | 复制过的一切，随叫随到 / 按下 ⇧⌘V，剪贴板历史浮在 Dock 上方 |
+| 02-search | Type to filter / Search content, source app or file name — the cards never jump | 即输即搜 / 按内容、来源应用、文件名过滤，卡片不跳动 |
+| 03-preview | Space to peek / Preview text, links and images above the panel | 空格，先看一眼 / 在面板上方预览文本、链接和图片 |
+| 04-pinboard | Keep what you use most / Press ⌘P to choose a Pinboard, right from the keyboard | 常用的，固定下来 / 按 ⌘P 选择 Pinboard，手不离键盘 |
+| 05-shortcuts | Hands stay on the keyboard / ⇥ switches filters, ⌘1–9 copies a card — ⇧⌘V is yours to remap | 手不离键盘 / ⇥ 切换筛选，⌘1–9 直接复制；⇧⌘V 可自定义 |
+
+文案仍守 1.0 那次 2.4.5 拒审的底线：只说「复制」，不说应用会替用户粘贴。
+
+预览视频中英各一段（`art/store/preview/`）：1920×1080、H.264、30 fps、约 28 秒，
+带一条 48 kHz 立体声 AAC 静音轨——**Mac 的 App 预览没有音轨会被 ASC 拒收**，无声也得有这条轨。
+海报帧设在 `00:00:01:00`（面板完整浮起的那一帧）。
+
+流水线分三段：
+
+1. **拍原始素材**（维护者本机，没有入库的临时工具）：`-demoData` 演示数据、深色外观；
+   背后铺一张全屏无边框「舞台」窗口（`art/store/_background-plate.png` 裁成 16:9，窗口层级 23，
+   低于菜单栏 24 与面板 25），这样既盖住桌面，面板的玻璃又是按这张背景真实合成的。
+   录屏用 `screencapture -v`，截图用 `screencapture -R0,0,1920,1080`。
+2. **合成截图**：`python3 scripts/make-store-shots.py <raw 目录>`，从原图裁 16:10（天然去掉顶部真实菜单栏），
+   叠图标、标题、副标题，转 sRGB 去 alpha，输出到 `<raw>/../out/`，不会写 `art/store/`。
+3. **剪预览**：`scripts/make-store-preview.sh`（ffmpeg），剪掉停顿压到 30 秒内，补静音轨，导出海报帧。
+
+合成与剪辑由 Codex 完成，拍摄与验收由 Claude Code 完成。
+
+踩过的坑：
+
+- `screencapture -x <路径>` 整屏模式**会静默地不覆盖**已存在的文件，拿到的是上一张；一律加 `-R` 指定区域。
+- 本机正在运行的 Copyo 会截走 `⇧⌘V`，演示实例收不到，拍摄期间要先退出它（这段时间的剪贴板不会进历史）。
+- 英文录屏前把输入法切到 ABC，拍完切回。
+
+### 用 API 上传媒体
+
+截图与预览都用 App Store Connect API 传（`appScreenshotSets` / `appPreviewSets` 的上传三步：
+POST 预约 → 按返回的分片 PUT → PATCH `uploaded: true` 带 MD5）。API 可以直接 PATCH 截图集的
+`appScreenshots` 关系来定顺序，所以第十七节那条「必须一张一张传」的限制在 API 下不存在。
+中英两套各 5 张 + 各 1 段预览。
+
+### 审核备注
+
+`appStoreReviewDetails.notes` 上限 **4000 字符**，第一稿 4532 超了，压到 3997。
+在「OPENING THE APP」之后新增一段「NEW IN 1.2.0」，其余结构沿用上一版：打开方式、测试说明、审核问卷 1–6 条、剪贴板隐私。
+
+### 第二版素材（给 1.2.1，2026-09-27 晚）
+
+维护者看了第一版，三点意见：面板太小、副标题到面板空了约三分之一屏；最右一张卡被切掉一半，像截歪了；
+图片卡是一块模糊的土黄色占位。第一版已随 1.2.0 送审（审核中截图锁定），维护者决定**不撤回，第二版随 1.2.1 换上**。
+
+- 拍摄：新增启动参数 `-panelWidth 1104`，面板压窄到正好放满四张整卡（卡片轨道一直延伸到面板边缘，
+  取对称的 1108 时第五张会露出 4pt 细边，所以是 1104）。这是窄屏上真实会出现的形态，不是修图。
+- 演示图片：`DemoSampleImage` 换成 Codex 生成的原创山湖照片（浅 / 深两套只调色调）。
+- 合成：每张单独裁切，面板在成品里从约 2272px 放大到约 2426px，卡片文字约大 24%，副标题到面板的留白从约 430px 收到约 100px。
+  03 有过「预览山湖照片」的备选（`make-store-shots.py --include-image-preview`），面板里只剩一张卡、照片两侧是来源色的土黄边，维护者选了文本版。
+- 视频：照片预览那一段在动作的静止处硬切到宽取景，其余是紧取景；中 29.2s / 英 28.7s。
+- 质检：三路独立核对（规格与像素、视频逐帧、脚本复现）都通过。顺带查出一个应用 bug：预览窗的相对时间用 `Date()`，
+  卡片用每分钟刷新的 `TimelineView`，跨整分钟时一个写「12 分钟前」一个写「11 分钟前」，已改成同一个分钟时钟后重拍了 03。
+- 两个脚本都记了这批素材的指纹（截图原图 SHA-256，录屏精确时长与帧数），以后换素材会直接报错，提示重调裁切 / 剪点。
+

@@ -13,6 +13,9 @@ struct GeneralSettingsView: View {
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     /// 找回设置那句提示里要印当前快捷键；页面每次切进来都会重建，改完快捷键回来就是新值
     @State private var hotkeyDisplay = HotkeyConfig.load().displayString
+    /// 探测出当前组合按下去 Copyo 收不到（被系统快捷键或别的 App 独占）时，这句防锁在门外的提示不能再教用户按它，
+    /// 只留「在访达里再次打开」这条路（7.5.1，与菜单栏、面板空态同一口径）
+    @State private var hotkeyWorks = (AppDelegate.shared?.hotkeyStatus ?? .active) == .active
 
     var body: some View {
         SettingsPage {
@@ -25,7 +28,9 @@ struct GeneralSettingsView: View {
                 // 第八节第 11(a) 条：允许关掉菜单栏图标，但必须当场告诉用户怎么回来——
                 // 再次打开 App → 面板 → 齿轮，这条路径已经存在
                 SettingsToggleRow(title: Text("Show icon in menu bar"),
-                                  subtitle: Text("When this is off, press \(hotkeyDisplay) or open Copyo again in Finder to get back to Settings"),
+                                  subtitle: hotkeyWorks
+                                      ? Text("When this is off, press \(hotkeyDisplay) or open Copyo again in Finder to get back to Settings")
+                                      : Text("When this is off, open Copyo again in Finder to get back to Settings"),
                                   isOn: $showMenuBarIcon) {
                     SettingsTile(hex: "#8E8E93", symbol: "menubar.rectangle")
                 }

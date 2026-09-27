@@ -1,6 +1,23 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ is also used by another app: pressing it triggers that app, and Copyo may not respond. Choose a different combination.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ est aussi utilisé par une autre app : appuyer dessus déclenche cette app, et Copyo risque de ne pas réagir. Choisissez une autre combinaison."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 同时被另一个 App 占用：按下时会触发那个 App，Copyo 不一定响应，请换一个组合"
+          }
+        }
+      }
+    },
     "%@ isn’t working because another app is using it. Choose a different combination.": {
       "extractionState": "manual",
       "localizations": {
@@ -14,6 +31,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 现在不起作用，它已被另一个 App 占用，请换一个组合"
+          }
+        }
+      }
+    },
+    "%@ isn’t working because macOS uses it as a keyboard shortcut. Choose a different combination, or turn that shortcut off in System Settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ne fonctionne pas, car macOS l’utilise comme raccourci clavier. Choisissez une autre combinaison ou désactivez ce raccourci dans Réglages Système."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 现在不起作用，它已被系统快捷键占用，请换一个组合，或在系统设置里关掉那个快捷键"
           }
         }
       }
@@ -1009,23 +1043,6 @@
         }
       }
     },
-    "Copied as plain text · press ⌘V to paste": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copié en texte brut · appuyez sur ⌘V pour coller"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已复制纯文本 · 按 ⌘V 粘贴"
-          }
-        }
-      }
-    },
     "Copied · press ⌘V to paste": {
       "extractionState": "manual",
       "localizations": {
@@ -1039,6 +1056,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "已复制 · 按 ⌘V 粘贴"
+          }
+        }
+      }
+    },
+    "Copied, press ⌘V to paste": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copié, appuyez sur ⌘V pour coller"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已复制，按 ⌘V 粘贴"
           }
         }
       }
@@ -1243,6 +1277,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copyo 正在只使用本地数据库，数据一条都没有丢失。解决上面的问题后重启 Copyo 即可。"
+          }
+        }
+      }
+    },
+    "Copyo lives in the menu bar (the clipboard icon in the top-right corner).\n\n• Click the menu bar icon anytime to bring up the clipboard panel\n• Everything you copy is saved automatically — type to search\n• Pick an item and press Return to put it back on the clipboard, then paste it yourself with ⌘V. ⇧Return copies it as plain text\n• Open Settings from the gear in the panel, or by right-clicking the menu bar icon": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo réside dans la barre des menus (l’icône de presse-papiers en haut à droite).\n\n• Cliquez sur l’icône de la barre des menus à tout moment pour faire apparaître le panneau\n• Tout ce que vous copiez est enregistré automatiquement — saisissez pour rechercher\n• Choisissez un élément et appuyez sur Retour pour le replacer dans le presse-papiers, puis collez-le vous-même avec ⌘V. ⇧Retour le copie en texte brut\n• Ouvrez les réglages depuis la roue dentée du panneau ou en cliquant avec le bouton droit sur l’icône de la barre des menus"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 已在菜单栏常驻运行（右上角剪贴板图标）。\n\n• 点按菜单栏图标随时呼出剪贴板面板\n• 复制过的内容会自动记录，输入即可搜索\n• 选中条目按回车放回剪贴板，再由你自己按 ⌘V 粘贴；⇧回车以纯文本复制\n• 点击面板右上角的齿轮，或右键菜单栏图标，即可打开设置"
           }
         }
       }
@@ -1570,6 +1621,23 @@
         }
       }
     },
+    "Everything you’ve copied is here.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout ce que vous avez copié est ici."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制过的东西都在这里。"
+          }
+        }
+      }
+    },
     "Everything you’ve copied is here. Press %@ to get it back anytime.": {
       "extractionState": "manual",
       "localizations": {
@@ -1702,6 +1770,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "知道了"
+          }
+        }
+      }
+    },
+    "Help": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aide"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "帮助"
           }
         }
       }
@@ -2335,19 +2420,19 @@
         }
       }
     },
-    "Press it anytime to bring up this panel": {
+    "Press %@ anytime to bring up this panel": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Appuyez dessus à tout moment pour afficher ce panneau"
+            "value": "Appuyez sur %@ à tout moment pour afficher ce panneau"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "随时按下它唤出这个面板"
+            "value": "随时按 %@ 唤出这个面板"
           }
         }
       }
@@ -3151,6 +3236,23 @@
         }
       }
     },
+    "This combination is already used by a macOS keyboard shortcut. Restored to %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette combinaison est déjà utilisée par un raccourci clavier de macOS. Rétablie sur %@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这个组合已被系统快捷键占用，已恢复为 %@"
+          }
+        }
+      }
+    },
     "This combination is already used by another app. Restored to %@.": {
       "extractionState": "manual",
       "localizations": {
@@ -3385,6 +3487,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "超出上限时最旧的未固定记录会被自动清理，固定到 Pinboard 的内容不受影响。"
+          }
+        }
+      }
+    },
+    "When this is off, open Copyo again in Finder to get back to Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Si cette option est désactivée, rouvrez Copyo dans le Finder pour retrouver les réglages"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭后可在访达中再次打开 Copyo 找回设置"
           }
         }
       }

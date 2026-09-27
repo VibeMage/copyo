@@ -20,8 +20,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// 不适合在「删除所有数据」的对话框里反复调用，所以启动时存下来。
     private(set) var storeURL: URL?
     private let hotkey = HotkeyManager()
-    /// 当前保存的全局快捷键有没有注册成功。启动时就失败的话，设置 · 快捷键页据此亮警示
-    private(set) var hotkeyRegistered = true
+    /// 当前保存的全局快捷键的注册结果（含冲突探测，见 HotkeyManager.register）。
+    /// 启动时就冲突的话，设置 · 快捷键页据此亮警示
+    private(set) var hotkeyStatus: HotkeyStatus = .active
     private var statusItem: NSStatusItem!
     private var settingsController: SettingsWindowController?
     private var legacyColorRewrite: DispatchWorkItem?
@@ -114,7 +115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.panelController.toggle()
             }
         }
-        hotkeyRegistered = hotkey.register(HotkeyConfig.load())
+        hotkeyStatus = hotkey.register(HotkeyConfig.load())
         // -demoData 是拍截图用的内存库：不采集真实剪贴板、不同步，否则真实内容会混进截图、
         // 样例数据也可能被快照同步写到别的 Mac 上
         if !demo {
@@ -210,17 +211,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// 首启欢迎。完整的引导页顺延到 1.3（design-spec 第八节第 47 条），本轮只中文化并更新键位。
     /// 两种构建风味的面板现在都有齿轮（第 15 条），文案不再分两套。
+    /// 默认的 ⇧⌘V 正是别的剪贴板工具常用的组合，首启就冲突是现实场景：探测出按下去收不到（7.5.1），
+    /// 第一条就改成点菜单栏图标（「在菜单栏显示图标」默认开着，第一句也已经指明了它在哪）
     private func showWelcome() {
         let alert = NSAlert()
         alert.messageText = String(localized: "Welcome to Copyo")
-        alert.informativeText = String(localized: """
-        Copyo lives in the menu bar (the clipboard icon in the top-right corner).
+        if hotkeyStatus == .active {
+            alert.informativeText = String(localized: """
+            Copyo lives in the menu bar (the clipboard icon in the top-right corner).
 
-        • Press \(HotkeyConfig.load().displayString) anytime to bring up the clipboard panel
-        • Everything you copy is saved automatically — type to search
-        • Pick an item and press Return to put it back on the clipboard, then paste it yourself with ⌘V. ⇧Return copies it as plain text
-        • Open Settings from the gear in the panel, or by right-clicking the menu bar icon
-        """)
+            • Press \(HotkeyConfig.load().displayString) anytime to bring up the clipboard panel
+            • Everything you copy is saved automatically — type to search
+            • Pick an item and press Return to put it back on the clipboard, then paste it yourself with ⌘V. ⇧Return copies it as plain text
+            • Open Settings from the gear in the panel, or by right-clicking the menu bar icon
+            """)
+        } else {
+            alert.informativeText = String(localized: """
+            Copyo lives in the menu bar (the clipboard icon in the top-right corner).
+
+            • Click the menu bar icon anytime to bring up the clipboard panel
+            • Everything you copy is saved automatically — type to search
+            • Pick an item and press Return to put it back on the clipboard, then paste it yourself with ⌘V. ⇧Return copies it as plain text
+            • Open Settings from the gear in the panel, or by right-clicking the menu bar icon
+            """)
+        }
         alert.addButton(withTitle: String(localized: "Try It Now"))
         alert.addButton(withTitle: String(localized: "Got It"))
         NSApp.activate(ignoringOtherApps: true)
@@ -229,11 +243,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// 设置里改了快捷键后重新注册。返回 false 时调用方负责回滚到旧组合（第八节第 19 条）
+    /// 按当前保存的组合重新注册，也就重新探测一遍冲突。
+    /// 设置里改了快捷键后调用；不是 `.active` 时调用方负责回滚到旧组合（第八节第 19 条）
     @discardableResult
-    func reloadHotkey() -> Bool {
-        hotkeyRegistered = hotkey.register(HotkeyConfig.load())
-        return hotkeyRegistered
+    func reloadHotkey() -> HotkeyStatus {
+        hotkeyStatus = hotkey.register(HotkeyConfig.load())
+        return hotkeyStatus
+    }
+
+    /// 录制新组合期间让出当前组合（HotkeyManager.suspend），录完或取消后由 reloadHotkey() 注册回来
+    func suspendHotkey() {
+        hotkey.suspend()
     }
 
     // MARK: - 菜单栏
@@ -279,11 +299,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func showStatusMenu() {
         let menu = NSMenu()
 
-        let config = HotkeyConfig.load()
-        let openItem = NSMenuItem(title: String(localized: "Open Copyo"),
-                                  action: #selector(openPanel),
-                                  keyEquivalent: config.keyEquivalentCharacter ?? "")
-        openItem.keyEquivalentModifierMask = config.cocoaModifiers
+        let openItem = NSMenuItem(title: String(localized: "Open Copyo"), action: #selector(openPanel), keyEquivalent: "")
+        // 探测出当前组合按下去 Copyo 收不到（被系统快捷键或别的 App 独占占用），就不再标注它（7.5.1）。
+        // 状态是最近一次注册时的结果（启动、换绑、打开设置 · 快捷键页时更新），这里不为弹个菜单去重注册
+        if hotkeyStatus == .active {
+            let config = HotkeyConfig.load()
+            openItem.keyEquivalent = config.keyEquivalentCharacter ?? ""
+            openItem.keyEquivalentModifierMask = config.cocoaModifiers
+        }
         openItem.target = self
         menu.addItem(openItem)
 

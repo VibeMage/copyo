@@ -15,19 +15,49 @@ enum AppIconProvider {
     private static var missingSince: [String: Date] = [:]
     private static let missingTTL: TimeInterval = 60
 
-    static func icon(forBundleID bundleID: String?) -> NSImage {
-        let key = bundleID ?? "?"
-        if let cached = iconCache[key] { return cached }
-        let icon: NSImage
-        if let bundleID, let url = applicationURL(forBundleID: bundleID) {
-            icon = NSWorkspace.shared.icon(forFile: url.path)
-            genericIconKeys.remove(key)
-        } else {
-            icon = NSWorkspace.shared.icon(for: UTType.application)
-            genericIconKeys.insert(key)
+    /// 卡片底行的图标走后台查（7.5.5）：同一 bundle ID 去重、并发有上限、卡片离屏时排队中的撤掉
+    private static let iconLoads = BackgroundLoadQueue<String, IconLookup>(maxConcurrent: 3)
+    /// 是否已经向 `IconPrerender.onNewScales` 登记了 `rescale`
+    private static var observesNewScales = false
+    /// 接上像素密度不同的屏之后重取的轮次：接连换屏时只认最后一轮
+    private static var rescaleRound = 0
+
+    /// 后台查询的结果。`queried` 为 false 表示负缓存期内没去查 LaunchServices，回来时不刷新 missingSince
+    private struct IconLookup: Sendable {
+        let icon: TransferredImage
+        let found: Bool
+        let queried: Bool
+    }
+
+    /// 只查内存。view body 里只许调这个（design-spec 7.5.5：LaunchServices 查询与 `NSWorkspace.icon` 移出 body）；
+    /// 未命中返回 nil，由调用方先空着图标位，同时 `await icon(forBundleID:)`
+    static func cachedIcon(forBundleID bundleID: String) -> NSImage? {
+        iconCache[bundleID]
+    }
+
+    /// 后台查 LaunchServices、取图标，结果进 iconCache。同一 bundle ID 的并发请求只查一次。
+    /// 找不到 App 时给通用 App 图标并记进 genericIconKeys——与 headerColor 共用同一套语义：
+    /// 卡片可以显示这个替身，headerColor 绝不拿它采样
+    static func icon(forBundleID bundleID: String) async -> NSImage? {
+        if let cached = iconCache[bundleID] { return cached }
+        if !observesNewScales {
+            observesNewScales = true
+            IconPrerender.onNewScales { rescale(to: $0) }
         }
-        iconCache[key] = icon
-        return icon
+        // 负缓存要在主线程上判：missingSince 只在主线程上读写。屏幕像素密度同理，在主线程上读好带过去
+        let skipLookup = isKnownMissing(bundleID)
+        let scales = IconPrerender.currentScales()
+        let lookup = await iconLoads.load(bundleID) {
+            lookUpIcon(bundleID: bundleID, skipLookup: skipLookup, scales: scales)
+        } commit: { lookup in
+            commit(lookup, for: bundleID)
+        }
+        return iconCache[bundleID] ?? lookup?.icon.image
+    }
+
+    /// 预热用：结果留在 iconCache 里，调用方不要图
+    static func warm(bundleID: String) async {
+        _ = await icon(forBundleID: bundleID)
     }
 
     /// 来源 App 的主题色；**取不到时返回 nil**，由显示层统一回退 `source.local` #8E8E93
@@ -67,13 +97,79 @@ enum AppIconProvider {
 
     /// LaunchServices 查询 + 负缓存。找到了就清掉负缓存记录
     private static func applicationURL(forBundleID bundleID: String) -> URL? {
-        if let since = missingSince[bundleID], Date().timeIntervalSince(since) < missingTTL { return nil }
+        if isKnownMissing(bundleID) { return nil }
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else {
             missingSince[bundleID] = Date()
             return nil
         }
         missingSince[bundleID] = nil
         return url
+    }
+
+    private static func isKnownMissing(_ bundleID: String) -> Bool {
+        guard let since = missingSince[bundleID] else { return false }
+        return Date().timeIntervalSince(since) < missingTTL
+    }
+
+    /// 后台线程上跑：LaunchServices 找 App、IconServices 取图标，再按卡片底行的 20pt 先栅格化一次
+    /// （见 `IconPrerender`：不然这一步会留到主线程第一次画它时才做）。只碰 Sendable 的入参，
+    /// 取到的 NSImage 整体移交给主线程，这一侧不再留引用
+    nonisolated private static func lookUpIcon(bundleID: String, skipLookup: Bool, scales: [CGFloat]) -> IconLookup {
+        let found: Bool
+        let icon: NSImage
+        if !skipLookup, let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) {
+            found = true
+            icon = NSWorkspace.shared.icon(forFile: url.path)
+        } else {
+            found = false
+            icon = NSWorkspace.shared.icon(for: UTType.application)
+        }
+        IconPrerender.warm(icon, pointSizes: [ClipCardMetrics.sourceIconSize], scales: scales)
+        return IconLookup(icon: TransferredImage(image: icon), found: found, queried: !skipLookup)
+    }
+
+    /// 接上像素密度不同的屏之后（`IconPrerender.onNewScales`），把缓存里的图标在后台按新的一组重取一份。
+    /// 取的是新实例：已经交给主线程的那张，后台不能再碰（见 `TransferredImage`）。一轮是一段串行的后台活，
+    /// 回来后只做同类替换——真图标换真图标、通用替身换替身：这期间替身已被真图标顶掉的不动，
+    /// 这次找不到 App 的也不拿替身去顶真图标。卡片 body 里是 `cachedIcon` 优先，下一次重算就用上新的这张
+    private static func rescale(to scales: [CGFloat]) {
+        rescaleRound &+= 1
+        let round = rescaleRound
+        let entries = iconCache.keys.map { (bundleID: $0, generic: genericIconKeys.contains($0)) }
+        guard !entries.isEmpty else { return }
+        Task {
+            let lookups = await BackgroundWork.run {
+                entries.map { entry in
+                    (entry.bundleID, lookUpIcon(bundleID: entry.bundleID, skipLookup: entry.generic, scales: scales))
+                }
+            }
+            guard round == rescaleRound else { return }
+            for (bundleID, lookup) in lookups
+            where iconCache[bundleID] != nil && genericIconKeys.contains(bundleID) != lookup.found {
+                iconCache[bundleID] = lookup.icon.image
+            }
+        }
+    }
+
+    /// 回到主线程写缓存，与 headerColor 的语义对齐：真图标总是压过通用替身，通用替身绝不压过真图标。
+    /// 在途期间采集那边的 headerColor 可能已经按运行中 App 的位置放进了真图标——那时这边找不到也不能覆盖它
+    private static func commit(_ lookup: IconLookup, for bundleID: String) {
+        if lookup.found {
+            missingSince[bundleID] = nil
+            if iconCache[bundleID] == nil || genericIconKeys.contains(bundleID) {
+                iconCache[bundleID] = lookup.icon.image
+                genericIconKeys.remove(bundleID)
+            }
+        } else {
+            let hasRealIcon = iconCache[bundleID] != nil && !genericIconKeys.contains(bundleID)
+            // 在途期间已经有了真图标：这边的「找不到」已经过时，既不动图标，也不记负缓存
+            guard !hasRealIcon else { return }
+            if lookup.queried { missingSince[bundleID] = Date() }
+            if iconCache[bundleID] == nil {
+                iconCache[bundleID] = lookup.icon.image
+                genericIconKeys.insert(bundleID)
+            }
+        }
     }
 
     /// 对图标做粗粒度像素采样求平均色，过滤透明与接近黑白的像素。

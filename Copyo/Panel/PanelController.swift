@@ -77,12 +77,23 @@ final class PanelController: NSObject, NSWindowDelegate {
     /// 尺寸是死点数，不随系统文字大小变（第 34 条），1× 与 2× 屏用同一套 pt。
     static func frame(on screen: NSScreen) -> NSRect {
         let visible = screen.visibleFrame
-        let width = min(CopyoTheme.Dense.panelWidth, visible.width - 2 * CopyoTheme.Dense.panelSideMargin)
+        let width = min(maxWidth, visible.width - 2 * CopyoTheme.Dense.panelSideMargin)
         return NSRect(x: (visible.midX - width / 2).rounded(),
                       y: visible.minY + CopyoTheme.Dense.panelBottomInset,
                       width: width,
                       height: CopyoTheme.Dense.panelHeight)
     }
+
+    /// 截图辅助：-panelWidth <pt> 把面板宽度上限压窄，效果等同于窄屏（只能压窄，不会超过 1280）。
+    /// 商店截图用 1104 = 内距 16 + 4 × 卡宽 260 + 4 × 间距 12：第五张卡的左缘正好落在面板边缘外。
+    /// 卡片轨道一直延伸到面板边缘（内距只是轨道内容的起点），取对称的 1108 时第五张会露出 4pt 细边。
+    /// 满宽时第五张露出六成，宣传图里像截歪了（2026-09-27 维护者对 1.2.0 截图的意见）。
+    private static let maxWidth: CGFloat = {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "-panelWidth"), args.indices.contains(i + 1),
+              let value = Double(args[i + 1]), value > 0 else { return CopyoTheme.Dense.panelWidth }
+        return min(CopyoTheme.Dense.panelWidth, CGFloat(value))
+    }()
 
     // MARK: - 显示 / 隐藏
 
@@ -167,9 +178,8 @@ final class PanelController: NSObject, NSWindowDelegate {
         pasteService.copyToPasteboard(item, asPlainText: asPlainText)
         let bottomCenter = NSPoint(x: panel.frame.midX,
                                    y: (panel.screen?.visibleFrame.minY ?? panel.frame.minY) + CopyoTheme.Dense.panelBottomInset)
-        let plain = asPlainText || UserDefaults.standard.bool(forKey: "plainTextPaste")
         hide(reactivatePrevious: true)
-        toast.show(bottomCenter: bottomCenter, plainText: plain && item.kind != .image && item.kind != .file)
+        toast.show(bottomCenter: bottomCenter)
     }
 
     private func setPreview(_ item: ClipItem?) {

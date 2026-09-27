@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-// 面板里反复出现的小件：玻璃外壳、键帽、提示、筛选胶囊、空态插画、弹出菜单。
+// 面板里反复出现的小件：玻璃外壳、键帽、提示、筛选胶囊、空态插画、弹出菜单、Pinboard 色点。
 // 数值取自 art/macos-design/2026-09-27/gen_v2.py，令牌在 CopyoTheme.Dense。
 
 // MARK: - 玻璃
@@ -77,8 +77,9 @@ struct FilterChip: View {
                     .font(.system(size: 12, weight: isOn ? .semibold : .medium))
                     .lineLimit(1)
                 if showsChevron {
+                    // 画板 CHEV_I 11pt、线宽 1.8 → .semibold（5.2 表「Pinboard 胶囊的下拉箭头」行；gen_v2.py:212）
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 9, weight: .semibold))
+                        .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(isOn ? Color.white.opacity(0.85) : CopyoTheme.labelSecondary)
                 }
             }
@@ -207,5 +208,36 @@ final class PopupMenu: NSObject {
 
     @objc private func run(_ sender: NSMenuItem) {
         actions[sender.tag]()
+    }
+}
+
+// MARK: - Pinboard 色点
+
+/// 卡片右键子菜单里每个 Pinboard 行前的色点：15 × 15 的图标位里居中一块 10 × 10、圆角 3 的色块
+/// （第八节第 22 条；4.4.1 序 3；5.2.2「子菜单 · 各 Pinboard 行」；gen_v2.py:356-361）。
+/// NSMenu 没法给 SF Symbol 任意着色，只能预先画成 NSImage，且不能是 template，否则会被菜单染成文字色。
+///
+/// 色取 `Pinboard.colorHex`；为空或解析不了时回退 accent `#0A84FF`，与 iOS `PinboardAppearance.defaultColorHex`
+/// 同一个值，两端给同一个板画同一种色。**待设计**：回退色取什么、新建时默认分配什么色（03c 没有选色步骤），
+/// design-spec 5.2.2 / 2.1 仍是设计未定，定了之后改这里（Mac 端新建时目前不写 colorHex）。
+/// ⌘P / 动作簇图钉弹出的 Pinboard 列表要不要色点 v2 没画（4.1.6 末段），那边暂不加。
+@MainActor
+enum PinboardSwatch {
+    /// 按 colorHex 缓存：菜单每次弹出都会重建，板数很少，画一次就够
+    private static var cache: [String: NSImage] = [:]
+
+    static func image(colorHex: String?) -> NSImage {
+        let key = colorHex ?? ""
+        if let cached = cache[key] { return cached }
+        let color = CopyoTheme.uiColor(hexString: colorHex) ?? CopyoTheme.accentUI
+        let image = NSImage(size: NSSize(width: 15, height: 15), flipped: false) { bounds in
+            let swatch = NSRect(x: bounds.midX - 5, y: bounds.midY - 5, width: 10, height: 10)
+            color.setFill()
+            NSBezierPath(roundedRect: swatch, xRadius: 3, yRadius: 3).fill()
+            return true
+        }
+        image.isTemplate = false
+        cache[key] = image
+        return image
     }
 }
