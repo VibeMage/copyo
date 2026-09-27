@@ -3864,8 +3864,11 @@ v1 画板底部的两条说明文字（「通用 · 540 × 460，结构不动…
 | `-panelWidth <pt>` | 压窄面板宽度上限（只能压窄、不超过 1280，等同窄屏）；商店截图用 `1104` = 16 + 4 × 260 + 4 × 12，第五张卡的左缘正好落在面板边缘外（轨道延伸到面板边缘，取对称的 1108 会露出 4pt） | 1.2.x：`Copyo/Panel/PanelController.swift`（`maxWidth`） |
 | `-demoData` | 内存容器 + 本节样例，不碰 `Copyo.store`（7.5.18） | 基线无（7.5.13）；1.2.0 在 `Copyo/App/MacDemoData.swift` |
 
-**1.2.0 这一套（2026-09-27 随 1.2.0 (3) 提审，已上传 ASC）**：十张 = 2 语言 × 5 张，成品在 `art/store/<序号>-<名称>-<lang>.png`，
-另有中英各一段 App 预览在 `art/store/preview/<lang>-preview.mp4`。采集、合成、上传的完整记录见 `docs/appstore-submission.md` 第二十六节。
+**当前这一套（第二版，2026-09-27，准备随 1.2.1 上架；`art/store/` 里就是它）**：十张 = 2 语言 × 5 张，成品在 `art/store/<序号>-<名称>-<lang>.png`，
+另有中英各一段 App 预览在 `art/store/preview/<lang>-preview.mp4`。随 1.2.0 (3) 上架的是第一版；第二版按维护者对第一版的三点意见改了：
+拍摄时 `-panelWidth 1104` 让面板正好放满四张整卡（第一版最右一张被切掉四成）；演示图片换成真实照片（第一版是土黄色占位）；
+合成时面板放大、标题区收紧（面板在成品里约 2426px 宽，第一版约 2272px，副标题到面板的留白从约 430px 收到约 100px）。
+采集、合成、上传的完整记录见 `docs/appstore-submission.md` 第二十七节。
 
 | 序号 | 原始素材（`raw/<lang>-…`） | 采集方式 | 英文主标题 / 副标题 | 中文主标题 / 副标题 |
 | --- | --- | --- | --- | --- |
@@ -3875,15 +3878,16 @@ v1 画板底部的两条说明文字（「通用 · 540 × 460，结构不动…
 | 04-pinboard | `05-pinmenu.png` | 整屏，按 ⌘P 弹出 Pinboard 菜单 | `Keep what you use most` / `Press ⌘P to choose a Pinboard, right from the keyboard` | `常用的，固定下来` / `按 ⌘P 选择 Pinboard，手不离键盘` |
 | 05-shortcuts | `04-settings.png` | 单窗口（`screencapture -l`），加 `-showSettings -settingsTab 2` | `Hands stay on the keyboard` / `⇥ switches filters, ⌘1–9 copies a card — ⇧⌘V is yours to remap` | `手不离键盘` / `⇥ 切换筛选，⌘1–9 直接复制；⇧⌘V 可自定义` |
 
-- 公共启动参数：`-demoData -showPanel -forceDark -AppleLanguages '(zh-Hans)'`（英文换 `'(en)'`）。**不用 `-opaquePanel`**：
+- 公共启动参数：`-demoData -showPanel -forceDark -panelWidth 1104 -AppleLanguages '(zh-Hans)'`（英文换 `'(en)'`；第一版没有 `-panelWidth`）。**不用 `-opaquePanel`**：
   背后铺一张全屏无边框的舞台窗口（`art/store/_background-plate.png` 裁成 16:9，窗口层级 23，低于菜单栏 24 与面板 25），
   面板、预览子窗的玻璃按这张背景真实合成，成品里的玻璃就是用户看到的样子。整屏素材 3840 × 2160（1920 × 1080 pt 的 2x）。
-- 合成（`scripts/make-store-shots.py`）：整屏素材统一裁 `SCENE_CROP = (480, 300, 3360, 2100)`（2880 × 1800，16:10，
-  天然去掉顶部 60px 的真实菜单栏），缩到 2560 × 1600；图标 190 × 190、顶 105，主标题顶 324、副标题顶 447，
-  主标题色 `(255,255,255)`、副标题色 `(190,192,197)`；设置窗口按原比例缩到宽 1120、顶 578 贴在舞台背景上；
-  转 sRGB、去 alpha。不裁切、不重绘、不单独挪动任何应用像素。
-- 预览视频（`scripts/make-store-preview.sh`）：约 40 秒的真实操作录屏剪到 30 秒内（中 28.2s / 英 27.7s），1920 × 1080、H.264、30 fps，
-  带一条 48 kHz 立体声 AAC 静音轨（Mac App 预览没有音轨会被 ASC 拒收）；海报帧 `00:00:01:00`。
+- 合成（`scripts/make-store-shots.py`）：每张从原图裁一块连续区域（天然去掉顶部 60px 的真实菜单栏），可轻微放大（不超过约 1.1 倍）；
+  01 / 02 / 04 面板同大同位，03 为给面板上方的预览窗留位把标题区再收紧一档；05 的设置窗口按原比例缩到宽 1340、顶 440 贴在舞台背景上；
+  转 sRGB、嵌入固定的 sRGB ICC、去 alpha，同样的输入逐字节产出同样的文件；脚本记有这批原图的 SHA-256，换了素材会报错，提示重调裁切。
+  不裁切、不重绘、不单独挪动任何应用像素。第一版统一裁 `SCENE_CROP = (480, 300, 3360, 2100)` 再缩到 2560 × 1600。
+- 预览视频（`scripts/make-store-preview.sh`）：约 40 秒的真实操作录屏剪到 30 秒内（第二版中 29.2s / 英 28.7s，第一版 28.2s / 27.7s），1920 × 1080、H.264、30 fps，
+  带一条 48 kHz 立体声 AAC 静音轨（Mac App 预览没有音轨会被 ASC 拒收）；平时是紧取景，照片预览那一段在动作的静止处硬切到宽取景，不推拉摇移、不变速；
+  脚本记有源片的精确时长与帧数，换了录屏会报错，提示重挑剪点。海报帧取第 1 秒（ASC `00:00:01:00`）。
 - 文案守 1.0 那次 2.4.5 拒审的底线：只说「复制」，不说应用会替用户粘贴（见本节末）。
 
 **v1 现状（基线 `5a3f8fe`，已作废）**：八张 = 2 语言 × 4 张（`make-store-shots.py:55 TEXT`），采集文件名 `ui_<编号>_<lang>.png`，
