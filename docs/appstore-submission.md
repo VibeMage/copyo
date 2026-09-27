@@ -1,6 +1,6 @@
 # Mac App Store 提审材料与操作清单
 
-创建日期：2026-09-01 · 最后更新：2026-09-19
+创建日期：2026-09-01 · 最后更新：2026-09-27
 
 ## 一、App Store Connect 建应用（你来操作）
 
@@ -874,3 +874,215 @@ cfprefsd 有缓存，直接改文件不生效。
 `.automatic` 这种「看情况」的默认值，在一个签了 entitlement 的上架包里和在
 开发机上行为完全不同，而单元测试和本地 Debug 跑都发现不了。
 
+
+## 二十六、iOS / iPadOS 首版（1.1.0）提审材料（2026-09-27）
+
+iOS 版挂在同一条应用记录（`6813955206`）上，走通用购买：ASC → App → 左上「添加平台」→ iOS。
+版本号 1.1.0（与工程 `MARKETING_VERSION` 一致；iOS 与 macOS 的版本号在 ASC 里各自独立）。
+
+### 字段归属：哪些是两个平台共用的
+
+- **App 级（共用）**：名称、副标题、隐私政策网址、类别、年龄分级、App 隐私问卷。
+  改副标题会**同时改掉 Mac 商品页**，所以下面的副标题两端都成立。
+- **版本级（iOS 单独填）**：推广文本、描述、关键词、技术支持网址、版权、截图、审核备注。
+- 隐私政策（Gist）与支持页已按 iOS 补写，见仓库 `PRIVACY.md` 与 `docs/support/index.html`。
+  **Gist 要手工同步**（`gist.github.com/VibeMage/d39d7165…`），支持页随 main 推送由 GitHub Pages 发布。
+
+### 截图
+
+`art/store-ios/`，由 `scripts/capture-store-shots-ios.sh` 采集、`scripts/make-store-shots-ios.py` 合成。
+6.9 英寸 iPhone（1320×2868）六张、13 英寸 iPad（2064×2752）四张，中英各一套。版式跟 iOS 设计稿走
+（暖白底、系统字体），不沿用 Mac 那套深色底板。ASC 里用「媒体管理」按语言分别上传（见第十七节）。
+
+### 口径（与 Mac 不同的地方，写文案时别抄错）
+
+- **iOS 上 iCloud 同步默认开启**（`IOSSettings` 注册默认值为 `true`），Mac 上默认关闭
+- iOS 只在前台读剪贴板；首次启动只记账不读取；没有「隐藏内容过滤」与「忽略应用」
+- 键盘扩展**不在**这一版的包里（见 `docs/ios-plan.md` 3.6），文案与审核备注都不要提它能用
+- 系统搜索索引默认关闭
+
+### 副标题（App 级字段，iOS 与 macOS 共用）
+
+English (U.S.) — 28/30
+
+```
+Search everything you copied
+```
+
+简体中文 — 11/30
+
+```
+复制过的一切，随时找回
+```
+
+---
+
+### 推广文本（iOS 版本字段）
+
+English — 163/170
+
+```
+Everything you copy on your Mac, searchable on iPhone and iPad through your own iCloud. Tap to copy it again. Save new clips from the share sheet or Action Button.
+```
+
+简体中文 — 81/170
+
+```
+Mac 上复制过的一切，经你自己的 iCloud 来到 iPhone 和 iPad，随时搜索、轻点即可再次复制。分享面板、操作按钮一键保存新内容。开源，无需账号。
+```
+
+---
+
+### 描述
+
+English — 2279/4000
+
+```
+Everything you've copied on your Mac, in your pocket. Copyo brings your clipboard history to iPhone and iPad through your own iCloud account, so you can search it anywhere and tap any clip to copy it again.
+
+Copyo is an open-source clipboard manager for Mac, iPhone and iPad.
+
+SEARCH AND COPY
+• Text, rich text, links, colors and images, shown as cards
+• Type to search, or filter by links, images or colors
+• Tap a card to copy it, then paste it wherever you like
+• Copy as plain text, share, or open a full-size preview
+• Swipe right to pin, swipe left to delete
+• Files copied on your Mac are listed by name and marked "Mac only"
+
+SAVE FROM YOUR iPHONE
+iOS doesn't let apps read the clipboard in the background, so Copyo saves at moments you choose:
+• When you open Copyo, it saves what's on the clipboard. You can turn this off and use the Paste button instead.
+• Share sheet: save text, links and images from any app, straight into a Pinboard if you like
+• Quick Save: one press on the Action Button, a Control Center or Lock Screen control, or Back Tap through a shortcut. Copyo opens and saves the clipboard.
+• "Save Clipboard" is also available in Shortcuts and Siri
+
+PINBOARDS
+Keep the clips you use often on Pinboards. Clearing history never touches pinned clips.
+
+WIDGETS
+• Recent Clips widget in small and medium sizes. Tap a clip to open Copyo and copy it.
+• Save Clipboard control for Control Center, the Lock Screen and the Action Button
+
+ON iPAD
+• Sidebar layout with a grid of cards
+• Drag clips into the app next to Copyo
+• Hardware keyboard: Command-F to search, arrow keys to move, Return to copy, Shift-Return for plain text, Space to preview, Command-P to pin
+
+PRIVACY
+• Sync goes through Apple's iCloud to a private database in your own Apple Account. We run no server and can't read your clips.
+• iCloud sync is on by default on iPhone and iPad so your devices share one history. Turn it off during setup or anytime in Settings, and your clips stay on this device.
+• Showing clips in system Search is off by default.
+• No account, no sign-in, no ads, no analytics, no third-party SDKs.
+• The source code is on GitHub under the GNU GPLv3.
+
+To sync with your Mac, get Copyo for Mac and turn on iCloud sync in its Settings (it's off by default on the Mac).
+```
+
+简体中文 — 956/4000
+
+```
+Mac 上复制过的一切，装进口袋。Copyo 通过你自己的 iCloud 把剪贴板历史带到 iPhone 和 iPad，随时搜索，轻点任意一条即可再次复制。
+
+Copyo 是一款开源的剪贴板管理工具，支持 Mac、iPhone 和 iPad。
+
+搜索与复制
+• 文本、富文本、链接、颜色、图片，以卡片呈现
+• 即输即搜，也可按链接、图片、颜色筛选
+• 轻点卡片即复制，再粘贴到任何地方
+• 纯文本复制、分享、大图预览
+• 右滑固定，左滑删除
+• Mac 上复制的文件显示文件名，并标注「仅 Mac」
+
+在 iPhone 上保存
+iOS 不允许应用在后台读取剪贴板，所以 Copyo 只在你选择的时刻保存：
+• 打开 Copyo 时自动保存当前剪贴板。可以关闭，改用「粘贴」按钮手动保存
+• 分享面板：在任意 App 里保存文本、链接和图片，可直接放进 Pinboard
+• 一键保存：操作按钮、控制中心或锁屏控件一按即存，也可以通过快捷指令用「轻点背面」触发。Copyo 会打开并保存剪贴板
+• 「保存剪贴板」也可以在快捷指令和 Siri 里使用
+
+Pinboard
+常用内容固定到 Pinboard，清空历史不会动到已固定的条目。
+
+小组件
+• 「最近的内容」小组件，小、中两种尺寸，轻点即打开 Copyo 并复制
+• 「保存剪贴板」控件，可放进控制中心、锁屏，或绑定操作按钮
+
+iPad
+• 侧栏布局，卡片网格
+• 把卡片拖到旁边的 App 里
+• 硬件键盘：Command-F 搜索，方向键移动，回车复制，Shift-回车复制纯文本，空格预览，Command-P 固定
+
+隐私
+• 同步走 Apple 的 iCloud，数据存在你自己 Apple 账户下的私有数据库里。我们没有服务器，也读不到你的内容
+• iPhone 和 iPad 上 iCloud 同步默认开启，让各设备共享同一份历史；可在首次引导或设置里随时关闭，关闭后内容只保存在本机
+• 在系统搜索中显示条目，默认关闭
+• 无需账号，无需登录，无广告，无统计，无第三方 SDK
+• 源代码以 GNU GPLv3 许可证发布在 GitHub
+
+要与 Mac 同步，请在 Mac 上安装 Copyo，并在其设置里开启 iCloud 同步（Mac 版默认关闭）。
+```
+
+---
+
+### 关键词（iOS 版本字段）
+
+English — 96/100（14 个词，逗号后没有空格，没有 App 名称，没有竞品名）。名称里已有的 clipboard、history 会被自动索引，所以没有重复写。
+
+```
+paste,copy,pasteboard,manager,clip,clips,pinboard,snippets,sync,icloud,widget,save,organizer,mac
+```
+
+简体中文 — 49/100 字符（UTF-8 为 97 字节，不管 ASC 按字符还是按字节计，都在 100 以内）
+
+```
+剪贴板,剪切板,粘贴板,历史,复制,粘贴,同步,小组件,收藏,效率,clipboard,paste
+```
+
+---
+
+### 审核备注（英文）— 3851/4000
+
+```
+Copyo for iPhone and iPad is the companion to Copyo for Mac, which is already on the Mac App Store under this app record. It shows the user's clipboard history, synced from their Mac through their own private iCloud database, and lets them save new clips from the iPhone. Everything below can be tested on one iPhone or iPad, without a Mac.
+
+No account, no login, no demo credentials needed. No in-app purchases.
+
+CLIPBOARD ACCESS
+- Copyo reads the clipboard only while it is in the foreground: when the user opens or returns to the app, and when the user presses the Save Clipboard control (which opens the app first). It never reads the clipboard in the background.
+- On the very first launch Copyo only records the pasteboard change count and reads nothing, so whatever was copied before installing is not saved. To see a capture, copy something after the first launch, then return to Copyo.
+- The iOS system prompt "Copyo would like to paste from <app>" is expected. Tap Allow Paste. Onboarding and Settings > Allow Paste from Other Apps explain how to set it to Allow in iOS Settings.
+- The user can turn this off in Settings > Read Clipboard Automatically. Copyo then shows a banner with the system Paste button (UIPasteControl) and saves only when the user taps it.
+- Copyo never pastes into other apps and uses no Accessibility APIs. Tapping a card copies it; the user pastes it themselves.
+
+HOW TO TEST
+1. Launch Copyo. Three onboarding pages; tap Skip or go through them.
+2. History: in Safari, copy some text, a link and an image (touch and hold > Copy). Return to Copyo after each one and allow paste; the clip appears at the top. Tap a card to copy it. Touch and hold for Copy as Plain Text, Share, Pin and Delete. Swipe right to pin, left to delete. Use the search field and filter chips.
+3. Pinboard tab: create a Pinboard and pin clips to it.
+4. Share extension: in Safari, tap Share > Copyo (under More if hidden), optionally choose a Pinboard, tap Save to Copyo. The item appears in History.
+5. Quick Save control: open Control Center, touch and hold an empty area > Add a Control > search "Copyo" > Save Clipboard. Copy something in another app, then tap the control: Copyo opens and shows "Saved". On iPhone 15 Pro or later the same control can be assigned in Settings > Action Button > Controls. Back Tap is optional and uses a shortcut the user builds with Copyo's Save Clipboard action; steps are in Settings > Quick Save.
+6. Widgets: add Copyo's Recent Clips widget (small or medium) to the Home Screen. Tapping a clip opens Copyo and copies it.
+7. iPad: sidebar layout; drag a card into another app in Split View; with a hardware keyboard: Command-F, arrow keys, Return, Shift-Return, Space, Command-P, Delete, Command-1/2/3.
+
+ICLOUD SYNC (OPTIONAL)
+- The only network use is Apple CloudKit, through SwiftData mirroring to the user's own private database (container iCloud.dev.vibemage.Copyo). We operate no server and cannot read it. No third-party services, SDKs, analytics or ads.
+- Sync is on by default on iPhone and iPad (switch on onboarding page 3) and can be turned off in Settings > iCloud Sync; the change applies the next time Copyo opens. Without an iCloud account Copyo works fully on the device.
+- The push entitlement is used only by CloudKit's silent change notifications. Copyo never asks for notification permission and shows no notifications.
+- To see sync with a Mac: sign in to the same Apple Account, install Copyo for Mac and choose iCloud under its Settings > Sync. Not required for review.
+
+OTHER
+- System Search (Core Spotlight) indexing is off by default: Settings > Show Clips in System Search. Turning it off removes everything Copyo indexed.
+- This build contains no keyboard extension.
+- Interface languages: English, Simplified Chinese, French.
+- Source code: https://github.com/VibeMage/copyo
+```
+
+### 提审前的检查单
+
+1. 隐私政策 Gist 已同步为新版 `PRIVACY.md`；支持页已发布（两处审核员都会点）
+2. 构建版本：`UPLOAD=1 ./scripts/build-appstore-ios.sh`（先在 ASC 添加 iOS 平台，否则上传被拒）
+3. App 隐私问卷**不用改**：仍是「不收集数据」（私有 CloudKit 数据库开发者读不到）
+4. 出口合规已写进 Info.plist（`ITSAppUsesNonExemptEncryption = NO`），上传后无需回答
+5. 年龄分级沿用 4+；价格与销售范围沿用 Mac 的设置（免费），iOS 平台需确认一遍「App 供应情况」
+6. **TestFlight 真机装一次再提审**：iCloud 同步的 entitlement 判断曾经只在 Apple 重签过的包里出错
+   （`embedded.mobileprovision` 被删），本地出的任何包都测不出来——见 `docs/ios-plan.md` 3.9
