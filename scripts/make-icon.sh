@@ -3,7 +3,7 @@
 #
 #   ./scripts/make-icon.sh [master.png]   macOS：把 1024 主图按比例缩成 10 个规格
 #                                         （默认 art/icon-master.png）
-#   ./scripts/make-icon.sh --ios          iOS：按 art/icon/paster-icon-spec.md 重新绘制
+#   ./scripts/make-icon.sh --ios          iOS：按 art/icon/copyo-icon-spec.md 重新绘制
 #                                         浅色 / 深色 / 单色三份 1024
 #
 # iOS 不能复用 macOS 那张主图。macOS 的主图是「透明底 + 内缩 9.8% 的圆角方块」——
@@ -31,7 +31,7 @@ if [[ "${1:-}" == "--ios" ]]; then
   # iOS 图标由脚本现画，不吃任何输入图片——一张栅格主图没法派生出深色与单色变体。
   python3 - "CopyoIOS/Assets.xcassets/AppIcon.appiconset" <<'PY'
 # -*- coding: utf-8 -*-
-"""按 art/icon/paster-icon-spec.md 绘制 iOS App 图标的三个外观变体。
+"""按 art/icon/copyo-icon-spec.md 绘制 iOS App 图标的三个外观变体。
 
 几何全部来自 spec 的「几何（以图标边长为 1）」表。spec 里那些比例的基准是**内缩后的
 圆角方块**（1024 主图里量得的卡片是 412×458 @ (306,283)，正是 0.50/0.556/0.25/0.222

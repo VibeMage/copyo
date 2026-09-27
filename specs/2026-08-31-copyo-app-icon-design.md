@@ -1,8 +1,8 @@
-# Paster App Icon Exploration
+# Copyo App Icon Exploration
 
 ## Goal
 
-Create six independent square character-image candidates for Paster, a local-first, keyboard-first macOS clipboard manager. The exploration should add memorability without losing the product ideas of collecting, retrieving, and quickly delivering clipboard content.
+Create six independent square character-image candidates for Copyo, a local-first, keyboard-first macOS clipboard manager. The exploration should add memorability without losing the product ideas of collecting, retrieving, and quickly delivering clipboard content.
 
 The six images are concept candidates only. They do not replace the existing app icon or update the Xcode asset catalog until the user selects a winner.
 
@@ -46,7 +46,7 @@ Represents fast delivery and automatic paste. Use a plump bird silhouette and on
 
 Save the six original candidates in a new project-local exploration directory and present all six together in the visual companion, labeled `A1`, `A2`, `B1`, `B2`, `C1`, and `C2`. Report each candidate's direction, corner, dimensions, saved path, prompt, color mapping, generation provider, and constraint-delivery mode.
 
-No selected candidate is installed into `art/icon-master.png` or `Paster/Assets.xcassets/AppIcon.appiconset` during this exploration.
+No selected candidate is installed into `art/icon-master.png` or `Copyo/Assets.xcassets/AppIcon.appiconset` during this exploration.
 
 ## Additional Comparison Rounds
 
@@ -97,7 +97,7 @@ Refine the two Card Stack candidates from Round 4 as image-based edits, preservi
 
 ## Round 6 — D2 Multi-Content Refinement
 
-Round 6 supersedes only the content-simplification decision for the D2 direction. The important product signal in `R4-D2` is that Paster retains more than plain text: the front clipboard visibly contains different kinds of cached content, including a recognizable image preview. Generate one candidate labeled `R6-D2`, using `R4-D2` directly as the image-edit target rather than deriving it from `R5-D2`.
+Round 6 supersedes only the content-simplification decision for the D2 direction. The important product signal in `R4-D2` is that Copyo retains more than plain text: the front clipboard visibly contains different kinds of cached content, including a recognizable image preview. Generate one candidate labeled `R6-D2`, using `R4-D2` directly as the image-edit target rather than deriving it from `R5-D2`.
 
 ### Content Hierarchy
 

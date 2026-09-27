@@ -5,5 +5,5 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-# 刻意不加 swift 生态：PasterCore 是工程内的本地包，零远程 SPM 依赖、也没有
+# 刻意不加 swift 生态：CopyoCore 是工程内的本地包，零远程 SPM 依赖、也没有
 # Package.resolved，加了只会每月空转一次。

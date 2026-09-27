@@ -67,8 +67,8 @@ struct ClipsUnavailableView: View {
         }
     }
 
-    /// 设计 07b 那句原文是「Paster 不联网，也不记录你的输入」（稿子早于改名）。
-    /// 改名之外还**收窄了主语**：Copyo 这个应用是联网的（CloudKit 私有数据库 + APNs 静默通知），
+    /// 设计 07b 那句原文的主语是整个应用。这里**收窄了主语**：
+    /// Copyo 这个应用是联网的（CloudKit 私有数据库 + APNs 静默通知），
     /// 那句话按字面讲是假的——仓库里已经有一次专门的提交在修同一类过度承诺
     /// （`stop claiming the app makes no network requests`）。
     /// 收窄成「Copyo 键盘」之后它才是真的：这个进程里没有任何一行网络代码，

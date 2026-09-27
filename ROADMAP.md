@@ -61,7 +61,8 @@
 - [ ] 应用内更新检查：比对 GitHub Releases，有新版时提示下载（仅直发版启用，
   App Store 版必须屏蔽该入口）
 - [ ] GitHub Actions CI：推送 tag 自动构建并附加 DMG 到 Release
-  （2026-09-20 构建校验与测试已接入，发布流程待配置 secret 并演练，见 docs/ci.md）
+  （2026-09-20 构建校验与测试已接入。2026-09-21 决定签名留在本地、不配 secret，
+  理由见 docs/ci.md 第二节）
 
 ## 已完成
 
@@ -78,8 +79,6 @@
 - **CloudKit iCloud 同步**：SwiftData 直接镜像到用户自己的 iCloud 私有数据库，
   与文件夹快照同步并存、二选一。Production schema 已于 2026-09-20 部署并逐字段核验
   （见 docs/appstore-submission.md 第二十一节）
-- **改名 Paster → Copyo**：目录、工程、target、模块、类型名、bundle ID、App Group、
-  iCloud 容器全部更名；本地数据库与文件夹同步目录带自动迁移，老用户升级不丢数据
 - **商店截图管线**：`scripts/make-store-shots.py`，背景板 + 图标 + 文案 + 真实 UI 截图合成，
   可复现。初版四张里有两张还在宣传已移除的自动粘贴，已全部重拍
 - **构建号自动递增**：`scripts/bump-build-number.sh`，只动上架配置；导出选项显式设置

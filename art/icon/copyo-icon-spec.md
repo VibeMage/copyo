@@ -1,4 +1,4 @@
-# Paster App Icon — 色散卡片 (8a)
+# Copyo App Icon — 色散卡片 (8a)
 
 选定方向：骨白卡片 + 红蓝双层错位套印，各自发光。错位手法来自印刷套印不准与 RGB 通道分离。
 四条内容条代表剪贴板缓存的不同内容类型。
@@ -50,7 +50,7 @@ menubar-template-18/36/54.png   NSStatusItem 模板图标
 cp icon-master-1024.png art/icon-master.png
 ./scripts/make-icon.sh
 # make-icon.sh 用 sips 按比例缩，16pt 必糊，最后手动覆盖一次
-cp appiconset/icon_16x16.png Paster/Assets.xcassets/AppIcon.appiconset/
+cp appiconset/icon_16x16.png Copyo/Assets.xcassets/AppIcon.appiconset/
 ```
 
 菜单栏图标需要在代码里以 `isTemplate = true` 加载，系统会按明暗模式自动反色。
