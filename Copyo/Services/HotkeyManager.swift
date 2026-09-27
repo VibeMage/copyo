@@ -115,20 +115,35 @@ final class HotkeyManager {
     private var eventHandlerRef: EventHandlerRef?
     var onHotkey: (() -> Void)?
 
-    /// 注册（或换绑）全局快捷键
-    func register(_ config: HotkeyConfig) {
+    /// 注册（或换绑）全局快捷键。
+    ///
+    /// 返回 false 表示注册失败。此前返回值被直接丢掉，失败完全无声（design-spec 7.5.1）；
+    ///
+    /// **能检测到的范围比设计时以为的小得多**（2026-09-27 实测）：另一个进程已经用 Carbon 注册了
+    /// 同一个组合时，这里照样返回 noErr——`eventHotKeyExistsErr` 只在**本进程内**重复注册时出现。
+    /// 而且被占用的组合在录制时会被占用方在全局截走，录制器根本收不到。所以跨 App 冲突这一类
+    /// 在这里一律检测不到，返回 false 只覆盖参数非法等罕见失败。
+    /// 现在由设置页据此回滚到旧组合（第八节第 19 条）。
+    /// 注意被**系统**快捷键占用时 API 仍然报成功，只是按下去收不到——这一类检测不到。
+    @discardableResult
+    func register(_ config: HotkeyConfig) -> Bool {
         installHandlerIfNeeded()
         if let hotKeyRef {
             UnregisterEventHotKey(hotKeyRef)
             self.hotKeyRef = nil
         }
         let hotKeyID = EventHotKeyID(signature: OSType(0x50415354), id: 1) // 'PAST'
-        RegisterEventHotKey(config.keyCode,
-                            config.carbonModifiers,
-                            hotKeyID,
-                            GetApplicationEventTarget(),
-                            0,
-                            &hotKeyRef)
+        let status = RegisterEventHotKey(config.keyCode,
+                                         config.carbonModifiers,
+                                         hotKeyID,
+                                         GetApplicationEventTarget(),
+                                         0,
+                                         &hotKeyRef)
+        guard status == noErr else {
+            hotKeyRef = nil
+            return false
+        }
+        return true
     }
 
     private func installHandlerIfNeeded() {

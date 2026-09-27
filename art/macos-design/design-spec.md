@@ -2358,7 +2358,7 @@ text / 微信 / `#07C160` / `微信 · 12 分钟前` / 正文同 6.1 第 2 条�
 | 01-panel | `-forceDark -opaquePanel -showPanel` | panel | `复制过的一切，随叫随到` / `按下 ⇧⌘V，剪贴板历史从屏幕底部滑出` | `Everything you copied, one key away` / `Press ⇧⌘V — your clipboard history slides up` |
 | 02-search | 同上 + `-demoSearch Q3` | panel | `即输即搜` / `按内容、来源应用、文件名过滤，不用先点搜索框` | `Type to filter` / `Search by content, source app or file name — no clicking first` |
 | 03-preview | 同上 + `-demoPreview` | panel | `空格，先看一眼` / `大图预览文本、图片和文件，不用离开面板` | `Space to peek` / `Preview text, images and files without leaving the panel` |
-| 04-shortcuts | `-forceDark -showSettings -settingsTab 3` | window | `手不离键盘` / `呼出、导航、复制、预览，全程快捷键；⇧⌘V 可自定义` | `Hands stay on the keyboard` / `Summon, search, copy, preview — and ⇧⌘V is yours to remap` |
+| 04-shortcuts | `-forceDark -showSettings -settingsTab 2` | window | `手不离键盘` / `呼出、导航、复制、预览，全程快捷键；⇧⌘V 可自定义` | `Hands stay on the keyboard` / `Summon, search, copy, preview — and ⇧⌘V is yours to remap` |
 
 合成版式（`make-store-shots.py:43–54`）：画布 2560 × 1600；图标 `(1194, 179)` 175 × 175；
 主标题顶 448、副标题顶 590；主标题色 `(255,255,255)`、副标题色 `(190,192,197)`；
@@ -2366,7 +2366,7 @@ text / 微信 / `#07C160` / `微信 · 12 分钟前` / 正文同 6.1 第 2 条�
 
 **两条硬约束：**
 
-1. **04 号图拍的就是设置 > 快捷键页。** `-settingsTab 3` 按 `Copyo/Settings/SettingsView.swift:48`
+1. **04 号图拍的就是设置 > 快捷键页。** 1.2 起是 `-settingsTab 2`（旧编号为 `3`）； 按 `Copyo/Settings/SettingsView.swift:48`
    的 `case general, clipboard, sync, shortcuts, about` 数到 `shortcuts`。所以**设置换肤会连带作废这一整组
    8 张截图**——04 直接变样，01–03 也因为同一批必须在同一台机器、同一次采集里出（面板高度固定、屏幕越宽贴出来越扁，
    见 `make-store-shots.py:132–135`）而不能只补拍一张。
@@ -2729,6 +2729,11 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
 本节只登记**已经在当前工作区源码里核对过**的缺陷与结构问题，每条都会影响本次「面板重做 + 设置换肤」的实现排期。
 
 #### 7.5.1 全局快捷键冲突无声失败
+
+> **2026-09-27 实测更正**：跨 App 的冲突**用 `RegisterEventHotKey` 检测不到**。另一个进程已经注册了同一组合时，
+> 第二次注册照样返回 `noErr`（`eventHotKeyExistsErr` 只在本进程内重复注册时出现）；被占用的组合在录制时还会被
+> 占用方在全局截走，录制器收不到。1.2 已经把返回值接上，并实现了第八节第 19 条的回滚与警示，但它们只覆盖罕见的
+> 注册失败。要真正发现冲突，需要换一条路（例如注册后自测一次能否收到事件），另行立项。
 
 | 项 | 内容 |
 | --- | --- |

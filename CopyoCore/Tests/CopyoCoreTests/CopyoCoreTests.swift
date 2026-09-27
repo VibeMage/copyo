@@ -325,6 +325,24 @@ final class CopyoCoreTests: XCTestCase {
         XCTAssertEqual(long.displayTitle.count, 200, "标题最多 200 字")
     }
 
+    /// 渲染色（design-spec 7.4.2、第八节第 31 条）：颜色条目取内容本身的颜色，其余取来源色
+    func testRenderColorHex() {
+        let color = ClipItem(kind: .color, plainText: " #ff2d55 ", sourceColorHex: "#A259FF")
+        XCTAssertEqual(color.renderColorHex, "#FF2D55", "颜色条目取内容本身的颜色，不取来源 App 的色")
+
+        let withAlpha = ClipItem(kind: .color, plainText: "#FF2D5580", sourceColorHex: "#A259FF")
+        XCTAssertEqual(withAlpha.renderColorHex, "#FF2D55", "带 alpha 的只取前六位：淡染按不透明色混")
+
+        let unparsable = ClipItem(kind: .color, plainText: "rgb(255, 45, 85)", sourceColorHex: "#A259FF")
+        XCTAssertEqual(unparsable.renderColorHex, "#A259FF", "解析失败回退来源色，按普通卡画")
+
+        let text = ClipItem(kind: .text, plainText: "#FF2D55", sourceColorHex: "#147EFB")
+        XCTAssertEqual(text.renderColorHex, "#147EFB", "只有颜色条目才取内容色")
+
+        let noSource = ClipItem(kind: .text, plainText: "hello")
+        XCTAssertNil(noSource.renderColorHex, "两者都没有时给 nil，由显示层回退 source.local")
+    }
+
     // MARK: - 辅助
 
     @MainActor

@@ -1,712 +1,136 @@
 import AppKit
-import Carbon.HIToolbox
-import CloudKit
-import CopyoCore
-import ServiceManagement
-import SwiftData
+import Observation
 import SwiftUI
 
+/// 设置窗口的根视图：居中分段控件 + 当前页（第八节第 9 条：分段控件替换 `TabView`）。
+///
+/// 选中哪一页不放在 `@State` 里，而是由窗口控制器持有的 `SettingsSelection` 提供：
+/// 窗口开着时再点面板顶栏的同步格，要能当场切到「同步」页，`@State` 从外面够不着。
 struct SettingsView: View {
-    // 截图辅助：-settingsTab <0-4> 指定初始标签页
-    @State private var selectedTab: Int = {
-        let args = ProcessInfo.processInfo.arguments
-        if let flagIndex = args.firstIndex(of: "-settingsTab"),
-           args.indices.contains(flagIndex + 1),
-           let tab = Int(args[flagIndex + 1]), (0...4).contains(tab) {
-            return tab
-        }
-        return 0
-    }()
+    @Bindable var selection: SettingsSelection
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            GeneralSettingsView()
-                .tabItem { SettingsTab.general.label }
-                .tag(SettingsTab.general.rawValue)
-            HistorySettingsView()
-                .tabItem { SettingsTab.clipboard.label }
-                .tag(SettingsTab.clipboard.rawValue)
-            SyncSettingsView()
-                .tabItem { SettingsTab.sync.label }
-                .tag(SettingsTab.sync.rawValue)
-            ShortcutsSettingsView()
-                .tabItem { SettingsTab.shortcuts.label }
-                .tag(SettingsTab.shortcuts.rawValue)
-            AboutView()
-                .tabItem { SettingsTab.about.label }
-                .tag(SettingsTab.about.rawValue)
+        VStack(spacing: 0) {
+            SettingsSegmentedControl(selection: $selection.tab)
+                .padding(EdgeInsets(top: 12, leading: 16, bottom: 4, trailing: 16))
+            page
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
-        .frame(width: SettingsLayout.width, height: SettingsLayout.height)
+        .frame(width: SettingsLayout.width, height: SettingsLayout.contentHeight)
+        .background(CopyoTheme.bgGrouped)
+    }
+
+    @ViewBuilder
+    private var page: some View {
+        switch selection.tab {
+        case .general: GeneralSettingsView()
+        case .sync: SyncSettingsView()
+        case .shortcuts: ShortcutsSettingsView()
+        case .history: HistorySettingsView()
+        case .about: AboutView()
+        }
+    }
+}
+
+/// 当前选中的设置页。窗口控制器持有一份，`show(tab:)` 直接改它。
+@Observable
+final class SettingsSelection {
+    var tab: SettingsTab
+
+    init(tab: SettingsTab = SettingsTab.launchArgument ?? .general) {
+        self.tab = tab
     }
 }
 
 // MARK: - 标签页与窗口尺寸
 
-/// 设置窗口的五个标签页。标题只在这里写一遍——窗口宽度要按标题的实际宽度算，
-/// 两边各写一份迟早对不上。
-enum SettingsTab: Int, CaseIterable {
-    case general, clipboard, sync, shortcuts, about
+/// 设置窗口的五页，顺序按设计稿 `通用 / 同步 / 快捷键 / 历史 / 关于`（第八节第 9 条）。
+/// rawValue 就是 `-settingsTab <0-4>` 的编号：顺序改了，编号含义跟着变，商店截图 04 需重拍（6.6）。
+enum SettingsTab: Int, CaseIterable, Identifiable {
+    case general, sync, shortcuts, history, about
+
+    var id: Int { rawValue }
 
     var title: String {
         switch self {
         case .general: String(localized: "General")
-        case .clipboard: String(localized: "Clipboard")
         case .sync: String(localized: "Sync")
         case .shortcuts: String(localized: "Shortcuts")
+        // 第八节第 9 条：这一页统一叫「历史」
+        case .history: String(localized: "History")
         case .about: String(localized: "About")
         }
     }
 
-    var systemImage: String {
-        switch self {
-        case .general: "gearshape"
-        case .clipboard: "clock.arrow.circlepath"
-        case .sync: "arrow.triangle.2.circlepath.icloud"
-        case .shortcuts: "keyboard"
-        case .about: "info.circle"
-        }
+    /// 截图辅助：`-settingsTab <0-4>` 指定初始页
+    static var launchArgument: SettingsTab? {
+        let args = ProcessInfo.processInfo.arguments
+        guard let flagIndex = args.firstIndex(of: "-settingsTab"),
+              args.indices.contains(flagIndex + 1),
+              let raw = Int(args[flagIndex + 1]) else { return nil }
+        return SettingsTab(rawValue: raw)
     }
-
-    var label: some View { Label(title, systemImage: systemImage) }
 }
 
 enum SettingsLayout {
-    /// 英文 / 中文下的窗口尺寸。商店截图是按这个尺寸拍的，别随手改。
-    static let baseWidth: CGFloat = 540
-    static let height: CGFloat = 400
-
-    /// 标签页栏一行放不下时，SwiftUI 会把整条栏折叠成一个 » 溢出按钮，
-    /// 五个标签页就全藏进那个菜单里。窗口不可缩放，所以只能预先开够宽。
+    /// 窗口外框固定 540 × 460（第八节第 9 条）。
     ///
-    /// 下面几个常数是在 macOS 26 上实测的：标签页会被拉成同宽（按最长的那个标题算），
-    /// 标签栏两端另有约 106pt 留白，窗口左右还要给红绿灯留约 103pt。
-    /// 算出来英文 504pt、简中 403pt，都在 540 以内，尺寸不变；
-    /// 法语最长的 Synchronisation 把窗口顶到 707pt——这正是它原先被折叠的原因。
-    static var width: CGFloat {
-        let font = NSFont.systemFont(ofSize: 13)
-        let widest = SettingsTab.allCases
-            .map { $0.title.size(withAttributes: [.font: font]).width }
-            .max() ?? 0
-        let tabBar = CGFloat(SettingsTab.allCases.count) * widest + 106
-        return max(baseWidth, ceil(tabBar + 103 + 12))   // 12pt 余量，留给系统字体的版本差异
+    /// 宽度不再按标签标题实算：那套算法是为了躲 `TabView` 标签栏放不下时折叠成 » 菜单，
+    /// 换成居中分段控件后不存在折叠，法语最长的 Synchronisation 也在 540 以内（法语截图验收）。
+    static let width: CGFloat = 540
+    static let windowHeight: CGFloat = 460
+    static let styleMask: NSWindow.StyleMask = [.titled, .closable]
+
+    /// 460 是连标题栏在内的窗口总高；SwiftUI 内容区要扣掉系统标题栏，由 AppKit 按样式算，不写死 28
+    static var contentHeight: CGFloat {
+        NSWindow.contentRect(forFrameRect: NSRect(x: 0, y: 0, width: width, height: windowHeight),
+                             styleMask: styleMask).height
     }
 }
 
-// MARK: - 通用
+// MARK: - 分段控件
 
-struct GeneralSettingsView: View {
-    @AppStorage("plainTextPaste") private var plainTextPaste = false
-    @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
-
-    var body: some View {
-        Form {
-            Section {
-                Toggle("Launch at login", isOn: $launchAtLogin)
-                    .onChange(of: launchAtLogin) { _, enabled in
-                        do {
-                            if enabled {
-                                try SMAppService.mainApp.register()
-                            } else {
-                                try SMAppService.mainApp.unregister()
-                            }
-                        } catch {
-                            launchAtLogin = SMAppService.mainApp.status == .enabled
-                        }
-                    }
-            }
-            Section {
-                Toggle("Always copy as plain text", isOn: $plainTextPaste)
-            } footer: {
-                Text("Applies when you press Return. ⌥↩ always copies as plain text.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .formStyle(.grouped)
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-            launchAtLogin = SMAppService.mainApp.status == .enabled
-        }
-    }
-}
-
-// MARK: - 历史
-
-struct HistorySettingsView: View {
-    @Environment(\.modelContext) private var modelContext
-    @AppStorage("historyLimit") private var historyLimit = 500
-    @AppStorage("ignoredApps") private var ignoredApps = ""
-    @State private var showClearConfirm = false
+/// 居中的分段控件，照 gen_v2.py `seg()` 自绘：容器 `padding 3`、圆角 8、底 `fill`、项间距 2；
+/// 每项高 24、`padding 0 12`、圆角 6、12pt；选中 = 底 `bgCard` + 600 + 1pt 投影。
+///
+/// 不用原生 `Picker(.segmented)`：macOS 26 的原生分段是胶囊玻璃样式，与设计稿差得远，
+/// 而且在 14–25 与 26 上长得不一样，截图验收没法用同一张稿对。
+struct SettingsSegmentedControl: View {
+    @Binding var selection: SettingsTab
 
     var body: some View {
-        Form {
-            Section {
-                Picker("History Limit", selection: $historyLimit) {
-                    Text("100 items").tag(100)
-                    Text("300 items").tag(300)
-                    Text("500 items").tag(500)
-                    Text("1000 items").tag(1000)
-                    Text("Unlimited").tag(0)
-                }
-            } footer: {
-                Text("When the limit is exceeded, the oldest unpinned entries are removed automatically. Anything pinned to a Pinboard is unaffected.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-            }
-            Section("Ignored Apps") {
-                TextEditor(text: $ignoredApps)
-                    .font(.system(size: 12, design: .monospaced))
-                    .frame(height: 80)
-                Text("One bundle ID per line (for example com.1password.1password). Copies made in these apps are never recorded. Content that password managers mark as concealed is always skipped.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-            }
-            Section {
-                Button("Clear History…", role: .destructive) {
-                    showClearConfirm = true
-                }
-                Button("Delete All Data…", role: .destructive) {
-                    // 确认和结果都交给 AppDelegate 里那套 NSAlert：菜单栏和这里必须是
-                    // 同一个流程，而且擦除失败要再弹一个 alert——SwiftUI 在一个 alert 的
-                    // 动作里弹第二个会被直接吞掉，那正好是「什么都没删，却什么都不显示」。
-                    AppDelegate.shared?.deleteAllData()
-                }
+        HStack(spacing: 2) {
+            ForEach(SettingsTab.allCases) { tab in
+                segment(tab)
             }
         }
-        .formStyle(.grouped)
-        .confirmationDialog("Clear History?", isPresented: $showClearConfirm) {
-            Button("Clear", role: .destructive) { clearHistory() }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("This deletes every clipboard entry that isn’t pinned to a Pinboard. Pinned entries and Pinboards are kept — use Delete All Data to remove those too. This action cannot be undone.")
-        }
+        .padding(3)
+        .background(CopyoTheme.fill, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .contain)
     }
 
-    private func clearHistory() {
-        let descriptor = FetchDescriptor<ClipItem>(predicate: #Predicate { $0.pinboard == nil })
-        guard let items = try? modelContext.fetch(descriptor) else { return }
-        for item in items {
-            modelContext.delete(item)
-        }
-        try? modelContext.save()
-        ThumbnailCache.removeAll()
-    }
-}
-
-// MARK: - 同步
-
-/// 同步方式三选一。「文件夹」是快照同步，不传播删除；「iCloud」把数据库直接
-/// 镜像到 CloudKit 私有数据库，删除会在所有设备生效。两种方式共用同一个数据库文件，
-/// 但容器是启动时按方式建好的，所以改了方式要重启才换得过来。
-struct SyncSettingsView: View {
-    @AppStorage(SyncMode.defaultsKey) private var syncModeRaw = SyncMode.off.rawValue
-    @AppStorage(CloudSyncStatus.containerErrorKey) private var containerError = ""
-    @AppStorage(DataEraser.cloudWipePendingKey) private var cloudWipePending = false
-    @AppStorage(DataEraser.icloudCopyMayRemainKey) private var icloudCopyMayRemain = false
-
-    private var mode: SyncMode { SyncMode(rawValue: syncModeRaw) ?? .off }
-    private var cloudKitActive: Bool { AppDelegate.shared?.cloudKitActive ?? false }
-
-    var body: some View {
-        Form {
-            Section {
-                Picker("Sync Method", selection: $syncModeRaw) {
-                    Text("Off").tag(SyncMode.off.rawValue)
-                    Text("Shared Folder").tag(SyncMode.folder.rawValue)
-                    Text(verbatim: "iCloud").tag(SyncMode.icloud.rawValue)
-                }
-                .onChange(of: syncModeRaw) { oldValue, newValue in
-                    // 文件夹同步的计时器立刻跟着起停；iCloud 那一路要等重启才换容器
-                    AppDelegate.shared?.syncService.updateActivation()
-                    // 从 iCloud 切走是唯一一个「界面已经改了、字节还在往外走」的方向。
-                    // 挂一行灰字等于默许它继续传，所以当场拦下：要么重启（真的停了），
-                    // 要么把选择器退回去（界面重新说真话）。绝不能停在
-                    // 「显示关闭 / 共享文件夹，而 CloudKit 还在上传」这个状态上。
-                    //
-                    // 切到共享文件夹也必须拦：SyncService 的注释明令两套同步不能同时跑，
-                    // 否则快照导入会把 iCloud 刚删掉的条目又写回来。
-                    guard oldValue == SyncMode.icloud.rawValue,
-                          newValue != SyncMode.icloud.rawValue,
-                          cloudKitActive else { return }
-                    // 让 SwiftUI 把这次更新走完再开模态循环
-                    DispatchQueue.main.async { confirmStopCloudKit() }
-                }
-            } footer: {
-                Text(modeDescription)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-
-            switch mode {
-            case .off:
-                EmptyView()
-            case .folder:
-                FolderSyncSections()
-            case .icloud:
-                CloudKitSyncSections()
-            }
-
-            if needsRestartToStart {
-                Section {
-                    HStack {
-                        Text("Changing the sync method takes effect after you restart Copyo.")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Button("Restart Copyo") { AppDelegate.shared?.restartForSyncChange() }
+    private func segment(_ tab: SettingsTab) -> some View {
+        let isOn = selection == tab
+        return Button {
+            selection = tab
+        } label: {
+            Text(tab.title)
+                .font(.system(size: 12, weight: isOn ? .semibold : .regular))
+                .foregroundStyle(CopyoTheme.label)
+                .lineLimit(1)
+                .padding(.horizontal, 12)
+                .frame(height: 24)
+                .background {
+                    if isOn {
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .fill(CopyoTheme.bgCard)
+                            .shadow(color: .black.opacity(0.12), radius: 1, y: 1)
                     }
                 }
-            }
-
-            if cloudWipePending {
-                // 唯一一种「删除真的会到 iCloud」的情况，也是唯一一种没法观测进度的情况。
-                // 不挂这一行的话，确认框里那句「保持打开」用户根本没法照着做。
-                Section {
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Image(systemName: "arrow.triangle.2.circlepath.icloud")
-                            .foregroundStyle(.orange)
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Copyo is sending the deletion to your iCloud private database. Keep Copyo open and signed in to iCloud. Copyo cannot tell you when this has finished.")
-                            Button("Finish Erasing This Mac") { AppDelegate.shared?.finishErasing() }
-                        }
-                        .font(.system(size: 12))
-                        Spacer()
-                    }
-                }
-            }
-
-            if icloudCopyMayRemain {
-                // 在 iCloud 同步关着的时候擦过一次：云端那份没动。用户一旦把 iCloud
-                // 打开，整份历史有可能被导回来——这句话必须在选 iCloud 之前就看得到。
-                Section {
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.orange)
-                        Text("Copyo erased this Mac while iCloud sync was off, so the iCloud copy was never removed. Turning iCloud sync on can bring those entries back.")
-                    }
-                    .font(.system(size: 12))
-                }
-            }
+                .contentShape(Rectangle())
         }
-        .formStyle(.grouped)
-    }
-
-    /// 从 iCloud 切走时当场拦一下。用 NSAlert 而不是 SwiftUI 的 .alert：这里要在
-    /// 动作里再弹第二个 alert（重启失败），SwiftUI 会把第二个吞掉，结果就是
-    /// 「界面说关了、CloudKit 还在传、一个字都不说」——正是这次要修掉的那一格。
-    private func confirmStopCloudKit() {
-        let alert = NSAlert()
-        alert.messageText = String(localized: "Restart Copyo to stop iCloud sync?")
-        alert.informativeText = cloudWipePending
-            // 刚用「删除所有数据」擦过、删除还在往 iCloud 推：这一重启就等于把没推完的
-            // 那部分永远留在云端。绝不能拿「什么都不会丢」糊过去——恰恰是删除会丢。
-            ? String(localized: "Until Copyo restarts, this Mac keeps sending your clipboard history to your iCloud private database. Copyo is also still sending the entries you deleted; whatever has not been sent when Copyo restarts stays in iCloud.")
-            : String(localized: "Until Copyo restarts, this Mac keeps sending your clipboard history to your iCloud private database. If you don’t restart now, Copyo keeps using iCloud sync for the rest of this session.")
-        alert.addButton(withTitle: String(localized: "Restart Copyo"))
-        alert.addButton(withTitle: String(localized: "Not Now"))
-        // 关掉对话框不该顺手把应用退掉：Return 给「稍后」
-        alert.buttons[0].keyEquivalent = ""
-        alert.buttons[1].keyEquivalent = "\r"
-        NSApp.activate(ignoringOtherApps: true)
-        let wantsRestart = alert.runModal() == .alertFirstButtonReturn
-        if wantsRestart, AppDelegate.shared?.restartForSyncChange() == true { return }
-        // 「稍后」，或者重启没派出去：把选择器退回 iCloud。界面上绝不允许出现
-        // 「显示关闭，而 CloudKit 还在上传」。回退会再触发一次 onChange，
-        // 但那一次的 oldValue 不是 icloud，拦截条件不成立，不会循环弹框。
-        syncModeRaw = SyncMode.icloud.rawValue
-        AppDelegate.shared?.syncService.updateActivation()
-    }
-
-    /// 容器是启动时按当时的方式建好的，CloudKit 镜像开不开只能靠重启换。
-    ///
-    /// 只在「选了 iCloud、这次会话还没挂上」这一个方向提示：一个字节都还没传出去，
-    /// 等重启就行。反方向已经在 onChange 里当场拦下并回退，不存在需要挂提示的残留状态。
-    ///
-    /// 两个闸门：
-    /// - 没签 entitlement 的构建重启多少次也挂不上（AppDelegate.swift:41），
-    ///   那条说明归 CloudKitSyncSections，这里别再挂一行自相矛盾的；
-    /// - 这次启动建容器失败时，CloudKitSyncSections 已经在说「修好上面的问题再重启
-    ///   Copyo」，重启按钮跟着那句话走（见下一处改动），这里不重复。
-    private var needsRestartToStart: Bool {
-        mode == .icloud
-            && !cloudKitActive
-            && CloudSyncStatus.hasCloudKitEntitlement
-            && containerError.isEmpty
-    }
-
-    private var modeDescription: LocalizedStringKey {
-        switch mode {
-        case .off:
-            "Your clipboard history stays on this Mac only."
-        case .folder:
-            "Snapshot sync through a folder every device can reach. Deletions are not propagated: an entry you delete on one Mac stays on the others."
-        case .icloud:
-            "Sync through your iCloud account. Every Mac signed in to the same Apple Account sees the same history, and deleting an entry removes it everywhere."
-        }
-    }
-}
-
-// MARK: - iCloud 同步
-
-/// iCloud 同步没有可调的参数，这一页只回答用户唯一关心的问题：现在到底同不同步。
-/// 建容器和注册推送都发生在启动时，失败又完全静默，不显式说出来用户根本无从判断。
-private struct CloudKitSyncSections: View {
-    @AppStorage(CloudSyncStatus.containerErrorKey) private var containerError = ""
-    @AppStorage(CloudSyncStatus.pushErrorKey) private var pushError = ""
-    @State private var accountStatus: CKAccountStatus?
-
-    var body: some View {
-        Section("iCloud Account") {
-            if CloudSyncStatus.hasCloudKitEntitlement {
-                HStack(spacing: 6) {
-                    Image(systemName: accountSymbol)
-                        .foregroundStyle(accountTint)
-                    Text(accountDescription)
-                    Spacer()
-                    if accountStatus == .noAccount {
-                        Button("Open System Settings") { openAppleAccountSettings() }
-                    }
-                }
-                .font(.system(size: 12))
-                .task { accountStatus = await CloudSyncStatus.accountStatus() }
-                // 用户很可能是看到提示后切出去登录 iCloud 再切回来的，回前台重查一次
-                .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-                    Task { accountStatus = await CloudSyncStatus.accountStatus() }
-                }
-            } else if containerError.isEmpty {
-                // 这份构建没有 iCloud entitlement：账号状态查不得（查了会直接终止进程），
-                // 启动时也没走 iCloud 那条路，所以在这里直接把原因说出来
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
-                    Text("This copy of Copyo is not signed for iCloud sync.")
-                }
-                .font(.system(size: 12))
-            }
-            if !containerError.isEmpty {
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
-                    Text("iCloud sync could not start: \(containerError)")
-                }
-                .font(.system(size: 12))
-                HStack {
-                    Text("Copyo is using the local database only, so nothing was lost. Fix the problem above and restart Copyo.")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    // 这句话让用户重启，就得给他一个按得到的按钮。新建的 CloudKit 容器
-                    // 首次连接被拒是已知坑，重启一次就恢复。
-                    Button("Restart Copyo") { AppDelegate.shared?.restartForSyncChange() }
-                }
-            } else if !pushError.isEmpty {
-                Text("Push notifications are unavailable on this Mac, so changes made on your other devices only arrive when Copyo starts.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    /// 查询结果还没回来时用中性图标，别一进页面就先亮一个橙色警告吓人
-    private var accountSymbol: String {
-        switch accountStatus {
-        case .available: "checkmark.circle.fill"
-        case nil: "ellipsis.circle"
-        default: "exclamationmark.triangle.fill"
-        }
-    }
-
-    private var accountTint: Color {
-        switch accountStatus {
-        case .available: .green
-        case nil: .secondary
-        default: .orange
-        }
-    }
-
-    private var accountDescription: LocalizedStringKey {
-        switch accountStatus {
-        case .available:
-            "Signed in to iCloud"
-        case .noAccount:
-            "No iCloud account is signed in on this Mac"
-        case .restricted:
-            "iCloud is restricted on this Mac"
-        case .temporarilyUnavailable:
-            "iCloud is temporarily unavailable"
-        case nil:
-            "Checking iCloud status…"
-        default:
-            "Could not determine the iCloud status"
-        }
-    }
-
-    private func openAppleAccountSettings() {
-        let url = URL(string: "x-apple.systempreferences:com.apple.systempreferences.AppleIDSettings")!
-        NSWorkspace.shared.open(url)
-    }
-}
-
-// MARK: - 文件夹同步
-
-#if APPSTORE
-
-/// App Store 版本跑在沙盒里，手输的路径一律无权访问：同步目录必须由用户
-/// 在 NSOpenPanel 里亲自选中，再把安全作用域书签存下来长期复用。
-private struct FolderSyncSections: View {
-    @AppStorage(SyncService.lastSyncedAtKey) private var lastSyncedAt = 0.0
-    @AppStorage(SyncService.lastErrorKey) private var lastError = ""
-    // 解析书签会读文件系统并可能回写 UserDefaults，绝不能放在 @State 的初值里：
-    // SwiftUI 每次重算父视图 body 都会重建这个 struct，副作用会跟着反复触发。
-    @State private var folderPath: String?
-
-    private var lostAccess: Bool { lastError == SyncService.SyncFailure.noAccess.rawValue }
-
-    var body: some View {
-        Section {
-            if folderPath != nil {
-                Button("Sync Now") {
-                    AppDelegate.shared?.syncService.syncNow()
-                    refreshFolderPath()
-                }
-            }
-        } footer: {
-            VStack(alignment: .leading, spacing: 6) {
-                if folderPath == nil {
-                    if lostAccess {
-                        Text("Copyo lost access to the sync folder. Choose it again below to resume syncing.")
-                    } else {
-                        Text("Choose a sync folder below to turn on syncing.")
-                    }
-                } else {
-                    Text("Your clipboard history and Pinboards sync between your Macs through the folder you chose. The data only ever passes through your own storage — Copyo never touches a third-party server. Deletions are not propagated across devices.")
-                    statusLine
-                }
-            }
-            .font(.system(size: 12))
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        Section("Sync Folder") {
-            HStack {
-                Text(folderPath ?? String(localized: "No folder selected"))
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundStyle(folderPath == nil ? .secondary : .primary)
-                    .lineLimit(1)
-                    .truncationMode(.head)
-                Spacer()
-                Button("Choose Sync Folder…") {
-                    chooseFolder()
-                }
-            }
-            Text("Any folder all of your devices share works — for example a folder inside iCloud Drive, or a company drive. Copyo keeps its files in its own subfolder and can only reach the folder you pick here.")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-                .task { refreshFolderPath() }
-                // 同步目录可能在应用不活跃时被删除/卸载，回到前台时重新确认一次，
-                // 否则这一页会一直显示早已失效的旧路径。
-                .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-                    refreshFolderPath()
-                }
-        }
-    }
-
-    @ViewBuilder
-    private var statusLine: some View {
-        if lostAccess {
-            HStack(spacing: 6) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.orange)
-                Text("Copyo lost access to the sync folder. Choose it again below to resume syncing.")
-            }
-        } else if lastSyncedAt > 0 {
-            Text("Last synced \(Date(timeIntervalSince1970: lastSyncedAt).formatted(date: .abbreviated, time: .shortened))")
-        }
-    }
-
-    private func refreshFolderPath() {
-        folderPath = SyncService.syncRoot?.path
-    }
-
-    private func chooseFolder() {
-        let panel = NSOpenPanel()
-        panel.canChooseDirectories = true
-        panel.canChooseFiles = false
-        panel.canCreateDirectories = true
-        panel.allowsMultipleSelection = false
-        panel.prompt = String(localized: "Choose")
-        panel.message = String(localized: "Choose a folder that all of your Macs can read and write.")
-        guard panel.runModal() == .OK, let url = panel.url,
-              let bookmark = try? url.bookmarkData(options: .withSecurityScope,
-                                                   includingResourceValuesForKeys: nil,
-                                                   relativeTo: nil) else { return }
-        UserDefaults.standard.set(bookmark, forKey: SyncService.bookmarkKey)
-        // 重选文件夹就是「失去访问权」的解法，旧的错误状态到此为止
-        UserDefaults.standard.set("", forKey: SyncService.lastErrorKey)
-        folderPath = url.path
-        AppDelegate.shared?.syncService.updateActivation()
-    }
-}
-
-#else
-
-private struct FolderSyncSections: View {
-    @AppStorage("syncFolderOverride") private var syncFolderOverride = ""
-
-    var body: some View {
-        Section {
-            if SyncService.isAvailable {
-                Button("Sync Now") {
-                    AppDelegate.shared?.syncService.syncNow()
-                }
-            }
-        } footer: {
-            Group {
-                if SyncService.isAvailable {
-                    Text("By default your clipboard history and Pinboards sync between your Macs through iCloud Drive (iCloud Drive/Copyo/). The data only ever passes through your own iCloud — Copyo never touches a third-party server. Deletions are not propagated across devices.")
-                } else if syncFolderOverride.isEmpty {
-                    Text("iCloud Drive is not enabled on this Mac. Turn it on in System Settings → click your name → iCloud, or point Copyo at a custom sync folder below.")
-                } else {
-                    Text("The parent directory of the custom sync folder does not exist. Please check the path.")
-                }
-            }
-            .font(.system(size: 12))
-            .foregroundStyle(.secondary)
-        }
-        Section("Custom Sync Folder (Optional)") {
-            TextField("Leave empty to use iCloud Drive, e.g. ~/Shared/Copyo", text: $syncFolderOverride)
-                .font(.system(size: 12, design: .monospaced))
-                .onSubmit {
-                    AppDelegate.shared?.syncService.updateActivation()
-                }
-            Text("Enter any directory all of your devices can read and write (a company NAS, another cloud-sync folder, and so on) to use it instead of iCloud Drive.")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-        }
-    }
-}
-
-#endif
-
-// MARK: - 快捷键
-
-struct ShortcutsSettingsView: View {
-    @State private var hotkeyDisplay = HotkeyConfig.load().displayString
-    @State private var isRecording = false
-    @State private var recordingMonitor: Any?
-
-    private let fixedShortcuts: [(String, String)] = [
-        (String(localized: "Move between cards"), "← →"),
-        (String(localized: "Copy selected item"), "↩"),
-        (String(localized: "Copy selected item as plain text"), "⌥↩"),
-        (String(localized: "Preview selected item (when search is empty)"), String(localized: "Space")),
-        (String(localized: "Search"), String(localized: "Just type")),
-        (String(localized: "Delete selected item"), "⌘⌫"),
-        (String(localized: "Clear search / Close panel"), "Esc"),
-    ]
-
-    var body: some View {
-        Form {
-            Section {
-                HStack {
-                    Text("Open / Close panel")
-                    Spacer()
-                    Button {
-                        isRecording ? cancelRecording() : startRecording()
-                    } label: {
-                        Text(isRecording ? String(localized: "Press the new shortcut…") : hotkeyDisplay)
-                            .font(.system(size: 12, weight: .medium, design: .monospaced))
-                            .frame(minWidth: 90)
-                    }
-                    if HotkeyConfig.load() != .default {
-                        Button("Reset") {
-                            cancelRecording()
-                            HotkeyConfig.resetToDefault()
-                            AppDelegate.shared?.reloadHotkey()
-                            hotkeyDisplay = HotkeyConfig.load().displayString
-                        }
-                    }
-                }
-            } footer: {
-                Text(isRecording
-                     ? "The combination must include at least one of ⌘, ⌥ or ⌃. Press Esc to cancel."
-                     : "Click the shortcut to customize it. The default is ⇧⌘V.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-            }
-            Section {
-                ForEach(fixedShortcuts, id: \.0) { name, keys in
-                    HStack {
-                        Text(name)
-                        Spacer()
-                        Text(keys)
-                            .font(.system(size: 12, weight: .medium, design: .monospaced))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(Color.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: 5))
-                    }
-                }
-            }
-        }
-        .formStyle(.grouped)
-        .onDisappear { cancelRecording() }
-    }
-
-    private func startRecording() {
-        isRecording = true
-        recordingMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            if event.keyCode == UInt16(kVK_Escape) && event.modifierFlags.intersection([.command, .option, .control]).isEmpty {
-                cancelRecording()
-                return nil
-            }
-            let carbon = HotkeyConfig.carbonFlags(from: event.modifierFlags)
-            // 必须带 ⌘/⌥/⌃ 至少一个，避免把普通输入键劫持为全局快捷键
-            guard event.modifierFlags.intersection([.command, .option, .control]).isEmpty == false else {
-                NSSound.beep()
-                return nil
-            }
-            let config = HotkeyConfig(keyCode: UInt32(event.keyCode), carbonModifiers: carbon)
-            config.save()
-            AppDelegate.shared?.reloadHotkey()
-            hotkeyDisplay = config.displayString
-            cancelRecording()
-            return nil
-        }
-    }
-
-    private func cancelRecording() {
-        if let monitor = recordingMonitor {
-            NSEvent.removeMonitor(monitor)
-            recordingMonitor = nil
-        }
-        isRecording = false
-    }
-}
-
-// MARK: - 关于
-
-struct AboutView: View {
-    private var version: String {
-        let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "-"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "-"
-        return "\(short) (\(build))"
-    }
-
-    var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "doc.on.clipboard.fill")
-                .font(.system(size: 48))
-                .foregroundStyle(.tint)
-            Text(verbatim: "Copyo")
-                .font(.system(size: 22, weight: .bold))
-            Text("Version \(version)")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-            Text("An open-source clipboard manager for macOS.\nSync is off by default. Turn it on and your history goes only to your own iCloud or a folder you choose — never to a server of ours.")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isOn ? [.isSelected] : [])
     }
 }

@@ -15,21 +15,20 @@ extension ClipItem {
         return name.isEmpty ? String(localized: "This iPhone") : name
     }
 
-    /// 来源色。Mac 端算好同步过来；没有就用本机灰 #8E8E93（存量条目也走这里）。
+    /// 卡片的渲染色：颜色条目取内容本身的颜色，其余取来源色（Mac 端算好同步过来）；
+    /// 都没有就用本机灰 #8E8E93。见 CopyoCore `renderColorHex`（design-spec 7.4.2）。
     var sourceUIColor: UIColor {
-        CopyoTheme.uiColor(hexString: sourceColorHex) ?? CopyoTheme.sourceLocalUI
+        CopyoTheme.uiColor(hexString: renderColorHex) ?? CopyoTheme.sourceLocalUI
     }
 
     var sourceColor: Color { Color(uiColor: sourceUIColor) }
 
-    /// 整卡淡染色（浅 12% 混白 / 深 20% 混 #1C1C1E），随系统外观自动切换
+    /// 整卡淡染色（浅 12% 混白 / 深 20% 混 #2C2C2E），随系统外观自动切换
     var tintColor: Color { Color(uiColor: CopyoTheme.tintUIColor(source: sourceUIColor)) }
 
     /// 需要按指定外观取值时用这个（截图、小组件预览等场景拿不到 trait）
     func tintColor(for scheme: ColorScheme) -> Color {
-        let base = scheme == .dark ? CopyoTheme.rgb(0x1C1C1E) : CopyoTheme.rgb(0xFFFFFF)
-        let fraction: CGFloat = scheme == .dark ? 0.20 : 0.12
-        return Color(uiColor: CopyoTheme.mix(sourceUIColor, into: base, fraction: fraction))
+        Color(uiColor: CopyoTheme.tintUIColor(source: sourceUIColor, dark: scheme == .dark))
     }
 
     /// 角标文字色：亮度 > 0.62 用 78% 黑，否则白
@@ -39,57 +38,15 @@ extension ClipItem {
 
     // MARK: - 时间
 
-    /// 「刚刚 / 3 分钟前 / 1 小时前 / 昨天 18:42」，英文对应 `now / 3m / 1h / Yesterday 18:42`。
-    ///
-    /// 当天的分 / 时不走系统的 `.relative` 格式化：那个在英文下给的是 "3 minutes ago"，
-    /// 卡片头部「来源 · 时间」这一行放不下（设计 6.2 要的是 `3m` 这种短形）。
+    /// 「刚刚 / 3 分钟前 / 昨天 18:42」。口径与四端共用，见 `CopyoShared/UI/RelativeTime.swift`
     func relativeTime(reference: Date = Date()) -> String {
-        let interval = reference.timeIntervalSince(createdAt)
-        if interval < 60 { return String(localized: "now") }
-        let calendar = Calendar.current
-        if calendar.isDate(createdAt, inSameDayAs: reference) {
-            let minutes = Int(interval / 60)
-            if minutes < 60 {
-                return String(format: String(localized: "%lldm"), minutes)
-            }
-            return String(format: String(localized: "%lldh"), minutes / 60)
-        }
-        // 昨天保留「日期 + 时刻」：设计 6.4 的 `昨天 18:42` 就是系统相对日期格式化的结果
-        if calendar.isDateInYesterday(createdAt) {
-            return Self.dateTimeFormatter.string(from: createdAt)
-        }
-        // 更早的按设计 6.4 给「3 天前 / 上周」。卡片元信息只有 171pt 宽，
-        // `2026/8/28 13:16` 一定被截成 `202…`，读不出任何时间信息；
-        // 需要精确时刻的是详情页，那里走 absoluteTime，不受这里影响。
-        let days = calendar.dateComponents([.day],
-                                           from: calendar.startOfDay(for: createdAt),
-                                           to: calendar.startOfDay(for: reference)).day ?? 0
-        if days < 7 { return String(format: String(localized: "%lldd"), days) }
-        if days < 14 { return String(localized: "Last week") }
-        return Self.dateOnlyFormatter.string(from: createdAt)
+        RelativeTime.string(for: createdAt, reference: reference)
     }
 
     var relativeTime: String { relativeTime() }
 
     /// 详情页的绝对时间：`今天 14:32`
-    var absoluteTime: String { Self.dateTimeFormatter.string(from: createdAt) }
-
-    /// 两周以前的条目：只给日期不给时刻，元信息行才放得下
-    private static let dateOnlyFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .none
-        return formatter
-    }()
-
-    private static let dateTimeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        // 「今天 / 昨天」由系统按当前语言给，自己拼会在英文下变成错误的语序
-        formatter.doesRelativeDateFormatting = true
-        return formatter
-    }()
+    var absoluteTime: String { RelativeTime.absolute(createdAt) }
 
     // MARK: - 正文
 

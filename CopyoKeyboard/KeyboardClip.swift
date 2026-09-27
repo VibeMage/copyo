@@ -66,7 +66,8 @@ struct KeyboardClip: Identifiable, Hashable {
         self.id = item.persistentModelID
         self.kind = item.kind
         self.title = item.displayTitle
-        self.sourceColorHex = item.sourceColorHex
+        // 存渲染色而不是来源色：颜色条目要用内容本身的颜色染（design-spec 7.4.2）
+        self.sourceColorHex = item.renderColorHex
         self.createdAt = item.createdAt
         self.isPinned = item.pinboard != nil
         self.isMono = item.isCodeLike
@@ -105,65 +106,16 @@ struct KeyboardClip: Identifiable, Hashable {
         CopyoTheme.uiColor(hexString: sourceColorHex) ?? CopyoTheme.sourceLocalUI
     }
 
-    /// 整卡淡染（设计 3.3：浅 12% 混白 / 深 20% 混 #1C1C1E）。
-    ///
-    /// **这是 `CopyoIOS/Model/ClipItem+Display.swift` 里 `tintColor(for:)` 的第二份实现**，
-    /// 那个扩展写在 `ClipItem` 上、文件属于 `CopyoIOS` target，键盘编译不到。
-    /// 混色本身走共用的 `CopyoTheme.mix`，抄过来的只有 base 与那两个比例；
-    /// **改淡染比例时两处都要改**，只改一处的表现是同一条内容在应用里和在键盘上不是一个颜色。
-    /// 该把它提到 `CopyoTheme` 去（那里已经有 trait 版的 `tintUIColor`），只是那个文件
-    /// 不在本次改动范围内。
+    /// 整卡淡染（浅 12% 混白 / 深 20% 混 #2C2C2E）。键盘的深浅跟宿主输入框走、不跟 trait，
+    /// 所以按 scheme 取值；base 与比例都在 `CopyoTheme.tintUIColor(source:dark:)`，这里不再抄。
     func tintColor(for scheme: ColorScheme) -> Color {
-        let base = scheme == .dark ? CopyoTheme.rgb(0x1C1C1E) : CopyoTheme.rgb(0xFFFFFF)
-        let fraction: CGFloat = scheme == .dark ? 0.20 : 0.12
-        return Color(uiColor: CopyoTheme.mix(sourceUIColor, into: base, fraction: fraction))
+        Color(uiColor: CopyoTheme.tintUIColor(source: sourceUIColor, dark: scheme == .dark))
     }
 
-    /// 「刚刚 / 3 分钟前 / 昨天 18:42」。
-    ///
-    /// **这是同一段逻辑的第三份实现**：`CopyoIOS/Model/ClipItem+Display.swift` 的
-    /// `relativeTime(reference:)`、`CopyoWidgets/ClipSnapshot.swift` 的 `relativeTime(at:)`，
-    /// 和这里。本地化键（`now` / `%lldm` / `%lldh` / `%lldd` / `Last week`）三处逐字相同，
-    /// **改档位口径时三处都要改**——只改一处的表现是同一条内容在应用、小组件、键盘上
-    /// 各写一个时间。小组件那份的注释已经写着「该把它提到 `CopyoShared/` 去」；
-    /// 到第三份了，下一次碰这块之前应该先把它搬走，本次改动范围只含 `CopyoKeyboard/`。
+    /// 「刚刚 / 3 分钟前 / 昨天 18:42」，口径见 `CopyoShared/UI/RelativeTime.swift`
     func relativeTime(at reference: Date = Date()) -> String {
-        let interval = reference.timeIntervalSince(createdAt)
-        if interval < 60 { return String(localized: "now") }
-        let calendar = Calendar.current
-        if calendar.isDate(createdAt, inSameDayAs: reference) {
-            let minutes = Int(interval / 60)
-            if minutes < 60 {
-                return String(format: String(localized: "%lldm"), minutes)
-            }
-            return String(format: String(localized: "%lldh"), minutes / 60)
-        }
-        if calendar.isDateInYesterday(createdAt) {
-            return Self.dateTimeFormatter.string(from: createdAt)
-        }
-        let days = calendar.dateComponents([.day],
-                                           from: calendar.startOfDay(for: createdAt),
-                                           to: calendar.startOfDay(for: reference)).day ?? 0
-        if days < 7 { return String(format: String(localized: "%lldd"), days) }
-        if days < 14 { return String(localized: "Last week") }
-        return Self.dateOnlyFormatter.string(from: createdAt)
+        RelativeTime.string(for: createdAt, reference: reference)
     }
-
-    private static let dateOnlyFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .none
-        return formatter
-    }()
-
-    private static let dateTimeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        // 「今天 / 昨天」交给系统按当前语言给，自己拼会在英文下变成错误的语序
-        formatter.doesRelativeDateFormatting = true
-        return formatter
-    }()
 
     // MARK: - 搜索
 

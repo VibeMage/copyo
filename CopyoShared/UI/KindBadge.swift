@@ -46,7 +46,7 @@ struct KindBadge: View {
         .padding(.vertical, 1)
         .frame(minHeight: minHeight)
         .background(
-            Color(uiColor: CopyoTheme.uiColor(hexString: sourceHex) ?? CopyoTheme.sourceLocalUI),
+            Color(platformColor: CopyoTheme.uiColor(hexString: sourceHex) ?? CopyoTheme.sourceLocalUI),
             in: RoundedRectangle(cornerRadius: radius, style: .continuous)
         )
     }
@@ -54,6 +54,6 @@ struct KindBadge: View {
 
 extension KindBadge {
     init(item: ClipItem, dense: Bool = false) {
-        self.init(kind: item.kind, sourceHex: item.sourceColorHex, dense: dense)
+        self.init(kind: item.kind, sourceHex: item.renderColorHex, dense: dense)
     }
 }
