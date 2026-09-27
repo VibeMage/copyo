@@ -34,6 +34,16 @@ own and cannot read your clipboard or your history.
   apps to ignore by bundle ID.
 - **Copied files** are recorded as file paths only. Their contents are never
   copied into Copyo's database and are never synced.
+- **Recording a global shortcut**: only while you are recording a new shortcut in
+  Settings, and only while Copyo is the frontmost app, Copyo checks about every
+  20 ms which keys are held down, so it can tell you when macOS or another app has
+  taken the combination you pressed. Each check reads whether each key is up or
+  down, but only a key pressed while ⌘, ⌥ or ⌃ is held is ever acted on; the rest
+  are ignored. It keeps nothing and stops as soon as recording ends (if you switch
+  away mid-recording, it checks once more as you leave, then stops). Copyo does not
+  ask for Input Monitoring or Accessibility access. At any other time it receives
+  only what any app receives: the keys you type into its own windows and the press
+  of its own global shortcut.
 - **Optional sync — you pick one of two, or neither:**
   - *Shared Folder*: Copyo reads and writes files only inside a folder you choose
     yourself. In the Mac App Store build that access comes from the standard
@@ -113,6 +123,12 @@ Copyo 不收集、不传输、不出售任何数据。我们不运营任何服�
 - 密码管理器一类应用标记为隐藏、临时或自动生成的内容**从不记录**；你还可以按
   Bundle ID 指定要忽略的应用。
 - **复制的文件**只记录路径，文件内容不会进入 Copyo 的数据库，也不会被同步。
+- **录制全局快捷键**：只有在设置里录制新快捷键、并且 Copyo 在最前面时，Copyo 才会
+  约每 20 毫秒查看一次哪些键正被按着，用来提醒你刚按的组合已被 macOS 或别的 App 占用。
+  每次查看的是每个键是否按下，但只有在按着 ⌘、⌥ 或 ⌃ 时按下的键才会被拿来判断，其余的
+  一概不理。它不保存任何内容，录制一结束就停止（录制中途切到别处时，会在切走的那一刻再
+  查看一次，随即停止）。Copyo 不申请「输入监控」或「辅助功能」权限；其他任何时候，它和
+  任何 App 一样，只接收你在它自己窗口里按的键，以及它自己的全局快捷键被按下。
 - **可选的同步——两种任选其一，也可以都不开：**
   - *共享文件夹*：Copyo 只读写你亲自选定的那个文件夹。Mac App Store 版的访问权限
     来自系统标准的「打开」面板，且仅限于那一个文件夹。这种模式下 Copyo 不发起任何
