@@ -1144,7 +1144,7 @@ TestFlight 真机上逐轮修掉的，都进了 1.1.0：
 
 版本页现在选的是 **构建 11**（`./scripts/asc.rb attach 11`）。
 
-**许可证改为 GNU GPLv3**（仓库历史被整体改写，不是本会话做的）：iOS 描述里原来写的「under the MIT License」/「以 MIT 许可证发布」已用 API 改成 GPLv3，中英各一处。
+**许可证改为 GNU GPLv3**（仓库历史被整体改写，不是本会话做的）：iOS 描述里原来的许可证说明已用 API 改成 GPLv3，中英各一处。
 
 ### TestFlight 外部测试（给朋友，2026-09-27）
 
