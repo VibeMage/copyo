@@ -891,7 +891,9 @@ iOS 版挂在同一条应用记录（`6813955206`）上，走通用购买：ASC 
 ### 截图
 
 `art/store-ios/`，由 `scripts/capture-store-shots-ios.sh` 采集、`scripts/make-store-shots-ios.py` 合成。
-6.9 英寸 iPhone（1320×2868）六张、13 英寸 iPad（2064×2752）四张，中英各一套。版式跟 iOS 设计稿走
+6.9 英寸 iPhone（1320×2868）六张、13 英寸 iPad（2064×2752）四张，中英各一套。
+**ASC 的 iPhone 截图位要的是 6.5 英寸**（1284×2778，不收 6.9 英寸的尺寸），上传用的是
+`art/store-ios/iphone-6.5/`：从 6.9 英寸成图按宽等比缩放、上下各裁约 6px 得到。版式跟 iOS 设计稿走
 （暖白底、系统字体），不沿用 Mac 那套深色底板。ASC 里用「媒体管理」按语言分别上传（见第十七节）。
 
 ### 口径（与 Mac 不同的地方，写文案时别抄错）
@@ -1086,3 +1088,16 @@ OTHER
 5. 年龄分级沿用 4+；价格与销售范围沿用 Mac 的设置（免费），iOS 平台需确认一遍「App 供应情况」
 6. **TestFlight 真机装一次再提审**：iCloud 同步的 entitlement 判断曾经只在 Apple 重签过的包里出错
    （`embedded.mobileprovision` 被删），本地出的任何包都测不出来——见 `docs/ios-plan.md` 3.9
+
+### 2026-09-27 在 ASC 上已经做了的
+
+| 项目 | 状态 |
+| --- | --- |
+| 添加平台 → iOS | ✅ 版本号改为 **1.1.0**（ASC 默认给 1.0，要和包里的 `CFBundleShortVersionString` 一致） |
+| 版本页（英 / 中） | ✅ 推广文本、描述、关键词；支持网址与版权沿用 Mac 的 |
+| 审核备注 | ✅ 替换掉了从 Mac 版带过来的「菜单栏应用」那一段（新平台会把 Mac 的备注原样抄过来，要当心） |
+| 截图（英 / 中） | ✅ iPhone 6.5 英寸 6 张、iPad 13 英寸 4 张 |
+| 副标题（App 级，Mac 共用） | ✅ `Search everything you copied` / `复制过的一切，随时找回`，随下一次提交生效 |
+| 隐私政策 Gist | ✅ 已换成含 iPhone / iPad 的新版（替换前核对过线上内容与 main 的 PRIVACY.md 一致） |
+| 构建版本 1.1.0 (3) | ⏳ `build/appstore-ios/Copyo.ipa` 已出包并核验；**上传失败**：Xcode 里的账户凭据失效（`missing Xcode-Username` → `App Store Connect access for “9A94W79V84” is required`）。需要在 Xcode → Settings → Accounts 重新登录，或在 Organizer 里 Distribute App |
+| 提交审核 | ⏳ 等构建处理完、TestFlight 真机验过 iCloud 同步之后 |
