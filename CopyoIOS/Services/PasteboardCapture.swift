@@ -134,13 +134,13 @@ final class PasteboardCapture {
 
         // 只有 URL 没有文本时才当链接读；Safari 之类两种表示都给，走文本路径由分类器判定
         if hasURLs && !hasStrings {
-            guard let url = pasteboard.url else { return denied() }
+            guard let url = timedRead({ pasteboard.url }) else { return denied() }
             IOSSettings.lastPasteboardChangeCount = changeCount
             return finish(save(text: url.absoluteString, rtfData: nil))
         }
 
         if hasStrings {
-            guard let text = pasteboard.string else { return denied() }
+            guard let text = timedRead({ pasteboard.string }) else { return denied() }
             IOSSettings.lastPasteboardChangeCount = changeCount
             let rtf = pasteboard.data(forPasteboardType: "public.rtf")
             return finish(save(text: text, rtfData: rtf))
@@ -163,6 +163,37 @@ final class PasteboardCapture {
         IOSSettings.lastPasteboardChangeCount = changeCount
         guard let prepared else { return finish(.empty) }
         return finish(save(imagePNG: prepared.png))
+    }
+
+    // MARK: - 有没有弹「允许粘贴」
+
+    /// 读剪贴板内容，并顺手记下这次有没有弹「允许粘贴」。
+    ///
+    /// iOS 没有任何 API 能问出「从其他 App 粘贴」设成了什么。但弹框时这次取值会**一直阻塞到用户点完**
+    /// （系统的 pasted 进程为此专门关掉看门狗：「Prevent watchdog termination while blocking on OOP
+    /// authorization」），设成「允许」时则直接返回——所以量一下耗时就知道。据此在**连续**弹过几次之后
+    /// 提示用户去设成「允许」，改了之后下一次读取变快，提示自己消失（`AppModel.allowPasteTipVisible`）。
+    ///
+    /// 慢不一定是弹框：Mac 通用剪贴板（Handoff）的内容要在取值时跨设备拉，大一点的富文本就可能过阈值；
+    /// 延迟提供数据的来源 App 也会让读取等一会儿。所以三条防线：
+    /// - 阈值取 0.8s：人看到弹框、读完、点下去不会更快，偶发的慢读多数落在它之下
+    /// - 计**连续**次数：任何一次快速成功的读取都清零，「允许」的用户偶尔慢一次不会累积
+    /// - 只有「慢且读到了」才算：弹框后点了「不允许」的人不该被劝去点允许
+    /// **只量文字与链接**：从别的 App 跨进程取一张大图本身就可能很慢。
+    private func timedRead<T>(_ read: () -> T?) -> T? {
+        let start = ContinuousClock.now
+        let value = read()
+        let slow = ContinuousClock.now - start >= .milliseconds(800)
+        if slow, value != nil {
+            IOSSettings.lastPasteReadPrompted = true
+            IOSSettings.promptedPasteReads += 1
+        } else {
+            // 快速成功 = 已经是「允许」；快速 nil = 设成了「拒绝」；慢且 nil = 弹框里点了「不允许」。
+            // 三种都不该亮提示
+            IOSSettings.lastPasteReadPrompted = false
+            if !slow, value != nil { IOSSettings.promptedPasteReads = 0 }
+        }
+        return value
     }
 
     /// 通道 A / C 的入库出口。Core Spotlight 索引挂在这里而不是 `ClipSaver`：

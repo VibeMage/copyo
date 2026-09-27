@@ -109,6 +109,11 @@ final class AppModel {
     /// 横幅上的粘贴按钮已经存下内容，原位换成「已保存」再收起
     var pasteBannerSaved = false
 
+    /// 「不想每次都点允许粘贴？」提示卡。只在**连续弹过两次框**之后出现（弹没弹框靠读取耗时判断，
+    /// 见 `PasteboardCapture.timedRead`），用户改成「允许」后下一次读取变成瞬时，它自己消失；
+    /// 点 × 则永不再出。从没被弹框打扰过的用户永远看不到它。
+    var allowPasteTipVisible = false
+
     // MARK: - 系统搜索索引
 
     /// 整库重建 / 对账都跑在这一个任务里，起新的之前先取消旧的——与 `searchDebounceTask`、
@@ -160,7 +165,9 @@ final class AppModel {
         }
         capture.onOutcome = { [weak self] outcome in
             self?.handle(outcome)
+            self?.refreshAllowPasteTip()
         }
+        refreshAllowPasteTip()
         // 通道 C 的截图入口：-simulateQuickSave 在这里预置请求，随后第一次 active 就会消费掉
         QuickSaveCoordinator.primeIfSimulated(launch)
         syncStatus.start()
@@ -174,6 +181,8 @@ final class AppModel {
         switch route {
         case .historyBanner:
             pasteBannerVisible = true
+        case .historyPasteTip:
+            allowPasteTipVisible = true
         case .historySaved:
             // 钉住不收：截图在启动几秒后才拍
             toast.show(String(localized: "Saved"), sticky: true)
@@ -364,6 +373,31 @@ final class AppModel {
                 break
             }
         }
+    }
+
+    // MARK: - 「允许粘贴」提示卡
+
+    private func refreshAllowPasteTip() {
+        // 演示模式不碰真实的计数；截图路由自己点亮它
+        guard !launch.useDemoData else { return }
+        let visible = IOSSettings.autoReadOnForeground
+            && !IOSSettings.allowPasteTipDismissed
+            && IOSSettings.promptedPasteReads >= 2
+            && IOSSettings.lastPasteReadPrompted
+        guard visible != allowPasteTipVisible else { return }
+        withAnimation(CopyoTheme.springAnimation) { allowPasteTipVisible = visible }
+    }
+
+    /// 用户去过系统设置里 Copyo 那一页（提示卡或 04d 引导页的按钮）：先收起。改成「允许」了下次读取
+    /// 是瞬时的，它不会再出现；没改的话下一次弹框又会把它点亮——那时用户确实还在被打扰
+    func openedPasteSettingsFromTip() {
+        IOSSettings.lastPasteReadPrompted = false
+        withAnimation(CopyoTheme.springAnimation) { allowPasteTipVisible = false }
+    }
+
+    func dismissAllowPasteTip() {
+        IOSSettings.allowPasteTipDismissed = true
+        withAnimation(CopyoTheme.springAnimation) { allowPasteTipVisible = false }
     }
 
     func dismissPasteBanner() {

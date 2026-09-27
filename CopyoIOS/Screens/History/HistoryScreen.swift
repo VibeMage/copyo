@@ -137,6 +137,11 @@ private struct HistoryContent: View {
                                 onDismiss: { model.dismissPasteBanner() })
                     .padding(.top, 14)
                     .transition(.move(edge: .top).combined(with: .opacity))
+                } else if model.allowPasteTipVisible {
+                    AllowPasteTip(onOpenSettings: { model.openedPasteSettingsFromTip() },
+                                  onDismiss: { model.dismissAllowPasteTip() })
+                    .padding(.top, 14)
+                    .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 if isSearching {
                     Text(resultCountText(visible))
@@ -233,6 +238,7 @@ private struct HistoryContent: View {
             Text(String(localized: "It syncs to the Pinboard tab on your Mac."))
         }
         .animation(CopyoTheme.springAnimation, value: model.pasteBannerVisible)
+        .animation(CopyoTheme.springAnimation, value: model.allowPasteTipVisible)
         .animation(CopyoTheme.springAnimation, value: model.pasteBannerSaved)
         .onChange(of: model.highlightedItemID, initial: true) { _, id in
             showHighlightRing(for: id)

@@ -32,6 +32,12 @@ enum IOSSettings {
         /// 右滑固定的默认目标 Pinboard，存 name（PersistentIdentifier 不能进 UserDefaults）
         static let defaultPinboardName = "defaultPinboardName"
         static let lastPasteboardChangeCount = "lastPasteboardChangeCount"
+        /// **连续**几次读剪贴板都弹了「允许粘贴」并被允许（一次快速读取就清零），见 `PasteboardCapture.timedRead`
+        static let promptedPasteReads = "promptedPasteReads"
+        /// 最近一次读剪贴板有没有弹框。改成「允许」之后读取变成瞬时，它就翻回 false
+        static let lastPasteReadPrompted = "lastPasteReadPrompted"
+        /// 「不想每次都点允许粘贴？」提示卡被用户关掉过，此后永不再出
+        static let allowPasteTipDismissed = "allowPasteTipDismissed"
         /// SaveClipboardIntent 写下的时间戳（timeIntervalSince1970），主应用激活时消费
         static let pendingQuickSaveAt = "pendingQuickSaveAt"
         /// Core Spotlight 索引开关。与 `CopyoAppGroup.Key.spotlightIndexing` **逐字一致**，
@@ -96,6 +102,21 @@ enum IOSSettings {
             if let newValue { defaults.set(newValue, forKey: Key.lastPasteboardChangeCount) }
             else { defaults.removeObject(forKey: Key.lastPasteboardChangeCount) }
         }
+    }
+
+    static var promptedPasteReads: Int {
+        get { defaults.integer(forKey: Key.promptedPasteReads) }
+        set { defaults.set(newValue, forKey: Key.promptedPasteReads) }
+    }
+
+    static var lastPasteReadPrompted: Bool {
+        get { defaults.bool(forKey: Key.lastPasteReadPrompted) }
+        set { defaults.set(newValue, forKey: Key.lastPasteReadPrompted) }
+    }
+
+    static var allowPasteTipDismissed: Bool {
+        get { defaults.bool(forKey: Key.allowPasteTipDismissed) }
+        set { defaults.set(newValue, forKey: Key.allowPasteTipDismissed) }
     }
 
     static var pendingQuickSaveAt: Date? {

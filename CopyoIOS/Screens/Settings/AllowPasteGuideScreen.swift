@@ -7,6 +7,7 @@ import SwiftUI
 /// 所以这里改成说明卡：只讲未设为「允许」时系统的行为，并说明 Copyo 读不到当前值。
 struct AllowPasteGuideScreen: View {
     @Environment(\.openURL) private var openURL
+    @Environment(AppModel.self) private var model
 
     /// 示意行的 40 行高与 14 的勾都不在样式表上，按行内 15pt 文字的 `.subheadline` 缩，
     /// 两者用同一把尺子才不会一个长一个不长
@@ -38,6 +39,8 @@ struct AllowPasteGuideScreen: View {
             GuidePrimaryButton(title: String(localized: "Open Copyo's Settings"),
                                symbol: "arrow.up.forward.app") {
                 if let url = SettingsLinks.appSettings { openURL(url) }
+                // 从这里去改设置同样该收起历史页的「允许粘贴」提示卡
+                model.openedPasteSettingsFromTip()
             }
 
             GuideParagraph(text: String(localized: "Until you allow it, History shows a “New clipboard content” banner at the top — use the system paste button there to save by hand."),

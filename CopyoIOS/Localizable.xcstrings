@@ -2256,6 +2256,29 @@
         }
       }
     },
+    "In Settings › Apps › Copyo, set Paste from Other Apps to Allow. Copyo then saves new clips without asking.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Settings › Apps › Copyo, set Paste from Other Apps to Allow. Copyo then saves new clips without asking."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans Réglages › Apps › Copyo, réglez « Coller depuis d’autres apps » sur « Autoriser ». Copyo enregistrera alors sans demander."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在「设置 › App › Copyo」里把「从其他 App 粘贴」设为「允许」，之后回到 Copyo 就直接保存，不再询问。"
+          }
+        }
+      }
+    },
     "In iOS Settings": {
       "extractionState": "manual",
       "localizations": {
@@ -3034,6 +3057,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开详情"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir Réglages"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去设置"
           }
         }
       }
@@ -5197,6 +5243,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "时间"
+          }
+        }
+      }
+    },
+    "Tired of tapping Allow Paste?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tired of tapping Allow Paste?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marre de toucher « Autoriser le collage » ?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不想每次都点「允许粘贴」？"
           }
         }
       }
