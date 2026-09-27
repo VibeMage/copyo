@@ -1142,3 +1142,11 @@ TestFlight 真机上逐轮修掉的，都进了 1.1.0：
 版本页现在选的是 **构建 8**（`./scripts/asc.rb attach 8`）。
 
 **许可证改为 GNU GPLv3**（仓库历史被整体改写，不是本会话做的）：iOS 描述里原来写的「under the MIT License」/「以 MIT 许可证发布」已用 API 改成 GPLv3，中英各一处。
+
+### TestFlight 外部测试（给朋友，2026-09-27）
+
+朋友不在开发者团队里，走外部测试：群组 **Friends**，公开链接 `https://testflight.apple.com/join/eC9XZhfV`（上限 100 人，
+随时可在群组里改或关）。Beta 描述与「测试内容」中英各一份，反馈邮箱 iyn@live.com（测试员可见），Beta 审核联系人复用正式版
+「App 审核信息」那份。同一版本只有第一个构建要过 Beta 审核；它与正式提审互不影响。
+
+内部群组 **Maintainer** 只给团队成员用。邀请邮件里的兑换码绑定的是那个测试员的名额，不能转给别人。

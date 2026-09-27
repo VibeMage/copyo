@@ -66,7 +66,8 @@ module ASC
   def request(method, path, params: nil, body: nil)
     uri = URI("https://api.appstoreconnect.apple.com#{path}")
     uri.query = URI.encode_www_form(params) if params
-    req = (method == :get ? Net::HTTP::Get : Net::HTTP::Patch).new(uri)
+    klass = { get: Net::HTTP::Get, post: Net::HTTP::Post, patch: Net::HTTP::Patch, delete: Net::HTTP::Delete }
+    req = klass.fetch(method).new(uri)
     req["Authorization"] = "Bearer #{token}"
     if body
       req["Content-Type"] = "application/json"
