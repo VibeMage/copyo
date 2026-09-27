@@ -21,7 +21,6 @@ struct OnboardingFlow: View {
     /// 而 footer 本身已经坐在安全区之上——直接加 50 会整条上移 34pt
     @State private var bottomSafeArea: CGFloat = 0
 
-    @Environment(\.openURL) private var openURL
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     /// 40 的跳过按钮与 52 的 CTA 都不在样式表上，按各自 17pt 文字的 `.body` 缩。
@@ -51,8 +50,7 @@ struct OnboardingFlow: View {
                     ForEach(Array(pages.enumerated()), id: \.offset) { index, content in
                         OnboardingPageView(content: content,
                                            cloudSyncChanged: cloudSyncEnabled != cloudSyncAtLaunch,
-                                           cloudSyncEnabled: $cloudSyncEnabled,
-                                           onOpenSettings: openSystemSettings)
+                                           cloudSyncEnabled: $cloudSyncEnabled)
                             .tag(index)
                     }
                 }
@@ -146,10 +144,6 @@ struct OnboardingFlow: View {
         IOSSettings.onboardingCompleted = true
         onFinish()
     }
-
-    private func openSystemSettings() {
-        if let url = SettingsLinks.appSettings { openURL(url) }
-    }
 }
 
 // MARK: - 单页
@@ -158,7 +152,6 @@ private struct OnboardingPageView: View {
     let content: OnboardingPageContent
     let cloudSyncChanged: Bool
     @Binding var cloudSyncEnabled: Bool
-    let onOpenSettings: () -> Void
 
     var body: some View {
         // 三页是固定高度的 `TabView`，页内容一旦超出就只能被裁掉——最大的辅助功能档位下
@@ -189,8 +182,7 @@ private struct OnboardingPageView: View {
                         ForEach(content.rows) { row in
                             OnboardingRow(row: row,
                                           cloudSyncChanged: cloudSyncChanged,
-                                          cloudSyncEnabled: $cloudSyncEnabled,
-                                          onOpenSettings: onOpenSettings)
+                                          cloudSyncEnabled: $cloudSyncEnabled)
                         }
                     }
                     .padding(.top, 28)
@@ -204,19 +196,14 @@ private struct OnboardingPageView: View {
     }
 }
 
-/// 设计 3.9 的说明行：36 圆角砖 + 标题 15 Semibold + 副文 13，右侧可挂开关或胶囊按钮。
+/// 设计 3.9 的说明行：36 圆角砖 + 标题 15 Semibold + 副文 13，右侧可挂开关。
 ///
 /// 砖是定尺装饰（已 `accessibilityHidden`），17pt 符号跟着放大会顶破 36 × 36，所以保持写死。
 private struct OnboardingRow: View {
     let row: OnboardingPageContent.Row
     let cloudSyncChanged: Bool
     @Binding var cloudSyncEnabled: Bool
-    let onOpenSettings: () -> Void
 
-    /// 胶囊按钮的 14 / 30 都不在样式表上，按行内标题的 `.subheadline`（15pt）缩，
-    /// 字与胶囊同一把尺子才不会放大后被上下切掉
-    @ScaledMetric(relativeTo: .subheadline) private var pillFontSize: CGFloat = 14
-    @ScaledMetric(relativeTo: .subheadline) private var pillMinHeight: CGFloat = 30
 
     var body: some View {
         HStack(spacing: 12) {
@@ -257,24 +244,6 @@ private struct OnboardingRow: View {
                     // 开关与左边的说明是两个停留点，拨完之后旁白停在开关上，
                     // 听不到说明行换成了「重新打开后生效」，所以在开关上再挂一遍
                     .accessibilityHint(cloudSyncChanged ? detail : "")
-            case .settingsButton:
-                Button(action: onOpenSettings) {
-                    Text(String(localized: "Go to Settings"))
-                        .font(.system(size: pillFontSize, weight: .semibold))
-                        .foregroundStyle(CopyoTheme.accent)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .padding(.horizontal, 12)
-                        // 默认档 14pt 的行高约 17，加 8 内距是 25 < 30，胶囊仍是 30
-                        .padding(.vertical, 4)
-                        .frame(minHeight: pillMinHeight)
-                        .background(CopyoTheme.tintBlue, in: Capsule())
-                }
-                .buttonStyle(.plain)
-                // 读屏把这枚胶囊单独念成「前往设置」，脱开左边那行就分不清是去 Copyo 的设置页
-                // 还是系统「设置」。复用说明页主按钮那条文案把去处补上。
-                // 用 hint 不用 label，是因为改 label 会让「语音控制」认不出屏幕上那四个字。
-                .accessibilityHint(String(localized: "Open Copyo's Settings"))
             }
         }
         .padding(.horizontal, 14)
@@ -397,7 +366,6 @@ struct OnboardingPageContent {
         enum Accessory {
             case none
             case cloudToggle
-            case settingsButton
         }
 
         let id = UUID()
@@ -449,7 +417,7 @@ struct OnboardingPageContent {
                 ]
             ),
             OnboardingPageContent(
-                title: String(localized: "Two switches and you're set"),
+                title: String(localized: "Two last things"),
                 body: String(localized: "You can change both later in Settings."),
                 skipTitle: String(localized: "Maybe Later"),
                 artwork: .cloudCheck,
@@ -460,9 +428,13 @@ struct OnboardingPageContent {
                         accessory: .cloudToggle),
                     Row(symbol: "list.clipboard",
                         title: String(localized: "Allow Paste from Other Apps"),
-                        // 设计原文带着「在系统设置里」：只说「设为允许」的话用户不知道去哪设
-                        detail: String(localized: "Set it to Allow in Settings, no more prompts"),
-                        accessory: .settingsButton),
+                        // 设计 05c 在这里挂了一枚「前往设置」。**去掉了**：iOS 只在 App 请求过一次粘贴、
+                        // 弹过一次系统授权框之后，才在「设置 › Copyo」里显示「从其他 App 粘贴」这一行，
+                        // 而引导页一定发生在第一次读剪贴板之前（首启只记账不读，见 PasteboardCapture）。
+                        // 按下去必然落进一个找不到这一项的设置页——维护者第一次上真机就撞上了。
+                        // 改成告诉用户会发生什么；设置里 04d 那页仍然有「打开 Copyo 的系统设置」
+                        detail: String(localized: "iOS asks the first time Copyo reads the clipboard. Tap Allow Paste; later you can set it to Allow in Settings."),
+                        accessory: .none),
                 ]
             ),
         ]

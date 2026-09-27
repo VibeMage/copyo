@@ -2,7 +2,6 @@ import SwiftUI
 
 /// 怎样保存剪贴板（设计 04c）：三条平台允许的通道，各一张卡片。
 struct HowToSaveScreen: View {
-    @Environment(\.openURL) private var openURL
     @State private var showsQuickSave = false
 
     var body: some View {
@@ -17,8 +16,11 @@ struct HowToSaveScreen: View {
                              tileBackground: CopyoTheme.tintBlue,
                              title: String(localized: "When you open Copyo"),
                              message: String(localized: "Every time you open or come back to Copyo it reads the current clipboard and saves it to your history. “Paste from Other Apps” has to be set to Allow.")) {
-                Button {
-                    if let url = SettingsLinks.appSettings { openURL(url) }
+                // 先进 04d 的说明页而不是直接跳系统设置：没弹过授权框的用户在系统设置里
+                // 找不到「从其他 App 粘贴」这一行（iOS 要 App 先请求过一次才显示），
+                // 04d 讲清了这件事，页里也有跳系统设置的按钮
+                NavigationLink {
+                    AllowPasteGuideScreen()
                 } label: {
                     InlineActionPill(title: String(localized: "Go to Settings"))
                 }

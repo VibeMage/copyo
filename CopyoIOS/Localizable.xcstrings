@@ -4142,29 +4142,6 @@
         }
       }
     },
-    "Set it to Allow in Settings, no more prompts": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set it to Allow in Settings, no more prompts"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réglez-le sur « Autoriser » dans Réglages : plus aucune demande"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在系统设置里设为「允许」，不再弹窗"
-          }
-        }
-      }
-    },
     "Settings": {
       "extractionState": "manual",
       "localizations": {
@@ -5315,25 +5292,25 @@
         }
       }
     },
-    "Two switches and you're set": {
+    "Two last things": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Two switches and you're set"
+            "value": "Two last things"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deux réglages et c’est prêt"
+            "value": "Deux dernières choses"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "两个开关，打开就好"
+            "value": "最后两件事"
           }
         }
       }
@@ -5725,6 +5702,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "系统每次弹窗确认"
+          }
+        }
+      }
+    },
+    "iOS asks the first time Copyo reads the clipboard. Tap Allow Paste; later you can set it to Allow in Settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS asks the first time Copyo reads the clipboard. Tap Allow Paste; later you can set it to Allow in Settings."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS vous le demande la première fois que Copyo lit le presse-papiers. Touchez « Autoriser le collage » ; vous pourrez ensuite choisir « Autoriser » dans Réglages."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 第一次读剪贴板时 iOS 会问你，点「允许粘贴」；之后可在系统设置里改成「允许」。"
           }
         }
       }
