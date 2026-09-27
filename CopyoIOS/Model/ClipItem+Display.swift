@@ -29,11 +29,30 @@ extension ClipItem {
     var sourceColor: Color { Color(uiColor: sourceUIColor) }
 
     /// 整卡淡染色（浅 12% 混白 / 深 20% 混 #2C2C2E），随系统外观自动切换
-    var tintColor: Color { Color(uiColor: CopyoTheme.tintUIColor(source: sourceUIColor)) }
+    var tintColor: Color {
+        // 两态先算好再进闭包：动态色的闭包会被系统长期持有，捕获 `self`（一个 `@Model`）就等于把它钉住
+        let light = cardFillUIColor(dark: false)
+        let dark = cardFillUIColor(dark: true)
+        return Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? dark : light })
+    }
 
     /// 需要按指定外观取值时用这个（截图、小组件预览等场景拿不到 trait）
     func tintColor(for scheme: ColorScheme) -> Color {
-        Color(uiColor: CopyoTheme.tintUIColor(source: sourceUIColor, dark: scheme == .dark))
+        Color(uiColor: cardFillUIColor(dark: scheme == .dark))
+    }
+
+    /// 没有渲染色的条目（本机采集的文本、图片）在浅色下用**白卡**，不按公式淡染。
+    ///
+    /// 公式给出的本机灰 `mix(#8E8E93 12%, #FFF)` = (240,240,241)，页面底 `#F2F2F7` = (242,242,247)，
+    /// 两者只差两三个色阶——设计画布上勉强分得开，真机屏幕加上色彩管理就完全融进背景，
+    /// 维护者第一次 TestFlight 就指出「文本卡片和背景融到一起了」。白卡压灰底是 iOS 分组列表的
+    /// 标准对比。深色下本机灰淡染是 (54,54,56) 对纯黑，对比足够，照公式走。
+    /// 只改 iOS：`CopyoTheme.tintUIColor` 是 Mac 面板也在用的共享公式，Mac 的底色不同，不跟着变。
+    private func cardFillUIColor(dark: Bool) -> UIColor {
+        if !dark, CopyoTheme.uiColor(hexString: renderColorHex) == nil {
+            return .white
+        }
+        return CopyoTheme.tintUIColor(source: sourceUIColor, dark: dark)
     }
 
     /// 角标文字色：亮度 > 0.62 用 78% 黑，否则白
