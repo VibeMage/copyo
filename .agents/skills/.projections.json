@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "projections": {
+    "find-skills": {
+      "atlas": {
+        "mode": "symlink",
+        "hash": "14a208f5e57cde49"
+      },
+      "claude-code": {
+        "mode": "symlink",
+        "hash": "14a208f5e57cde49"
+      }
+    }
+  }
+}

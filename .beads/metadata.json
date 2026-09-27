@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "copyo",
+  "project_id": "6fb6ed75-2f05-48d8-aed6-2da6c70ad92a"
+}

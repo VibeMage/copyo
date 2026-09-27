@@ -20,3 +20,10 @@ xcuserdata/
 
 # 工具会话工作目录（设计探索稿等，定稿才手动入库）
 .superpowers/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+*.gate.lock*
