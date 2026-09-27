@@ -1115,8 +1115,15 @@ Xcode 账户凭据残缺时命令行上传一律失败（见上表），所以�
 
 ```bash
 UPLOAD=1 ./scripts/build-appstore-ios.sh   # 递增构建号、出包、核验、上传
-./scripts/asc-builds.rb                    # 最近的 iOS 构建与处理状态（VALID = 可选入版本 / 可在 TestFlight 安装）
+./scripts/asc.rb builds                    # 最近的 iOS 构建与处理状态（VALID = 可选入版本 / 可在 TestFlight 安装）
+./scripts/asc.rb version                   # 待发布版本：状态、发布方式、选中的构建
+./scripts/asc.rb attach 7                  # 把待提交版本的构建换成 7（只改草稿）
 ```
 
+**提交审核故意没做成子命令**：那是以维护者名义对外的一步，每次都在 ASC 里由人确认。
+
 `altool --build-status` 需要上传时返回的 delivery ID，Transporter / Organizer 传的构建拿不到，
-所以查询走 REST API（`asc-builds.rb`，系统 Ruby + OpenSSL 签 ES256，不依赖第三方库）。
+所以查询走 REST API（`asc.rb`，系统 Ruby + OpenSSL 签 ES256，不依赖第三方库）。
+
+**发布方式：审核通过后自动上架**（`AFTER_APPROVAL`，维护者 2026-09-27 确认保持）。
+iOS 平台新建时默认就是它，别以为是「手动发布」。
