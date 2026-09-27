@@ -42,6 +42,10 @@
 > 便于互引「第 N 节第 M 条」。两端共用的 token、角标、样例数据以 iOS 规格为对照基准，分歧逐条登记在第八节；
 > 需要 iOS 一并跟进的修订集中在 **7.4 全平台修订**。
 
+> **2026-09-27 拍板与 v2 画板**：第八节 47 条与第七节的工程结构决定已全部拍板——前者记在每条末尾的「✅ 已拍板」行，后者见 **7.5.18**。
+> 画板以 `art/macos-design/2026-09-27/`（v2，17 张，`gen_v2.py` 生成）为准；`art/macos-design/2026-09-20/` 的十张作为 v1 留档。
+> 正文里与拍板结果冲突的旧表述（如 §4.1.1 的三区焦点模型、§03b 面板空白处右键菜单、01c 轨道高 158、「选中」与「键盘焦点」两种卡态）**一律以拍板行为准**，正文逐节改写另行跟进。
+
 ## 目录
 
 - [一、界面清单](#一界面清单)
@@ -2929,6 +2933,19 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
 
 ---
 
+#### 7.5.18 2026-09-27 工程结构拍板
+
+| 条目 | 拍板 |
+| --- | --- |
+| 7.3 / 7.5.12 共享 theme 层 | 选 (a)：`CopyoShared` 加进 Mac target 的同步组，解掉 `CopyoTheme` 的 UIKit 依赖（动态色、`getRed` 先转 sRGB、字号按平台分叉）；色与圆角两端共用 |
+| 7.5.16 `ClipCard` 的归属 | 新建 `CopyoHostUI/`，只同步给 `Copyo` 与 `Copyo iOS` 两个宿主 target；`ClipCard` 及其显示层放这里，扩展与 Widget 编译不到，守住 `docs/ios-plan.md` 第 3.5 节的边界；先拆出 `ClipItem+Display` 的 UIKit 部分 |
+| 7.5.3 / §4.2.1 主菜单 | 选 A：装最小主菜单（Edit 菜单 + App 菜单） |
+| 7.5.5 降级内容态 | 图片未就绪 / 解码失败 = 来源淡染底 + 居中 `photo` 符号（`label.tertiary`），卡片与预览统一；颜色与文件见第八节第 31、44 条；`NSWorkspace.icon` 移出 view body，异步 + 缓存 |
+| 7.5.13 Mac 的 `-demoData` | 照 iOS 补一份：内存容器 + 第六节样例；`make-store-shots.py:14` 的灌库路径退役；iOS 那几道门禁在 Mac 上没有对应物，不做；缩略图改用随包资源 |
+| 7.5.17 7.4 的交付口径 | 7.4.1、7.4.2 与第八节第 30、39 条这类共享层改动随 macOS 同期交付，两端都截图验收；7.4.3–7.4.5 只动 iOS 界面，独立排期 |
+| 7.5.8 新增字符串 | 英文、法文原文由实现方起草，在 PR 里审 |
+| 7.5.10 VoiceOver | 仍是待验证项，不属设计决定；单焦点模型下卡片靠辅助功能动作补全 |
+
 ### 本章待确认
 
 > 本章相关的待确认条目：见第八节第 1、2、6、9、10、13、14、16、17、20、21、30、31、32、33、37、38、44、45、47 条。
@@ -2944,6 +2961,8 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
 > 本节只收**设计稿的缺口**。属于工程缺陷、工具链问题或待验证事项的（快捷键注册失败无声、没有主菜单、
 > 相对时间被冻结、VoiceOver 可达性、`Main.dc.html` 与 `gen.py` 漂移、`-demoData` 缺 Mac 端等）
 > 一律登记在 **7.5 工程风险登记**，不重复列在这里。
+>
+> **2026-09-27：47 条已全部拍板**，结果记在每条末尾的「✅ 已拍板」行。
 
 ### 面板几何与布局
 
@@ -2961,6 +2980,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
      「基准从 `screen.frame` 换成 `visibleFrame`、宽 1280、离底浮动」这三条。
    - 出处：`gen.py:234` `panel(th, inner, w=1280, h=332)`；`gen.py:254` `desktop_frame(..., w=1440, h=520, px=80, py=92)`（展示构图）；
      现状 `Copyo/Panel/PanelController.swift:15`（`panelHeight = 380`）、`:79-82`（`screen.frame` 满宽贴底）、`:130-133`（按鼠标选屏）。
+   - ✅ **已拍板（2026-09-27）**：基准 = 鼠标所在屏的 `visibleFrame`；宽 `min(1280, visibleFrame.width − 32)`；水平居中；底边 = `visibleFrame.minY + 12`；窄屏卡片不缩、少露几张 + 横向滚动；1× / 2× 同一套 pt。见 v2 `Main.dc.html` 与画布便签 n1。
 
 2. **预览浮层（空格键 Quick Look）本轮重做，但设计未出。**
    - 悬而未决：尺寸、材质、页脚信息组成、五类内容的版式全部没有设计帧。
@@ -2973,6 +2993,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
      面板定稿后浮层还是旧皮会很扎眼；7.5.5 的三处降级内容态也要在这张图里一并解决。
    - 出处：十张画板里没有预览浮层；现状读数 `Copyo/Panel/PreviewOverlay.swift:20-26`（680 × 320、radius 14、`.regularMaterial`）、
      `:88-101`（底部 30pt 信息条）。
+   - ✅ **已拍板（2026-09-27）**：(b) 独立子窗口，浮在面板上方 12pt，宽 720，高随内容 ≤ 480，不抢 key；样式按 iOS 详情页降档：玻璃圆角 20、内容块圆角 12 + 来源淡染、底部 28 高 meta「来源 · 相对时间 · 字数」、无工具栏。见 v2 `A-preview.dc.html`。
 
 3. **空态只画了「历史为空」一种。**
    - 悬而未决：「搜索有词但零结果」与「Pinboard 内容为空」两种空态显示什么——是否复用同一插画、文案如何写、
@@ -2981,12 +3002,14 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
    - 不定会挡住：搜索是本轮重点交互（`A-search.dc.html` 已定稿），输入到无结果这一步会掉进没有设计的地方。
    - 出处：`A-empty.dc.html`（`gen.py:314-335`）只有「历史为空」；现状搜索无结果走
      `Copyo/Panel/PanelRootView.swift:293` 的英文原串 `Nothing matches "…"`。
+   - ✅ **已拍板（2026-09-27）**：搜索无结果 = 轨道居中一行「没有匹配「…」的内容」，无插画，保留筛选行（v2 `A-search-empty.dc.html`）；Pinboard 为空 = 复用插画 + 「这个 Pinboard 还是空的」+ 右键固定的引导（v2 `A-pinboard-empty.dc.html`）。
 
 4. **空态帧的竖向合计对不上面板高 332。**
    - 悬而未决：16 + 32 + 12 + **222** + 12 + 24 + 16 = **334**，比面板高 2pt；01 主态与 01c 搜索态都正好 332。
    - 选项：(a) 空态块改为 220；(b) 面板在空态下放高 2pt。
    - 不定会挡住：空态帧的实现取哪个高度；两个数都写不进 `PanelRootView` 的布局。
    - 出处：`gen.py:314-335`（空态区 222）；`gen.py:234` 面板高 332。
+   - ✅ **已拍板（2026-09-27）**：(a) 空态区 220，面板高恒为 332（v2 `A-empty.dc.html`）。
 
 5. **搜索态到底用不用矮卡片。**
    - 悬而未决：`A-search.dc.html` 把轨道高设成 **158**，但卡片本身仍是 `height: 184px; flex: none`——
@@ -2994,6 +3017,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
    - 选项：(a) 搜索态用真矮卡片（重排内容、clamp 下调）；(b) 沿用裁切（需接受半行被切）。
    - 不定会挡住：搜索态的卡片视图要不要第二套几何；也牵动第 38 条的 clamp 行数。
    - 出处：`A-search.dc.html` 的轨道高 158 与 `gen.py:108` `card()` 默认 `h=184`。
+   - ✅ **已拍板（2026-09-27）**：另解：「N 条结果」移进搜索框右侧（11pt `label.meta`），轨道恒 184，只有一套卡片几何，打字时卡片不跳（v2 `A-search.dc.html`）。与第 38 条一并定。
 
 6. **轻提示只画了「已复制」一条，且定位基准有两个互相冲突的答案。**
    - 悬而未决：(a) 固定 / 删除 / 删除后撤销均无对应提示；(b) 实现基准是贴面板还是贴屏幕、越出多少。
@@ -3004,6 +3028,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
    - 不定会挡住：悬停动作簇里固定 / 删除两枚按钮按下后没有任何反馈的定义；`Panel/CopyToast.swift` 的窗口归属写不了。
    - 出处：`gen.py:284-288`（36pt 高胶囊、radius 18、`SUCCESS_L #34C759` 勾、`bottom: 60px`）、`gen.py:291-294`（画板外层 div）。
      进出时长（0.22s / 0.18s）为本规格自定，设计稿未给。
+   - ✅ **已拍板（2026-09-27）**：独立、不抢焦点的小窗，同屏底部水平居中、底边落在原面板底边处，约 1.2s；只保留「已复制」，删除撤销不进本轮（v2 `A-toast.dc.html`）。
 
 7. **悬停态的数值全部未经设计稿验证。**
    - 悬而未决：`gen.py:108-147` 的 `card()` 在 `hover=True` 时**只叠加玻璃动作簇，底色仍是默认淡染**；
@@ -3013,6 +3038,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
      拖放原位 ghost `opacity .35`（移植图 §5.10）——**要么整体采纳，要么补一版悬停卡画板核定**。
    - 不定会挡住：卡片是面板里唯一高频的悬停对象，悬停反馈定不下来，`ClipCard` 的状态机就少一档。
    - 出处：`gen.py:108-147`、`gen2.py:55`、`gen2.py:59`（拖起态）。
+   - ✅ **已拍板（2026-09-27）**：(a) 采纳本规格的悬停值，实现后截图验收（v2 `Card.dc.html` 状态行第 2 张）。
 
 ### 设置窗口
 
@@ -3022,6 +3048,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
    - 选项：(a) 画板漏画，按 `Toggle` 实现；(b) 有意改成别的控件形态（需给形态）。
    - 不定会挡住：通用页是已定稿的两页之一，行右侧留空就没法交付。
    - 出处：`gen2.py` 的 `toggle()` 定义与 `gen2.py:235-239` 的 `gen_content` 四行。
+   - ✅ **已拍板（2026-09-27）**：(a) 漏画，用系统 `Toggle(.switch)`（v2 `Settings-general.dc.html`）。
 
 9. **设置窗口的尺寸与标签页顺序，设计与代码三处冲突。**（同一问题此前散在五处，已合并于此）
    - 悬而未决：(a) **高度**——设计 460（`gen2.py:219` `win(..., h=460)`）vs 代码内容高 400
@@ -3036,6 +3063,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
    - 不定会挡住：设置换肤的画板与代码对不上，一行都落不了地；标签顺序若改，`-settingsTab <0-4>` 的编号含义跟着变
      （见第六节 6.6），商店截图 04 是否重拍也取决于此。
    - 出处：`gen2.py:219`、`gen2.py:228`；`SettingsView.swift:22-38 / :47-48 / :73-93`；`SettingsWindowController.swift:9`。
+   - ✅ **已拍板（2026-09-27）**：分段控件替换 `TabView`；宽固定 540，删掉 `SettingsLayout.width` 的实算（法语截图验证）；窗口总高 460；顺序按设计稿 `通用 / 同步 / 快捷键 / 历史 / 关于`，`-settingsTab` 编号随之改，商店截图 04 重拍；历史页标签统一叫「历史」。
 
 10. **设置的「同步」「历史」「关于」三页未画。**
     - 悬而未决：`gen2.py` 只产出「通用」（`gen2.py:234-239` `gen_content`）与「快捷键」（`gen2.py:250-261` `key_content`）两页，
@@ -3044,6 +3072,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 不定会挡住：同步页是分歧最大的一页（两套构建风味的 UI 不同见 7.5.6、11 种可区分状态见 7.5.7），外推不出来；
       历史页有一个 80pt 高的 `TextEditor`（`SettingsView.swift:156-158`），换肤规则里没有对应控件。
     - 出处：`gen2.py:234-271`；`Settings.dc.html`。
+    - ✅ **已拍板（2026-09-27）**：(c) 按已画两页的规则外推，v2 已补出三页（`Settings-sync.dc.html`、`Settings-history.dc.html`），实现后截图验收；历史页的 `ignoredApps` 文本框改为 App 列表 + `+` / `−`。
 
 11. **「在菜单栏显示图标」与「忽略密码管理器」两个新开关的行为未定义。**
     - 悬而未决：两者都出现在设计稿的「通用」页，代码里**都不存在**（全仓 grep 无 `showMenuBarIcon` 一类的 key）；
@@ -3052,6 +3081,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       (b) 「忽略密码管理器」是一个内置 bundle ID 列表的开关，还是 `ignoredApps` 的一个预设？两者与历史页那个文本框如何并存。
     - 不定会挡住：通用页是已定稿的两页之一，这两行落不了地这一页就换不完。
     - 出处：`gen2.py:235-238`。
+    - ✅ **已拍板（2026-09-27）**：(a) 允许关闭菜单栏图标，行下注明找回方式（再次打开 App → 面板 → 齿轮，路径已存在）；(b) 「忽略密码管理器」不做开关，改为只读行、右侧「始终开启」（`ConcealedType` / `TransientType` 的过滤现状无条件生效）。
 
 12. **设置图标砖有四处内容是占位。**
     - 悬而未决：`TILE["start"]` / `TILE["priv"]` / `TILE["about"]` 的 `inner` 是 `None` 且从未被渲染；
@@ -3060,6 +3090,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：四个都需要补定真实 SF Symbol 名。
     - 不定会挡住：通用页与（将来的）关于页的图标砖画不出来。
     - 出处：`gen2.py:177-181` `TILE`、`gen2.py:238`。
+    - ✅ **已拍板（2026-09-27）**：登录时启动 `power`、忽略密码管理器 `key.fill`、唤出面板 `command`、关于 `info.circle`；「在菜单栏显示图标」改用 `menubar.rectangle`；色沿用 `TILE`。符号名实现时逐个核实。
 
 ### 面板顶栏右侧那一格（第 13–16 条共用同一块 32 × 32 的空间，须一起拍板）
 
@@ -3072,6 +3103,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       （`gen.py` 只有 `CLOUD_OK_I` 一个图标常量、只有 `SUCCESS_L #34C759` 一种着色），采纳前需补图。
     - 不定会挡住：顶栏右侧那一格定不下来；三态图标与文案也要出图；第五节 §5.2 表里这两行的符号名目前是本规格规定的。
     - 出处：`gen.py:55 / :210`；现状见 7.5.7。
+    - ✅ **已拍板（2026-09-27）**：只分「正常 / 需要处理」两态，不设「同步中」（代码里没有这个信号）；真错误用橙 `#FF9F0A`、未配置用灰；点一下打开设置 · 同步页（v2 `A-sync-states.dc.html`）。
 
 14. **文件夹同步模式在面板顶栏没有任何符号与状态。**
     - 悬而未决：macOS 的同步方式是**三选一**（`Copyo/Services/SyncMode.swift:11-14` `enum SyncMode { case off, folder, icloud }`，
@@ -3090,18 +3122,21 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       所以「面板上怎么表达」的答案在两套构建风味下可能不同。
     - 不定会挡住：与第 13 / 15 条是同一格空间，三条不一起拍板就定不下那一格；会反过来决定第五节 §5.2 要不要再补一组符号。
     - 出处：`SyncMode.swift:6-14`；`SettingsView.swift:202-206 / :368-397 / :421-426 / :450`；`SyncService.swift:49 / :163 / :169`。
+    - ✅ **已拍板（2026-09-27）**：(a) 形状随同步方式，文件夹模式用 folder 系符号；`off` 时整格隐藏；「未选目录」灰色、「书签失效」橙色。
 
 15. **面板顶栏的齿轮按钮在直接分发版是否显示。**
     - 悬而未决：设计稿**无条件**画了齿轮（`gen.py:212`），代码里它在 `#if APPSTORE` 里（`Copyo/Panel/PanelRootView.swift:148-166`）。
     - 选项：(a) 两套风味都显示（需删掉那段条件编译）；(b) 保持差异，直接分发版顶栏右侧只有同步图钮。
     - 不定会挡住：顶栏右侧是 `32 + 8 + 32` 还是 `32` 一格，直接影响搜索框的可用宽度。
     - 出处：`gen.py:212`；`PanelRootView.swift:148-166`。
+    - ✅ **已拍板（2026-09-27）**：(a) 两种风味都显示齿轮，删掉那段 `#if APPSTORE`。
 
 16. **两套构建风味下的同步页是否收敛成一套。**
     - 悬而未决：商店版走 `NSOpenPanel` + 安全书签（有 `lostAccess` 失败态），直接分发版是一个自由文本框（无失败态）。
     - 选项：(a) 出两套设计稿；(b) 把直接分发版的自由文本框也改成 `NSOpenPanel`，收敛成一套；(c) 直接分发版同步页维持现状不换肤。
     - 不定会挡住：设置换肤的工作量估不准（两套 vs 一套）；也决定第 10 条同步页能不能外推。
     - 出处：详见 7.5.6。
+    - ✅ **已拍板（2026-09-27）**：(b) 直接分发版也改为「只读路径 + 选择文件夹… + 恢复默认位置」，收敛成一套；「目录不存在」与「书签失效」共用「需要重新选择」一行。
 
 ### 键盘与交互
 
@@ -3115,6 +3150,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 不定会挡住：快捷键页是已定稿的两页之一，keycap 上印哪个字得先定；底部提示条与通用页脚注也要跟着改；
       牵动 7.5.8 的字符串替换清单。
     - 出处：`gen2.py:241`；`PanelRootView.swift:326-328`；`SettingsView.swift:120 / :506`。
+    - ✅ **已拍板（2026-09-27）**：(b) 以 `⇧↩` 为准，`⌥↩` 保留一个版本作隐藏别名后删除；界面只印 `⇧↩`。
 
 18. **四条键盘语义未定：`⇥` / `↑↓` / `⌘1–9` / 搜索框有内容时的空格。**
     - 悬而未决：
@@ -3128,6 +3164,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       设计稿没画「搜索框有内容时空格怎么办」。
     - 不定会挡住：`⌘F` / `⇥` / `⌘1–9` 三项 Mac 今天完全不存在，是本轮新增；焦点模型改造要一次做对，四条不定就要返工。
     - 出处：`gen2.py:241-243`；`PanelRootView.swift:315-316 / :320`。
+    - ✅ **已拍板（2026-09-27）**：(a) 单焦点模型：打字恒进搜索框，← → 恒移卡片，`⇥` / `⇧⇥` 切筛选（设置页行名「在筛选间循环」不变）；**4.1.1 的三区模型作废**。(b) `↑↓` 继续吞掉（有意为之，加注释）。(c) `⌘1–9` = 选中并复制收起。(d) 搜索框有字时空格就是空格；另加 `⌘Y` 预览。
 
 19. **快捷键被占用后的恢复流程未定。**
     - 悬而未决：设计稿只画了警示行本身（`gen2.py:258`，文案「这个组合已被另一个 App 占用，Copyo 收不到它」）。
@@ -3135,6 +3172,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：(a) 保存失败即回滚到旧组合并弹警示；(b) 保存新组合但标红，菜单栏与提示条都不再标注该组合。
     - 不定会挡住：7.5.1（注册结果被丢弃）的修法取决于这条；快捷键页的失败态目前无法点亮。
     - 出处：`gen2.py:258`。
+    - ✅ **已拍板（2026-09-27）**：(a) 注册失败即回滚到旧组合，并显示「这个组合已被另一个 App 占用，已恢复为 <旧组合>」；被系统快捷键占用时检测不到，属 API 限制，记在 7.5.1。
 
 20. **「新建 Pinboard…」对话框的视觉归属未定，设计稿十张画板一张都没画。**
     - 悬而未决：它**不是** `NSAlert`，是**面板内弹的 SwiftUI `.alert`**（`Copyo/Panel/PanelRootView.swift:108-117`：
@@ -3150,6 +3188,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       **落地顺序**——第四节 §4.1.3 第 3 条要把 `suppressAutoHide` 升级成引用计数，若选 (c) 这个 alert 就不再是计数的第一个使用者，两件事的先后要重排。
     - 不定会挡住：右键菜单里「新建 Pinboard…」点下去之后长什么样是空白；面板重写时那段补丁是删是留也取决于选哪个方案。
     - 出处：`PanelRootView.swift:98-117`；`PanelController.swift:23` `var suppressAutoHide = false`。
+    - ✅ **已拍板（2026-09-27）**：(c) 面板内联：Pinboard 胶囊原地变输入框，↩ 创建、esc 取消（单焦点模型唯一的例外）；建完把触发的卡固定进去。`suppressAutoHide` / `makePanelKey()` 补丁删除，4.1.3 第 3 条的计数改造不再需要（v2 `A-pinboard-new.dc.html`）。
 
 21. **「清空历史」确认框的形态与入口统一。**
     - 悬而未决：仓库里现有**两份**实现，共用同一批 `String(localized:)`、删除逻辑一致——
@@ -3162,6 +3201,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       （实现层面的「两份代码是否收敛成一处」登记在 7.5.15。）
     - 不定会挡住：面板空白处右键菜单的最后一项点下去之后没有定义。
     - 出处：`AppDelegate.swift:231-239`；`SettingsView.swift:170-175`。
+    - ✅ **已拍板（2026-09-27）**：不加面板入口；菜单栏 `NSAlert` 与设置页 `.confirmationDialog` 保留原生形态，删除逻辑收敛为一个函数（7.5.15）。
 
 22. **卡片右键菜单的三个新增项需确认。**
     - 悬而未决：`03` / `03b` 上下文菜单**没有设计帧**，菜单项文案是按 iOS 规格 3.11 与现有
@@ -3173,6 +3213,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       `预览` / `在访达中显示` / `拷贝色值` 三项尤其没有交代用什么符号，第五节的符号表也没有它们。
       需要与菜单行数一并定下（macOS 的 `NSMenu` 可以不带图标，这本身也是一个选项）。
     - 出处：iOS 规格 §3.11；`PanelRootView.swift:253-285`；第五节符号表。
+    - ✅ **已拍板（2026-09-27）**：`分享` 顺延 1.2；面板空白处右键菜单整个删除（**03b 作废**）；卡片菜单 = `复制 / 纯文本复制 / ─ / 固定到 Pinboard ▸（已固定时为取消固定）/ 预览 / ─ / 删除`，带 SF Symbol（v2 `A-menu.dc.html`）。
 
 23. **多选未设计。**
     - 悬而未决：今天 `selectedIndex: Int` 是单一整数（`PanelRootView.swift:24`），面板不支持多选，
@@ -3180,6 +3221,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：(a) 1.1 不做多选；(b) 现在就把焦点模型做成支持多选。
     - 不定会挡住：不挡本轮；但若 1.2 要做批量删除 / 批量固定，焦点模型需要再改一次，代价在那时。
     - 出处：`PanelRootView.swift:24`。
+    - ✅ **已拍板（2026-09-27）**：(a) 1.1 不做多选。
 
 24. **增强对比度 / 减弱透明度的降级数值，全是本规格自造。**
     - 悬而未决：`gen.py` / `gen2.py` 与十张画板里**都没有**对比度 / 透明度降级的变体可查。本规格自定的值是：
@@ -3190,6 +3232,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：(a) 整体采纳本规格的值；(b) 补一版「增强对比度 + 减弱透明度」的降级画板核定。
     - 不定会挡住：这两个系统开关打开时面板会怎样，今天没有任何可验收的标准。
     - 出处：本规格第四节 §4.7.2 / §4.7.3 / §4.7.4，设计稿无对应。
+    - ✅ **已拍板（2026-09-27）**：(a) 整体采纳（「失焦选中环」改称「失焦当前卡环」），两个系统开关各截一张图验收。
 
 ### 符号与品牌
 
@@ -3199,6 +3242,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：需要一张逐档对照表，或改为逐个符号指定 `Font.Weight`。
     - 不定会挡住：第五节整张符号表的「线宽」列无法翻译成实现代码。
     - 出处：`gen.py` 的 `icon()` 与各图标常量。
+    - ✅ **已拍板（2026-09-27）**：1.5 → `.regular`；1.6 / 1.7 → `.medium`；1.8 / 2 → `.semibold`；与画板并排截图对比，个别偏差单独调。
 
 26. **卡片「已固定」标记取 `pin` 还是 `pin.fill`。**
     - 悬而未决：设计稿两处（悬停动作簇、拖起态标记）用的都是同一个描边 `PIN_I`，即 `pin`；
@@ -3206,6 +3250,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：两端统一到 `pin.fill`（填充）/ 两端统一到 `pin`（描边）/ 允许分叉（动作簇用描边、状态标记用填充）。
     - 不定会挡住：同一条目在 Mac 和 iPhone 上的「已固定」标记形状不同。
     - 出处：`gen.py` 的 `PIN_I`；iOS 规格第五节。
+    - ✅ **已拍板（2026-09-27）**：按用途分：卡片上的「已固定」标记两端统一 `pin.fill`；悬停动作簇的按钮未固定时 `pin`、已固定时 `pin.fill`。
 
 27. **品牌红蓝在 macOS 的使用边界未定。**
     - 悬而未决：`Tokens.dc.html` 的 token 表把 `brand.bone` / `brand.red` 的允许范围写成
@@ -3218,6 +3263,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：(a) 把允许清单按 macOS 实际收紧（去掉「设置图标砖」「引导」）；(b) 保留宽口径备将来用。
     - 不定会挡住：token 表的「允许范围」一列写不准；也决定将来设置图标砖能不能用品牌红。
     - 出处：`gen2.py:115-116`、`gen2.py:177-181`、`gen.py:316-324`。
+    - ✅ **已拍板（2026-09-27）**：(a) macOS 只用于 App 图标与空态插画；引导顺延 1.2 时再议。
 
 28. **菜单栏模板图标未重新构思。**
     - 悬而未决：现状是 `Copyo/Assets.xcassets/MenuBarIcon.imageset` 下的 `menubar-template-18.png` /
@@ -3226,6 +3272,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：(a) 原样留到下一轮；(b) 本轮顺手按新品牌标识（`CopyoShared/Share/CopyoMark.swift`）出一版模板图。
     - 不定会挡住：不挡实现，但菜单栏图标是这个 App 唯一的常驻可见面，和新面板并排出现时风格是否割裂需要有人看过一眼再定。
     - 出处：`AppDelegate.swift:167-172`。
+    - ✅ **已拍板（2026-09-27）**：(a) 本轮不重画。
 
 ### Token 与取色
 
@@ -3246,6 +3293,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 不定会挡住：一端硬编码 hex、另一端浮点插值的话，同一条目在 Mac 和 iPhone 上会差 1，
       在卡片这种大面积淡染上**肉眼可辨**。
     - 出处：`gen.py` 的 `SRC` / `COLORCLIP` 字典（`:65 / :67 / :71 / :74`）；`CopyoTheme.swift:121-131`。
+    - ✅ **已拍板（2026-09-27）**：公式为准、运行时计算，两端用同一个 `mix`、不量化；`gen.py` 的四个字面量改为公式值（round-half-up；v2 的 `gen_v2.py` 已按公式算）；字典仅作示意。
 
 30. **取不到来源色时的回退色，两端不一致。**
     - 悬而未决：Mac 侧 `AppIconProvider.fallbackColor`（`Copyo/Services/AppIconProvider.swift:10`，
@@ -3260,6 +3308,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       写进条目并同步给 iOS，两端不一致时同一条目在 Mac 和 iPhone 上淡染不同色。
     - 不定会挡住：卡片淡染与角标底色都依赖它；不定就会持续产出两端不一致的存量数据。
     - 出处：`AppIconProvider.swift:10`；`ClipboardMonitor.swift:76`；`CopyoTheme.swift:104`；本文 7.4.7。
+    - ✅ **已拍板（2026-09-27）**：7.4.7 的 (a)：取不到来源色时写 `nil`，两端显示时统一回退 `#8E8E93`；存量迁移按精确值匹配（`#7E8EA5` 与通用 App 图标算出的主色）；`headerColor` 需区分「算不出」与「算得出但很灰」。
 
 31. **颜色类条目解析失败时的淡染回退未画。**
     - 悬而未决：`plainText` 不是合法 hex 时，渲染色是落回 `sourceColorHex`，还是落回 `source.local #8E8E93`？
@@ -3267,6 +3316,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 不定会挡住：`ClipItem+Display.swift:143-146` 的 `colorValue` 今天返回 `Color?`，失败即 `nil`，**没有兜底**，
       7.4.2「颜色类条目的淡染取自身色」落地后这条路径会直接露出来。
     - 出处：`ClipItem+Display.swift:143-146`；本文 7.4.2。
+    - ✅ **已拍板（2026-09-27）**：回退到来源色，按普通卡画。
 
 32. **两端 token 的五处分歧，需逐条定「统一」还是「分叉」。**
     | # | token | macOS 设计稿 | iOS 规格 / `CopyoTheme.swift` | 待定 |
@@ -3276,6 +3326,8 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     | c | `glass` | 浅 `rgba(255,255,255,0.74)` + blur24 / 深 `rgba(58,58,60,0.72)` + blur24 | 浅 `rgba(255,255,255,.72)` + blur20 / 深 `rgba(120,120,128,.28)` + blur20 | 深色差异尤其大（不透明灰 vs 半透明中性灰），是平台差异还是需要对齐 |
     | d | `cring`（卡片 0.5px 描边）与 `swatchring` | macOS 新增 | iOS 卡片明确「无边框」 | iOS 是否补上，还是就此分叉 |
     | e | 卡片 meta 行颜色 | 新增 `label.meta`（`.78` / `.72`） | `labelSecondary`（`.6` / `.6`） | iOS 是否一并抬档；不抬的话同一条目两端浓度不同 |
+
+    - ✅ **已拍板（2026-09-27）**：(a) 分叉，macOS `.34`、iOS 保持 `.3`；(b) 统一到 `rgba(0,0,0,.78)`；(c) 分叉，macOS 26+ 用系统玻璃、14–25 用 `NSVisualEffectView`，rgba 只作视觉目标；(d) 分叉，macOS 有描边、iOS 无；(e) 分叉，iOS 本轮不抬。
 
 33. **五个 token 的归宿未定（`rowOpaque` / `bg.raised` / `sheet` / `menu` / `sidebarBg`）。**
     - 悬而未决：
@@ -3290,12 +3342,14 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       (e) **`sidebarBg`**（`CopyoTheme.swift:85`，深 `#141416`）——比新的 `bg.grouped` 还暗；未出现在 macOS 设计稿里，取值未定。
     - 不定会挡住：token 表的条目数与别名关系定不下来，共享 theme 层（7.3）就没法定稿。
     - 出处：`CopyoTheme.swift:75 / :77 / :82-85`；`Tokens.dc.html`；本文 7.4.1。
+    - ✅ **已拍板（2026-09-27）**：`rowOpaque` 作为 `bgCard` 的别名；`bg.raised` 不进 macOS 表，留到 1.2；`sheet` / `menu` / `sidebarBg` 是 iOS 独有，不进 macOS 表；`menu` 的层级记为 iOS 待验证。
 
 34. **macOS 是否响应系统「文字大小」设置。**
     - 悬而未决：设计稿给的是死点数；`CopyoTheme.swift:183-203` 那套 Dynamic Type 约束是 iOS 侧的，macOS 侧未表态。
     - 选项：(a) macOS 固定点数不响应；(b) 按系统设置做有限档位缩放（面板高度与卡片几何都要跟着变）。
     - 不定会挡住：若要响应，第一条（面板几何）与卡片 260 × 184 全部要改成可变；这是一个前置决定。
     - 出处：`CopyoTheme.swift:183-203`。
+    - ✅ **已拍板（2026-09-27）**：(a) 不响应，固定点数。
 
 ### 排版与文案
 
@@ -3305,6 +3359,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：两者二选一；若取 Medium，生成脚本要一并改。
     - 不定会挡住：颜色类与代码类卡片的正文字重定不下来。
     - 出处：`Tokens.dc.html` 字号表；`gen.py` 的 `body_text()`。
+    - ✅ **已拍板（2026-09-27）**：Regular；v2 Tokens 板的标注已改。
 
 36. **两处题注与代码矛盾，需定要不要回改生成脚本。**
     - 悬而未决：
@@ -3318,6 +3373,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：题注就地改正 / 保留题注并在规格里长期挂更正。
     - 不定会挡住：不挡实现（取值已裁定），但下一轮重跑画板仍会印出错的题注。
     - 出处：`gen2.py:66`；`gen2.py` 的 `state_row()`；`gen.py:83` `pad="0 6px 0 5px"`、`gen.py:108-147` `card()`。
+    - ✅ **已拍板（2026-09-27）**：就地改正；v2 画板已按 54pt / `2px + 7px` 标注。
 
 37. **meta 行的截断阈值未给，且生成脚本与目标行为相反。**
     - 悬而未决：题注说的「省略号从来源名开始吃、时间永不被截」是**目标行为**，画板本身做不到——
@@ -3329,6 +3385,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       这个下限下来源名可能只剩两三个字，需要设计方给一个「宁可整段不显示」的阈值。
     - 不定会挡住：SwiftUI 侧必须把 meta 行拆成两段实现，拆点的阈值不定就写不了。
     - 出处：`gen.py:137-138`；`gen2.py:66`；本文第三节 §3.3。
+    - ✅ **已拍板（2026-09-27）**：(a) 生成脚本改为两段（`gen_v2.py` 的 `meta_line`）；(b) 来源名段可用宽小于「两个全角字 + …」（11pt 下约 33pt）时，连同「 · 」整段隐藏；不用 `minimumScaleFactor`。
 
 38. **文本卡正文的 clamp 取 7 行还是 6 行。**
     - 悬而未决：`gen.py:149-153` 的 `body_text` 默认 `-webkit-line-clamp: 7`，但按 `gen.py` 自己的卡片几何实算，
@@ -3338,6 +3395,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：(a) 把 clamp 改成 6；(b) 保留 7 并接受第 7 行被卡片高度切掉（那就等于没有真正消除「半行被切」）。
     - 不定会挡住：与第 5 条（搜索态是否换矮卡片）是同一处几何，宜一起定。
     - 出处：`gen.py:149-153`、`gen.py:108`。
+    - ✅ **已拍板（2026-09-27）**：(a) clamp 6。
 
 39. **相对时间的显示阈值未定。**
     - 悬而未决：6.1 / 6.3 的「相对时间」在设计稿里是写死的字符串（`2 分钟前` / `昨天 18:42`），
@@ -3345,12 +3403,14 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：给一套三段阈值，或直接采用 `RelativeDateTimeFormatter` 的默认行为。
     - 不定会挡住：卡片 meta 行的右半段写不出来。（相对时间**被冻结不刷新**是另一回事，属工程缺陷，见 7.5.4。）
     - 出处：第六节 6.1 / 6.3 的样例串。
+    - ✅ **已拍板（2026-09-27）**：复用 iOS 的 `relativeTime`（挪到共享层），两端一致；设计稿里「今天 09:12」的写法作废。
 
 40. **文件卡「另外 N 个文件」的英文文案未给。**
     - 悬而未决：6.3 第 6 条的「另外 4 个文件」是中文写死串，英文版文案未给。
     - 选项：沿用现状 `"\(count) files"`（`Copyo/Panel/CardView.swift:154-173`），或另拟。
     - 不定会挡住：本地化清单少一条；英文商店截图里这张卡没有文案。
     - 出处：第六节 6.3 第 6 条；`CardView.swift:154-173`。
+    - ✅ **已拍板（2026-09-27）**：`1 more file` / `%lld more files`；法文 `1 autre fichier` / `%lld autres fichiers`（String Catalog 复数变体）。
 
 ### 顺延与暂不影响本轮的
 
@@ -3359,6 +3419,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 不定会挡住：设置·历史页出图时才需要，不挡面板。
     - 出处：`Copyo/Settings/SettingsView.swift:136`（`@AppStorage("historyLimit") = 500`）、`:143-149`（选项）；
       默认注册在 `Copyo/App/AppDelegate.swift:26-29`。
+    - ✅ **已拍板（2026-09-27）**：保留五档，关闭。
 
 42. **排序维度未列举。**
     - 悬而未决：面板当前只按创建时间倒序；设计稿里没有出现任何排序控件（A 版顶栏只有搜索框 + 两枚图钮 +
@@ -3366,6 +3427,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：(a) 本轮不做排序；(b) 在 Pinboard 胶囊旁加一个排序菜单。
     - 不定会挡住：不挡本轮；但若要加，顶栏那一行 32pt 高的横向空间已经排满，要重排。
     - 出处：`gen.py:199-224`。
+    - ✅ **已拍板（2026-09-27）**：(a) 本轮不做。
 
 43. **「关于」与「隐私说明」二级页未画。**
     - 悬而未决：现状「关于」页是一段居中的图标 + 版本 + 两句说明，没有独立的隐私说明页。
@@ -3373,6 +3435,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 选项：(a) 沿用单段文字；(b) 按 iOS 补一个二级页，两端共用文案。
     - 不定会挡住：不挡本轮实现；但商店审核要求的隐私描述如果要在 App 内可达，得提前定。
     - 出处：`Copyo/Settings/SettingsView.swift:593-617`（`:610` 是隐私那句）。
+    - ✅ **已拍板（2026-09-27）**：(a) 沿用单段文字。
 
 44. **多文件卡片在沙盒下图标不可读时的降级画法未定。**
     - 悬而未决：卡片 `fileContent` 单文件显示图标 + 文件名（两行截断），多文件显示图标 + `"\(count) files"`；
@@ -3382,6 +3445,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 不定会挡住：文件类卡片在新面板里画不出来；而筛选胶囊第六项就是「文件」（`gen.py:219` 的 `names` 列表末项），
       点进去必须有东西可看。
     - 出处：`Copyo/Panel/CardView.swift:154-173`（图标取自 `:157` 的 `NSWorkspace.shared.icon(forFile:)`）；`PanelRootView.swift:410-418`（`isReadableFile` 的 guard 在 `:415`）。
+    - ✅ **已拍板（2026-09-27）**：按扩展名取 `NSWorkspace.shared.icon(for: UTType)`，不读文件；多文件按设计稿画三块叠放 + 首个文件名 + 「另外 N 个文件」。
 
 45. **B 版主窗口的处置与边界。**
     - 悬而未决：`B-window-light.dc.html` / `B-window-dark.dc.html`（各 26k，1180 × 800 画布，228pt 侧栏 + 三列 268pt 网格；
@@ -3399,6 +3463,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       （A 版胶囊 `gen.py:105-106` 不带数量）。B 版侧栏分类与 7.4.3 的 6 项筛选是同一套分类法，届时不需要二次拍板；
       其侧栏的键盘导航、三列网格的 `↑↓` 语义与多选（`⇧` 点选 / `⌘` 点选）均未展开。
     - 出处：`gen.py:337-398`；`canvas.json` 的便签 `n1`（2026-09-20 拍板原文）。
+    - ✅ **已拍板（2026-09-27）**：(a) 1.1 不实现、不做计数；两张稿原地保留，作为 1.2 的起点，不是本轮依据。
 
 46. **成品深色帧只有 01 一张。**
     - 悬而未决：十张画板里只有 `A-panel-dark.dc.html`（01 主态）是成品深色整帧。另有两处深色内容**不构成整帧**：
@@ -3411,6 +3476,7 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
       但**骨白卡本身与深色面板的对比需实机确认**。
     - 不定会挡住：深色是 macOS 上的常见设置，五张缺帧覆盖了本轮全部交付界面；不出图就没有深色的验收标准。
     - 出处：`canvas.json` 的 `boards` 列表；`gen2.py:84-85`、`gen2.py:153`。
+    - ✅ **已拍板（2026-09-27）**：(b) 不补深色帧，按 token 推导，验收时每个界面浅 / 深各截一张；空态骨白卡实机确认。
 
 47. **首启欢迎：按 iOS 引导页降档重做，还是维持 `NSAlert` 只做中文化。**
     - 悬而未决：macOS 今天的首启是一个英文 `NSAlert`（`Copyo/App/AppDelegate.swift:125-155`，
@@ -3423,3 +3489,4 @@ let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
     - 不定会挡住：不挡面板与设置的实现；但 7.4 的「品牌红蓝可出现在引导插图」这一条在 macOS 上
       是否成立取决于此（见第 27 条），且首启是安装后第一眼，与本轮重做的面板放在一起看会很割裂。
     - 出处：`Copyo/App/AppDelegate.swift:125-155`；iOS 规格 §3.9；A 版画板无对应帧。
+    - ✅ **已拍板（2026-09-27）**：(a) 本轮只把 `NSAlert` 中文化并把键位改成 `⇧↩`；完整引导顺延 1.2。

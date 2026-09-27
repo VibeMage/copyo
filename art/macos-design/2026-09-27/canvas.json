@@ -1,0 +1,71 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-27T00:43:02Z"
+  },
+  "title": "Copyo Mac 设计稿 v2",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 1440, "h": 520, "title": "01 · 面板 · 主态 · 浅色" },
+    "A-panel-dark.dc.html": { "x": 1520, "y": 0, "w": 1440, "h": 520, "title": "01 · 面板 · 主态 · 深色" },
+    "A-hover.dc.html": { "x": 0, "y": 900, "w": 1360, "h": 412, "title": "01b · 悬停动作簇" },
+    "A-search.dc.html": { "x": 1440, "y": 900, "w": 1360, "h": 412, "title": "01c · 搜索中" },
+    "A-search-empty.dc.html": { "x": 2880, "y": 900, "w": 1360, "h": 412, "title": "01e · 搜索无结果" },
+    "A-empty.dc.html": { "x": 0, "y": 1392, "w": 1360, "h": 412, "title": "01d · 历史为空" },
+    "A-pinboard-empty.dc.html": { "x": 1440, "y": 1392, "w": 1360, "h": 412, "title": "01f · Pinboard 为空" },
+    "A-pinboard-new.dc.html": { "x": 2880, "y": 1392, "w": 1360, "h": 412, "title": "03c · 新建 Pinboard（胶囊原地输入）" },
+    "A-menu.dc.html": { "x": 0, "y": 2184, "w": 1360, "h": 412, "title": "03 · 卡片右键菜单" },
+    "A-toast.dc.html": { "x": 1440, "y": 2184, "w": 1440, "h": 520, "title": "01g · 已复制轻提示（面板已收起）" },
+    "A-sync-states.dc.html": { "x": 2960, "y": 2184, "w": 1040, "h": 620, "title": "顶栏 · 同步格的状态" },
+    "A-preview.dc.html": { "x": 0, "y": 3184, "w": 1440, "h": 900, "title": "02 · 预览浮层" },
+    "Settings-general.dc.html": { "x": 0, "y": 4464, "w": 1192, "h": 532, "title": "04 · 设置 · 通用 / 快捷键" },
+    "Settings-sync.dc.html": { "x": 1272, "y": 4464, "w": 1192, "h": 532, "title": "04c · 设置 · 同步（共享文件夹 / iCloud）" },
+    "Settings-history.dc.html": { "x": 2544, "y": 4464, "w": 1192, "h": 532, "title": "04c · 设置 · 历史 / 关于" },
+    "Card.dc.html": { "x": 0, "y": 5376, "w": 1760, "h": 1440, "title": "ClipCard · dense" },
+    "Tokens.dc.html": { "x": 1840, "y": 5376, "w": 1760, "h": 1000, "title": "Tokens" }
+  },
+  "order": [
+    "Main.dc.html",
+    "A-panel-dark.dc.html",
+    "A-hover.dc.html",
+    "A-search.dc.html",
+    "A-search-empty.dc.html",
+    "A-empty.dc.html",
+    "A-pinboard-empty.dc.html",
+    "A-pinboard-new.dc.html",
+    "A-menu.dc.html",
+    "A-toast.dc.html",
+    "A-sync-states.dc.html",
+    "A-preview.dc.html",
+    "Settings-general.dc.html",
+    "Settings-sync.dc.html",
+    "Settings-history.dc.html",
+    "Card.dc.html",
+    "Tokens.dc.html"
+  ],
+  "notes": {
+    "t1": { "x": 0, "y": -260, "text": "悬浮面板 · 主态", "kind": "title1", "maxW": 2960 },
+    "t2": { "x": 0, "y": 640, "text": "面板 · 状态", "kind": "title1", "maxW": 4240 },
+    "t3": { "x": 0, "y": 1924, "text": "右键菜单 · 轻提示 · 同步格", "kind": "title1", "maxW": 4000 },
+    "t4": { "x": 0, "y": 2924, "text": "预览浮层", "kind": "title1", "maxW": 1440 },
+    "t5": { "x": 0, "y": 4204, "text": "设置窗口 · 五页", "kind": "title1", "maxW": 3736 },
+    "t6": { "x": 0, "y": 5116, "text": "组件与 Tokens", "kind": "title1", "maxW": 3600 },
+    "n1": {
+      "x": 3040, "y": 0, "w": 440, "color": "blue",
+      "text": "面板位置（第 1 条）：以鼠标所在屏幕的 visibleFrame 为准；宽 min(1280, 可用宽 − 32)，水平居中，底边离 Dock 顶 12。\n\n窄屏时卡片保持 260 × 184 不缩，只是同时露出的卡变少，靠横向滚动。尺寸固定，不跟随系统文字大小。"
+    },
+    "n2": {
+      "x": 3560, "y": 0, "w": 440, "color": "gray",
+      "text": "v2 · 2026-09-27：按 design-spec 第八节的拍板结果重出。\n\nv1（2026-09-20）的十张画板和 B 版主窗口留在仓库 art/macos-design/2026-09-20/。B 版是 1.2 的起点，不是本轮依据。\n\n深色只出主态一张，其余界面按 token 推导、验收时截图。"
+    },
+    "n3": {
+      "x": 1520, "y": 3184, "w": 440, "color": "blue",
+      "text": "预览是面板上方的独立子窗口：宽 720，高随内容、最高 480，底边离面板顶 12。它不抢键盘焦点，按键仍由面板处理。\n\n搜索框为空时按空格打开，任何时候都可以按 ⌘Y。"
+    }
+  },
+  "designSystems": []
+}
