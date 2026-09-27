@@ -82,9 +82,10 @@ struct SyncIndicatorIcon: View {
         }
     }
 
+    /// 画板 17pt、线宽 1.5 → .regular（第八节第 25 条；5.2 表「同步格」行、5.2.1；gen_v2.py:180）
     private func symbol(_ name: String, _ color: Color) -> some View {
         Image(systemName: name)
-            .font(.system(size: 15, weight: .medium))
+            .font(.system(size: 17, weight: .regular))
             .foregroundStyle(color)
     }
 }

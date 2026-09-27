@@ -183,15 +183,17 @@ struct SettingsTile: View {
     }
 }
 
-/// 状态行的前导符号：设计稿是 18pt 的描边图标、不带砖。
-/// 放进 26pt 宽的框里，与上下行的图标砖左缘、文字起点对齐。
+/// 状态行的前导符号：设计稿是 18pt、线宽 1.5 的描边图标、不带砖（gen_v2.py:534-535、:541-542）；
+/// 1.5 → `.regular`（第八节第 25 条；5.3）。
+/// 放进 26pt 宽的框里，与上下行的图标砖左缘、文字起点对齐——画板上这类行没有框、文字比图标砖行左移 8，
+/// 框留不留 3.11 标为设计未定，先照旧。
 struct SettingsStatusIcon: View {
     var symbol: String
     var color: Color
 
     var body: some View {
         Image(systemName: symbol)
-            .font(.system(size: 16))
+            .font(.system(size: 18, weight: .regular))
             .foregroundStyle(color)
             .frame(width: 26, height: 26)
             .accessibilityHidden(true)

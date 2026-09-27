@@ -34,9 +34,9 @@ struct ClipCardView: View {
     var now: Date = Date()
     /// 当前搜索词，正文命中处高亮（01c）
     var highlight: String = ""
-    /// 排在「固定 / 删除」前面的读屏动作（复制、纯文本复制、预览）。由面板传入，
-    /// 这样动作顺序与右键菜单一致（4.7.2），不必在外层再追加一串排在后面的动作
-    var leadingActions: [CardAccessibilityAction] = []
+    /// 卡片的全部读屏动作，与右键菜单同序同名（4.7.2、4.4.1）：复制 / 纯文本复制 / 固定到 Pinboard（已固定时为取消固定）/ 预览 / 删除。
+    /// 整串由面板按这个顺序传入，卡片自己不再追加固定、删除——追加的只能排在末尾，预览就会跑到固定前面
+    var accessibilityActions: [CardAccessibilityAction] = []
 
     @State private var isHovering = false
     @Environment(\.colorSchemeContrast) private var contrast
@@ -89,13 +89,10 @@ struct ClipCardView: View {
         .accessibilityValue(isPinned ? String(localized: "Pinned") : "")
         .accessibilityAddTraits(state == .normal ? [] : .isSelected)
         .accessibilityActions {
-            ForEach(leadingActions) { action in
+            ForEach(accessibilityActions) { action in
                 Button(action.name, action: action.perform)
             }
         }
-        .accessibilityAction(named: isPinned ? String(localized: "Unpin") : String(localized: "Pin to Pinboard"),
-                             onPinButton)
-        .accessibilityAction(named: String(localized: "Delete"), onDelete)
     }
 
     // MARK: - 头行
@@ -128,14 +125,26 @@ struct ClipCardView: View {
 
     /// 右对齐的来源图标位。有 bundle ID 取 App 图标（`AppIconProvider` 按 ID 缓存）；
     /// 没有的（iPhone 存进来的条目）画一块来源色方片，与画板上的色块同形。
+    ///
+    /// App 图标要查 LaunchServices，挪到后台（7.5.5）：body 里只查内存，查到之前图标位先空着——
+    /// 不拿来源色方片顶替，那是「来自别的设备」的画法，闪一下会被读成另一种意思。
     private var footer: some View {
         HStack {
             Spacer(minLength: 0)
             if let bundleID = item.sourceAppBundleID {
-                Image(nsImage: AppIconProvider.icon(forBundleID: bundleID))
-                    .resizable()
-                    .interpolation(.high)
-                    .frame(width: ClipCardMetrics.sourceIconSize, height: ClipCardMetrics.sourceIconSize)
+                AsyncCachedImage(key: bundleID,
+                                 cached: { AppIconProvider.cachedIcon(forBundleID: bundleID) },
+                                 load: { await AppIconProvider.icon(forBundleID: bundleID) }) { icon in
+                    if let icon {
+                        Image(nsImage: icon)
+                            .resizable()
+                            .interpolation(.high)
+                    } else {
+                        // 占位必须是一个真实存在的视图：内容为空时 `.task` 不会触发，图标就永远不来了
+                        Color.clear
+                    }
+                }
+                .frame(width: ClipCardMetrics.sourceIconSize, height: ClipCardMetrics.sourceIconSize)
             } else {
                 let square = RoundedRectangle(cornerRadius: ClipCardMetrics.sourceIconRadius, style: .continuous)
                 square

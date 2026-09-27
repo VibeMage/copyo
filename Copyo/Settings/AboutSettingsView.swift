@@ -8,6 +8,8 @@ import SwiftUI
 struct AboutView: View {
     /// 说明里要印当前快捷键；页面每次切进来都会重建，改完快捷键回来就是新值
     @State private var hotkeyDisplay = HotkeyConfig.load().displayString
+    /// 探测出当前组合按下去 Copyo 收不到时，第一句不再教用户按它（7.5.1，与菜单栏、面板空态同一口径）
+    @State private var hotkeyWorks = (AppDelegate.shared?.hotkeyStatus ?? .active) == .active
 
     private var version: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "-"
@@ -31,7 +33,11 @@ struct AboutView: View {
                     .padding(.top, 4)
                 // 两句是对外承诺（design-spec §04c：改动需同步改隐私说明）
                 VStack(spacing: 0) {
-                    Text("Everything you’ve copied is here. Press \(hotkeyDisplay) to get it back anytime.")
+                    if hotkeyWorks {
+                        Text("Everything you’ve copied is here. Press \(hotkeyDisplay) to get it back anytime.")
+                    } else {
+                        Text("Everything you’ve copied is here.")
+                    }
                     Text("Your history lives only on this Mac and in the sync location you choose. Copyo collects no data.")
                 }
                 .font(.system(size: 12))

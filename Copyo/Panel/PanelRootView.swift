@@ -47,6 +47,9 @@ struct PanelRootView: View {
     @State private var search = Self.initialSearch
     @State private var scope: Scope = .kind(nil)
     @State private var selectedIndex = 0
+    /// 这次选中变化来自 ← → / Home / End（见 `selectFromKeyboard`）。只有键盘移动才把当前卡滚到可视中央（§01）；
+    /// 单击、删除后的下标调整、换筛选等只做最小滚动，保证当前卡露出来即可
+    @State private var centerOnSelect = false
     @State private var previewOpen = Self.initialPreview
     @State private var editingPinboard = false
     @State private var newPinboardName = ""
@@ -56,6 +59,8 @@ struct PanelRootView: View {
     @State private var pinboardChipFrame: CGRect = .zero
     @State private var currentCardFrame: CGRect = .zero
     @State private var searchHovering = false
+    /// 面板唤出时那一轮首屏预热（7.5.5）。再次唤出、擦除时撤掉，排队中还没开跑的随之取消
+    @State private var warmUp: Task<Void, Never>?
     @FocusState private var focus: Field?
 
     /// meta 一档的颜色：增强对比度时提到 label（第八节第 24 条）
@@ -117,6 +122,8 @@ struct PanelRootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .copyoPanelDidShow)) { _ in resetForShow() }
         .onReceive(NotificationCenter.default.publisher(for: .copyoDidEraseAll)) { _ in
             // 宿主视图与进程同寿命，擦除后要自己把指向已删对象的瞬时状态清掉
+            warmUp?.cancel()
+            warmUp = nil
             scope = .kind(nil)
             search = ""
             selectedIndex = 0
@@ -167,10 +174,11 @@ struct PanelRootView: View {
                     SyncIndicatorIcon(state: syncIndicator)
                 }
             }
-            // 两种构建风味都显示齿轮（第 15 条）：直接分发版此前只能右键菜单栏图标进设置
+            // 两种构建风味都显示齿轮（第 15 条）：直接分发版此前只能右键菜单栏图标进设置。
+            // 画板 GEAR_I 17pt、线宽 1.5 → .regular（第八节第 25 条；5.2 表「设置」行；gen_v2.py:185）
             PanelIconButton(help: String(localized: "Settings"), action: { actions.openSettings(nil) }) {
                 Image(systemName: "gearshape")
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(size: 17, weight: .regular))
                     .foregroundStyle(CopyoTheme.labelSecondary)
             }
         }
@@ -179,8 +187,9 @@ struct PanelRootView: View {
 
     private func searchField(resultCount: Int) -> some View {
         HStack(spacing: 6) {
+            // 画板 SEARCH_I 14pt、线宽 1.6 → .medium（5.2 表「搜索」行；gen_v2.py:200）
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(CopyoTheme.labelSecondary)
             TextField(String(localized: "Search History"), text: $search)
                 .textFieldStyle(.plain)
@@ -197,7 +206,8 @@ struct PanelRootView: View {
         }
         .padding(.horizontal, 10)
         .frame(height: CopyoTheme.Dense.searchHeight)
-        .background(searchHovering ? CopyoTheme.fill2 : CopyoTheme.fill,
+        // 悬停 fill → fill2 只在没有搜索词时：有词时画焦点环、底色回 fill，悬停也不变（4.3；第八节第 7 条）
+        .background((searchHovering && search.isEmpty) ? CopyoTheme.fill2 : CopyoTheme.fill,
                     in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .onHover { searchHovering = $0 }
         .overlay {
@@ -254,8 +264,9 @@ struct PanelRootView: View {
     /// 于是此前那套 suppressAutoHide / makePanelKey 补丁整个删掉了。
     private var newPinboardField: some View {
         HStack(spacing: 6) {
+            // 画板 PIN_I 12pt、线宽 1.5 → .regular（5.2 表「新建 Pinboard 内联输入框的前导图钉」行；gen_v2.py:208）
             Image(systemName: "pin")
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(size: 12, weight: .regular))
                 .foregroundStyle(CopyoTheme.accent)
             TextField(String(localized: "New Pinboard Name"), text: $newPinboardName)
                 .textFieldStyle(.plain)
@@ -317,10 +328,11 @@ struct PanelRootView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
+    /// 探测出全局快捷键按下去 Copyo 收不到时，不再教用户按它（7.5.1，与菜单栏「打开 Copyo」一致）
     private var historyEmptyState: some View {
         emptyIllustration(title: String(localized: "Nothing here yet"),
                           body: String(localized: "Anything you copy shows up here. Copyo records it in the background — there is nothing you need to do."),
-                          showsHotkey: true)
+                          showsHotkey: (AppDelegate.shared?.hotkeyStatus ?? .active) == .active)
     }
 
     private func emptyIllustration(title: String, body: String, showsHotkey: Bool) -> some View {
@@ -336,9 +348,12 @@ struct PanelRootView: View {
                     .foregroundStyle(metaColor)
                     .fixedSize(horizontal: false, vertical: true)
                 if showsHotkey {
+                    // 提示行逐字是「keycap + 随时按 ⇧⌘V 唤出这个面板」，句子里也印组合（§01d；gen_v2.py:316-317）。
+                    // keycap 与句子都印当前保存的组合；改键后是否随之改印 §01d 标为设计未定，先跟着改
+                    let combo = HotkeyConfig.load().displayString
                     HStack(spacing: 6) {
-                        KeyCap(text: HotkeyConfig.load().displayString)
-                        Text("Press it anytime to bring up this panel")
+                        KeyCap(text: combo)
+                        Text("Press \(combo) anytime to bring up this panel")
                             .font(.system(size: 11))
                             .foregroundStyle(CopyoTheme.labelSecondary)
                     }
@@ -360,7 +375,7 @@ struct PanelRootView: View {
                 TimelineView(.everyMinute) { timeline in
                     LazyHStack(alignment: .top, spacing: CopyoTheme.Dense.cardGap) {
                         ForEach(Array(items.enumerated()), id: \.element.persistentModelID) { index, item in
-                            card(item, index: index, now: timeline.date,
+                            card(item, index: index, in: items, now: timeline.date,
                                  state: index != selectedIndex ? .normal : (panelIsKey ? .current : .currentInactive))
                         }
                     }
@@ -371,39 +386,55 @@ struct PanelRootView: View {
             }
             .padding(.vertical, -7)
             .padding(.horizontal, -CopyoTheme.Dense.panelPadding)
+            // ← → 移动当前卡时把它滚到可视中央（§01「← → 移动当前卡时」、4.6「当前卡滚动跟随」）；减弱动态时同样居中，只是不包动画。
+            // 其余来源（单击、⌘⌫ 后的下标调整、换筛选归零）只滚到刚好露出来：单击可视区里偏右的卡时若整轨平移到中央，
+            // 用户在原处接着双击，复制到的是邻卡，而面板随即收起，看不到复制错了。§01 与 4.7「单击卡片」都没写单击要居中
             .onChange(of: selectedIndex) { _, newIndex in
+                let anchor: UnitPoint? = centerOnSelect ? .center : nil
+                centerOnSelect = false
                 guard let id = items[safe: newIndex]?.persistentModelID else { return }
                 if reduceMotion {
-                    proxy.scrollTo(id)
+                    proxy.scrollTo(id, anchor: anchor)
                 } else {
-                    withAnimation(.easeOut(duration: 0.15)) { proxy.scrollTo(id) }
+                    withAnimation(.easeOut(duration: 0.15)) { proxy.scrollTo(id, anchor: anchor) }
                 }
             }
         }
     }
 
-    private func card(_ item: ClipItem, index: Int, now: Date, state: CardState) -> some View {
-        ClipCardView(item: item,
+    private func card(_ item: ClipItem, index: Int, in items: [ClipItem], now: Date, state: CardState) -> some View {
+        // 这张卡在屏上期间，替左右各两张预热缩略图与来源图标（7.5.5）；卡片离屏时 task 被取消，
+        // 排队中还没开跑的预热随之撤掉。邻居是在 body 里拆好的 Sendable 值，task 里不碰 ClipItem
+        let neighbors = ClipPrefetcher.neighbors(of: index, in: items)
+        return ClipCardView(item: item,
                      state: state,
                      onPinButton: { togglePin(item, at: nil) },
                      onDelete: { delete(item) },
                      now: now,
                      highlight: search,
-                     leadingActions: [
+                     // 与右键菜单 cardMenu 同序同名（4.7.2、4.4.1）：复制 / 纯文本复制 / 固定（已固定时为取消固定）/ 预览 / 删除。
+                     // 「固定到 Pinboard」固定到哪个 Pinboard 与 ⌘P、动作簇图钉是同一处设计空白（4.1.6），沿用图钉按钮的行为
+                     accessibilityActions: [
                         CardAccessibilityAction(name: String(localized: "Copy")) { actions.copy(item, false) },
                         CardAccessibilityAction(name: String(localized: "Copy as Plain Text")) { actions.copy(item, true) },
+                        CardAccessibilityAction(name: item.pinboard != nil
+                                                ? String(localized: "Unpin")
+                                                : String(localized: "Pin to Pinboard")) { togglePin(item, at: nil) },
                         CardAccessibilityAction(name: String(localized: "Preview")) {
                             selectedIndex = index
                             previewOpen = true
                         },
+                        CardAccessibilityAction(name: String(localized: "Delete")) { delete(item) },
                      ])
             .id(item.persistentModelID)
             .onTapGesture(count: 2) { actions.copy(item, false) }
             .onTapGesture { selectedIndex = index }
-            .onDrag { dragProvider(for: item) }
+            // 拖出按 kind 注册多种表示、多文件卡交出全部文件（§4.5.2、§4.5.3），见 ClipDragSource
+            .modifier(ClipDragSource(item: item))
             // macOS 的右键菜单默认只显示 Label 的文字；第 22 条要求菜单项带 SF Symbol，必须显式要图标
             .contextMenu { cardMenu(item, index: index).labelStyle(.titleAndIcon) }
             .modifier(TrackFrame(active: index == selectedIndex, frame: $currentCardFrame))
+            .task(id: neighbors.map(\.id)) { await ClipPrefetcher.warm(neighbors) }
     }
 
     /// 卡片右键菜单（第 22 条）：复制 / 纯文本复制 / ─ / 固定到 Pinboard ▸（已固定时为取消固定）/ 预览 / ─ / 删除。
@@ -417,8 +448,15 @@ struct PanelRootView: View {
             Button { unpin(item) } label: { Label("Unpin", systemImage: "pin.slash") }
         } else {
             Menu {
+                // 每行前一枚 10 × 10、圆角 3 的色点（4.4.1 序 3；gen_v2.py:356-361），见 PinboardSwatch
                 ForEach(pinboards) { pinboard in
-                    Button(pinboard.name) { pin(item, to: pinboard) }
+                    Button { pin(item, to: pinboard) } label: {
+                        Label {
+                            Text(verbatim: pinboard.name)
+                        } icon: {
+                            Image(nsImage: PinboardSwatch.image(colorHex: pinboard.colorHex))
+                        }
+                    }
                 }
                 if !pinboards.isEmpty { Divider() }
                 Button("New Pinboard…") { beginNewPinboard(pinning: item) }
@@ -515,10 +553,10 @@ struct PanelRootView: View {
             moveSelection(1, count: items.count)
             return .handled
         case .home:
-            selectedIndex = 0
+            selectFromKeyboard(0)
             return .handled
         case .end:
-            selectedIndex = max(0, items.count - 1)
+            selectFromKeyboard(max(0, items.count - 1))
             return .handled
         case .upArrow, .downArrow:
             // 有意吞掉（第 18(b) 条）：面板是单行横轨，↑↓ 没有含义；
@@ -558,7 +596,15 @@ struct PanelRootView: View {
 
     private func moveSelection(_ delta: Int, count: Int) {
         guard count > 0 else { return }
-        selectedIndex = min(max(0, selectedIndex + delta), count - 1)
+        selectFromKeyboard(min(max(0, selectedIndex + delta), count - 1))
+    }
+
+    /// 键盘移动当前卡：记下来源，`onChange(of: selectedIndex)` 据此滚到可视中央。
+    /// 下标没变（已在两端再按）时不置标记，免得它残留到下一次单击上
+    private func selectFromKeyboard(_ index: Int) {
+        guard index != selectedIndex else { return }
+        centerOnSelect = true
+        selectedIndex = index
     }
 
     /// ⇥ / ⇧⇥ 在六项类型筛选间循环（第 18(a) 条）；停在某个 Pinboard 时 ⇥ 回到「全部」
@@ -718,6 +764,11 @@ struct PanelRootView: View {
         // 历史为空时筛选行是藏起来的，别让一个看不见的筛选挡住第一条真实剪贴
         if historyIsEmpty { scope = .kind(nil) }
         focus = .search
+        // 面板唤出：首屏与紧随其后的几张先排进后台加载（7.5.5）。面板还在淡入，卡片上屏时多半已经是真图；
+        // 已经在缓存里的直接命中，不会重复读盘
+        warmUp?.cancel()
+        let targets = ClipPrefetcher.firstScreen(of: visibleItems)
+        warmUp = Task { await ClipPrefetcher.warm(targets) }
         // previewOpen 可能本来就是这个值（-demoPreview），onChange 不会触发；
         // 等这一轮跑完、面板已经上屏，再主动同步一次预览窗
         Task { @MainActor in syncPreview(visibleItems) }
@@ -736,34 +787,6 @@ struct PanelRootView: View {
         if selectedIndex >= countBefore - 1 {
             selectedIndex = max(0, countBefore - 2)
         }
-    }
-
-    private func dragProvider(for item: ClipItem) -> NSItemProvider {
-        switch item.kind {
-        case .image:
-            if let data = item.imageData, let image = NSImage(data: data) {
-                return NSItemProvider(object: image)
-            }
-        case .file:
-            if let path = item.filePaths.first {
-                let url = URL(fileURLWithPath: path)
-#if APPSTORE
-                // 沙盒里这些路径通常读不了。NSItemProvider(contentsOf:) 是惰性的，
-                // 照样会声称能提供 public.data，接收方真去取字节时才拿到 nil ——
-                // 拖拽看起来成功了，落地却是空的。读不了就只登记 file-url，
-                // 让需要字节的目标当场拒绝，而不是静默吞掉内容。
-                guard FileManager.default.isReadableFile(atPath: path) else {
-                    return NSItemProvider(object: url as NSURL)
-                }
-#endif
-                if let provider = NSItemProvider(contentsOf: url) {
-                    return provider
-                }
-            }
-        default:
-            return NSItemProvider(object: (item.plainText ?? "") as NSString)
-        }
-        return NSItemProvider()
     }
 }
 

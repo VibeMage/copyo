@@ -7,6 +7,9 @@ import SwiftUI
 /// 不抢焦点（焦点此刻正要交还给原来的 App，用户马上要按 ⌘V）、不接收鼠标，
 /// 出现在同一块屏幕的底部居中、底边落在面板原来的底边处——用户的视线本来就在那里。
 /// 约 1.2s 后淡出。只有这一种提示：固定、删除时面板还开着，卡片本身的变化就是反馈。
+/// `⇧↩` 纯文本复制、「始终以纯文本复制」之后出的也是这一条（第八节第 6 条「只保留『已复制』」，§01g、3.5），读屏播报也是同一句。
+/// 播报按 4.7.2 的逗号句「已复制，按 ⌘V 粘贴」单独取串，不直接念可见文案：可见文案里的「·」只是排版分隔符，
+/// 标点朗读级别调高时 VoiceOver 可能按符号名把它念出来（未实测）。
 @MainActor
 final class CopyToast {
     private let window: NSPanel
@@ -29,17 +32,16 @@ final class CopyToast {
         window.isReleasedWhenClosed = false
         window.animationBehavior = .none
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
-        hosting = NSHostingView(rootView: ToastView(plainText: false))
+        hosting = NSHostingView(rootView: ToastView())
         window.contentView = hosting
     }
 
     /// - Parameters:
     ///   - bottomCenter: 面板底边中点的屏幕坐标
-    func show(bottomCenter: NSPoint, plainText: Bool) {
+    func show(bottomCenter: NSPoint) {
         hideWork?.cancel()
         generation += 1
         let current = generation
-        hosting.rootView = ToastView(plainText: plainText)
         let size = hosting.fittingSize
         let finalFrame = NSRect(x: bottomCenter.x - size.width / 2, y: bottomCenter.y,
                                 width: size.width, height: size.height)
@@ -69,25 +71,22 @@ final class CopyToast {
         }
         hideWork = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2, execute: work)
-        // 小窗不进可访问性焦点，读屏用户靠这句播报知道复制成功了
+        // 小窗不进可访问性焦点，读屏用户靠这句播报知道复制成功了（4.7.2「轻提示」行，见类注释）
         NSAccessibility.post(element: NSApp as Any, notification: .announcementRequested, userInfo: [
-            .announcement: plainText
-                ? String(localized: "Copied as plain text · press ⌘V to paste")
-                : String(localized: "Copied · press ⌘V to paste"),
+            .announcement: String(localized: "Copied, press ⌘V to paste"),
             .priority: NSAccessibilityPriorityLevel.high.rawValue,
         ])
     }
 }
 
 private struct ToastView: View {
-    let plainText: Bool
-
     var body: some View {
         HStack(spacing: 7) {
+            // 画板 CHECK_I 14pt、线宽 2 → .semibold（第八节第 25 条；gen_v2.py:294）
             Image(systemName: "checkmark")
-                .font(.system(size: 12, weight: .bold))
+                .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(CopyoTheme.success)
-            Text(plainText ? "Copied as plain text · press ⌘V to paste" : "Copied · press ⌘V to paste")
+            Text("Copied · press ⌘V to paste")
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(CopyoTheme.label)
         }

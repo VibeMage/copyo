@@ -122,13 +122,22 @@ struct ClipCardBody: View {
 
     // MARK: - 图片
 
-    /// 缩略图走 `ThumbnailCache`（NSCache，按 imageHash 键），命中后 body 里不再解码。
-    /// 取不到（CloudKit 资源还没下完、解码失败）时画 7.5.5 的占位：淡染底上居中 `photo`，
+    /// 缩略图走 `ThumbnailCache`（NSCache，按 imageHash 键）。body 里只查内存；未命中时读 externalStorage
+    /// 与解码都在后台做，回来再换成真图（7.5.5，见 `AsyncCachedImage`）。
+    /// 还没加载好、或取不到（CloudKit 资源还没下完、解码失败）时画 7.5.5 的占位：淡染底上居中 `photo`，
     /// 与预览浮层同一种画法，不留一块空白。
     private var imageBody: some View {
         let shape = RoundedRectangle(cornerRadius: CopyoTheme.Dense.thumbRadius, style: .continuous)
-        return Group {
-            if let thumbnail = ThumbnailCache.thumbnail(for: item) {
+        let key = ThumbnailCache.key(for: item)
+        let request = ThumbnailCache.Request(item)
+        return AsyncCachedImage(key: key,
+                                cached: { ThumbnailCache.cachedThumbnail(forKey: key) },
+                                load: {
+                                    guard let request else { return nil }
+                                    return await ThumbnailCache.thumbnail(for: request)
+                                },
+                                retryToken: { ThumbnailCache.retryToken }) { thumbnail in
+            if let thumbnail {
                 Color.clear
                     .overlay {
                         Image(nsImage: thumbnail)
@@ -182,10 +191,21 @@ struct ClipCardBody: View {
             fileSquare(fill: Color(platformColor: CopyoTheme.uiColor(hexString: item.renderColorHex)
                                    ?? CopyoTheme.sourceLocalUI))
                 .overlay {
-                    Image(nsImage: FileTypeIconCache.icon(forPath: item.filePaths.first))
-                        .resizable()
-                        .interpolation(.high)
-                        .frame(width: 22, height: 22)
+                    // 类型图标在后台查（7.5.5）：查到之前只露出这块来源色方片
+                    let ext = FileTypeIconCache.extensionKey(forPath: item.filePaths.first)
+                    AsyncCachedImage(key: ext,
+                                     cached: { FileTypeIconCache.cachedIcon(forExtension: ext) },
+                                     load: { await FileTypeIconCache.icon(forExtension: ext) }) { icon in
+                        if let icon {
+                            Image(nsImage: icon)
+                                .resizable()
+                                .interpolation(.high)
+                        } else {
+                            // 占位要是真实存在的视图，内容为空时 `.task` 不会触发
+                            Color.clear
+                        }
+                    }
+                    .frame(width: FileTypeIconCache.cardIconSize, height: FileTypeIconCache.cardIconSize)
                 }
                 .offset(x: 14, y: 0)
         }
