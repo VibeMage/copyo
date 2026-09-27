@@ -1099,5 +1099,6 @@ OTHER
 | 截图（英 / 中） | ✅ iPhone 6.5 英寸 6 张、iPad 13 英寸 4 张 |
 | 副标题（App 级，Mac 共用） | ✅ `Search everything you copied` / `复制过的一切，随时找回`，随下一次提交生效 |
 | 隐私政策 Gist | ✅ 已换成含 iPhone / iPad 的新版（替换前核对过线上内容与 main 的 PRIVACY.md 一致） |
-| 构建版本 1.1.0 (3) | ⏳ `build/appstore-ios/Copyo.ipa` 已出包并核验；**上传失败**：Xcode 里的账户凭据失效（`missing Xcode-Username` → `App Store Connect access for “9A94W79V84” is required`）。需要在 Xcode → Settings → Accounts 重新登录，或在 Organizer 里 Distribute App |
+| 构建版本 1.1.0 (3) | ✅ 已上传、处理完成、选入版本页。命令行上传失败过一次：Xcode 账户凭据残缺（`missing Xcode-Username` → `App Store Connect access for “9A94W79V84” is required`，账户页只列出 Certificates 一项权限），改由维护者在 Organizer → Distribute App 上传，流程里重新登录即恢复。出口合规没有再问（Info.plist 已声明豁免） |
+| TestFlight | ✅ 内部群组 `Maintainer`（自动分发开），测试员 iyn@live.com |
 | 提交审核 | ⏳ 等构建处理完、TestFlight 真机验过 iCloud 同步之后 |
