@@ -1102,7 +1102,7 @@ OTHER
 | 隐私政策 Gist | ✅ 已换成含 iPhone / iPad 的新版（替换前核对过线上内容与 main 的 PRIVACY.md 一致） |
 | 构建版本 1.1.0 (3) | ✅ 已上传、处理完成、选入版本页。命令行上传失败过一次：Xcode 账户凭据残缺（`missing Xcode-Username` → `App Store Connect access for “9A94W79V84” is required`，账户页只列出 Certificates 一项权限），改由维护者在 Organizer → Distribute App 上传，流程里重新登录即恢复。出口合规没有再问（Info.plist 已声明豁免） |
 | TestFlight | ✅ 内部群组 `Maintainer`（自动分发开），测试员 iyn@live.com |
-| 提交审核 | ⏳ 等构建处理完、TestFlight 真机验过 iCloud 同步之后 |
+| 提交审核 | ✅ 2026-09-27 21:14 UTC 用 API 提交（构建 11，附审核视频），状态「等待审核」，过审自动上架 |
 
 ### 上传与查询改用 App Store Connect API 密钥（2026-09-27 起）
 
