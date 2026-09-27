@@ -109,6 +109,9 @@ module ASC
   end
 end
 
+# 被别的脚本 `require` 时只提供 ASC 模块，不跑命令分发
+return unless __FILE__ == $PROGRAM_NAME
+
 command = ARGV.shift
 case command
 when "builds"
