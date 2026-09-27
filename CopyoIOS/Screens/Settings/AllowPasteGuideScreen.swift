@@ -7,6 +7,7 @@ import SwiftUI
 /// 所以这里改成说明卡：只讲未设为「允许」时系统的行为，并说明 Copyo 读不到当前值。
 struct AllowPasteGuideScreen: View {
     @Environment(\.openURL) private var openURL
+    @Environment(AppModel.self) private var model
 
     /// 示意行的 40 行高与 14 的勾都不在样式表上，按行内 15pt 文字的 `.subheadline` 缩，
     /// 两者用同一把尺子才不会一个长一个不长
@@ -22,7 +23,12 @@ struct AllowPasteGuideScreen: View {
             GroupedCard {
                 GuideStepRow(1, title: String(localized: "Open Settings › Apps › Copyo"))
                 HairlineSeparator()
-                GuideStepRow(2, title: String(localized: "Tap “Paste from Other Apps”"))
+                // iOS 只在 App 请求过一次粘贴之后才把「从其他 App 粘贴」放进它的设置页，
+                // 而 Copyo 首次启动刻意不读剪贴板——刚装好就照着走，第 2 步那一行根本不存在。
+                // 副文告诉用户怎么让它出现，不然这一页就是一条死路
+                GuideStepRow(2,
+                             title: String(localized: "Tap “Paste from Other Apps”"),
+                             detail: String(localized: "Not there yet? Copy something in another app, come back to Copyo once, then look again."))
                 HairlineSeparator()
                 GuideStepRow(number: 3, title: String(localized: "Choose “Allow”")) {
                     optionPreview
@@ -33,6 +39,8 @@ struct AllowPasteGuideScreen: View {
             GuidePrimaryButton(title: String(localized: "Open Copyo's Settings"),
                                symbol: "arrow.up.forward.app") {
                 if let url = SettingsLinks.appSettings { openURL(url) }
+                // 从这里去改设置同样该收起历史页的「允许粘贴」提示卡
+                model.openedPasteSettingsFromTip()
             }
 
             GuideParagraph(text: String(localized: "Until you allow it, History shows a “New clipboard content” banner at the top — use the system paste button there to save by hand."),

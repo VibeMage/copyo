@@ -11,6 +11,10 @@ struct PinboardContentScreen: View {
 
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// 分栏 detail 列会把它设成 true，判据与 `HistoryScreen` 同一条：
+    /// iPad 侧栏里点板和点「历史」要落在同一套三列网格、同一个 24pt 页边上，切换时版面不跳
+    @Environment(\.copyoIsSplitDetail) private var isSplitDetail
 
     @AppStorage(PinboardPreferences.contentSort, store: IOSSettings.defaults)
     private var contentSortRaw = PinboardContentSort.pinnedTime.rawValue
@@ -45,6 +49,18 @@ struct PinboardContentScreen: View {
 
     init(board: Pinboard) {
         self.board = board
+    }
+
+    /// iPad 分栏里的内容区（设计 09 / spec 3.14）：三列、页边 24、没有浮动标签栏。
+    /// 只看分栏标志就够：窄到按 iPhone 排的 iPad 走的是标签栏布局，这一屏不会在 detail 列里
+    private var isRegularLayout: Bool {
+        horizontalSizeClass == .regular && isSplitDetail
+    }
+
+    private var columns: Int { isRegularLayout ? 3 : 2 }
+
+    private var pageInset: CGFloat {
+        isRegularLayout ? CopyoTheme.Metrics.pageInsetPad : CopyoTheme.Metrics.pageInset
     }
 
     private var contentSort: PinboardContentSort {
@@ -87,8 +103,11 @@ struct PinboardContentScreen: View {
                 }
             }
             .padding(.top, 8)
-            .padding(.horizontal, CopyoTheme.Metrics.pageInset)
-            .padding(.bottom, CopyoTheme.Metrics.tabBarHeight + CopyoTheme.Metrics.tabBarBottomInset)
+            .padding(.horizontal, pageInset)
+            // 浮动标签栏只在 iPhone 布局里有，分栏里不必给它让位
+            .padding(.bottom, isRegularLayout
+                     ? 24
+                     : CopyoTheme.Metrics.tabBarHeight + CopyoTheme.Metrics.tabBarBottomInset)
         }
         .background(CopyoTheme.bgGrouped)
         .navigationTitle(displayName)
@@ -148,6 +167,7 @@ struct PinboardContentScreen: View {
 
     private var grid: some View {
         MasonryGrid(items: items,
+                    columns: columns,
                     estimatedHeight: { ClipCard.estimatedHeight(for: $0,
                                                                 width: columnWidth,
                                                                 dense: false,
@@ -183,7 +203,7 @@ struct PinboardContentScreen: View {
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
         } action: { width in
-            columnWidth = max(80, (width - CopyoTheme.Metrics.gridGap) / 2)
+            columnWidth = max(80, (width - CopyoTheme.Metrics.gridGap * CGFloat(columns - 1)) / CGFloat(columns))
         }
     }
 
@@ -287,8 +307,13 @@ struct PinboardContentScreen: View {
             Menu {
                 boardMenu
             } label: {
-                Image(systemName: "ellipsis")
+                // 设计 03b 右上是与详情页同一枚 accent 色 ellipsis.circle。iOS 26 玻璃导航栏默认画成单色，
+                // 只能在字形上点名要颜色——**不要**改成给 Menu 挂 `.tint`：iPad 分栏里它和同步胶囊同在一条栏上，
+                // 挂了 tint 整个窗口一帧都画不出来（实测白屏，主线程空闲、首帧从未提交）
+                Image(systemName: "ellipsis.circle")
+                    .foregroundStyle(CopyoTheme.accent)
             }
+            .accessibilityLabel(String(localized: "More"))
         }
     }
 

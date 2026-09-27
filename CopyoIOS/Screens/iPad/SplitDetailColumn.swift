@@ -27,7 +27,14 @@ struct SplitDetailColumn: View {
                     }
                     .environment(\.copyoHidesSyncStatusPill, false)
                 }
+                // 胶囊自己有玻璃，不要系统再套一层（否则成了「胶囊套胶囊」）
+                .copyoOwnGlass()
                 if showsSort {
+                    // 设计 09：同步胶囊与排序按钮是两个分开的玻璃控件。
+                    // 不隔开的话 iOS 26 会把相邻的两个工具栏项并进同一块玻璃
+                    if #available(iOS 26.0, *) {
+                        ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                    }
                     ToolbarItem(placement: .topBarTrailing) { sortMenu }
                 }
             }
@@ -71,7 +78,9 @@ struct SplitDetailColumn: View {
             }
             .pickerStyle(.inline)
         } label: {
+            // 设计 09：排序按钮的 ↑↓ 是 accent 蓝，不是工具栏默认的 label 色
             Image(systemName: "arrow.up.arrow.down")
+                .foregroundStyle(CopyoTheme.accent)
         }
         .accessibilityLabel(String(localized: "Sort"))
     }

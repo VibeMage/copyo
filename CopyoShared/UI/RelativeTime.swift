@@ -33,6 +33,8 @@ enum RelativeTime {
                                            from: calendar.startOfDay(for: date),
                                            to: calendar.startOfDay(for: reference)).day ?? 0
         if days < 7 { return String(format: String(localized: "%lldd"), days) }
+        // 完整说法 `Last week` 同时进旁白标签，不能缩写（旁白会念成「one w」）；
+        // iOS 卡片上放不下时由 `ClipItem.compactRelativeTime` 换成短形 `1w`
         if days < 14 { return String(localized: "Last week") }
         return dateOnlyFormatter.string(from: date)
     }

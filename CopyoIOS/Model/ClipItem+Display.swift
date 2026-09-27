@@ -10,6 +10,11 @@ extension ClipItem {
     // MARK: - 来源
 
     /// 来源 App 名。iOS 本机采集的条目没有来源，显示「本机」。
+    ///
+    /// 键名还叫 "This iPhone"，但英文 / 法语译文是设备中性的「This Device / Cet appareil」：
+    /// 同一个应用也跑在 iPad 上，iPad 存的条目来源同样为空，同步到 iPhone 后也走这里——
+    /// 写死「iPhone」在 iPad 上是错的，同步过去以后在两边都是错的。
+    /// 键名不改是为了让键盘、小组件与分享扩展里同一个键跟着译文一起变，不必四处各改一次代码。
     var sourceDisplayName: String {
         let name = sourceAppName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return name.isEmpty ? String(localized: "This iPhone") : name
@@ -24,11 +29,30 @@ extension ClipItem {
     var sourceColor: Color { Color(uiColor: sourceUIColor) }
 
     /// 整卡淡染色（浅 12% 混白 / 深 20% 混 #2C2C2E），随系统外观自动切换
-    var tintColor: Color { Color(uiColor: CopyoTheme.tintUIColor(source: sourceUIColor)) }
+    var tintColor: Color {
+        // 两态先算好再进闭包：动态色的闭包会被系统长期持有，捕获 `self`（一个 `@Model`）就等于把它钉住
+        let light = cardFillUIColor(dark: false)
+        let dark = cardFillUIColor(dark: true)
+        return Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? dark : light })
+    }
 
     /// 需要按指定外观取值时用这个（截图、小组件预览等场景拿不到 trait）
     func tintColor(for scheme: ColorScheme) -> Color {
-        Color(uiColor: CopyoTheme.tintUIColor(source: sourceUIColor, dark: scheme == .dark))
+        Color(uiColor: cardFillUIColor(dark: scheme == .dark))
+    }
+
+    /// 没有渲染色的条目（本机采集的文本、图片）在浅色下用**白卡**，不按公式淡染。
+    ///
+    /// 公式给出的本机灰 `mix(#8E8E93 12%, #FFF)` = (240,240,241)，页面底 `#F2F2F7` = (242,242,247)，
+    /// 两者只差两三个色阶——设计画布上勉强分得开，真机屏幕加上色彩管理就完全融进背景，
+    /// 维护者第一次 TestFlight 就指出「文本卡片和背景融到一起了」。白卡压灰底是 iOS 分组列表的
+    /// 标准对比。深色下本机灰淡染是 (54,54,56) 对纯黑，对比足够，照公式走。
+    /// 只改 iOS：`CopyoTheme.tintUIColor` 是 Mac 面板也在用的共享公式，Mac 的底色不同，不跟着变。
+    private func cardFillUIColor(dark: Bool) -> UIColor {
+        if !dark, CopyoTheme.uiColor(hexString: renderColorHex) == nil {
+            return .white
+        }
+        return CopyoTheme.tintUIColor(source: sourceUIColor, dark: dark)
     }
 
     /// 角标文字色：亮度 > 0.62 用 78% 黑，否则白
@@ -45,8 +69,40 @@ extension ClipItem {
 
     var relativeTime: String { relativeTime() }
 
+    /// 卡片元信息行放不下完整时间时的短形：「昨天 15:38」→「昨天」，「Last week」→「1w」，
+    /// 其余各档本来就是短的，原样返回。
+    ///
+    /// 英文的 `Yesterday, 15:48` 在 iPhone 双列里连 `VS Code` 都放不下，原来是整行缩到 0.8，
+    /// 于是这几张卡的元信息比邻居小一号（design-spec 6.2 的英文样例也只写 `Yesterday`）。
+    /// 「昨天」同样交给系统的相对日期格式化给，不进本地化目录，语序与大小写各语言自己管。
+    func compactRelativeTime(reference: Date = Date()) -> String {
+        let calendar = Calendar.current
+        let days = calendar.dateComponents([.day],
+                                           from: calendar.startOfDay(for: createdAt),
+                                           to: calendar.startOfDay(for: reference)).day ?? 0
+        // 「上周」这一档的短形，写法与 `%lldd` 一致（`1w` / `1 sem.`）；只给屏幕，不进旁白
+        if (7..<14).contains(days) { return String(localized: "1w") }
+        if reference.timeIntervalSince(createdAt) >= 60,
+           !calendar.isDate(createdAt, inSameDayAs: reference),
+           calendar.isDateInYesterday(createdAt) {
+            return Self.relativeDayFormatter.string(from: createdAt)
+        }
+        return relativeTime(reference: reference)
+    }
+
+    var compactRelativeTime: String { compactRelativeTime() }
+
     /// 详情页的绝对时间：`今天 14:32`
     var absoluteTime: String { RelativeTime.absolute(createdAt) }
+
+    /// 只要「昨天」这个词，不带时刻（`compactRelativeTime` 用）
+    private static let relativeDayFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .none
+        formatter.doesRelativeDateFormatting = true
+        return formatter
+    }()
 
     // MARK: - 正文
 

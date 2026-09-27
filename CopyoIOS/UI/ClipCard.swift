@@ -60,7 +60,7 @@ struct ClipCard: View {
     // MARK: - 头部
 
     /// 头部一行还是两行。辅助功能字号下角标会宽到把元信息行挤没：
-    /// 角标带 `fixedSize` 优先占位，元信息只能缩 20%（0.8 的下限），
+    /// 角标带 `fixedSize` 优先占位，元信息只剩截断一条退路，
     /// 实测 AX2 下整行只剩一个「…」——来源和时间全丢了，比不跟随放大还糟。
     ///
     /// 判据用 `typeScale` 而不是 `dynamicTypeSize.isAccessibilitySize`，是为了和
@@ -87,7 +87,7 @@ struct ClipCard: View {
         } else {
             HStack(spacing: 6) {
                 // 角标本身没有降级手段，被挤窄就直接截成「Cou…」（法语的 Couleur 就会这样）。
-                // 右边那行有缩放和截断兜底，让它先让位。
+                // 右边那行有短时间与截断兜底（见 `metaLine`），让它先让位。
                 KindBadge(item: item, dense: dense)
                     .fixedSize(horizontal: true, vertical: false)
                 metaLine
@@ -96,19 +96,43 @@ struct ClipCard: View {
         }
     }
 
+    /// 「来源 · 时间」。设计要求整张网格一个字号（11，`label.secondary`），
+    /// 所以这里**不再用** `minimumScaleFactor` 兜底：原来放不下就整行缩到 0.8，
+    /// 「VS Code · 昨天 15:38」「Figma · Last week」这几张卡的元信息比邻居小一号，一眼就看得出来。
+    ///
+    /// 改成按长短依次试，第一档放得下就用它：
+    /// 1. 完整时间（`昨天 15:38`）
+    /// 2. 短时间（`昨天` / `Yesterday`，design-spec 6.2 英文样例本来就只写 `Yesterday`）
+    /// 3. 来源名尾部截断、时间保持完整——时间是这一行里最有用的信息，宁可丢来源的后半截
+    /// 4. 只剩时间（兜底，见下）
     private var metaLine: some View {
-        Text(verbatim: "\(item.sourceDisplayName) · \(item.relativeTime)")
+        ViewThatFits(in: .horizontal) {
+            metaText("\(item.sourceDisplayName) · \(item.relativeTime)")
+            metaText("\(item.sourceDisplayName) · \(item.compactRelativeTime)")
+            HStack(spacing: 0) {
+                metaText(item.sourceDisplayName)
+                    .truncationMode(.tail)
+                // 分隔点跟着时间走：拼在来源名后面的话，截断会连「·」一起吃掉
+                metaText(" · \(item.compactRelativeTime)")
+                    .fixedSize(horizontal: true, vertical: false)
+                    .layoutPriority(1)
+            }
+            // 4. 连「… · 时间」都放不下（大字号、法语长角标加固定钉）：只留时间，
+            //    放不下就缩、再截断。`ViewThatFits` 一档都不合适时用的是最后一档，
+            //    上一档的时间是 `fixedSize`，没有这一档就会把整行撑出卡片、被圆角裁掉
+            metaText(item.compactRelativeTime)
+                .minimumScaleFactor(0.8)
+                .truncationMode(.tail)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func metaText(_ text: String) -> some View {
+        Text(verbatim: text)
             .font(CopyoTheme.Fonts.meta)
             .foregroundStyle(CopyoTheme.labelSecondary)
             .lineLimit(1)
-            // 设计稿按 440pt 画布画的列宽 194，真机 iPhone 只有 171——
-            // 英文的 `This iPhone · now` 在原字号下放不下，宁可缩小也要把时间显示全。
-            // 下限按最长的语言定：法语的 `Cet iPhone · 3 min` 比英文还长一截，
-            // 0.85 会把时间截成 `3…`，反而把这一行里最有用的信息丢了
-            .minimumScaleFactor(0.8)
             .allowsTightening(true)
-            .truncationMode(.tail)
-            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
@@ -139,13 +163,29 @@ struct ClipCard: View {
     private static let bodyRenderLimit = 600
 
     private var textContent: some View {
-        Text(String((item.plainText ?? "").prefix(Self.bodyRenderLimit)))
+        let raw = String((item.plainText ?? "").prefix(Self.bodyRenderLimit))
+        return Text(item.isMono ? Self.breakAll(raw) : raw)
             .font(item.isMono ? CopyoTheme.Fonts.cardMono(dense: dense) : CopyoTheme.Fonts.cardBody(dense: dense))
             .foregroundStyle(CopyoTheme.label)
-            .lineSpacing(CopyoTheme.cardLineSpacing(dense: dense))
+            .lineSpacing(item.isMono ? CopyoTheme.cardMonoLineSpacing(dense: dense) : CopyoTheme.cardLineSpacing(dense: dense))
             .lineLimit(lineLimit)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// 设计 3.1：等宽正文 `word-break: break-all`，每行写满再折（`--force-w / ith-lease`）。
+    /// SwiftUI 的 Text 只会按词折行，命令里一长串不带空格的参数会整段挪到下一行，
+    /// 右边空出三分之一；中文界面下的断行规则更保守，`HEAD~3` 这种放得下的也会被挤下去。
+    /// 在每个字符后插一个零宽空格，让每个位置都成为合法断点，效果等同 break-all。
+    /// 只影响显示：复制走的是 `plainText`，旁白读的是整卡合成的 `accessibilityDescription`。
+    static func breakAll(_ text: String) -> String {
+        var out = ""
+        out.reserveCapacity(text.utf8.count * 2)
+        for character in text {
+            out.append(character)
+            if !character.isNewline { out.append("\u{200B}") }
+        }
+        return out
     }
 
     private var richTextContent: some View {
@@ -166,7 +206,7 @@ struct ClipCard: View {
                     .font(.system(size: richTextBodySize))
                     // 富文本正文用专用的 sec2（比元信息行的 label.secondary 深一档），见设计 CopyoCard sec2
                     .foregroundStyle(CopyoTheme.cardBodySecondary)
-                    .lineSpacing(CopyoTheme.cardLineSpacing(dense: dense))
+                    .lineSpacing(CopyoTheme.cardRichLineSpacing(dense: dense))
                     .lineLimit(max(1, lineLimit - 2))
             }
         }

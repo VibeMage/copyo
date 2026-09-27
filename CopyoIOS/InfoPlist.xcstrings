@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSPhotoLibraryAddUsageDescription" : {
+      "comment" : "Privacy - Photo Library Additions Usage Description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyo saves the image you choose to your photo library."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyo enregistre l’image choisie dans votre photothèque."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyo 会把你选中的图片存入照片图库。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

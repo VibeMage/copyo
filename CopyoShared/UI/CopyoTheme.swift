@@ -313,14 +313,23 @@ enum CopyoTheme {
         static func cardMono(dense: Bool) -> Font {
             .system(dense ? .caption2 : .footnote, design: .monospaced)
         }
-        /// 「来源 · 相对时间」11
+        /// 「来源 · 相对时间」11。整张网格只有这一个字号——宽度不够时截断来源名，不缩字
         static let meta = Font.caption2
         /// 链接域名 12
         static let linkDomain = Font.caption
     }
 
-    /// 卡片正文的行距（设计稿给的是行高，SwiftUI 用行距表达）
-    static func cardLineSpacing(dense: Bool) -> CGFloat { dense ? 4 : 5 }
+    /// 卡片正文的行距。设计稿给的是**行高**（15/20、dense 13/17），SwiftUI 的 `lineSpacing`
+    /// 却是叠在字体自然行高**之上**的额外间距——两者不是一个量，不能把差值之外的数填进来。
+    /// subheadline 自然行高约 18，footnote 约 15.5，所以这里只补 2 / 1.5。
+    /// 原来的 5 / 4 叠出来是 23pt 行距，每张卡都比设计高一截，同屏少看一两张。
+    static func cardLineSpacing(dense: Bool) -> CGFloat { dense ? 1.5 : 2 }
+
+    /// 等宽正文的行距：13/18（dense 11/15）。mono footnote 自然行高约 15.5、caption2 约 13
+    static func cardMonoLineSpacing(dense: Bool) -> CGFloat { dense ? 2 : 2.5 }
+
+    /// 富文本正文 14pt 的行距。设计里要点行与标题同为 20pt 一行，14pt 自然行高约 16.7
+    static func cardRichLineSpacing(dense: Bool) -> CGFloat { dense ? 2 : 3 }
 
     /// 轻点、插入卡片等统一动效
     static let springAnimation = Animation.spring(response: 0.35, dampingFraction: 0.8)

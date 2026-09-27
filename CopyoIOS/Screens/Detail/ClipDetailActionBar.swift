@@ -50,10 +50,13 @@ struct ClipDetailActionBar: View {
             .buttonStyle(.plain)
             .accessibilityLabel(String(localized: "Share"))
 
-            iconButton(symbol: isPinned ? "pin.slash" : "pin",
+            // 已固定只换颜色、不换字形（设计 02b）：pin.slash 读起来是「未固定」，
+            // 配上表示「已固定」的蓝色等于同时说两句相反的话。动作本身由旁白标签交代
+            iconButton(symbol: "pin",
                        label: isPinned ? String(localized: "Unpin") : String(localized: "Pin"),
                        tint: isPinned ? CopyoTheme.accent : CopyoTheme.label,
                        action: onTogglePin)
+                .accessibilityAddTraits(isPinned ? .isSelected : [])
 
             iconButton(symbol: "trash",
                        label: String(localized: "Delete"),

@@ -95,7 +95,25 @@ final class AppModel {
     /// 类型筛选（nil = 全部）
     var kindFilter: ClipKind?
     /// 刚插入的条目，历史页据此做一次高亮插入动效
-    var highlightedItemID: PersistentIdentifier?
+    private(set) var highlightedItemID: PersistentIdentifier?
+    /// 每次请求高亮都换一个：同一条目再存一次时 ID 不变，历史页靠它才知道要再亮一次
+    private(set) var highlightToken = UUID()
+
+    /// 历史页此刻是否在屏幕上、按什么类型筛（nil = 不在屏幕上）。由 `HistoryScreen` 自己报告，
+    /// 只在这里读，不驱动任何界面，所以不参与观察
+    struct HistoryOnScreen: Equatable {
+        var kind: ClipKind?
+        /// 列表是否停在顶部：新条目插在最前面，停在中段时它插在视口上方，高亮看不到
+        var atTop = true
+        /// 是否按时间排：只有按时间，新条目才一定在最前面（iPad 可以改排序）
+        var newestFirst = true
+    }
+    @ObservationIgnored var historyOnScreen: HistoryOnScreen?
+
+    func highlight(_ item: ClipItem) {
+        highlightedItemID = item.persistentModelID
+        highlightToken = UUID()
+    }
 
     /// 「新建 Pinboard」Alert 的开关。触发点分散在多处（Pinboard 列表右上的 `+`、空态按钮、
     /// iPad 侧栏 PINBOARD 分组头的 `+`、任意卡片长按菜单里 `PinboardPickerMenu` 的「新建 Pinboard…」），
@@ -106,8 +124,22 @@ final class AppModel {
     // MARK: - 剪贴板横幅（通道 A 的兜底）
 
     var pasteBannerVisible = false
+    /// 横幅粘贴按钮那一轮「已保存 → 0.4s 后收起」。新的一轮开始前先取消旧的，
+    /// 免得旧任务把后来重新亮起的横幅收掉（Codex 复盘 I）
+    @ObservationIgnored private var pasteBannerTask: Task<Void, Never>?
+    /// 横幅的「代次」：每亮一次新横幅、每点一次粘贴、每手动关一次都 +1。异步保存回来之后
+    /// 只有代次没变才碰横幅——取消任务管不住那个不响应取消的 provider 加载，旧请求回来仍可能
+    /// 把新横幅设成「已保存」再也收不掉，或把后来亮起的新横幅收掉（Codex 复盘第二轮 #4）
+    @ObservationIgnored private var pasteBannerGeneration = 0
+    /// 自动读取最近存下的那条与时刻，用来识别「一键保存补读到的是刚被自动读取存下的」
+    @ObservationIgnored private var lastForegroundSave: (id: PersistentIdentifier, at: Date)?
     /// 横幅上的粘贴按钮已经存下内容，原位换成「已保存」再收起
     var pasteBannerSaved = false
+
+    /// 「不想每次都点允许粘贴？」提示卡。只在**连续弹过两次框**之后出现（弹没弹框靠读取耗时判断，
+    /// 见 `PasteboardCapture.timedRead`），用户改成「允许」后下一次读取变成瞬时，它自己消失；
+    /// 点 × 则永不再出。从没被弹框打扰过的用户永远看不到它。
+    var allowPasteTipVisible = false
 
     // MARK: - 系统搜索索引
 
@@ -135,8 +167,19 @@ final class AppModel {
         // 因为一键保存会在建库之后立刻走完整条保存链路）。
         WidgetRefresher.isSuspended = launch.useDemoData
         self.demoRoute = launch.demoRoute
-        self.syncStatus = SyncStatusMonitor(cloudKitActive: bootstrap.cloudKitActive,
-                                            offReason: bootstrap.offReason)
+        if launch.useDemoData {
+            // 设计 01 是「已同步」，01c（横幅）是「同步中」，01b（空态 · 首次启动）是「未同步」——
+            // 空态的「开启 iCloud 同步」按钮只在同步没开成时出现，拍 01b 得给它一个关着的状态
+            let demoStatus: SyncStatus = switch launch.demoRoute {
+            case .historyBanner: .syncing
+            case .historyEmpty: .off(.disabledInSettings)
+            default: .synced(Date(timeIntervalSinceNow: -120))
+            }
+            self.syncStatus = SyncStatusMonitor(demoStatus: demoStatus)
+        } else {
+            self.syncStatus = SyncStatusMonitor(cloudKitActive: bootstrap.cloudKitActive,
+                                                offReason: bootstrap.offReason)
+        }
         self.capture = PasteboardCapture(context: bootstrap.container.mainContext)
 
         // history-empty 要的是「有样例库但一条都没有」，所以只建内存容器、不灌样例
@@ -147,11 +190,16 @@ final class AppModel {
         if let route = launch.demoRoute {
             applyDemoRoute(route)
         }
-        capture.onOutcome = { [weak self] outcome in
-            self?.handle(outcome)
+        capture.onOutcome = { [weak self] outcome, source in
+            self?.handle(outcome, from: source)
+            self?.refreshAllowPasteTip()
         }
+        refreshAllowPasteTip()
         // 通道 C 的截图入口：-simulateQuickSave 在这里预置请求，随后第一次 active 就会消费掉
         QuickSaveCoordinator.primeIfSimulated(launch)
+        // 「iCloud → 已同步 / 未同步」可以发生在任何时刻，不一定碰上回前台或本机保存，
+        // 那两处是原来仅有的抄写时机。落定的结果一出来就抄（值没变不写，见下面的去重）
+        syncStatus.onStatusChange = { [weak self] _ in self?.refreshWidgetSyncStateIfResolved() }
         syncStatus.start()
     }
 
@@ -163,8 +211,11 @@ final class AppModel {
         switch route {
         case .historyBanner:
             pasteBannerVisible = true
+        case .historyPasteTip:
+            allowPasteTipVisible = true
         case .historySaved:
-            toast.show(String(localized: "Saved"))
+            // 钉住不收：截图在启动几秒后才拍
+            toast.show(String(localized: "Saved"), sticky: true)
         case .historyEmpty:
             break
         default:
@@ -252,7 +303,7 @@ final class AppModel {
         guard let clipID = QuickSaveCoordinator.consumeCopyRequest() else { return false }
         // 解不开或库里已经没有：都是「小组件上那一格已经过期了」，给一句话，不要静默什么都不做
         guard let id = SpotlightIndexer.modelID(from: clipID), let item = clip(with: id) else {
-            toast.show(String(localized: "That clip is no longer in Copyo."), symbol: "questionmark.circle")
+            toast.show(String(localized: "That clip is no longer in Copyo."), symbol: "questionmark.circle", kind: .info)
             return true
         }
         copy(item)
@@ -294,56 +345,107 @@ final class AppModel {
 
     // MARK: - 采集结果 → 提示
 
-    private func handle(_ outcome: PasteboardCapture.Outcome) {
+    /// 一次采集的结果只给**一份**主反馈（维护者 2026-09-27 真机反馈 + Codex 复盘）：
+    /// - 自动读取：系统已经在顶部说了「粘贴自 X」，新卡片也会亮一下插在最前面——再弹「已保存」
+    ///   就是同一件事说三遍，而且和系统横幅叠在一起。条目**看得到**时只高亮 + 触感 + 旁白；
+    ///   在别的页、被筛掉、在搜索里时看不到高亮，才补一条底部提示
+    /// - 一键保存：用户刚按下按钮，结果（已保存 / 已保存过 / 没有可保存的内容）必须说清楚
+    /// - 横幅粘贴按钮：横幅自己原位换成「已保存」再收起（`handlePasteControl`），不再叠提示；
+    ///   这里也**不**先把横幅关掉——原来公共分支先关，原位的「已保存」永远出不来（Codex 复盘 D）
+    private func handle(_ outcome: PasteboardCapture.Outcome, from source: PasteboardCapture.Source) {
         switch outcome {
         case .saved(let item):
-            highlightedItemID = item.persistentModelID
-            pasteBannerVisible = false
+            highlight(item)
+            if source != .pasteControl { pasteBannerVisible = false }
             // 通道 A、通道 C、横幅粘贴三条路的入库都会走到这里（`PasteboardCapture.finish`
             // 把每一次结果都回调上来），所以小组件的刷新挂在这一处就够，
             // 不必像 Spotlight 那样在 `PasteboardCapture` 的两个保存出口各挂一次——
             // 而且只有这里拿得到 `syncStatus`，那份状态要和内容同一时刻抄过去（见 `refreshWidgets`）。
             // 带上 `createdAt`：刚存下的这条就是最新的那条，记下来下次回前台才不会重刷一遍
             refreshWidgets(newestClipAt: item.createdAt)
-            toast.show(String(localized: "Saved"))
             feedback(.success)
+            if source == .foreground { lastForegroundSave = (item.persistentModelID, Date()) }
+            let saved = String(localized: "Saved")
+            switch source {
+            case .pasteControl:
+                toast.announce(saved)
+            case .quickSave:
+                toast.show(saved)
+            case .foreground:
+                if isVisibleInHistory(item) { toast.announce(saved) } else { toast.show(saved) }
+            }
         case .duplicate(let item):
-            highlightedItemID = item.persistentModelID
-            pasteBannerVisible = false
+            highlight(item)
+            if source != .pasteControl { pasteBannerVisible = false }
             // 去重命中也要刷：`ClipSaver` 的 `.refreshed` 分支原地把 `createdAt` 改成了现在，
             // 这条内容刚刚跳到了历史最前面，小组件上那一格跟着换人
             refreshWidgets(newestClipAt: item.createdAt)
-            // 用户按了一键保存却发现内容早就在库里：高亮环可能在可视区外，
-            // 不给一句提示的话这一按看起来像是什么都没发生
-            if capture.lastOutcomeWasExplicit {
-                toast.show(String(localized: "Already saved"), symbol: "checkmark.circle.fill")
+            // 与新条目同一套规则，只是文案换成「已保存过」：一键保存必须说出来（高亮环可能在
+            // 可视区外，不说这一按就像什么都没发生）；横幅那条只播报（横幅原位已经换成「已保存」，
+            // 原来这里连旁白都没有）；自动读取看得到就只高亮，看不到才补提示
+            // 一键保存与自动读取没有定序：扩展进程的按下有时晚于这次激活才落地，前台那次自动读取
+            // 先把内容存下了，补读的一键保存再读到的就是「重复」。对用户来说这一按确实存下了东西，
+            // 说「已保存过」是错的——几秒内由自动读取刚存下的那条，一律按「已保存」说
+            let savedJustNow = lastForegroundSave.map {
+                $0.id == item.persistentModelID && Date().timeIntervalSince($0.at) < 5
+            } ?? false
+            let already = savedJustNow ? String(localized: "Saved") : String(localized: "Already saved")
+            switch source {
+            case .pasteControl:
+                toast.announce(already)
+            case .quickSave:
+                toast.show(already)
+            case .foreground:
+                if isVisibleInHistory(item) { toast.announce(already) } else { toast.show(already) }
             }
         case .needsBanner:
+            pasteBannerGeneration += 1
             pasteBannerVisible = true
             pasteBannerSaved = false
+            // 一键保存时读取被拒：横幅亮在历史页，人却可能在别处——按了按钮总得知道接下来怎么办
+            if source == .quickSave, historyOnScreen == nil {
+                toast.show(String(localized: "Open History and tap Paste to save it"),
+                           symbol: "doc.on.clipboard", kind: .info)
+            }
         case .failed:
-            toast.show(String(localized: "Couldn't save"), symbol: "exclamationmark.triangle.fill")
+            toast.show(String(localized: "Couldn't save"), symbol: "exclamationmark.triangle.fill", kind: .warning)
         case .empty:
-            // 通道 A 的例行采集不吭声；一键保存这条路必须有反馈
-            if capture.lastOutcomeWasExplicit {
-                toast.show(String(localized: "Nothing to save"), symbol: "doc.on.clipboard")
+            // 通道 A 的例行采集不吭声；用户亲手按下的必须有反馈
+            if source.isExplicit {
+                toast.show(String(localized: "Nothing to save"), symbol: "doc.on.clipboard", kind: .info)
             }
         case .unchanged:
             break
         }
     }
 
+    /// 刚存下的这条此刻能不能在历史页上直接看到（高亮只在看得到时才算反馈）
+    private func isVisibleInHistory(_ item: ClipItem) -> Bool {
+        guard let screen = historyOnScreen, !showsOnboarding else { return false }
+        guard searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return false }
+        // 拿不到肯定的「看得见」就当看不见，宁可多一条提示也不能一点反馈都没有
+        guard screen.atTop, screen.newestFirst else { return false }
+        // 与列表同一个筛选口径：「文本」筛选下富文本也在列表里，用 == 会把它判成看不见
+        return KindPresentation.matches(item, filter: screen.kind)
+    }
+
     // MARK: - 横幅
 
     /// 横幅里的系统粘贴按钮交回来的内容。走这条路不需要「从其他 App 粘贴」的授权。
     func handlePasteControl(itemProviders: [NSItemProvider]) {
-        Task {
+        pasteBannerTask?.cancel()
+        pasteBannerGeneration += 1
+        let generation = pasteBannerGeneration
+        pasteBannerTask = Task {
+            // 内容本身照存（用户点了系统按钮，这份授权要兑现）；只是回来之后动不动横幅要看代次
             let outcome = await capture.save(itemProviders: itemProviders)
+            guard generation == pasteBannerGeneration else { return }
             switch outcome {
             case .saved, .duplicate:
                 // 设计 01c：原位换成「已保存」，0.4s 后收起
                 pasteBannerSaved = true
                 try? await Task.sleep(for: .milliseconds(400))
+                guard generation == pasteBannerGeneration else { return }
                 withAnimation(CopyoTheme.springAnimation) {
                     pasteBannerVisible = false
                     pasteBannerSaved = false
@@ -354,7 +456,33 @@ final class AppModel {
         }
     }
 
+    // MARK: - 「允许粘贴」提示卡
+
+    private func refreshAllowPasteTip() {
+        // 演示模式不碰真实的计数；截图路由自己点亮它
+        guard !launch.useDemoData else { return }
+        let visible = IOSSettings.autoReadOnForeground
+            && !IOSSettings.allowPasteTipDismissed
+            && IOSSettings.promptedPasteReads >= 2
+            && IOSSettings.lastPasteReadPrompted
+        guard visible != allowPasteTipVisible else { return }
+        withAnimation(CopyoTheme.springAnimation) { allowPasteTipVisible = visible }
+    }
+
+    /// 用户去过系统设置里 Copyo 那一页（提示卡或 04d 引导页的按钮）：先收起。改成「允许」了下次读取
+    /// 是瞬时的，它不会再出现；没改的话下一次弹框又会把它点亮——那时用户确实还在被打扰
+    func openedPasteSettingsFromTip() {
+        IOSSettings.lastPasteReadPrompted = false
+        withAnimation(CopyoTheme.springAnimation) { allowPasteTipVisible = false }
+    }
+
+    func dismissAllowPasteTip() {
+        IOSSettings.allowPasteTipDismissed = true
+        withAnimation(CopyoTheme.springAnimation) { allowPasteTipVisible = false }
+    }
+
     func dismissPasteBanner() {
+        pasteBannerGeneration += 1
         // 用户手动关掉横幅 = 这份内容不想要了，记下 changeCount 免得下次回前台又弹一次
         capture.markSeen()
         withAnimation(CopyoTheme.springAnimation) { pasteBannerVisible = false }
@@ -369,7 +497,7 @@ final class AppModel {
             toast.show(String(localized: "Copied"))
             feedback(.success)
         case .unsupported:
-            toast.show(String(localized: "Mac only"), symbol: "desktopcomputer")
+            toast.show(String(localized: "Mac only"), symbol: "desktopcomputer", kind: .info)
         case .empty:
             break
         }
@@ -382,7 +510,7 @@ final class AppModel {
             toast.show(String(localized: "Copied as plain text"))
             feedback(.success)
         case .unsupported:
-            toast.show(String(localized: "Mac only"), symbol: "desktopcomputer")
+            toast.show(String(localized: "Mac only"), symbol: "desktopcomputer", kind: .info)
         case .empty:
             break
         }
@@ -512,6 +640,12 @@ final class AppModel {
 
     func completeOnboarding() {
         IOSSettings.onboardingCompleted = true
+        // 首次启动时引导盖在屏幕上，通道 A 的例行采集被门禁挡掉，「只记账不读取」那一步也就没做。
+        // 不在这里补记的话，用户看完引导出去复制的**第一条**会被当成「首次运行」只记账、不入库——
+        // 刚被告知「回到 Copyo 就会自动保存」，第一次试就失败。读 changeCount 不会弹授权框
+        if IOSSettings.lastPasteboardChangeCount == nil {
+            capture.markSeen()
+        }
         withAnimation(CopyoTheme.springAnimation) { showsOnboarding = false }
     }
 
@@ -538,10 +672,10 @@ final class AppModel {
         guard enabled else {
             SpotlightIndexer.disable()
             lastSpotlightReconcile = nil
-            toast.show(String(localized: "Removed from system search"), symbol: "magnifyingglass")
+            toast.show(String(localized: "Removed from system search"), symbol: "magnifyingglass", kind: .info)
             return
         }
-        toast.show(String(localized: "Adding clips to system search"), symbol: "magnifyingglass")
+        toast.show(String(localized: "Adding clips to system search"), symbol: "magnifyingglass", kind: .info)
         spotlightTask = Task { @MainActor in
             // 只有跑完整趟才记时刻：中途被取消（用户又把开关拨回去、或回前台触发了新一轮）
             // 时账本没写全，记成功会让下面那道 5 分钟节流把没建完的那一截一直挡在外面。
@@ -615,7 +749,8 @@ final class AppModel {
         // 开发者本人主屏上的小组件就被钉在「未同步」，还要钉满 24 小时的有效期。
         guard !launch.useDemoData, !launch.localOnly else { return }
         if let newestClipAt { lastWidgetNewestClipAt = newestClipAt }
-        CopyoAppGroup.widgetSyncState = currentWidgetSyncState
+        // 还没落定（iCloud / 同步中）时不动那一格：写 nil 会把上次的结果连同时间戳一起抹掉
+        if let resolved = currentWidgetSyncState { CopyoAppGroup.widgetSyncState = resolved }
         WidgetRefresher.reloadRecentClips()
     }
 
@@ -659,18 +794,22 @@ final class AppModel {
     /// 后台刷新配额经不起每次激活都花一次。
     private func refreshWidgetSyncStateIfResolved() {
         guard !launch.useDemoData, !launch.localOnly else { return }
-        let resolved = currentWidgetSyncState
+        // 还没落定（中性的「iCloud」）就不抄：小组件那一格只有三个词，没有「等第一次同步」
+        guard let resolved = currentWidgetSyncState else { return }
         guard CopyoAppGroup.widgetSyncState != resolved else { return }
         CopyoAppGroup.widgetSyncState = resolved
         WidgetRefresher.reloadRecentClips()
     }
 
-    /// 胶囊的三态压成小组件那一格放得下的三个词。`.off` 的具体原因（没登录 / 关了开关 /
+    /// 胶囊的状态压成小组件那一格放得下的词。`.off` 的具体原因（没登录 / 关了开关 /
     /// 这份构建没签 entitlement）在小组件上摆不下，一律并成「未同步」。
-    private var currentWidgetSyncState: WidgetSyncState {
+    ///
+    /// **只抄落定的结果**（已同步 / 未同步）。「iCloud」还没有结论；「同步中」是转瞬即逝的，
+    /// 抄过去就可能在主屏上一挂一整天——小组件的时间线不会跟着它每秒刷新
+    private var currentWidgetSyncState: WidgetSyncState? {
         switch syncStatus.status {
+        case .idle, .syncing: nil
         case .synced: .synced
-        case .syncing: .syncing
         case .off: .off
         }
     }
@@ -696,7 +835,7 @@ final class AppModel {
         do {
             try modelContext.save()
         } catch {
-            toast.show(String(localized: "Couldn't save"), symbol: "exclamationmark.triangle.fill")
+            toast.show(String(localized: "Couldn't save"), symbol: "exclamationmark.triangle.fill", kind: .warning)
         }
     }
 

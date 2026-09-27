@@ -17,6 +17,20 @@ extension View {
     }
 }
 
+extension ToolbarContent {
+    /// 自己带玻璃的工具栏项（同步胶囊）用它：iOS 26 的导航栏会给每个工具栏项再套一层共享玻璃，
+    /// 和 `copyoGlass` 叠在一起就成了「胶囊套胶囊」。这里把系统那层关掉，只留自己那层——
+    /// iOS 18 没有共享玻璃，原样返回。
+    @ToolbarContentBuilder
+    func copyoOwnGlass() -> some ToolbarContent {
+        if #available(iOS 26.0, *) {
+            sharedBackgroundVisibility(.hidden)
+        } else {
+            self
+        }
+    }
+}
+
 /// 胶囊玻璃容器：iCloud 状态、轻提示、浮动工具栏共用。
 /// 左右内距分开给，设计稿里带图标的一侧总是窄 2pt。
 struct GlassPill<Content: View>: View {

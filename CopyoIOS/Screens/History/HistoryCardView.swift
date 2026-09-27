@@ -147,6 +147,8 @@ struct HistoryCardView: View {
                            onSelect: onPin,
                            onUnpin: item.pinboard == nil ? nil : onUnpin,
                            onCreate: onCreatePinboard)
+        // 设计 01e / 3.11：破坏项前是一道 8pt 的分组隔断，不是普通行间的细线
+        Divider()
         Button(role: .destructive) {
             onDelete()
         } label: {

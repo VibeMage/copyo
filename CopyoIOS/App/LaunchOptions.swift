@@ -56,6 +56,7 @@ enum DemoRoute: String, CaseIterable {
     case history
     case historyEmpty = "history-empty"
     case historyBanner = "history-banner"
+    case historyPasteTip = "history-paste-tip"
     case historySaved = "history-saved"
     case historyMenu = "history-menu"
     case historySearch = "history-search"
@@ -70,6 +71,7 @@ enum DemoRoute: String, CaseIterable {
     case pinboardNew = "pinboard-new"
     case settings
     case settingsQuickSave = "settings-quicksave"
+    case settingsQuickSaveBackTap = "settings-quicksave-backtap"
     case settingsHowTo = "settings-howto"
     case settingsPaste = "settings-paste"
     case settingsKeyboard = "settings-keyboard"
@@ -82,12 +84,13 @@ enum DemoRoute: String, CaseIterable {
     /// 这个 route 属于哪个标签
     var tab: CopyoTab {
         switch self {
-        case .history, .historyEmpty, .historyBanner, .historySaved, .historyMenu, .historySearch,
+        case .history, .historyEmpty, .historyBanner, .historyPasteTip, .historySaved, .historyMenu, .historySearch,
              .detailText, .detailRich, .detailColor, .detailImage, .detailLink, .detailFile, .share:
             return .history
         case .pinboards, .pinboardContent, .pinboardNew:
             return .pinboard
-        case .settings, .settingsQuickSave, .settingsHowTo, .settingsPaste, .settingsKeyboard:
+        case .settings, .settingsQuickSave, .settingsQuickSaveBackTap, .settingsHowTo, .settingsPaste,
+             .settingsKeyboard:
             return .settings
         case .onboarding1, .onboarding2, .onboarding3:
             return .history

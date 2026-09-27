@@ -622,6 +622,29 @@
         }
       }
     },
+    "Save ${text} to Copyo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save ${text} to Copyo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把${text}存进 Copyo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer ${text} dans Copyo"
+          }
+        }
+      }
+    },
     "Save Clipboard": {
       "extractionState": "manual",
       "localizations": {
@@ -812,13 +835,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This iPhone"
+            "value": "This Device"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cet iPhone"
+            "value": "Cet appareil"
           }
         },
         "zh-Hans": {

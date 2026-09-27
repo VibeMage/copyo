@@ -55,7 +55,10 @@ struct SettingsScreen: View {
         .navigationBarTitleDisplayMode(.large)
         .navigationDestination(item: $route) { destination in
             switch destination {
-            case .quickSave: QuickSaveGuideScreen()
+            case .quickSave:
+                // iPad 上没有轻点背面这一段，`QuickSaveGuideScreen` 会把这个值收回默认段
+                QuickSaveGuideScreen(initialEntry: model.demoRoute == .settingsQuickSaveBackTap
+                                     ? .backTap : .defaultEntry)
             case .howToSave: HowToSaveScreen()
             case .allowPaste: AllowPasteGuideScreen()
             case .keyboard: KeyboardGuideScreen()
@@ -84,7 +87,7 @@ struct SettingsScreen: View {
             // 容器是在 App 启动时按这个开关建的，运行中改不了，只能提示重开
             .onChange(of: cloudSyncEnabled) { _, _ in
                 model.toast.show(String(localized: "Takes effect after you reopen Copyo"),
-                                 symbol: "arrow.clockwise")
+                                 symbol: "arrow.clockwise", kind: .info)
             }
 
             HStack(spacing: 8) {
@@ -116,13 +119,18 @@ struct SettingsScreen: View {
             .settingsRow(leading: 58)
         } header: {
             Text(String(localized: "Sync"))
+                .settingsSectionHeader()
         } footer: {
-            Text(String(localized: "Sign in to the same Apple Account on your Mac and iPhone. Your clips travel through iCloud only, never through a third-party server."))
+            // iPad 上照写「iPhone」会让人以为这台设备不算数
+            Text(UIDevice.current.userInterfaceIdiom == .pad
+                 ? String(localized: "Sign in to the same Apple Account on your Mac and iPad. Your clips travel through iCloud only, never through a third-party server.")
+                 : String(localized: "Sign in to the same Apple Account on your Mac and iPhone. Your clips travel through iCloud only, never through a third-party server."))
         }
     }
 
     private var syncSymbol: String {
         switch model.syncStatus.status {
+        case .idle: "icloud"
         case .synced: "checkmark.icloud"
         case .syncing: "arrow.triangle.2.circlepath.icloud"
         case .off: "icloud.slash"
@@ -131,6 +139,9 @@ struct SettingsScreen: View {
 
     private var syncStatusText: String {
         switch model.syncStatus.status {
+        case .idle:
+            // 开着、账号没问题，只是这次启动还没见到一次成功的传输
+            return String(localized: "On · waiting for the first sync")
         case .synced(let date):
             guard let date else { return String(localized: "Synced") }
             return String(format: String(localized: "Synced · %@"), Self.relativeTime(date))
@@ -172,7 +183,8 @@ struct SettingsScreen: View {
                 SettingsRowLabel(symbol: "bolt.fill",
                                  color: SettingsTint.bolt,
                                  title: String(localized: "Quick Save"),
-                                 detail: String(localized: "Action Button"),
+                                 // 右值跟着这一页默认打开的那段走：iPad 没有操作按钮，只剩控制中心
+                                 detail: QuickSaveGuideScreen.QuickSaveEntry.defaultEntry.title,
                                  showsDisclosure: true)
             }
             .settingsRow()
@@ -254,6 +266,7 @@ struct SettingsScreen: View {
             }
         } header: {
             Text(String(localized: "Clipboard"))
+                .settingsSectionHeader()
         } footer: {
             Text(String(localized: "With this off, Copyo won't read the clipboard when it opens — use the banner at the top of History to paste and save by hand."))
         }
@@ -285,6 +298,7 @@ struct SettingsScreen: View {
             }
         } header: {
             Text(String(localized: "System Search"))
+                .settingsSectionHeader()
         } footer: {
             Text(String(localized: "Off by default. Turn it on and your clips become searchable from the Home Screen, the Lock Screen and Siri Suggestions — including the verification codes, passwords and private messages that end up in a clipboard history. Turning it off deletes everything Copyo put in the index."))
         }
@@ -395,7 +409,7 @@ struct SettingsScreen: View {
         guard !didApplyDemoRoute else { return }
         didApplyDemoRoute = true
         switch model.demoRoute {
-        case .settingsQuickSave: route = .quickSave
+        case .settingsQuickSave, .settingsQuickSaveBackTap: route = .quickSave
         case .settingsHowTo: route = .howToSave
         case .settingsPaste: route = .allowPaste
         case .settingsKeyboard: route = .keyboard

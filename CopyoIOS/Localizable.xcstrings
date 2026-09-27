@@ -369,6 +369,30 @@
         }
       }
     },
+    "1w": {
+      "comment": "Card meta line, clips 7–13 days old, when “Last week” does not fit. Same style as %lldd / %lldh.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1w"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 sem."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上周"
+          }
+        }
+      }
+    },
     "331 Caoxi North Rd, Tower B, 12F, Xuhui, Shanghai": {
       "extractionState": "manual",
       "localizations": {
@@ -456,7 +480,30 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "操作按钮 / 敲击背面 / 控制中心"
+            "value": "操作按钮 / 轻点背面 / 控制中心"
+          }
+        }
+      }
+    },
+    "Add Copyo’s “Save Clipboard” action": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Copyo’s “Save Clipboard” action"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajoutez l’action « Enregistrer le presse-papiers » de Copyo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加 Copyo 的「保存剪贴板」操作"
           }
         }
       }
@@ -549,6 +596,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "复制后按操作按钮、敲两下手机背面，或点控制中心按钮。Copyo 会打开并提示「已保存」。"
+          }
+        }
+      }
+    },
+    "After copying, tap the “Save Clipboard” button in Control Center. Copyo opens and shows “Saved”.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After copying, tap the “Save Clipboard” button in Control Center. Copyo opens and shows “Saved”."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Après avoir copié, touchez le bouton « Enregistrer le presse-papiers » du Centre de contrôle. Copyo s’ouvre et affiche « Enregistré »."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制后点控制中心里的「保存剪贴板」按钮。Copyo 会打开并提示「已保存」。"
           }
         }
       }
@@ -691,6 +761,29 @@
         }
       }
     },
+    "Anything you copy on your Mac shows up here through iCloud. To keep something from this iPad, use Share or Quick Save.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anything you copy on your Mac shows up here through iCloud. To keep something from this iPad, use Share or Quick Save."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout ce que vous copiez sur votre Mac apparaît ici via iCloud. Pour conserver quelque chose depuis cet iPad, utilisez « Partager » ou « Enregistrement rapide »."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Mac 上复制过的内容，会通过 iCloud 出现在这里。iPad 上想留住的，用「分享」或「一键保存」存进来。"
+          }
+        }
+      }
+    },
     "Anything you copy on your Mac shows up here through iCloud. To keep something from this iPhone, use Share or Quick Save.": {
       "extractionState": "manual",
       "localizations": {
@@ -755,7 +848,30 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "敲击背面"
+            "value": "轻点背面"
+          }
+        }
+      }
+    },
+    "Back Tap can only run a shortcut, so it needs one that runs “Save Clipboard”.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back Tap can only run a shortcut, so it needs one that runs “Save Clipboard”."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le toucher du dos ne peut lancer qu’un raccourci : il lui en faut un qui exécute « Enregistrer le presse-papiers »."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轻点背面只能触发快捷指令，所以要先做一条运行「保存剪贴板」的快捷指令。"
           }
         }
       }
@@ -1433,7 +1549,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copyo can't read the current value of this setting"
+            "value": "Copyo can’t read the current value of this setting"
           }
         },
         "fr": {
@@ -2071,29 +2187,6 @@
         }
       }
     },
-    "How to save clipboard": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "How to save clipboard"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Comment enregistrer le presse-papiers"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "怎样保存剪贴板"
-          }
-        }
-      }
-    },
     "Icon": {
       "extractionState": "manual",
       "localizations": {
@@ -2159,6 +2252,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "图片"
+          }
+        }
+      }
+    },
+    "In Settings › Apps › Copyo, set Paste from Other Apps to Allow. Copyo then saves new clips without asking.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Settings › Apps › Copyo, set Paste from Other Apps to Allow. Copyo then saves new clips without asking."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans Réglages › Apps › Copyo, réglez « Coller depuis d’autres apps » sur « Autoriser ». Copyo enregistrera alors sans demander."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在「设置 › App › Copyo」里把「从其他 App 粘贴」设为「允许」，之后回到 Copyo 就直接保存，不再询问。"
           }
         }
       }
@@ -2669,6 +2785,29 @@
         }
       }
     },
+    "Not there yet? Copy something in another app, come back to Copyo once, then look again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not there yet? Copy something in another app, come back to Copyo once, then look again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option absente ? Copiez quelque chose dans une autre app, revenez une fois dans Copyo, puis regardez à nouveau."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找不到这一项？先在别的 App 里复制点内容，回 Copyo 一次再来看。"
+          }
+        }
+      }
+    },
     "Nothing pinned yet": {
       "extractionState": "manual",
       "localizations": {
@@ -2807,6 +2946,29 @@
         }
       }
     },
+    "On · waiting for the first sync": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On · waiting for the first sync"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activé · en attente de la première synchronisation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已开启 · 等待首次同步"
+          }
+        }
+      }
+    },
     "One press saves whatever is on the clipboard right now. Copyo opens and shows “Saved”.": {
       "extractionState": "manual",
       "localizations": {
@@ -2882,7 +3044,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Copyo's Settings"
+            "value": "Open Copyo’s Settings"
           }
         },
         "fr": {
@@ -2918,6 +3080,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开详情"
+          }
+        }
+      }
+    },
+    "Open History and tap Paste to save it": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open History and tap Paste to save it"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez l’historique et touchez Coller pour l’enregistrer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到历史页点「粘贴」即可保存"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir Réglages"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去设置"
           }
         }
       }
@@ -2987,6 +3195,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开「设置 › App › Copyo」"
+          }
+        }
+      }
+    },
+    "Open Shortcuts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Shortcuts"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir Raccourcis"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开「快捷指令」"
           }
         }
       }
@@ -3681,6 +3912,29 @@
         }
       }
     },
+    "Save ${text} to Copyo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save ${text} to Copyo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把${text}存进 Copyo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer ${text} dans Copyo"
+          }
+        }
+      }
+    },
     "Save Clipboard": {
       "extractionState": "manual",
       "localizations": {
@@ -3842,6 +4096,29 @@
         }
       }
     },
+    "Search for Copyo in the action list": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search for Copyo in the action list"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recherchez Copyo dans la liste des actions"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在操作列表里搜索 Copyo"
+          }
+        }
+      }
+    },
     "Search history": {
       "extractionState": "manual",
       "localizations": {
@@ -3865,25 +4142,25 @@
         }
       }
     },
-    "Select text or an image in any app, tap Share, then tap “Save to Copyo”. You can pick a Pinboard on the way in.": {
+    "Select text or an image in any app, tap Share, then tap “Copyo”. You can pick a Pinboard on the way in.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Select text or an image in any app, tap Share, then tap “Save to Copyo”. You can pick a Pinboard on the way in."
+            "value": "Select text or an image in any app, tap Share, then tap “Copyo”. You can pick a Pinboard on the way in."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sélectionnez du texte ou une image dans n’importe quelle app, touchez « Partager », puis « Enregistrer dans Copyo ». Vous pouvez choisir un Pinboard au passage."
+            "value": "Sélectionnez du texte ou une image dans n’importe quelle app, touchez « Partager », puis « Copyo ». Vous pouvez choisir un Pinboard au passage."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在任何 App 里选中文字或图片，点「分享」，再点「保存到 Copyo」。可以顺手选 Pinboard。"
+            "value": "在任何 App 里选中文字或图片，点「分享」，再点「Copyo」。可以顺手选 Pinboard。"
           }
         }
       }
@@ -3953,29 +4230,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "设为「允许」后，打开 Copyo 时自动读取剪贴板，不再弹窗。这是 iOS 的隐私设置，只能在系统「设置」里更改。"
-          }
-        }
-      }
-    },
-    "Set it to Allow, no more prompts": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set it to Allow, no more prompts"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réglé sur « Autoriser » : plus aucune demande"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "设为「允许」后不再弹窗"
           }
         }
       }
@@ -4095,29 +4349,6 @@
         }
       }
     },
-    "Shortcut link not published yet": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shortcut link not published yet"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lien du raccourci pas encore publié"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "快捷指令链接尚未发布"
-          }
-        }
-      }
-    },
     "Show Clips in System Search": {
       "extractionState": "manual",
       "localizations": {
@@ -4229,6 +4460,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "登录 iCloud 才能与 Mac 同步"
+          }
+        }
+      }
+    },
+    "Sign in to the same Apple Account on your Mac and iPad. Your clips travel through iCloud only, never through a third-party server.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in to the same Apple Account on your Mac and iPad. Your clips travel through iCloud only, never through a third-party server."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connectez-vous au même compte Apple sur votre Mac et votre iPad. Vos éléments passent uniquement par iCloud, jamais par un serveur tiers."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 与 iPad 登录同一 Apple 账户即可。内容只经过 iCloud，不经过任何第三方服务器。"
           }
         }
       }
@@ -4538,22 +4792,23 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Syncing…"
+            "value": "Syncing"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Synchronisation…"
+            "value": "Synchronisation"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "同步中…"
+            "value": "同步中"
           }
         }
-      }
+      },
+      "comment": "iCloud 胶囊的同步中态。不带省略号：胶囊里的「…」看起来像文字被截断（维护者真机反馈），进行中由转动的箭头表达"
     },
     "System Search": {
       "extractionState": "manual",
@@ -4620,6 +4875,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "敲两下手机背面即可保存"
+          }
+        }
+      }
+    },
+    "Tap the button above and create a new shortcut": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the button above and create a new shortcut"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez le bouton ci-dessus et créez un nouveau raccourci"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点上方按钮，新建一条快捷指令"
           }
         }
       }
@@ -4854,29 +5132,6 @@
         }
       }
     },
-    "The shortcut ships with the App Store release. Until then use the Action Button or Control Center — neither one needs a shortcut.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The shortcut ships with the App Store release. Until then use the Action Button or Control Center — neither one needs a shortcut."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le raccourci sera fourni avec la version de l’App Store. En attendant, utilisez le bouton Action ou le Centre de contrôle : aucun des deux n’a besoin de raccourci."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "快捷指令会随 App Store 版本一起发布。在那之前请用操作按钮或控制中心，这两条通道都不需要快捷指令。"
-          }
-        }
-      }
-    },
     "There's nothing to save here.": {
       "extractionState": "manual",
       "localizations": {
@@ -4929,7 +5184,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This deletes every clip that isn't pinned to a Pinboard. It can't be undone."
+            "value": "This deletes every clip that isn’t pinned to a Pinboard. It can’t be undone."
           }
         },
         "fr": {
@@ -4952,19 +5207,42 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This iPhone"
+            "value": "This Device"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cet iPhone"
+            "value": "Cet appareil"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "本机"
+          }
+        }
+      }
+    },
+    "Three ways to save from this iPad": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Three ways to save from this iPad"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trois façons d’enregistrer depuis cet iPad"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPad 上想留住的，三种方式存进来"
           }
         }
       }
@@ -5011,6 +5289,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "时间"
+          }
+        }
+      }
+    },
+    "Tired of tapping Allow Paste?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tired of tapping Allow Paste?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marre de toucher « Autoriser le collage » ?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不想每次都点「允许粘贴」？"
           }
         }
       }
@@ -5107,25 +5408,25 @@
         }
       }
     },
-    "Two switches and you're set": {
+    "Two last things": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Two switches and you're set"
+            "value": "Two last things"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deux réglages et c’est prêt"
+            "value": "Deux dernières choses"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "两个开关，打开就好"
+            "value": "最后两件事"
           }
         }
       }
@@ -5297,7 +5598,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "With this off, Copyo won't read the clipboard when it opens — use the banner at the top of History to paste and save by hand."
+            "value": "With this off, Copyo won’t read the clipboard when it opens — use the banner at the top of History to paste and save by hand."
           }
         },
         "fr": {
@@ -5452,6 +5753,52 @@
         }
       }
     },
+    "iCloud is restricted on this device": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud is restricted on this device"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud est restreint sur cet appareil"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台设备上的 iCloud 受到限制"
+          }
+        }
+      }
+    },
+    "iCloud is temporarily unavailable. Copyo will try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud is temporarily unavailable. Copyo will try again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud est temporairement indisponible. Copyo réessaiera."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 暂时不可用，Copyo 会自动重试。"
+          }
+        }
+      }
+    },
     "iCloud sync failed": {
       "extractionState": "manual",
       "localizations": {
@@ -5521,13 +5868,36 @@
         }
       }
     },
+    "iOS asks the first time Copyo reads the clipboard. Tap Allow Paste; later you can set it to Allow in Settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS asks the first time Copyo reads the clipboard. Tap Allow Paste; later you can set it to Allow in Settings."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS vous le demande la première fois que Copyo lit le presse-papiers. Touchez « Autoriser le collage » ; vous pourrez ensuite choisir « Autoriser » dans Réglages."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyo 第一次读剪贴板时 iOS 会问你，点「允许粘贴」；之后可在系统设置里改成「允许」。"
+          }
+        }
+      }
+    },
     "iOS won't let apps read the clipboard in the background, so Copyo only saves at these three moments.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "iOS won't let apps read the clipboard in the background, so Copyo only saves at these three moments."
+            "value": "iOS won’t let apps read the clipboard in the background, so Copyo only saves at these three moments."
           }
         },
         "fr": {
@@ -5540,6 +5910,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "iOS 不允许 App 在后台读剪贴板，所以 Copyo 只在这三种时刻保存内容。"
+          }
+        }
+      }
+    },
+    "iOS won't let apps read the clipboard in the background. Copyo only saves at these three moments.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS won’t let apps read the clipboard in the background. Copyo only saves at these three moments."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS n’autorise pas les apps à lire le presse-papiers en arrière-plan. Copyo n’enregistre qu’à ces trois moments."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS 不允许 App 在后台读剪贴板，Copyo 只在这三种时刻保存。"
           }
         }
       }
@@ -5665,19 +6058,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "“Save to Copyo” in any app"
+            "value": "Share › Copyo in any app"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "« Enregistrer dans Copyo » depuis n’importe quelle app"
+            "value": "Partager › Copyo dans n’importe quelle app"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "任何 App 里「保存到 Copyo」"
+            "value": "任何 App 里点「分享」→「Copyo」"
           }
         }
       }

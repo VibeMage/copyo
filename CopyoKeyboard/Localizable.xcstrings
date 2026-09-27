@@ -1663,13 +1663,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This iPhone"
+            "value": "This Device"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cet iPhone"
+            "value": "Cet appareil"
           }
         },
         "zh-Hans": {

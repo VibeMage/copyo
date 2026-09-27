@@ -3,6 +3,9 @@ import SwiftUI
 /// 设计 01b 的空态。插画是全 App 唯一一处品牌红蓝错位套印，
 /// 所以没有复用通用的 `EmptyState`（它只画 SF Symbol）。
 struct HistoryEmptyState: View {
+    /// 同步没开成时才给「开启 iCloud 同步」。同步默认就是开的，这时再摆一颗「开启」按钮，
+    /// 点下去只是落到设置页、什么也没打开——第一次打开应用的人（包括审核员）看到的就是这一屏
+    var showsEnableSync: Bool
     var onEnableSync: () -> Void
     var onHowToSave: () -> Void
 
@@ -20,31 +23,36 @@ struct HistoryEmptyState: View {
                 .font(CopyoTheme.Fonts.title2)
                 .foregroundStyle(CopyoTheme.label)
 
-            Text(String(localized: "Anything you copy on your Mac shows up here through iCloud. To keep something from this iPhone, use Share or Quick Save."))
+            Text(message)
                 .font(CopyoTheme.Fonts.subheadline)
-                .lineSpacing(6)
+                // 设计 01b 是 15/21：subheadline 自然行高约 18，只补 3
+                .lineSpacing(3)
                 .foregroundStyle(CopyoTheme.labelSecondary)
                 .multilineTextAlignment(.center)
 
             VStack(spacing: 10) {
-                Button(action: onEnableSync) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "icloud.fill")
-                            .font(.system(.body, weight: .semibold))
-                        Text(String(localized: "Turn on iCloud Sync"))
-                            .font(.system(.body, weight: .semibold))
-                            .multilineTextAlignment(.center)
+                if showsEnableSync {
+                    Button(action: onEnableSync) {
+                        HStack(spacing: 6) {
+                            // 设计 01b 是描边的云；实心的 icloud.fill 属于设置页的 iCloud 图标砖
+                            Image(systemName: "icloud")
+                                .font(.system(.body, weight: .regular))
+                            Text(String(localized: "Turn on iCloud Sync"))
+                                .font(.system(.body, weight: .semibold))
+                                .multilineTextAlignment(.center)
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .frame(minHeight: buttonMinHeight)
+                        .background(CopyoTheme.accent, in: Capsule())
                     }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .frame(minHeight: buttonMinHeight)
-                    .background(CopyoTheme.accent, in: Capsule())
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
 
                 Button(action: onHowToSave) {
-                    Text(String(localized: "How to save clipboard"))
+                    // 与设置页那一行、指引页标题同一个键：同一个去处在英文里只有一个名字
+                    Text(String(localized: "How Copyo Saves Clips"))
                         .font(.system(.body, weight: .semibold))
                         .foregroundStyle(CopyoTheme.accent)
                         .multilineTextAlignment(.center)
@@ -57,8 +65,18 @@ struct HistoryEmptyState: View {
             }
             .padding(.top, 10)
         }
+        // 设计 01b 的正文与按钮宽 352（440 画布减去两侧 20 + 24）。
+        // 原来先加内距再封顶 380，内容只剩 332，按钮比设计窄一截
+        .frame(maxWidth: 352)
         .padding(.horizontal, 24)
-        .frame(maxWidth: 380)
+    }
+
+    /// 正文里「这台设备」按实际设备说：iPad 上写「this iPhone / 手机上」是错的
+    private var message: String {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return String(localized: "Anything you copy on your Mac shows up here through iCloud. To keep something from this iPad, use Share or Quick Save.")
+        }
+        return String(localized: "Anything you copy on your Mac shows up here through iCloud. To keep something from this iPhone, use Share or Quick Save.")
     }
 
     /// 96 × 96 骨白卡片：红蓝两条错位套印 + 三条正文条（尺寸逐字取自设计稿）

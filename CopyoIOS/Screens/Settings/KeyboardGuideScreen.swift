@@ -55,7 +55,7 @@ struct KeyboardGuideScreen: View {
 /// 两条无障碍上的处理共用同一个理由——**它没有任何一条信息不在下面那段说明里**：
 /// - 整块 `accessibilityHidden`：读屏把三张假卡片的正文念出来，用户会以为那是自己的剪贴历史、
 ///   可以点进去用，而它们既不可点也不是真的。
-/// - 动态字号封顶在默认档：卡片宽 150、条高 84 是按默认档的字摆出来的一幅画，
+/// - 动态字号封顶在默认档：卡片宽 150、三行正文是按默认档的字摆出来的一幅画，
 ///   AX5 下一行 13pt 正文就有六十多点高，三张卡片会挤成看不出形状的碎片。
 ///   **只封上限不封下限**（`...(.large)`）——用户把字号调小时这幅画跟着变清爽，没有坏处。
 private struct KeyboardPreview: View {
@@ -72,9 +72,6 @@ private struct KeyboardPreview: View {
     var searchRowRadius: CGFloat = 8
     /// 卡片宽（设计 6.6：04e 的 `kbCards` 是 dense、宽 150）
     var cardWidth: CGFloat = 150
-    /// 卡片条高。84 = 内距 10 × 2 + 角标 18 + 头部下间距 6 + 两行 13pt 正文（18 + 行距 4 + 18）。
-    /// 写成定值而不是 `@ScaledMetric`，是上面那条封顶的延伸：字号不长，盒子也不必长
-    var cardHeight: CGFloat = 84
 
     var body: some View {
         VStack(alignment: .leading, spacing: spacing) {
@@ -82,7 +79,7 @@ private struct KeyboardPreview: View {
             cardStrip
         }
         .padding(padding)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
         .background(CopyoTheme.keyboardBackground(for: colorScheme),
                     in: RoundedRectangle(cornerRadius: CopyoTheme.Radius.card, style: .continuous))
         // 卡片条比面板宽，第三张会被裁掉半张——设计稿（`overflow:hidden`）就是这么画的，
@@ -96,9 +93,9 @@ private struct KeyboardPreview: View {
     /// （见 `CopyoKeyboard/KeyboardSearchRow.swift`）；预览里按设计稿取短的那个，
     /// 150pt 的缩略图上摆不下那么多字。
     ///
-    /// 这一行（以及下面卡片的定高）敢写死 `frame(height:)` 而不是走内距 + `minHeight`，
+    /// 这一行敢写死 `frame(height:)` 而不是走内距 + `minHeight`，
     /// 只因为整块预览的字号已经封顶在默认档：字不会长高，盒子也就切不到字。
-    /// 这个前提一旦去掉，两处都要改回 `minHeight`
+    /// 这个前提一旦去掉，这里要改回 `minHeight`
     private var searchRow: some View {
         HStack(spacing: 6) {
             // 设计第五节：搜索 = `magnifyingglass`
@@ -115,18 +112,21 @@ private struct KeyboardPreview: View {
     }
 
     private var cardStrip: some View {
-        HStack(spacing: spacing) {
+        // 顶对齐、各按内容长高：设计 04e 里链接卡（三行标题 + 域名）比两张文本卡高，下沿是参差的
+        HStack(alignment: .top, spacing: spacing) {
             ForEach(Self.clips) { clip in
-                KeyboardPreviewCard(clip: clip, width: cardWidth, height: cardHeight)
+                KeyboardPreviewCard(clip: clip, width: cardWidth)
             }
         }
         // 三张 150 的卡片加间距是 466，一定比面板宽。两个修饰的**顺序是关键**：
-        // 先 `fixedSize` 让 HStack 按自己的 466 摆开（不然它会去压缩本来就是定宽的卡片），
-        // 再套一个 `maxWidth: .infinity` 的框把**对外报出的宽度**收回到可用宽度。
-        // 少了外面这一层，466 会一路顶出去，把整块面板撑得比页面还宽。
+        // 先 `fixedSize` 让 HStack 按自己的理想尺寸摆开（不然它会去压缩本来就是定宽的卡片，
+        // 纵向也会把三行正文压回省略号），
+        // 再套一个 `minWidth: 0, maxWidth: .infinity` 的框把**对外报出的宽度**收回到可用宽度。
+        // `minWidth: 0` 不能省——不写下限时弹性框会把子视图的 466 原样报出去，
+        // 整块面板连同整页一起被撑得比屏幕还宽、左右两边都被裁掉。
         // 溢出的部分留给面板的 `clipShape` 裁——设计要的正是露出半张
-        .fixedSize(horizontal: true, vertical: false)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize()
+        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: - 样例
@@ -184,24 +184,21 @@ private struct PreviewClip: Identifiable {
 private struct KeyboardPreviewCard: View {
     let clip: PreviewClip
     let width: CGFloat
-    let height: CGFloat
 
     /// 头部与正文之间的间距（设计 3.1 dense）
     var headerSpacing: CGFloat = 6
-    /// 正文行数。真卡片 dense 档是 3 行，这里收到 2 行——`cardHeight` 的 84 就是按两行算出来的，
-    /// 两个数必须一起改，否则第三行会被卡片下沿切掉
-    var lineLimit: Int = 2
+    /// 正文行数，与真卡片的 dense 档一致（设计 3.1：文本 3 行、链接标题 3 行 + 一行域名）。
+    /// 卡片不定高，行数就是高度的唯一来源
+    var lineLimit: Int = 3
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
                 .padding(.bottom, headerSpacing)
             content
-            // 正文短的时候把卡片顶到上边，别让剩下的空白把它撑成居中
-            Spacer(minLength: 0)
         }
         .padding(CopyoTheme.Metrics.cardPadDense)
-        .frame(width: width, height: height, alignment: .topLeading)
+        .frame(width: width, alignment: .topLeading)
         .background(CopyoTheme.tint(sourceHex: clip.sourceHex))
         .clipShape(RoundedRectangle(cornerRadius: CopyoTheme.Radius.card, style: .continuous))
     }
@@ -230,7 +227,7 @@ private struct KeyboardPreviewCard: View {
                     .font(CopyoTheme.Fonts.cardBody(dense: true).weight(.semibold))
                     .foregroundStyle(CopyoTheme.label)
                     .lineSpacing(CopyoTheme.cardLineSpacing(dense: true))
-                    .lineLimit(lineLimit - 1)
+                    .lineLimit(lineLimit)
                 Text(verbatim: domain)
                     .font(CopyoTheme.Fonts.linkDomain)
                     .foregroundStyle(CopyoTheme.accent)

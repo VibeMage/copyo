@@ -25,7 +25,7 @@ struct RootView: View {
                     splitLayout
                 }
             }
-            .overlay(alignment: .top) {
+            .overlay(alignment: .bottom) {
                 ToastOverlay(toast: model.toast.current)
             }
             .fullScreenCover(isPresented: $model.showsOnboarding) {

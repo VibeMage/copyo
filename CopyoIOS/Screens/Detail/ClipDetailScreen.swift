@@ -42,6 +42,10 @@ struct ClipDetailScreen: View {
                     menuContent
                 } label: {
                     Image(systemName: "ellipsis.circle")
+                        // 设计 02 / 02b 的 ⋯ 是 accent 蓝。iOS 26 的玻璃导航栏把工具栏项画成单色、
+                        // 不认全局 tint，只能在字形上点名要颜色。**不要**改成给 Menu 挂 `.tint`：
+                        // iPad 分栏里那样会让整个窗口一帧都画不出来（实测白屏）
+                        .foregroundStyle(CopyoTheme.accent)
                 }
                 .accessibilityLabel(String(localized: "More"))
             }

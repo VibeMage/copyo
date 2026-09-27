@@ -267,6 +267,8 @@ final class CopyoCoreTests: XCTestCase {
             "{\n  \"name\": \"copyo\",\n  \"version\": \"1.0.0\"\n}",
             "$ swift test",
             "docker run -it --rm ubuntu bash",
+            "Color(red: 0.97, green: 0.95, blue: 0.92)",
+            "CGSize(width: 320, height: 44)",
         ]
         for sample in code {
             XCTAssertTrue(ClipClassifier.looksLikeCode(sample), "应当识别为代码：\(sample)")
@@ -285,6 +287,9 @@ final class CopyoCoreTests: XCTestCase {
             "Find the report and open it before the meeting",
             "| Mac 版能力 | iOS 现状 | 替代方案 |",
             "/Users/me/Documents/2026 年度总结.pdf",
+            "Lunch(with: Anna)",
+            "TODO(alan: fix later)",
+            "Meeting notes (see: page 3)",
         ]
         for sample in prose {
             XCTAssertFalse(ClipClassifier.looksLikeCode(sample), "不应当识别为代码：\(sample)")
