@@ -84,19 +84,30 @@ private struct SyncStatusPillBody: View {
 
     private var symbol: String {
         switch status {
+        case .idle: "icloud"
         case .synced: "checkmark.icloud"
         case .syncing: "arrow.triangle.2.circlepath.icloud"
         case .off: "icloud.slash"
         }
     }
 
-    private var title: String {
+    private var title: String { Self.title(for: status) }
+
+    private static func title(for status: SyncStatus) -> String {
         switch status {
+        case .idle: "iCloud"
         case .synced: String(localized: "Synced")
         case .syncing: String(localized: "Syncing…")
         case .off: String(localized: "Not synced")
         }
     }
+
+    /// 四态的文案都预先排版一遍、叠在一起撑出宽度：胶囊宽度按**当前语言、当前字号**下最长的那个定，
+    /// 状态怎么切外框都不动。原来宽度随文案伸缩，「同步中 → 已同步」时整枚胶囊跟着抽一下。
+    /// 不写死点数——中文三个字、法语「Non synchronisé」、放大字号，宽度都不一样
+    private static let allTitles: [String] = [
+        title(for: .idle), title(for: .synced(nil)), title(for: .syncing), title(for: .off(.noAccount)),
+    ]
 
     var body: some View {
         Button {
@@ -107,13 +118,16 @@ private struct SyncStatusPillBody: View {
                       trailing: size.trailing) {
                 icon
                     .font(.system(size: size.symbolSize * typeScale))
-                Text(title)
-                    .font(.system(size: size.fontSize * typeScale, weight: .medium))
-                    // 胶囊挂在导航栏右上角，宽度由标题挤剩下的地方决定。
-                    // 法语的「Non synchronisé」在放大档位下折成两行会把整条导航栏撑高，
-                    // 宁可按房规的 0.8 缩一点
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                ZStack(alignment: .leading) {
+                    ForEach(Self.allTitles, id: \.self) { candidate in
+                        titleText(candidate).hidden()
+                    }
+                    // 换文案时交叉淡化，不是一帧硬切（`.id` 让新旧两段各是一个视图，才有得淡）
+                    titleText(title)
+                        .id(title)
+                        .transition(.opacity)
+                }
+                .accessibilityHidden(true)
             }
             .foregroundStyle(CopyoTheme.labelSecondary)
         }
@@ -123,6 +137,9 @@ private struct SyncStatusPillBody: View {
         .allowsHitTesting(status.isOff)
         .accessibilityRemoveTraits(status.isOff ? [] : .isButton)
         .accessibilityLabel(title)
+        // 图标与文案的所有切换都在这一个动画里：状态一变，交叉淡化约 0.25s。
+        // 「减弱动态效果」下仍然淡化（那是透明度，不是位移），只是不转
+        .animation(.smooth(duration: 0.25), value: status)
     }
 
     /// 同步中那一态**单独一个视图**，另外两态另一个。
@@ -142,13 +159,27 @@ private struct SyncStatusPillBody: View {
                 .symbolEffect(.rotate.byLayer,
                               options: .repeat(.continuous).speed(0.5),
                               isActive: !reduceMotion)
+                .transition(.opacity)
         } else {
+            // 另外三态之间换图标走系统的符号替换动画（云 → 带勾的云是一次「长出一个勾」，不是硬切）
             Image(systemName: symbol)
+                .contentTransition(.symbolEffect(.replace))
+                .transition(.opacity)
         }
     }
 
     private var isSyncing: Bool {
         if case .syncing = status { return true }
         return false
+    }
+
+    private func titleText(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: size.fontSize * typeScale, weight: .medium))
+            // 胶囊挂在导航栏右上角，宽度由标题挤剩下的地方决定。
+            // 法语的「Non synchronisé」在放大档位下折成两行会把整条导航栏撑高，
+            // 宁可按房规的 0.8 缩一点
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
     }
 }

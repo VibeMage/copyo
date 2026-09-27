@@ -26,13 +26,23 @@ final class PasteboardCapture {
 
     private let context: ModelContext
 
-    /// 每次采集的结果都会回调一次，AppModel 据此发轻提示 / 亮横幅
-    var onOutcome: ((Outcome) -> Void)?
+    /// 这次采集是哪条通道发起的。**跟着结果一起走**，由结果的消费方决定给什么反馈——
+    /// 原来是一个共享的 `lastOutcomeWasExplicit` 标志：跨 `await` 置真、`defer` 复位，
+    /// 两次保存交错时会把一次自动读取错当成用户按下的（Codex 复盘 I）
+    enum Source {
+        /// 通道 A：回到前台自动读
+        case foreground
+        /// 通道 C：一键保存把 App 拉到前台之后
+        case quickSave
+        /// 横幅里的系统粘贴按钮
+        case pasteControl
 
-    /// 正在回调的这条结果是不是**用户明确动作**触发的（一键保存、横幅上的粘贴按钮）。
-    /// 通道 A 的例行采集读到空剪贴板或重复内容时不该打扰用户；
-    /// 通道 C 必须给反馈——用户刚按下控件，屏幕上什么都不发生就等于失败。
-    private(set) var lastOutcomeWasExplicit = false
+        /// 用户亲手按下的动作：必须给明确的结果反馈（空 / 重复 / 成功都要说）
+        var isExplicit: Bool { self != .foreground }
+    }
+
+    /// 每次采集的结果都会回调一次，AppModel 据此给反馈 / 亮横幅
+    var onOutcome: ((Outcome, Source) -> Void)?
 
     init(context: ModelContext) {
         self.context = context
@@ -49,16 +59,16 @@ final class PasteboardCapture {
         // IOSSettings 里 lastPasteboardChangeCount 的注释写的就是这条契约。
         guard let lastChangeCount = IOSSettings.lastPasteboardChangeCount else {
             IOSSettings.lastPasteboardChangeCount = changeCount
-            return finish(.unchanged)
+            return finish(.unchanged, .foreground)
         }
         guard lastChangeCount != changeCount else {
-            return finish(.unchanged)
+            return finish(.unchanged, .foreground)
         }
         guard IOSSettings.autoReadOnForeground else {
             // 这里**不**更新 changeCount：用户点横幅上的粘贴按钮时还要靠它判断是不是同一份内容
-            return finish(.needsBanner)
+            return finish(.needsBanner, .foreground)
         }
-        return capture(changeCount: changeCount)
+        return capture(changeCount: changeCount, source: .foreground)
     }
 
     // MARK: - 通道 C：一键保存把 App 拉到前台后
@@ -67,9 +77,7 @@ final class PasteboardCapture {
     /// changeCount 相同也照读一遍，用户可能就是想把手上这份再存一次。
     @discardableResult
     func captureNow() -> Outcome {
-        lastOutcomeWasExplicit = true
-        defer { lastOutcomeWasExplicit = false }
-        return capture(changeCount: UIPasteboard.general.changeCount)
+        capture(changeCount: UIPasteboard.general.changeCount, source: .quickSave)
     }
 
     // MARK: - 横幅上的系统粘贴按钮
@@ -80,27 +88,39 @@ final class PasteboardCapture {
         // 无论存没存成，这一份剪贴板都算「已经处理过」：
         // UIPasteControl 走的是 itemProvider 通道，UIPasteboard 的 changeCount 一点没变，
         // 不记账的话下次回前台还会当成新内容再弹一次横幅（或再弹一次系统授权框）。
-        defer { markSeen() }
-        lastOutcomeWasExplicit = true
-        defer { lastOutcomeWasExplicit = false }
+        //
+        // 记账记的是**按下按钮那一刻**的版本，不是保存完成时的：下面跨了几次 `await`，
+        // 加载期间用户若切出去又复制了新内容 B，完成时再读 changeCount 就会把 B 一并记成
+        // 「处理过」，下次回前台 B 被跳过（Codex 复盘 H）
+        //
+        // 完成时也不能无条件写回：等待期间别的通路（前台采集、我们自己复制出去的 `markSeen`）
+        // 可能已经记下了更新的版本，写回旧号会让那份内容被当成新的再读一遍（Codex 复盘第二轮 #5）。
+        // 所以只在记账还停在按下时的样子才写——比较后写入
+        let changeCountAtTap = UIPasteboard.general.changeCount
+        let recordedAtTap = IOSSettings.lastPasteboardChangeCount
+        defer {
+            if IOSSettings.lastPasteboardChangeCount == recordedAtTap {
+                IOSSettings.lastPasteboardChangeCount = changeCountAtTap
+            }
+        }
         for provider in itemProviders {
             if provider.canLoadObject(ofClass: UIImage.self),
                let image = await loadObject(UIImage.self, from: provider),
                let prepared = ClipImagePreparer.prepare(image: image) {
-                return finish(save(imagePNG: prepared.png))
+                return finish(save(imagePNG: prepared.png), .pasteControl)
             }
             // 用 NSURL / NSString 而不是 URL / String：NSItemProviderReading 是 Objective-C 协议，
             // Swift 值类型只有桥接重载，泛型里对不上
             if provider.canLoadObject(ofClass: NSURL.self),
                let url = await loadObject(NSURL.self, from: provider) {
-                return finish(save(text: (url as URL).absoluteString, rtfData: nil))
+                return finish(save(text: (url as URL).absoluteString, rtfData: nil), .pasteControl)
             }
             if provider.canLoadObject(ofClass: NSString.self),
                let text = await loadObject(NSString.self, from: provider) {
-                return finish(save(text: text as String, rtfData: nil))
+                return finish(save(text: text as String, rtfData: nil), .pasteControl)
             }
         }
-        return finish(.empty)
+        return finish(.empty, .pasteControl)
     }
 
     // MARK: - 剪贴板写回后的同步
@@ -113,7 +133,7 @@ final class PasteboardCapture {
 
     // MARK: - 内部
 
-    private func capture(changeCount: Int) -> Outcome {
+    private func capture(changeCount: Int, source: Source) -> Outcome {
         let pasteboard = UIPasteboard.general
         // has* 这几个属性不会触发系统弹窗，只有真的取值才会；先用它们决定读什么，少弹一次窗
         let hasURLs = pasteboard.hasURLs
@@ -121,7 +141,7 @@ final class PasteboardCapture {
         let hasImages = pasteboard.hasImages
         guard hasURLs || hasStrings || hasImages else {
             IOSSettings.lastPasteboardChangeCount = changeCount
-            return finish(.empty)
+            return finish(.empty, source)
         }
 
         // 取值读到 nil = 用户在系统弹窗里点了「不允许」。这时**也要记账**：不记的话 changeCount
@@ -129,21 +149,25 @@ final class PasteboardCapture {
         // 横幅照样亮（`.needsBanner`），而横幅上的 UIPasteControl 不依赖 changeCount。
         func denied() -> Outcome {
             IOSSettings.lastPasteboardChangeCount = changeCount
-            return finish(.needsBanner)
+            // 被拒绝一律打断「连续弹框」：图片那条路不经过 `timedRead`，原来拒绝了图片
+            // 旧的计数与标记还留着，关掉横幅后提示卡又冒出来（Codex 复盘第二轮 #10）
+            IOSSettings.lastPasteReadPrompted = false
+            IOSSettings.promptedPasteReads = 0
+            return finish(.needsBanner, source)
         }
 
         // 只有 URL 没有文本时才当链接读；Safari 之类两种表示都给，走文本路径由分类器判定
         if hasURLs && !hasStrings {
             guard let url = timedRead({ pasteboard.url }) else { return denied() }
             IOSSettings.lastPasteboardChangeCount = changeCount
-            return finish(save(text: url.absoluteString, rtfData: nil))
+            return finish(save(text: url.absoluteString, rtfData: nil), source)
         }
 
         if hasStrings {
             guard let text = timedRead({ pasteboard.string }) else { return denied() }
             IOSSettings.lastPasteboardChangeCount = changeCount
             let rtf = pasteboard.data(forPasteboardType: "public.rtf")
-            return finish(save(text: text, rtfData: rtf))
+            return finish(save(text: text, rtfData: rtf), source)
         }
 
         // 图片先拿原始字节交给 ImageIO 缩到 2048 边长再转 PNG（与分享扩展同一条路）。
@@ -161,8 +185,8 @@ final class PasteboardCapture {
             prepared = ClipImagePreparer.prepare(image: image)
         }
         IOSSettings.lastPasteboardChangeCount = changeCount
-        guard let prepared else { return finish(.empty) }
-        return finish(save(imagePNG: prepared.png))
+        guard let prepared else { return finish(.empty, source) }
+        return finish(save(imagePNG: prepared.png), source)
     }
 
     // MARK: - 有没有弹「允许粘贴」
@@ -189,9 +213,10 @@ final class PasteboardCapture {
             IOSSettings.promptedPasteReads += 1
         } else {
             // 快速成功 = 已经是「允许」；快速 nil = 设成了「拒绝」；慢且 nil = 弹框里点了「不允许」。
-            // 三种都不该亮提示
+            // 三种都不该亮提示，也都打断「连续」——原来只有快速成功清零，
+            // 「慢成功 → 拒绝 → 慢成功」仍然凑满两次（Codex 复盘 G）
             IOSSettings.lastPasteReadPrompted = false
-            if !slow, value != nil { IOSSettings.promptedPasteReads = 0 }
+            IOSSettings.promptedPasteReads = 0
         }
         return value
     }
@@ -237,8 +262,8 @@ final class PasteboardCapture {
     }
 
     @discardableResult
-    private func finish(_ outcome: Outcome) -> Outcome {
-        onOutcome?(outcome)
+    private func finish(_ outcome: Outcome, _ source: Source) -> Outcome {
+        onOutcome?(outcome, source)
         return outcome
     }
 

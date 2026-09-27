@@ -87,7 +87,7 @@ struct SettingsScreen: View {
             // 容器是在 App 启动时按这个开关建的，运行中改不了，只能提示重开
             .onChange(of: cloudSyncEnabled) { _, _ in
                 model.toast.show(String(localized: "Takes effect after you reopen Copyo"),
-                                 symbol: "arrow.clockwise")
+                                 symbol: "arrow.clockwise", kind: .info)
             }
 
             HStack(spacing: 8) {
@@ -130,6 +130,7 @@ struct SettingsScreen: View {
 
     private var syncSymbol: String {
         switch model.syncStatus.status {
+        case .idle: "icloud"
         case .synced: "checkmark.icloud"
         case .syncing: "arrow.triangle.2.circlepath.icloud"
         case .off: "icloud.slash"
@@ -138,6 +139,9 @@ struct SettingsScreen: View {
 
     private var syncStatusText: String {
         switch model.syncStatus.status {
+        case .idle:
+            // 开着、账号没问题，只是这次启动还没见到一次成功的传输
+            return String(localized: "On · waiting for the first sync")
         case .synced(let date):
             guard let date else { return String(localized: "Synced") }
             return String(format: String(localized: "Synced · %@"), Self.relativeTime(date))

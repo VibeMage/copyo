@@ -2946,6 +2946,29 @@
         }
       }
     },
+    "On · waiting for the first sync": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On · waiting for the first sync"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activé · en attente de la première synchronisation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已开启 · 等待首次同步"
+          }
+        }
+      }
+    },
     "One press saves whatever is on the clipboard right now. Copyo opens and shows “Saved”.": {
       "extractionState": "manual",
       "localizations": {
@@ -3057,6 +3080,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开详情"
+          }
+        }
+      }
+    },
+    "Open History and tap Paste to save it": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open History and tap Paste to save it"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez l’historique et touchez Coller pour l’enregistrer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到历史页点「粘贴」即可保存"
           }
         }
       }
@@ -5703,6 +5749,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "iCloud 同步"
+          }
+        }
+      }
+    },
+    "iCloud is restricted on this device": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud is restricted on this device"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud est restreint sur cet appareil"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台设备上的 iCloud 受到限制"
+          }
+        }
+      }
+    },
+    "iCloud is temporarily unavailable. Copyo will try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud is temporarily unavailable. Copyo will try again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud est temporairement indisponible. Copyo réessaiera."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 暂时不可用，Copyo 会自动重试。"
           }
         }
       }

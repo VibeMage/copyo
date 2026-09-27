@@ -81,6 +81,10 @@ private struct HistoryContent: View {
     @State private var focusedItemID: PersistentIdentifier?
     /// 刚插入的条目短暂带焦点环（设计 01d，0.8s 后消失）
     @State private var highlightRingID: PersistentIdentifier?
+    /// 这一轮高亮的 token：熄灭计时只熄自己这一轮，不熄紧接着的下一轮（同一条连存两次时 ID 一样）
+    @State private var highlightRingToken: UUID?
+    @State private var isOnScreen = false
+    @State private var listAtTop = true
     @State private var detailItem: ClipItem?
     @State private var previewItem: ClipItem?
     /// 正在被拖走的条目：原位留一张 35% 的影子（设计 09 的 ghost 卡）
@@ -120,6 +124,14 @@ private struct HistoryContent: View {
         let visible = visibleItems
         return ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                // 列表顶端的零高标记：它在滚动视图坐标里的位置就是「滚了多远」。
+                // 用来判断自动存下的新条目（插在最前面）此刻看不看得见，见 `reportOnScreen`
+                Color.clear
+                    .frame(height: 0)
+                    .onGeometryChange(for: Bool.self) { $0.frame(in: .scrollView).minY > -40 } action: { atTop in
+                        listAtTop = atTop
+                        reportOnScreen()
+                    }
                 if isRegularLayout {
                     // 设计 09 的内容区标题：28 Bold 画在内容里，不是导航栏的 34pt 大标题
                     Text(columnTitle)
@@ -193,6 +205,13 @@ private struct HistoryContent: View {
             }
         }
         .onGeometryChange(for: CGSize.self) { $0.size } action: { viewportSize = $0 }
+        // 告诉 AppModel 历史页此刻在不在屏幕上、按什么筛、是否停在顶部、是否按时间排：
+        // 自动存下的新条目确定看得见时只用高亮表达「已保存」，否则补一条底部提示（见 `AppModel.handle`）
+        .onAppear { isOnScreen = true; reportOnScreen() }
+        .onDisappear { isOnScreen = false; reportOnScreen() }
+        .onChange(of: activeKind) { _, _ in reportOnScreen() }
+        .onChange(of: sortOrder) { _, _ in reportOnScreen() }
+        .onChange(of: previewItem == nil) { _, _ in reportOnScreen() }
         // 焦点挂在滚动视图上：硬件键盘的方向键 / ↵ / 空格 / ⌫ 都要先有焦点才收得到
         .focusable()
         .focusEffectDisabled()
@@ -240,8 +259,10 @@ private struct HistoryContent: View {
         .animation(CopyoTheme.springAnimation, value: model.pasteBannerVisible)
         .animation(CopyoTheme.springAnimation, value: model.allowPasteTipVisible)
         .animation(CopyoTheme.springAnimation, value: model.pasteBannerSaved)
-        .onChange(of: model.highlightedItemID, initial: true) { _, id in
-            showHighlightRing(for: id)
+        // 盯的是「这一次高亮请求」而不是条目 ID：同一条内容再存一次（去重命中），ID 没变，
+        // 盯 ID 的话第二次就不亮了，看上去像什么都没发生（Codex 复盘 E）
+        .onChange(of: model.highlightToken, initial: true) { _, token in
+            showHighlightRing(for: model.highlightedItemID, token: token)
         }
         .onChange(of: isRegularLayout, initial: true) { _, regular in
             // iPad / 外接键盘：宽度一够就把焦点收下来，用户不必先点一下卡片。
@@ -477,16 +498,28 @@ private struct HistoryContent: View {
     }
 
     /// 新条目的焦点环只亮 0.8s（设计 01d），之后回到普通卡片
-    private func showHighlightRing(for id: PersistentIdentifier?) {
+    private func showHighlightRing(for id: PersistentIdentifier?, token: UUID) {
         guard let id else { return }
         highlightRingID = id
+        highlightRingToken = token
         // 截图路由要的就是这一帧，别让它自己灭掉
         guard model.demoRoute != .historySaved else { return }
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(800))
-            guard highlightRingID == id else { return }
-            withAnimation(CopyoTheme.springAnimation) { highlightRingID = nil }
+            // 比 token 不比 ID：同一条 0.6s 内再存一次，ID 相同，比 ID 会把第二轮提前熄掉
+            guard highlightRingToken == token else { return }
+            withAnimation(CopyoTheme.springAnimation) {
+                highlightRingID = nil
+                highlightRingToken = nil
+            }
         }
+    }
+
+    private func reportOnScreen() {
+        // 预览 sheet 盖着的时候也看不见列表
+        model.historyOnScreen = isOnScreen && previewItem == nil
+            ? .init(kind: activeKind, atTop: listAtTop, newestFirst: sortOrder == .time)
+            : nil
     }
 
     // MARK: - 硬件键盘
@@ -586,7 +619,7 @@ private struct HistoryContent: View {
         guard let item = model.clip(with: id) else {
             // 索引里还留着、库里已经没了：Mac 上删掉后镜像过来，或者是还没到 30 天过期的孤儿
             model.toast.show(String(localized: "That clip is no longer in Copyo."),
-                             symbol: "questionmark.circle")
+                             symbol: "questionmark.circle", kind: .info)
             return
         }
         detailItem = item
@@ -626,7 +659,7 @@ private struct HistoryContent: View {
         item.createdAt = Date()
         model.modelContext.insert(item)
         try? model.modelContext.save()
-        model.highlightedItemID = item.persistentModelID
+        model.highlight(item)
         // 真实链路里这条提示由 AppModel 在存下内容时给；截图路由是直接插数据，得自己补上。
         // 钉住不收，和上面的焦点环一样：截图要的就是这一帧
         model.toast.show(String(localized: "Saved"), sticky: true)
@@ -656,23 +689,19 @@ private struct HistoryContent: View {
 
 // MARK: - 同步胶囊
 
-/// iPhone 历史页右上角的同步胶囊。
+/// iPhone 历史页右上角的同步胶囊。**永远不让位。**
 ///
-/// 轻提示出现时让位（设计 01d / 01e：「已保存」「已复制」占的就是顶部操作行，那一帧没有胶囊）。
-/// 用透明度而不是把 ToolbarItem 拿掉：拿掉会让导航栏重排一次，大标题跟着跳。
-/// 单拆一个视图是为了让「读轻提示」这件事只让它自己重跑——
-/// 写在 `HistoryContent.body` 里的话，每复制一次整页都要把筛选、排序重算一遍。
+/// 原来照设计 01d / 01e 在轻提示出现时透明让位（那两帧里顶部操作行被「已保存」占着）。真机上
+/// 这就成了「右上角的同步状态时有时无」：每复制一次、每自动存一条，胶囊都消失再回来。轻提示已经
+/// 挪到底部（见 `ToastOverlay`），两者不再争位置，胶囊就是一个稳定的状态入口。
+/// 单拆一个视图是为了让同步状态变化只让它自己重跑，不牵动整页的筛选与排序。
 private struct HistorySyncPill: View {
     var onTapWhenOff: () -> Void
 
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        let yields = model.toast.current != nil
         SyncStatusPill(status: model.syncStatus.status, size: .phone, onTapWhenOff: onTapWhenOff)
-            .opacity(yields ? 0 : 1)
-            .accessibilityHidden(yields)
-            .animation(CopyoTheme.springAnimation, value: yields)
     }
 }
 
