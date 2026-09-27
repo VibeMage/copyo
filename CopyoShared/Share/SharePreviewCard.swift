@@ -177,11 +177,15 @@ struct SharePreviewCard: View {
     @ViewBuilder
     private func imageContent(png: Data) -> some View {
         if let image = UIImage(data: png) {
-            Image(uiImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
+            // 图片放 overlay 里，不参与布局：铺满后的宽度会撑宽预览卡（全景图能撑出分享面板）
+            Color.clear
                 .frame(maxWidth: .infinity)
                 .frame(height: 160)
+                .overlay {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                }
                 .clipShape(RoundedRectangle(cornerRadius: CopyoTheme.Radius.inner, style: .continuous))
         } else {
             RoundedRectangle(cornerRadius: CopyoTheme.Radius.inner, style: .continuous)

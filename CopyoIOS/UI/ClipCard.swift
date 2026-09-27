@@ -267,22 +267,29 @@ struct ClipCard: View {
 
     private var imageContent: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ZStack {
-                if let thumbnail = item.thumbnail {
-                    Image(uiImage: thumbnail)
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    // CloudKit 的图片资产还没下载下来：给一个占位块，不要留空洞
-                    CopyoTheme.fill
-                    Image(systemName: "photo")
-                        .font(.title2)
-                        .foregroundStyle(CopyoTheme.labelTertiary)
+            // 框先由 Color.clear 定好（列宽 × 缩略图高），图片放在 overlay 里铺满再裁掉。
+            // 不能让图片自己参与布局：scaledToFill 的横图在固定高度下算出来比列宽宽，
+            // 这个宽度会经 maxWidth: .infinity 一路传给卡片，把瀑布流撑出屏幕、压住另一列。
+            // Mac 版 ClipCardBody 也是这个写法
+            Color.clear
+                .frame(maxWidth: .infinity)
+                .frame(height: dense ? CopyoTheme.Metrics.thumbnailDense : CopyoTheme.Metrics.thumbnail)
+                .overlay {
+                    if let thumbnail = item.thumbnail {
+                        Image(uiImage: thumbnail)
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        // CloudKit 的图片资产还没下载下来：给一个占位块，不要留空洞
+                        ZStack {
+                            CopyoTheme.fill
+                            Image(systemName: "photo")
+                                .font(.title2)
+                                .foregroundStyle(CopyoTheme.labelTertiary)
+                        }
+                    }
                 }
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: dense ? CopyoTheme.Metrics.thumbnailDense : CopyoTheme.Metrics.thumbnail)
-            .clipShape(RoundedRectangle(cornerRadius: CopyoTheme.Radius.inner, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: CopyoTheme.Radius.inner, style: .continuous))
             if let meta = item.imageMetadata, !dense {
                 Text(meta)
                     .font(.caption)
