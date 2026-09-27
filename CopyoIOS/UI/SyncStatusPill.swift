@@ -105,16 +105,8 @@ private struct SyncStatusPillBody: View {
             GlassPill(minHeight: size.height * typeScale,
                       leading: size.leading,
                       trailing: size.trailing) {
-                Image(systemName: symbol)
+                icon
                     .font(.system(size: size.symbolSize * typeScale))
-                    // 只转云里那两枚循环箭头，云本身不动（`.byLayer`）。原来是 `rotationEffect`
-                    // 把整朵云每秒甩一圈，真机上看就是「疯狂旋转」；注释当时以为 `.rotate`
-                    // 要 iOS 26，其实 iOS 18 就有，正好是最低版本。
-                    // 速度减半（约两秒一圈）：同步是后台慢慢做的事，一秒一圈在角落里显得很急。
-                    // 「减弱动态效果」打开时不转，静止的图标加「同步中」已经把状态说清楚了
-                    .symbolEffect(.rotate.byLayer,
-                                  options: .repeat(.continuous).speed(0.5),
-                                  isActive: isSyncing && !reduceMotion)
                 Text(title)
                     .font(.system(size: size.fontSize * typeScale, weight: .medium))
                     // 胶囊挂在导航栏右上角，宽度由标题挤剩下的地方决定。
@@ -131,6 +123,28 @@ private struct SyncStatusPillBody: View {
         .allowsHitTesting(status.isOff)
         .accessibilityRemoveTraits(status.isOff ? [] : .isButton)
         .accessibilityLabel(title)
+    }
+
+    /// 同步中那一态**单独一个视图**，另外两态另一个。
+    ///
+    /// 原来是一个 `Image(systemName: symbol)` 挂 `.symbolEffect(..., isActive: isSyncing)`：状态一变，
+    /// 图标换成 `checkmark.icloud`、`isActive` 变 false，可旋转效果并不停，而是**接着作用在新图标上**——
+    /// 带勾的云没有可单独旋转的分层，于是整朵云一直转到下一次回到同步中（TestFlight 构建 7 真机上
+    /// 「已同步」时云朵自转，模拟器里来回切状态逐帧复现）。分成两个分支，视图身份不同，
+    /// 带效果的那个随状态整个移除，效果没有地方残留。
+    ///
+    /// 只转云里那两枚循环箭头，云本身不动（`.byLayer`）；约两秒一圈，同步是后台慢慢做的事。
+    /// 「减弱动态效果」打开时不转，静止的图标加「同步中」已经把状态说清楚了
+    @ViewBuilder
+    private var icon: some View {
+        if isSyncing {
+            Image(systemName: "arrow.triangle.2.circlepath.icloud")
+                .symbolEffect(.rotate.byLayer,
+                              options: .repeat(.continuous).speed(0.5),
+                              isActive: !reduceMotion)
+        } else {
+            Image(systemName: symbol)
+        }
     }
 
     private var isSyncing: Bool {
