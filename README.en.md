@@ -44,6 +44,22 @@ open build/Build/Products/Release/Copyo.app   # or copy it to /Applications
 
 You can also just open `Copyo.xcodeproj` in Xcode and run it (⌘R).
 
+### Running the latest build day to day (maintainers)
+
+```bash
+./scripts/install-local.sh   # build Release → replace /Applications/Copyo.app → relaunch
+```
+
+It installs the direct-distribution flavor (not sandboxed), which reads your everyday history in
+`~/Library/Application Support/Copyo/`, signed with your Apple Development certificate so iCloud sync works
+(requires your team account in Xcode). The previous version is kept in `build.noindex/install/previous/`.
+If `/Applications` holds the App Store version, the script stops first; delete that copy and run it again.
+It only quits the `/Applications` copy of Copyo and leaves other instances such as Debug builds running,
+just listing them (they compete with the new install for ⇧⌘V).
+Only the `/Applications` copy stays registered: builds live under `build.noindex/` (skipped by Spotlight)
+and are unregistered from LaunchServices after installing, so “Open With” doesn’t fill up with dev builds.
+Test App Store builds through TestFlight.
+
 The iOS / iPadOS app lives in the same project (scheme `Copyo iOS`, iOS 18+, sharing `CopyoCore` and the iCloud data with the Mac app). To build it for the simulator:
 
 ```bash

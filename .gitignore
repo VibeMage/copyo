@@ -1,5 +1,7 @@
 # Xcode
 build/
+# scripts/install-local.sh 的构建目录；.noindex 后缀让 Spotlight 整个跳过，免得开发版被登记成一排 Copyo
+build.noindex/
 dist/
 DerivedData/
 build-demo/

@@ -44,6 +44,19 @@ open build/Build/Products/Release/Copyo.app   # 或拷贝到 /Applications
 
 也可以直接用 Xcode 打开 `Copyo.xcodeproj` 运行（⌘R）。
 
+### 本机日常用最新版（维护者）
+
+```bash
+./scripts/install-local.sh   # 编 Release → 替换 /Applications/Copyo.app → 重启
+```
+
+装的是直分发版（非沙盒），读 `~/Library/Application Support/Copyo/` 那份日常历史；用 Apple Development
+证书签名，iCloud 同步可用（需要 Xcode 里已登录团队账号）。旧版备份在 `build.noindex/install/previous/`。
+`/Applications` 里是商店版时脚本会先停下，删掉商店版再跑。它只退出 `/Applications` 那一份 Copyo，
+Debug 构建等其他实例不碰，只提示它们还在跑（会和新装的抢 ⇧⌘V）。
+本机只留 `/Applications` 这一份：构建目录放在 `build.noindex/`（Spotlight 不索引），装完把构建产物从
+LaunchServices 注销，「打开方式」里不会冒出一排开发版。商店包要验证时走 TestFlight。
+
 iOS / iPadOS 版在同一个工程里（scheme `Copyo iOS`，iOS 18+，与 Mac 版共用 `CopyoCore` 与 iCloud 数据），模拟器构建：
 
 ```bash
