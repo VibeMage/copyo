@@ -996,19 +996,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Syncing…"
+            "value": "Syncing"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Synchronisation…"
+            "value": "Synchronisation"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "同步中…"
+            "value": "同步中"
           }
         }
       }

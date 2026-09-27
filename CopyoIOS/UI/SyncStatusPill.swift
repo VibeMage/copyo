@@ -81,8 +81,6 @@ private struct SyncStatusPillBody: View {
     /// 各自挑各自的样式会出现「字长了、胶囊没长」这种半截效果。
     @ScaledMetric(relativeTo: .footnote) private var typeScale: CGFloat = 1
 
-    @State private var spinning = false
-
     private var symbol: String {
         switch status {
         case .synced: "checkmark.icloud"
@@ -108,7 +106,10 @@ private struct SyncStatusPillBody: View {
                       trailing: size.trailing) {
                 Image(systemName: symbol)
                     .font(.system(size: size.symbolSize * typeScale))
-                    .rotationEffect(.degrees(spinning ? 360 : 0))
+                    // 只转云里那两枚循环箭头，云本身不动（`.byLayer`）。原来是 `rotationEffect`
+                    // 把整朵云每秒甩一圈，真机上看就是「疯狂旋转」；注释当时以为 `.rotate`
+                    // 要 iOS 26，其实 iOS 18 就有，正好是最低版本
+                    .symbolEffect(.rotate.byLayer, options: .repeat(.continuous), isActive: isSyncing)
                 Text(title)
                     .font(.system(size: size.fontSize * typeScale, weight: .medium))
                     // 胶囊挂在导航栏右上角，宽度由标题挤剩下的地方决定。
@@ -124,14 +125,6 @@ private struct SyncStatusPillBody: View {
         // 「已同步」看上去比设计 01 浅得多，像是失效了。改成不接点按、旁白也不报「按钮」
         .allowsHitTesting(status.isOff)
         .accessibilityRemoveTraits(status.isOff ? [] : .isButton)
-        .onChange(of: isSyncing, initial: true) { _, syncing in
-            // 图标 1s 转一圈；iOS 26 有 .symbolEffect(.rotate)，这里用旋转动画保证 iOS 18 一致
-            if syncing {
-                withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) { spinning = true }
-            } else {
-                spinning = false
-            }
-        }
         .accessibilityLabel(title)
     }
 

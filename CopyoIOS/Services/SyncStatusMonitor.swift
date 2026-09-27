@@ -50,6 +50,8 @@ final class SyncStatusMonitor {
     let cloudKitActive: Bool
 
     @ObservationIgnored private var eventObserver: NSObjectProtocol?
+    /// 导入 / 导出开始后先等一会儿再亮「同步中」，见 `handle(_:)`
+    @ObservationIgnored private var pendingSyncing: Task<Void, Never>?
     @ObservationIgnored private var lastSyncedAt: Date?
     /// 账号状态第一次查回来之前不能说「已同步」，见 init 的注释
     @ObservationIgnored private var didResolveAccount = false
@@ -123,9 +125,19 @@ final class SyncStatusMonitor {
         guard event.type == .import || event.type == .export else { return }
 
         if event.endDate == nil {
-            status = .syncing
+            // CloudKit 启动后会连着做好几次一闪而过的导入 / 导出。每次都立刻切「同步中」的话，
+            // 胶囊在两态之间来回跳、宽度跟着变——真机上看就是图标疯转、胶囊抖。
+            // 只有持续超过 0.8s 的那种才值得告诉用户
+            pendingSyncing?.cancel()
+            pendingSyncing = Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .milliseconds(800))
+                guard !Task.isCancelled else { return }
+                self?.status = .syncing
+            }
             return
         }
+        pendingSyncing?.cancel()
+        pendingSyncing = nil
         if event.succeeded {
             lastSyncedAt = event.endDate
             status = .synced(event.endDate)

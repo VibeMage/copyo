@@ -4700,22 +4700,23 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Syncing…"
+            "value": "Syncing"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Synchronisation…"
+            "value": "Synchronisation"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "同步中…"
+            "value": "同步中"
           }
         }
-      }
+      },
+      "comment": "iCloud 胶囊的同步中态。不带省略号：胶囊里的「…」看起来像文字被截断（维护者真机反馈），进行中由转动的箭头表达"
     },
     "System Search": {
       "extractionState": "manual",
