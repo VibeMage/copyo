@@ -1043,7 +1043,7 @@ paste,copy,pasteboard,manager,clip,clips,pinboard,snippets,sync,icloud,widget,sa
 
 ---
 
-### 审核备注（英文）— 3851/4000
+### 审核备注（英文）— 3964/4000
 
 ```
 Copyo for iPhone and iPad is the companion to Copyo for Mac, which is already on the Mac App Store under this app record. It shows the user's clipboard history, synced from their Mac through their own private iCloud database, and lets them save new clips from the iPhone. Everything below can be tested on one iPhone or iPad, without a Mac.
@@ -1052,16 +1052,17 @@ No account, no login, no demo credentials needed. No in-app purchases.
 
 CLIPBOARD ACCESS
 - Copyo reads the clipboard only while it is in the foreground: when the user opens or returns to the app, and when the user presses the Save Clipboard control (which opens the app first). It never reads the clipboard in the background.
-- On the very first launch Copyo only records the pasteboard change count and reads nothing, so whatever was copied before installing is not saved. To see a capture, copy something after the first launch, then return to Copyo.
+- On the very first launch Copyo only records the pasteboard change count and reads nothing, so whatever was copied before installing is not saved. To see a capture, copy something after onboarding, then return to Copyo.
 - The iOS system prompt "Copyo would like to paste from <app>" is expected. Tap Allow Paste. Onboarding and Settings > Allow Paste from Other Apps explain how to set it to Allow in iOS Settings.
 - The user can turn this off in Settings > Read Clipboard Automatically. Copyo then shows a banner with the system Paste button (UIPasteControl) and saves only when the user taps it.
 - Copyo never pastes into other apps and uses no Accessibility APIs. Tapping a card copies it; the user pastes it themselves.
 
 HOW TO TEST
+The attached video shows steps 1-4 in the iOS Simulator. It has no iCloud account, so the sync status there reads "Not synced".
 1. Launch Copyo. Three onboarding pages; tap Skip or go through them.
 2. History: in Safari, copy some text, a link and an image (touch and hold > Copy). Return to Copyo after each one and allow paste; the clip appears at the top. Tap a card to copy it. Touch and hold for Copy as Plain Text, Share, Pin and Delete. Swipe right to pin, left to delete. Use the search field and filter chips.
 3. Pinboard tab: create a Pinboard and pin clips to it.
-4. Share extension: in Safari, tap Share > Copyo (under More if hidden), optionally choose a Pinboard, tap Save to Copyo. The item appears in History.
+4. Share extension: in Safari, tap Share > Copyo (under More if hidden), optionally choose a Pinboard, tap Save. The item appears in History.
 5. Quick Save control: open Control Center, touch and hold an empty area > Add a Control > search "Copyo" > Save Clipboard. Copy something in another app, then tap the control: Copyo opens and shows "Saved". On iPhone 15 Pro or later the same control can be assigned in Settings > Action Button > Controls. Back Tap is optional and uses a shortcut the user builds with Copyo's Save Clipboard action; steps are in Settings > Quick Save.
 6. Widgets: add Copyo's Recent Clips widget (small or medium) to the Home Screen. Tapping a clip opens Copyo and copies it.
 7. iPad: sidebar layout; drag a card into another app in Split View; with a hardware keyboard: Command-F, arrow keys, Return, Shift-Return, Space, Command-P, Delete, Command-1/2/3.
@@ -1166,6 +1167,9 @@ Mac 版 1.0 第一次提审被 2.1 退回过，要的就是演示录屏（见第
 主屏幕点图标 → 三页引导 → Safari 里点网页的复制按钮 → 回到 Copyo 点系统「允许粘贴」→ 高亮新卡片 →
 Safari 复制图片 → 再次允许 → 「不想每次都点允许粘贴？」提示 → Safari「更多 › 分享 › Copyo › 存储」→
 轻点复制 → 长按菜单新建 Pinboard → Pinboard 标签 → 搜索 → 设置页。
+
+2026-09-27 录好的一版 154 秒、884×1920、8.4 MB，已挂到 1.1.0 的「App 审核信息 → 附件」，
+审核备注「HOW TO TEST」下加了一句说明。
 
 **局限**：录的是模拟器，没有 iCloud 账号，右上角胶囊显示「Not synced」，审核备注里写明了。
 Apple 的 2.1 模板要的是**真机**录屏；如果审核员还是要，维护者用控制中心的屏幕录制在手机上录两分钟即可。
