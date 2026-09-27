@@ -160,8 +160,9 @@ final class SyncStatusMonitor {
         case .noAccount: .unavailable(.noAccount)
         case .restricted: .unavailable(.accountRestricted)
         case .temporarilyUnavailable: .unavailable(.accountTemporarilyUnavailable)
-        // 查询本身失败（`accountStatus` 出错时回的就是它）：什么也不知道，不压过传输事件给出的结论
-        default: .unknown
+        // 查询本身失败（`accountStatus` 出错时回的就是它）：什么也没学到。**保留已知的结论**——
+        // 已经确认没登录的，不能因为这次没查成就退回到旧的「已同步」（Codex 复盘第三轮 #1）
+        default: account
         }
         recompute()
     }
@@ -243,6 +244,15 @@ final class SyncStatusMonitor {
 
     /// 优先级：本次启动就定了的关闭原因 > 账号 > 失败 > 同步中 > 已同步 > iCloud（中性）
     private func recompute() {
+        // 故障抢占且已经没有传输在跑：那段为「最短展示」留着的同步中作废。不作废的话故障一恢复，
+        // 残留的 `busyWanted` 会让胶囊重新亮起一个早已结束的同步中，闪一下再灭（Codex 复盘第三轮 #3）
+        let faulted = offReason != nil || failures.isEmpty == false
+            || { if case .unavailable = account { true } else { false } }()
+        if faulted, activeEvents.isEmpty, busyWanted {
+            busyWanted = false
+            busyTask?.cancel()
+            busyTask = nil
+        }
         let next: SyncStatus
         if let offReason {
             next = .off(offReason)

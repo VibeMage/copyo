@@ -26,6 +26,10 @@ final class PasteboardCapture {
 
     private let context: ModelContext
 
+    /// 系统粘贴按钮的点按序号，与最近一次由点按写下的记账（见 `save(itemProviders:)`）
+    private var pasteTapSequence = 0
+    private var recordedByTap: (sequence: Int, value: Int)?
+
     /// 这次采集是哪条通道发起的。**跟着结果一起走**，由结果的消费方决定给什么反馈——
     /// 原来是一个共享的 `lastOutcomeWasExplicit` 标志：跨 `await` 置真、`defer` 复位，
     /// 两次保存交错时会把一次自动读取错当成用户按下的（Codex 复盘 I）
@@ -96,11 +100,21 @@ final class PasteboardCapture {
         // 完成时也不能无条件写回：等待期间别的通路（前台采集、我们自己复制出去的 `markSeen`）
         // 可能已经记下了更新的版本，写回旧号会让那份内容被当成新的再读一遍（Codex 复盘第二轮 #5）。
         // 所以只在记账还停在按下时的样子才写——比较后写入
+        //
+        // 但**后点的粘贴**可以覆盖**先点的粘贴**写下的记录：先后两次点按（a、b）开始时记账都是 x，
+        // a 先完成写成 a，b 完成时若只比较「是否还是 x」就会放弃写 b，已经存下的 b 下次又亮横幅
+        // （Codex 复盘第三轮 #2）。所以记下是哪一次点按写的，只让更晚的点按覆盖更早的点按
         let changeCountAtTap = UIPasteboard.general.changeCount
         let recordedAtTap = IOSSettings.lastPasteboardChangeCount
+        pasteTapSequence += 1
+        let mySequence = pasteTapSequence
         defer {
-            if IOSSettings.lastPasteboardChangeCount == recordedAtTap {
+            let current = IOSSettings.lastPasteboardChangeCount
+            let untouched = current == recordedAtTap
+            let supersedesOlderTap = recordedByTap.map { $0.value == current && $0.sequence < mySequence } ?? false
+            if untouched || supersedesOlderTap {
                 IOSSettings.lastPasteboardChangeCount = changeCountAtTap
+                recordedByTap = (mySequence, changeCountAtTap)
             }
         }
         for provider in itemProviders {
