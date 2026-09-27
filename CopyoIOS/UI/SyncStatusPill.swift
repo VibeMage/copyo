@@ -80,6 +80,7 @@ private struct SyncStatusPillBody: View {
     /// 再乘到三档设计点数上。高度、图标、文字乘的是**同一个**倍率，才会一起长大；
     /// 各自挑各自的样式会出现「字长了、胶囊没长」这种半截效果。
     @ScaledMetric(relativeTo: .footnote) private var typeScale: CGFloat = 1
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var symbol: String {
         switch status {
@@ -108,8 +109,12 @@ private struct SyncStatusPillBody: View {
                     .font(.system(size: size.symbolSize * typeScale))
                     // 只转云里那两枚循环箭头，云本身不动（`.byLayer`）。原来是 `rotationEffect`
                     // 把整朵云每秒甩一圈，真机上看就是「疯狂旋转」；注释当时以为 `.rotate`
-                    // 要 iOS 26，其实 iOS 18 就有，正好是最低版本
-                    .symbolEffect(.rotate.byLayer, options: .repeat(.continuous), isActive: isSyncing)
+                    // 要 iOS 26，其实 iOS 18 就有，正好是最低版本。
+                    // 速度减半（约两秒一圈）：同步是后台慢慢做的事，一秒一圈在角落里显得很急。
+                    // 「减弱动态效果」打开时不转，静止的图标加「同步中」已经把状态说清楚了
+                    .symbolEffect(.rotate.byLayer,
+                                  options: .repeat(.continuous).speed(0.5),
+                                  isActive: isSyncing && !reduceMotion)
                 Text(title)
                     .font(.system(size: size.fontSize * typeScale, weight: .medium))
                     // 胶囊挂在导航栏右上角，宽度由标题挤剩下的地方决定。
