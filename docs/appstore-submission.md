@@ -1150,3 +1150,41 @@ TestFlight 真机上逐轮修掉的，都进了 1.1.0：
 「App 审核信息」那份。同一版本只有第一个构建要过 Beta 审核；它与正式提审互不影响。
 
 内部群组 **Maintainer** 只给团队成员用。邀请邮件里的兑换码绑定的是那个测试员的名额，不能转给别人。
+
+### 审核演示视频：模拟器里自动录（2026-09-27）
+
+Mac 版 1.0 第一次提审被 2.1 退回过，要的就是演示录屏（见第二十四节）。iOS 首版提审时主动附上一段，
+省掉一轮来回。维护者不在电脑前，所以做成了模拟器里全自动的：
+
+```bash
+./scripts/record-review-video.sh                                   # → build/review/copyo-ios-review.mp4
+./scripts/asc.rb review-attachment build/review/copyo-ios-review.mp4   # 挂到「App 审核信息 → 附件」，同名旧附件先删
+```
+
+脚本抹掉专用模拟器「Copyo Review」（iPhone 17 Pro）、切英文、固定 9:41，本机起服务提供
+`scripts/review-video/index.html`（虚构的里斯本行程笔记），然后跑 UI 测试 `CopyoIOSUITests/ReviewWalkthrough`：
+主屏幕点图标 → 三页引导 → Safari 里点网页的复制按钮 → 回到 Copyo 点系统「允许粘贴」→ 高亮新卡片 →
+Safari 复制图片 → 再次允许 → 「不想每次都点允许粘贴？」提示 → Safari「更多 › 分享 › Copyo › 存储」→
+轻点复制 → 长按菜单新建 Pinboard → Pinboard 标签 → 搜索 → 设置页。
+
+**局限**：录的是模拟器，没有 iCloud 账号，右上角胶囊显示「Not synced」，审核备注里写明了。
+Apple 的 2.1 模板要的是**真机**录屏；如果审核员还是要，维护者用控制中心的屏幕录制在手机上录两分钟即可。
+
+踩过的坑（改脚本前先看）：
+
+- **不要另开 `simctl io recordVideo`**。Xcode 的 UI 测试自己就在录屏（结果包里的 mp4，满分辨率），
+  两路同时抓一台模拟器会把它的 io 卡死，连截图都截不了。scheme 里设了 `systemAttachmentLifetime = keepAlways`，
+  成功也保留录屏，脚本用 `xcresulttool export attachments` 取出来。
+- **bash 边跑边读脚本**：脚本在跑的时候别改它，否则后半截会读到错位的内容，报莫名其妙的语法错误。
+- 中文标点紧贴变量名（`$status）`）时 bash 会把全角字节当成变量名的一部分，一律写成 `${status}`。
+- 端口 8765 常被别的本地服务占着，Safari 会打开那个服务的页面；脚本现在用 8779，并先 curl 确认页面对。
+- 新装的 App 在主屏幕第二页；`test-without-building` 要等 `launch()` 才装目标 App，所以脚本先 `simctl install`。
+- 文字和图片都用网页上的复制按钮（剪贴板 API；图片经 canvas 转 PNG，Safari 只收 PNG）。模拟器里长按图片常常
+  不出菜单，而长按菜单里的「Copy」又会和网页按钮重名、点错，所以不走长按。按钮的无障碍名字是
+  「Copy meeting point」/「Copy photo」，复制成功后变成「Copied」，测试据此确认——Safari 第一次开网页会冒一个
+  功能提示气泡，第一下点击会被它吃掉，没变就再点一次。
+- iOS 26 的搜索栏右边是「✕」不是「Cancel」，测试挨个试名字，找不到就点搜索框右侧。
+- 长按链接的菜单里有网页预览，维基百科会一直加载，测试干等一分钟，「分享」还在菜单折叠线以下。改走「更多 › 分享」。
+- 开机后半分钟左右系统会弹「Apple Intelligence 已就绪」通知，脚本等它弹完再开录；Safari 也先在录像外预热一次。
+- 机器负载高的时候模拟器会整体卡死（开机停在转圈、`simctl bootstatus` 永远不返回），重启 CoreSimulator 也没用，
+  过几个小时自己恢复了。卡住时别反复重跑，先看 `uptime`。

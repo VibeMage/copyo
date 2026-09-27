@@ -5,6 +5,8 @@
 #   ./scripts/asc.rb builds [IOS|MAC_OS]   最近的构建与处理状态（只读）
 #   ./scripts/asc.rb version [IOS|MAC_OS]  待发布的版本：状态、发布方式、选中的构建（只读）
 #   ./scripts/asc.rb attach <构建号>       把 iOS 待提交版本的构建换成这一个（只改草稿，不提交审核）
+#   ./scripts/asc.rb review-attachment <文件>  给 iOS 待提交版本的「App 审核信息」传一个附件（演示视频），
+#                                          同名的旧附件先删掉
 #
 # 凭据与 build-appstore-ios.sh 上传用的是同一把 App Store Connect API 密钥：
 #   ~/.appstoreconnect/copyo.env                      ASC_KEY_ID / ASC_ISSUER_ID（仓库是公开的，不进仓库）
@@ -20,6 +22,7 @@ require "json"
 require "net/http"
 require "uri"
 require "base64"
+require "digest"
 
 APP_ID = "6813955206"
 
@@ -138,6 +141,48 @@ when "attach"
               body: { data: { type: "builds", id: build["id"] } })
   after = ASC.pending_version("IOS")
   puts "版本 #{after['versionString']} 的构建：#{version['build'] || '（未选）'} → #{after['build']}"
+when "review-attachment"
+  path = ARGV[0] or abort "用法：#{$PROGRAM_NAME} review-attachment <文件>"
+  abort "找不到 #{path}" unless File.file?(path)
+  version = ASC.pending_version("IOS")
+  unless %w[PREPARE_FOR_SUBMISSION DEVELOPER_REJECTED REJECTED METADATA_REJECTED].include?(version["appStoreState"])
+    abort "版本 #{version['versionString']} 当前是 #{version['appStoreState']}，审核信息改不了"
+  end
+  detail = ASC.request(:get, "/v1/appStoreVersions/#{version['id']}/appStoreReviewDetail")["data"]
+  name = File.basename(path)
+  ASC.request(:get, "/v1/appStoreReviewDetails/#{detail['id']}/appStoreReviewAttachments")["data"].each do |old|
+    next unless old.dig("attributes", "fileName") == name
+    ASC.request(:delete, "/v1/appStoreReviewAttachments/#{old['id']}")
+    puts "删掉旧的 #{name}"
+  end
+  # 三步：先登记文件拿到分片上传地址，按分片 PUT 上去，最后带 MD5 标记「传完了」
+  created = ASC.request(:post, "/v1/appStoreReviewAttachments", body: { data: {
+    type: "appStoreReviewAttachments",
+    attributes: { fileName: name, fileSize: File.size(path) },
+    relationships: { appStoreReviewDetail: { data: { type: "appStoreReviewDetails", id: detail["id"] } } }
+  } })["data"]
+  File.open(path, "rb") do |file|
+    created.dig("attributes", "uploadOperations").each do |op|
+      file.seek(op["offset"])
+      uri = URI(op["url"])
+      req = Net::HTTPGenericRequest.new(op["method"], true, true, uri)
+      (op["requestHeaders"] || []).each { |h| req[h["name"]] = h["value"] }
+      req.body = file.read(op["length"])
+      res = Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |http| http.request(req) }
+      abort "分片上传失败 #{res.code}：#{res.body.to_s[0, 300]}" unless res.is_a?(Net::HTTPSuccess)
+    end
+  end
+  ASC.request(:patch, "/v1/appStoreReviewAttachments/#{created['id']}", body: { data: {
+    type: "appStoreReviewAttachments", id: created["id"],
+    attributes: { sourceFileChecksum: Digest::MD5.file(path).hexdigest, uploaded: true }
+  } })
+  state = nil
+  30.times do
+    state = ASC.request(:get, "/v1/appStoreReviewAttachments/#{created['id']}")["data"].dig("attributes", "assetDeliveryState", "state")
+    break unless %w[AWAITING_UPLOAD UPLOAD_COMPLETE].include?(state)
+    sleep 2
+  end
+  puts "#{name}（#{(File.size(path) / 1_048_576.0).round(1)} MB）已传到 #{version['versionString']} 的审核信息 · #{state}"
 else
-  abort "用法：#{$PROGRAM_NAME} builds [IOS|MAC_OS] | version [IOS|MAC_OS] | attach <构建号>"
+  abort "用法：#{$PROGRAM_NAME} builds [IOS|MAC_OS] | version [IOS|MAC_OS] | attach <构建号> | review-attachment <文件>"
 end

@@ -31,6 +31,13 @@
 			remoteGlobalIDString = AB0000000000000000000034;
 			remoteInfo = CopyoWidgets;
 		};
+		AB0000000000000000000067 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AB000000000000000000000A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AB0000000000000000000032;
+			remoteInfo = "Copyo iOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -54,6 +61,7 @@
 		AB0000000000000000000029 /* CopyoShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CopyoShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB000000000000000000002A /* CopyoWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CopyoWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB0000000000000000000051 /* CopyoKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CopyoKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB0000000000000000000062 /* CopyoIOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CopyoIOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -142,6 +150,11 @@
 			path = CopyoShared;
 			sourceTree = "<group>";
 		};
+		AB0000000000000000000061 /* CopyoIOSUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CopyoIOSUITests;
+			sourceTree = "<group>";
+		};
 		AB0000000000000000000053 /* CopyoKeyboard */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -193,6 +206,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AB0000000000000000000065 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -201,6 +221,7 @@
 			children = (
 				AB0000000000000000000001 /* Copyo */,
 				AB000000000000000000002B /* CopyoIOS */,
+				AB0000000000000000000061 /* CopyoIOSUITests */,
 				AB0000000000000000000053 /* CopyoKeyboard */,
 				AB000000000000000000002E /* CopyoShared */,
 				AB000000000000000000002C /* CopyoShareExtension */,
@@ -217,6 +238,7 @@
 				AB0000000000000000000029 /* CopyoShareExtension.appex */,
 				AB000000000000000000002A /* CopyoWidgets.appex */,
 				AB0000000000000000000051 /* CopyoKeyboard.appex */,
+				AB0000000000000000000062 /* CopyoIOSUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -347,6 +369,27 @@
 			productReference = AB0000000000000000000051 /* CopyoKeyboard.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		AB0000000000000000000063 /* CopyoIOSUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB0000000000000000000069 /* Build configuration list for PBXNativeTarget "CopyoIOSUITests" */;
+			buildPhases = (
+				AB0000000000000000000064 /* Sources */,
+				AB0000000000000000000065 /* Frameworks */,
+				AB0000000000000000000066 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AB0000000000000000000068 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AB0000000000000000000061 /* CopyoIOSUITests */,
+			);
+			name = CopyoIOSUITests;
+			productName = CopyoIOSUITests;
+			productReference = AB0000000000000000000062 /* CopyoIOSUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -356,6 +399,11 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					AB0000000000000000000063 = {
+						TestTargetID = AB0000000000000000000032;
+					};
+				};
 			};
 			buildConfigurationList = AB000000000000000000000B /* Build configuration list for PBXProject "Copyo" */;
 			developmentRegion = en;
@@ -381,6 +429,7 @@
 				AB0000000000000000000033 /* CopyoShareExtension */,
 				AB0000000000000000000034 /* CopyoWidgets */,
 				AB0000000000000000000055 /* CopyoKeyboard */,
+				AB0000000000000000000063 /* CopyoIOSUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -415,6 +464,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AB0000000000000000000056 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB0000000000000000000066 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -459,6 +515,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AB0000000000000000000064 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -471,6 +534,11 @@
 			isa = PBXTargetDependency;
 			target = AB0000000000000000000034 /* CopyoWidgets */;
 			targetProxy = AB0000000000000000000026 /* PBXContainerItemProxy */;
+		};
+		AB0000000000000000000068 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AB0000000000000000000032 /* Copyo iOS */;
+			targetProxy = AB0000000000000000000067 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1020,6 +1088,60 @@
 			};
 			name = "Release-AppStore";
 		};
+		AB000000000000000000006A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9A94W79V84;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.vibemage.Copyo.UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Copyo iOS";
+			};
+			name = Debug;
+		};
+		AB000000000000000000006B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9A94W79V84;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.vibemage.Copyo.UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Copyo iOS";
+			};
+			name = Release;
+		};
+		AB000000000000000000006C /* Release-AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9A94W79V84;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.vibemage.Copyo.UITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Copyo iOS";
+			};
+			name = "Release-AppStore";
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1079,6 +1201,16 @@
 				AB0000000000000000000059 /* Debug */,
 				AB000000000000000000005A /* Release */,
 				AB000000000000000000005B /* Release-AppStore */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AB0000000000000000000069 /* Build configuration list for PBXNativeTarget "CopyoIOSUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB000000000000000000006A /* Debug */,
+				AB000000000000000000006B /* Release */,
+				AB000000000000000000006C /* Release-AppStore */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
