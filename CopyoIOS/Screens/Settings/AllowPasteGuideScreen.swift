@@ -22,7 +22,12 @@ struct AllowPasteGuideScreen: View {
             GroupedCard {
                 GuideStepRow(1, title: String(localized: "Open Settings › Apps › Copyo"))
                 HairlineSeparator()
-                GuideStepRow(2, title: String(localized: "Tap “Paste from Other Apps”"))
+                // iOS 只在 App 请求过一次粘贴之后才把「从其他 App 粘贴」放进它的设置页，
+                // 而 Copyo 首次启动刻意不读剪贴板——刚装好就照着走，第 2 步那一行根本不存在。
+                // 副文告诉用户怎么让它出现，不然这一页就是一条死路
+                GuideStepRow(2,
+                             title: String(localized: "Tap “Paste from Other Apps”"),
+                             detail: String(localized: "Not there yet? Copy something in another app, come back to Copyo once, then look again."))
                 HairlineSeparator()
                 GuideStepRow(number: 3, title: String(localized: "Choose “Allow”")) {
                     optionPreview

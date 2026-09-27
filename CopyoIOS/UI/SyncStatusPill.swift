@@ -120,7 +120,10 @@ private struct SyncStatusPillBody: View {
             .foregroundStyle(CopyoTheme.labelSecondary)
         }
         .buttonStyle(.plain)
-        .disabled(!status.isOff)
+        // 只有未同步态可点。不用 `.disabled`：它会把整枚胶囊压淡一档，
+        // 「已同步」看上去比设计 01 浅得多，像是失效了。改成不接点按、旁白也不报「按钮」
+        .allowsHitTesting(status.isOff)
+        .accessibilityRemoveTraits(status.isOff ? [] : .isButton)
         .onChange(of: isSyncing, initial: true) { _, syncing in
             // 图标 1s 转一圈；iOS 26 有 .symbolEffect(.rotate)，这里用旋转动画保证 iOS 18 一致
             if syncing {

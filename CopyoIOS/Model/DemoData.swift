@@ -114,7 +114,10 @@ enum DemoData {
                 Spec(kind: .color, text: "#FF9F0A", age: hour, source: "Figma", colorHex: "#A259FF", pinned: true),
                 Spec(kind: .image, text: nil, age: hour, source: "Preview", colorHex: "#5B8DC9", image: true),
                 Spec(kind: .richText,
-                     text: "Standup 9/4\n· Login redesign ships next week\n· Icon 8a final\n· TestFlight Wed",
+                     // design-spec 6.2 写的是「Login redesign ships next week」，按 440pt 画布的 194 列宽画的；
+                     // 真机 iPhone 列宽只有 171，那一条会折成两行，第二行顶到卡片左缘，像另起了一段。
+                     // 卡片不做悬挂缩进（纯文本里的「· 」不该被猜成列表），所以把样例缩到一行放得下
+                     text: "Standup 9/4\n· New login next week\n· Icon 8a final\n· TestFlight Wed",
                      age: 2 * hour, source: "Notes", colorHex: "#F7C600"),
                 Spec(kind: .file, text: nil, age: day + 5 * hour, source: "Finder", colorHex: "#1E9BF0",
                      filePaths: ["/Users/demo/Documents/Q3-Review.key"]),
@@ -254,12 +257,21 @@ enum DemoData {
     /// 渐变照设计 CopyoCard 的 `imgBg` 两套值取（浅 `#D9E6F5 → #F3E7D6 60% → #E6DCEF`、
     /// 深 `#2B3646 → #3D3630 60% → #352D3F`），按 `-demoTheme` 选；
     /// 原来那套紫橙深色渐变在浅色截图里明显偏暗，两套值都对不上设计。
+    ///
+    /// 两处要留意：
+    /// - 卡片缩略图是 `scaledToFill` 进 160pt 高的横框，一张竖图只露中间一横条。渐变要是铺满整张，
+    ///   露出来的那一段正好落在 60% 的杏色附近，看着就是一块米色平涂，浅色下和卡片淡染底分不开。
+    ///   所以渐变只铺在这一横条里，条外用两端的颜色延伸；设计里那张「示意截图」（顶栏条 + 内容块）
+    ///   也画在这一条里。条高按 iPhone 双列的内容宽算。
+    /// - 渲染器是不透明的，底子是黑的。渐变终点线是斜的，原来不带 `drawsAfterEndLocation`，
+    ///   右下角那一块没人画，详情页的大图上就留着一个黑三角。先整张铺底色，再画渐变。
     private static let sampleImagePNG: Data = {
         let dark = LaunchOptions.current.demoColorScheme == .dark
         let hexes = dark
             ? ["#2B3646", "#3D3630", "#352D3F"]
             : ["#D9E6F5", "#F3E7D6", "#E6DCEF"]
-        let colors = hexes.compactMap { CopyoTheme.uiColor(hexString: $0)?.cgColor }
+        let uiColors = hexes.compactMap { CopyoTheme.uiColor(hexString: $0) }
+        let colors = uiColors.map(\.cgColor)
 
         let size = CGSize(width: 1284, height: 2778)
         let format = UIGraphicsImageRendererFormat()
@@ -271,11 +283,35 @@ enum DemoData {
                   let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
                                             colors: colors as CFArray,
                                             locations: [0, 0.6, 1]) else { return }
+            let cg = context.cgContext
+            cg.setFillColor(colors[1])
+            cg.fill(CGRect(origin: .zero, size: size))
+
+            // 卡片里露出来的那一横条：宽 : 高 = 170 : 160（设计 440 画布上的双列内容宽）。
+            // 更窄的机型露得更多，条外是两端颜色的延伸，示意截图仍然完整
+            let bandHeight = size.width * 160 / 170
+            let bandY = (size.height - bandHeight) / 2
             // 设计写的是 160deg：基本竖直、略微向右下偏
-            context.cgContext.drawLinearGradient(gradient,
-                                                 start: .zero,
-                                                 end: CGPoint(x: size.width * 0.35, y: size.height),
-                                                 options: [])
+            cg.drawLinearGradient(gradient,
+                                  start: CGPoint(x: 0, y: bandY),
+                                  end: CGPoint(x: size.width * 0.35, y: bandY + bandHeight),
+                                  options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
+
+            // 示意截图：顶栏条 + 一大块内容区（设计 01 / 01d 的图片卡）
+            let inset = size.width * 0.06
+            let barColor = dark ? UIColor.white.withAlphaComponent(0.10) : UIColor.black.withAlphaComponent(0.07)
+            let blockColor = dark ? UIColor.white.withAlphaComponent(0.07) : UIColor.white.withAlphaComponent(0.65)
+            let barHeight = bandHeight * 0.05
+            barColor.setFill()
+            UIBezierPath(roundedRect: CGRect(x: inset, y: bandY + inset,
+                                             width: size.width - inset * 2, height: barHeight),
+                         cornerRadius: barHeight / 2).fill()
+            let blockTop = bandY + inset + barHeight + inset * 0.6
+            blockColor.setFill()
+            UIBezierPath(roundedRect: CGRect(x: inset, y: blockTop,
+                                             width: size.width - inset * 2,
+                                             height: bandY + bandHeight - inset - blockTop),
+                         cornerRadius: inset * 0.6).fill()
         }
         return image.pngData() ?? Data()
     }()

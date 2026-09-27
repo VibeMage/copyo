@@ -103,6 +103,12 @@ public enum ClipClassifier {
             "^(if|guard)\\s+(let|var)\\s+[A-Za-z_]",
             "^</?[a-zA-Z][a-zA-Z0-9-]*(\\s|>|/>)",
             "^<\\?(xml|php)",
+            // 整行是一个带标签参数的构造调用：Color(red: 0.97, green: 0.95, blue: 0.92)、CGSize(width: 320, height: 44)。
+            // 收得很紧，因为这个分类器 Mac 与 iOS 共用、同步来的数据两端要判得一样：
+            // 调用名大写开头（类型名），紧贴左括号，**至少两个** `label: value`，值只能是数字、标识符、
+            // `.member` 或不含空格的字面量，整行以右括号收尾。于是「Lunch(with: Anna)」
+            //「TODO(alan: fix later)」「Meeting notes (see: page 3)」这类带括号的散文都不会中
+            "^[A-Z][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*\\(\\s*[a-z_][A-Za-z0-9_]*:\\s*[-+A-Za-z0-9_.\"']+(\\s*,\\s*[a-z_][A-Za-z0-9_]*:\\s*[-+A-Za-z0-9_.\"']+)+\\s*\\)[;,]?$",
         ]
         return patterns.contains { line.range(of: $0, options: .regularExpression) != nil }
     }

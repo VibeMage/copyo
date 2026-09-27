@@ -136,9 +136,14 @@ final class AppModel {
         WidgetRefresher.isSuspended = launch.useDemoData
         self.demoRoute = launch.demoRoute
         if launch.useDemoData {
-            // 设计 01 是「已同步」，01c（横幅）是「同步中」
-            self.syncStatus = SyncStatusMonitor(demoStatus: launch.demoRoute == .historyBanner
-                                                ? .syncing : .synced(Date(timeIntervalSinceNow: -120)))
+            // 设计 01 是「已同步」，01c（横幅）是「同步中」，01b（空态 · 首次启动）是「未同步」——
+            // 空态的「开启 iCloud 同步」按钮只在同步没开成时出现，拍 01b 得给它一个关着的状态
+            let demoStatus: SyncStatus = switch launch.demoRoute {
+            case .historyBanner: .syncing
+            case .historyEmpty: .off(.disabledInSettings)
+            default: .synced(Date(timeIntervalSinceNow: -120))
+            }
+            self.syncStatus = SyncStatusMonitor(demoStatus: demoStatus)
         } else {
             self.syncStatus = SyncStatusMonitor(cloudKitActive: bootstrap.cloudKitActive,
                                                 offReason: bootstrap.offReason)
@@ -170,7 +175,8 @@ final class AppModel {
         case .historyBanner:
             pasteBannerVisible = true
         case .historySaved:
-            toast.show(String(localized: "Saved"))
+            // 钉住不收：截图在启动几秒后才拍
+            toast.show(String(localized: "Saved"), sticky: true)
         case .historyEmpty:
             break
         default:

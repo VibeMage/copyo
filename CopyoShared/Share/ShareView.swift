@@ -26,6 +26,8 @@ public struct ShareView: View {
     @ScaledMetric(relativeTo: .body) private var rowMinHeight: CGFloat = Metrics.rowHeight
     @ScaledMetric(relativeTo: .body) private var saveButtonMinHeight: CGFloat = Metrics.saveButtonHeight
     @ScaledMetric(relativeTo: .body) private var headerSideWidth: CGFloat = Metrics.headerSideWidth
+    /// 「保存」前那只托盘跟着旁边 17pt 的字一起放大
+    @ScaledMetric(relativeTo: .body) private var saveGlyphSize: CGFloat = 18
 
     /// 面板顶上至少留出这么高的遮罩。内容再多也不能让面板顶到屏幕最上沿——
     /// 那样看不出宿主界面还在后面，也没地方点空白取消，面板会被当成一个卡住的整屏页面。
@@ -43,6 +45,10 @@ public struct ShareView: View {
         static let saveButtonHeight: CGFloat = 52
         static let headerSideWidth: CGFloat = 60
         static let sheetBottomPad: CGFloat = 44
+        /// 宽容器里悬浮卡片的宽度：设计画布就是 440 宽的 iPhone
+        static let floatingWidth: CGFloat = 440
+        /// 悬浮卡片离容器边、以及卡片内容离卡片底边的距离
+        static let floatingInset: CGFloat = 20
         /// 抓手 / 标题 / 预览卡 / Pinboard 行 / 「保存」之间的统一间距
         static let gap: CGFloat = 16
     }
@@ -61,7 +67,8 @@ public struct ShareView: View {
 
     public var body: some View {
         GeometryReader { proxy in
-            ZStack(alignment: .bottom) {
+            let floating = Self.isFloating(containerWidth: proxy.size.width)
+            ZStack(alignment: floating ? .center : .bottom) {
                 // 宿主界面在 sheet 后加暗（design-spec 3.10）。点击暗部等于取消，与系统 sheet 一致。
                 CopyoTheme.dim
                     .contentShape(Rectangle())
@@ -70,13 +77,16 @@ public struct ShareView: View {
                     // 取消这个动作在标题左边的按钮上，也接到了下面的 escape 手势上，功能不会丢
                     .accessibilityHidden(true)
 
-                sheet
-                    .frame(maxHeight: max(Self.minSheetHeight, proxy.size.height - Self.minDimHeight),
-                           alignment: .bottom)
+                sheet(floating: floating)
+                    .frame(maxHeight: max(Self.minSheetHeight,
+                                          proxy.size.height - (floating ? Metrics.floatingInset * 2
+                                                                        : Self.minDimHeight)),
+                           // 这层 frame 会撑到上限那么高，悬浮卡片要在里面居中，不然还是沉在底上
+                           alignment: floating ? .center : .bottom)
             }
             // 面板比容器还高时（辅助功能字号 + 长内容）必须底对齐。不写这层 frame 的话
             // ZStack 会跟着内容一起长高，再被 GeometryReader 按左上角摆，「保存」按钮直接掉到屏幕外
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: floating ? .center : .bottom)
         }
         // 面板要贴到屏幕最底下（design-spec 3.10 是贴底的 radius 38 面板），
         // 底部 44 的内距本身就把内容让出了 Home 指示条的位置
@@ -95,9 +105,22 @@ public struct ShareView: View {
 
     // MARK: - 面板
 
-    private var sheet: some View {
-        VStack(spacing: Metrics.gap) {
-            grabber
+    /// 容器比设计画布宽出一截（iPad、iPhone 横屏）时，面板改成居中的悬浮卡片、四角都圆。
+    /// 设计 06 只画了 440 宽的 iPhone：照原样贴底铺满 13 寸屏，「取消」贴在最左边、
+    /// 「保存」横跨整屏，一眼就是没适配的手机布局。
+    /// 按实际宽度判而不按 size class：扩展在 iPad 上可能被系统放进一块表单大小的容器，
+    /// 那里的 size class 说明不了面板有多宽。
+    private static func isFloating(containerWidth: CGFloat) -> Bool {
+        containerWidth >= Metrics.floatingWidth + Metrics.floatingInset * 2
+    }
+
+    private func sheet(floating: Bool) -> some View {
+        let bottomRadius = floating ? CopyoTheme.Radius.sheet : 0
+        return VStack(spacing: Metrics.gap) {
+            // 抓手暗示「可以往下拖走」，只对贴底的面板成立；居中的悬浮卡片与 iPad 的表单一样不带
+            if !floating {
+                grabber
+            }
             // 放得下就按自然高度摆（默认字号下与改造前逐像素一致），放不下才滚。
             // 不能直接套一层 ScrollView：ScrollView 会把提议到的高度全吃掉，
             // 默认字号下面板也会一路撑成整屏。
@@ -110,15 +133,19 @@ public struct ShareView: View {
             saveButton
         }
         .padding(.horizontal, CopyoTheme.Metrics.pageInset)
-        .padding(.bottom, Metrics.sheetBottomPad)
-        .frame(maxWidth: .infinity)
+        .padding(.top, floating ? Metrics.floatingInset : 0)
+        // 贴底时 44 的底距里含着 Home 指示条；悬浮卡片离屏幕底边还远，底距与两侧一样就够
+        .padding(.bottom, floating ? Metrics.floatingInset : Metrics.sheetBottomPad)
+        .frame(maxWidth: floating ? Metrics.floatingWidth : .infinity)
         .background(CopyoTheme.sheet)
         .clipShape(
             UnevenRoundedRectangle(topLeadingRadius: CopyoTheme.Radius.sheet,
+                                   bottomLeadingRadius: bottomRadius,
+                                   bottomTrailingRadius: bottomRadius,
                                    topTrailingRadius: CopyoTheme.Radius.sheet,
                                    style: .continuous)
         )
-        .shadow(color: .black.opacity(0.2), radius: 20, y: -8)
+        .shadow(color: .black.opacity(0.2), radius: 20, y: floating ? 8 : -8)
     }
 
     /// 抓手与「保存」之间的那一段。`ViewThatFits` 要拿它量两遍，所以单独抽出来。
@@ -282,9 +309,12 @@ public struct ShareView: View {
                         .progressViewStyle(.circular)
                         .tint(.white)
                 } else {
-                    Image(systemName: "tray.and.arrow.down.fill")
-                        .font(.system(.body, weight: .semibold))
-                        // 符号只是「保存」两个字的装饰，读屏念出 tray and arrow down fill 没有意义
+                    // 设计 06 是描边的开口托盘（18pt、网格线宽 2.2），不是实心的收件盒
+                    TrayGlyph()
+                        .stroke(.white, style: StrokeStyle(lineWidth: saveGlyphSize * 2.2 / 24,
+                                                           lineCap: .round, lineJoin: .round))
+                        .frame(width: saveGlyphSize, height: saveGlyphSize)
+                        // 形状只是「保存」两个字的装饰，读屏不必停
                         .accessibilityHidden(true)
                 }
                 Text(String(localized: "Save"))
@@ -321,9 +351,3 @@ public struct ShareView: View {
     }
 }
 
-/// 标题旁那枚 26pt 应用标记。
-///
-/// 设计稿这里画的是 App 图标，但扩展 bundle 里没有图标资源（图标只在主应用的 Assets 里），
-/// 跨进程取自己的图标也没有公开 API，所以按品牌语言（骨白卡片 + 红蓝错位套印）现画一枚，
-/// 与空态插画同源。
-///

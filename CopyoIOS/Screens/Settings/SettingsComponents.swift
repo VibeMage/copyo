@@ -107,9 +107,25 @@ struct SettingsRowLabel: View {
 
 extension View {
     /// 设计 3.8：行高 52、左右内距 16、分隔线通栏（系统默认会缩进到文字，与设计不符）
+    ///
+    /// 左右内距必须放在**内容自己的 padding** 上、行 inset 归零：分隔线的对齐参考线量的是
+    /// 行内容的边，inset 留着 16 的话，参考线写 0 也只能对齐到离卡片边 16pt 的地方，
+    /// 两端各空一截。内容贴着卡片边，0 与满宽才正好是卡片的左右边缘。
     func settingsRow(leading: CGFloat = 16) -> some View {
-        listRowInsets(EdgeInsets(top: 0, leading: leading, bottom: 0, trailing: 16))
+        padding(.leading, leading)
+            .padding(.trailing, 16)
+            .listRowInsets(EdgeInsets())
             .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+            .alignmentGuide(.listRowSeparatorTrailing) { d in d.width }
+    }
+
+    /// 设计 3.8 的分组标题：13 常规字重、`label.secondary`、不转大写。
+    /// iOS 26 的 insetGrouped 默认把标题画成接近行标题的粗大字，层级就乱了
+    func settingsSectionHeader() -> some View {
+        font(.footnote)
+            .fontWeight(.regular)
+            .foregroundStyle(CopyoTheme.labelSecondary)
+            .textCase(nil)
     }
 }
 
@@ -125,7 +141,9 @@ struct GuideScroll<Content: View>: View {
             VStack(alignment: .leading, spacing: spacing) {
                 content()
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            // `minWidth: 0` 不能省：不写下限时弹性框会把子视图的理想宽度原样报出去，
+            // 某个子视图过宽（04e 的卡片条就是 466）就把整页撑出屏幕、左右两边一起被裁
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, CopyoTheme.Metrics.pageInset)
             .padding(.top, 8)
             .padding(.bottom, 32)
@@ -190,7 +208,10 @@ struct GuideStepRow<Below: View>: View {
     @ScaledMetric(relativeTo: .subheadline) private var numberDiameter: CGFloat = 28
 
     var body: some View {
-        HStack(alignment: .top, spacing: 14) {
+        // 按首行基线对齐：序号圆里的数字与标题同为 15pt，基线对齐后圆正好对着标题第一行居中，
+        // 不管下面跟着副文、多行标题还是 04d 那块嵌入的系统选项示意。
+        // 原来的顶对齐 + 最小高度只在「单行、无下文」时对得上，一带下文圆就往下掉半行。
+        HStack(alignment: .firstTextBaseline, spacing: 14) {
             Text("\(number)")
                 .font(.system(.subheadline, weight: .semibold))
                 .foregroundStyle(CopyoTheme.label)
@@ -212,9 +233,6 @@ struct GuideStepRow<Below: View>: View {
                 below()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            // 单行步骤要与序号圆居中对齐，多行则顶对齐：给标题一个与圆同高的最小高度即可。
-            // 这里必须用同一个 `numberDiameter`，写死 28 会在放大档位下与圆错位。
-            .frame(minHeight: numberDiameter, alignment: .leading)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)

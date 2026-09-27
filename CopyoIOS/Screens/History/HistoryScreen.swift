@@ -90,6 +90,10 @@ private struct HistoryContent: View {
     @State private var newBoardName = ""
     @State private var pendingPinItem: ClipItem?
     @State private var didApplyDemoRoute = false
+    /// 空态「怎样保存剪贴板」直接推到指引页（设计 04c），不是只把标签切到设置总览
+    @State private var showsHowToSave = false
+    /// 搜索栏是否处于激活态（取消按钮出现、大标题收起）。截图路由 history-search 靠它进 01f
+    @State private var searchPresented = false
 
     @FocusState private var searchFocused: Bool
     @FocusState private var gridFocused: Bool
@@ -125,7 +129,7 @@ private struct HistoryContent: View {
                 }
                 if showsFilterChips {
                     HistoryFilterChips(selection: $model.kindFilter)
-                        .padding(.top, 12)
+                        .padding(.top, chipsTopInset)
                 }
                 if model.pasteBannerVisible {
                     PasteBanner(saved: model.pasteBannerSaved,
@@ -141,23 +145,46 @@ private struct HistoryContent: View {
                         .padding(.top, 14)
                 }
                 content(visible)
-                    .padding(.top, 16)
+                    // 空态自己按可见高度居中，再加 16 会把整块往下推（设计 01b 的空态比中线略高）
+                    .padding(.top, isLibraryEmpty ? 0 : 16)
             }
             .padding(.horizontal, pageInset)
-            .padding(.bottom, isRegularLayout ? 0 : 24)
+            .padding(.bottom, bottomContentInset)
         }
         .scrollDismissesKeyboard(.interactively)
         .background(CopyoTheme.bgGrouped)
-        // 设计 3.12 的 fade：列表底部 140pt 渐隐到 92% 背景色，
-        // 让最后一张卡片是「淡出」而不是被标签栏硬切一刀。iPad 分栏的设计 09 里没有这一层。
-        .overlay(alignment: .bottom) {
+        // 设计 3.12 的 fade：从**屏幕底边**往上 140pt，60% 处到 92% 背景色，
+        // 让最后一张卡片是「淡出」而不是被标签栏硬切一刀。iPad 分栏（设计 09）换成底部快捷键条
+        // 那一版：150pt，45% 处起为实心底，提示文字后面永远没有能读的字。
+        //
+        // `ignoresSafeArea` 必须挂在外层全尺寸的容器上：原来挂在 140pt 的渐变自己身上，
+        // 渐变先按安全区底边（标签栏上沿）定位、再被拉进标签栏与 home indicator 那一段，
+        // 实际高了七十多点，标签栏上方好几行字、色块都被洗淡——纯色 #FF9F0A 看上去成了渐变色。
+        .overlay {
             if !isRegularLayout {
-                LinearGradient(colors: [CopyoTheme.bgGrouped.opacity(0), CopyoTheme.bgGrouped.opacity(0.92)],
-                               startPoint: .top,
-                               endPoint: .bottom)
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    LinearGradient(stops: [
+                        .init(color: CopyoTheme.bgGrouped.opacity(0), location: 0),
+                        .init(color: CopyoTheme.bgGrouped.opacity(0.92), location: 0.6),
+                        .init(color: CopyoTheme.bgGrouped.opacity(0.92), location: 1)
+                    ], startPoint: .top, endPoint: .bottom)
                     .frame(height: 140)
-                    .allowsHitTesting(false)
-                    .ignoresSafeArea(edges: .bottom)
+                }
+                .ignoresSafeArea(edges: .bottom)
+                .allowsHitTesting(false)
+            } else {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    LinearGradient(stops: [
+                        .init(color: CopyoTheme.bgGrouped.opacity(0), location: 0),
+                        .init(color: CopyoTheme.bgGrouped.opacity(0.92), location: 0.3),
+                        .init(color: CopyoTheme.bgGrouped, location: 0.45)
+                    ], startPoint: .top, endPoint: .bottom)
+                    .frame(height: 150)
+                }
+                .ignoresSafeArea(edges: .bottom)
+                .allowsHitTesting(false)
             }
         }
         .onGeometryChange(for: CGSize.self) { $0.size } action: { viewportSize = $0 }
@@ -174,18 +201,22 @@ private struct HistoryContent: View {
         // 关键词由 AppModel.sidebarSearchText 喂进 searchText，过滤逻辑两边共用。
         .modifier(HistorySearchable(enabled: !isRegularLayout,
                                     text: $model.searchText,
+                                    isPresented: $searchPresented,
                                     focus: $searchFocused))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                SyncStatusPill(status: model.syncStatus.status, size: .phone) {
-                    goToSettings()
-                }
+                HistorySyncPill { goToSettings() }
             }
+            // 胶囊自己就是一层玻璃；iOS 26 工具栏再给它套一层共享玻璃，就成了双层胶囊
+            .copyoOwnGlass()
         }
         .safeAreaInset(edge: .bottom) {
             if isRegularLayout {
                 HistoryShortcutHints()
             }
+        }
+        .navigationDestination(isPresented: $showsHowToSave) {
+            HowToSaveScreen()
         }
         .navigationDestination(item: $detailItem) { item in
             ClipDetailScreen(item: item)
@@ -229,6 +260,22 @@ private struct HistoryContent: View {
     private var columnTitle: String {
         guard let kind = kindFilter else { return CopyoTab.history.title }
         return KindPresentation.label(kind)
+    }
+
+    /// 系统 `.navigationBarDrawer` 搜索栏在 iOS 26 下自己已经留了约 15pt 的底边，
+    /// 再照设计加 12 就成了 27pt——大标题、搜索、chips 那一块明显比设计松。
+    /// 这里只补到设计的 12 左右；iOS 18 的搜索栏底边留得少一些，补 4。
+    private var chipsTopInset: CGFloat {
+        if #available(iOS 26.0, *) { return 0 }
+        return 4
+    }
+
+    /// 卡片流底部的留白。iPhone 的 24 让最后一张卡能滚出标签栏；
+    /// iPad 的快捷键条带着约 60pt 的渐隐，多留一截，滚到底时最后一行不会压在渐隐里。
+    /// 空态是一屏高、自己居中的，不需要再多滚一截。
+    private var bottomContentInset: CGFloat {
+        if isLibraryEmpty { return 0 }
+        return isRegularLayout ? 60 : 24
     }
 
     private var pageInset: CGFloat {
@@ -282,11 +329,15 @@ private struct HistoryContent: View {
     @ViewBuilder
     private func content(_ visible: [ClipItem]) -> some View {
         if isLibraryEmpty {
-            HistoryEmptyState(onEnableSync: { goToSettings() },
-                              onHowToSave: { goToSettings() })
+            // 「开启 iCloud 同步」只在同步没开成时出现：同步默认开着，这时它是一颗名不副实的按钮
+            HistoryEmptyState(showsEnableSync: model.syncStatus.status.isOff,
+                              onEnableSync: { goToSettings() },
+                              onHowToSave: { showsHowToSave = true })
             .frame(maxWidth: .infinity)
-            // 设计 01b：空态在搜索栏与标签栏之间居中。
+            // 设计 01b：整组比搜索栏与标签栏之间的中线略高约 15pt——居中之前底部垫 60，
+            // 整组就往上抬 30pt 的一半。系统搜索栏比设计矮的 36 更高、更靠下，所以比 15 × 2 多垫一点。
             // 用 containerRelativeFrame 拿滚动视图的可见高度，比自己减安全区准。
+            .padding(.bottom, 60)
             .containerRelativeFrame(.vertical, alignment: .center) { height, _ in
                 max(240, height)
             }
@@ -300,41 +351,64 @@ private struct HistoryContent: View {
         }
     }
 
+    /// iPhone 用瀑布流（设计 `column-count: 2`）；iPad 用按行排的三列网格（设计 3.14
+    /// `repeat(3, 1fr)`、顶对齐）。iPad 的阅读顺序与硬件键盘的方向键都是「一行一行」的：
+    /// 瀑布流贪心分列之后，焦点右边那张并不是时间上的下一条，↑↓ 跨一行也对不上视觉位置。
+    @ViewBuilder
     private func grid(_ visible: [ClipItem]) -> some View {
-        MasonryGrid(items: visible,
-                    columns: columns,
-                    estimatedHeight: {
-                        ClipCard.estimatedHeight(for: $0,
-                                                 width: columnWidth,
-                                                 dense: false,
-                                                 typeScale: typeScale)
-                    }) { item in
-            SwipeableCard(onDelete: { delete(item, in: visible) },
-                          onPin: { pinToDefault(item) },
-                          pinEnabled: item.pinboard == nil) {
-                HistoryCardView(item: item,
-                                boards: boards,
-                                namespace: zoomNamespace,
-                                previewWidth: columnWidth,
-                                isFocused: isFocusRing(item),
-                                isHighlighted: model.highlightedItemID == item.persistentModelID,
-                                isGhost: draggingItemID == item.persistentModelID,
-                                allowsDrag: isRegularLayout,
-                                onDragChanged: { dragging in
-                                    withAnimation(CopyoTheme.springAnimation) {
-                                        draggingItemID = dragging ? item.persistentModelID : nil
-                                    }
-                                },
-                                onCopy: { copy(item) },
-                                onCopyPlainText: { model.copyPlainText(item) },
-                                onPin: { model.pin(item, to: $0) },
-                                onUnpin: { model.unpin(item) },
-                                onCreatePinboard: { promptNewPinboard(pinning: item) },
-                                onDelete: { delete(item, in: visible) },
-                                // 旁白的「打开详情」落到屏幕这一层的 `navigationDestination(item:)`：
-                                // 卡片在 `LazyVStack` 里，自带一份目的地会被回收掉，动作就哑了
-                                onOpenDetail: { detailItem = item })
+        if isRegularLayout {
+            // 每格按自己的内容高度、贴在本行顶上；**不要**给卡片加 `maxHeight: .infinity`，
+            // 那样同一行会被拉成等高，破坏「高度由内容决定」
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(),
+                                                         spacing: CopyoTheme.Metrics.gridGap,
+                                                         alignment: .top),
+                                     count: columns),
+                      alignment: .leading,
+                      spacing: CopyoTheme.Metrics.gridGap) {
+                ForEach(visible) { item in
+                    card(item, in: visible)
+                }
             }
+        } else {
+            MasonryGrid(items: visible,
+                        columns: columns,
+                        estimatedHeight: {
+                            ClipCard.estimatedHeight(for: $0,
+                                                     width: columnWidth,
+                                                     dense: false,
+                                                     typeScale: typeScale)
+                        }) { item in
+                card(item, in: visible)
+            }
+        }
+    }
+
+    private func card(_ item: ClipItem, in visible: [ClipItem]) -> some View {
+        SwipeableCard(onDelete: { delete(item, in: visible) },
+                      onPin: { pinToDefault(item) },
+                      pinEnabled: item.pinboard == nil) {
+            HistoryCardView(item: item,
+                            boards: boards,
+                            namespace: zoomNamespace,
+                            previewWidth: columnWidth,
+                            isFocused: isFocusRing(item),
+                            isHighlighted: model.highlightedItemID == item.persistentModelID,
+                            isGhost: draggingItemID == item.persistentModelID,
+                            allowsDrag: isRegularLayout,
+                            onDragChanged: { dragging in
+                                withAnimation(CopyoTheme.springAnimation) {
+                                    draggingItemID = dragging ? item.persistentModelID : nil
+                                }
+                            },
+                            onCopy: { copy(item) },
+                            onCopyPlainText: { model.copyPlainText(item) },
+                            onPin: { model.pin(item, to: $0) },
+                            onUnpin: { model.unpin(item) },
+                            onCreatePinboard: { promptNewPinboard(pinning: item) },
+                            onDelete: { delete(item, in: visible) },
+                            // 旁白的「打开详情」落到屏幕这一层的 `navigationDestination(item:)`：
+                            // 卡片在 `LazyVStack` 里，自带一份目的地会被回收掉，动作就哑了
+                            onOpenDetail: { detailItem = item })
         }
     }
 
@@ -476,7 +550,8 @@ private struct HistoryContent: View {
     }
 
     /// 焦点按扁平顺序移动：↑↓ 跨一行（±列数）、←→ 跨一张。
-    /// 瀑布流的视觉位置与数组下标并不严格对应（贪心分列会打乱），但方向感是对的。
+    /// regular 布局是按行排的网格，下标与视觉位置一一对应；iPhone 的瀑布流不严格对应
+    /// （贪心分列会打乱），但方向感是对的。
     private func moveFocus(by delta: Int, in list: [ClipItem]) {
         guard !list.isEmpty else { return }
         guard let current = focusedItemID,
@@ -526,6 +601,10 @@ private struct HistoryContent: View {
             // 走 applySearchText 而不是直接写 searchText：截图就在下一帧，
             // 等 250ms 防抖的话拍到的是还没筛过的满屏列表
             model.applySearchText(HistoryDemoContent.searchQuery)
+            // 设计 01f 是**激活**的搜索态：大标题与胶囊收起、出现「取消」、键盘弹起。
+            // 只写搜索词的话拍到的是闲置的搜索栏里躺着一个词
+            searchPresented = true
+            searchFocused = true
         case .historySaved:
             insertDemoSavedItem()
         case .detailText, .detailRich, .detailColor, .detailImage, .detailLink, .detailFile:
@@ -542,8 +621,9 @@ private struct HistoryContent: View {
         model.modelContext.insert(item)
         try? model.modelContext.save()
         model.highlightedItemID = item.persistentModelID
-        // 真实链路里这条提示由 AppModel 在存下内容时给；截图路由是直接插数据，得自己补上
-        model.toast.show(String(localized: "Saved"))
+        // 真实链路里这条提示由 AppModel 在存下内容时给；截图路由是直接插数据，得自己补上。
+        // 钉住不收，和上面的焦点环一样：截图要的就是这一帧
+        model.toast.show(String(localized: "Saved"), sticky: true)
     }
 
     private func demoDetailItem(for route: DemoRoute) -> ClipItem? {
@@ -568,6 +648,28 @@ private struct HistoryContent: View {
     }
 }
 
+// MARK: - 同步胶囊
+
+/// iPhone 历史页右上角的同步胶囊。
+///
+/// 轻提示出现时让位（设计 01d / 01e：「已保存」「已复制」占的就是顶部操作行，那一帧没有胶囊）。
+/// 用透明度而不是把 ToolbarItem 拿掉：拿掉会让导航栏重排一次，大标题跟着跳。
+/// 单拆一个视图是为了让「读轻提示」这件事只让它自己重跑——
+/// 写在 `HistoryContent.body` 里的话，每复制一次整页都要把筛选、排序重算一遍。
+private struct HistorySyncPill: View {
+    var onTapWhenOff: () -> Void
+
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        let yields = model.toast.current != nil
+        SyncStatusPill(status: model.syncStatus.status, size: .phone, onTapWhenOff: onTapWhenOff)
+            .opacity(yields ? 0 : 1)
+            .accessibilityHidden(yields)
+            .animation(CopyoTheme.springAnimation, value: yields)
+    }
+}
+
 // MARK: - 条件搜索栏
 
 /// `.searchable` 只在 compact 布局挂上。写成 ViewModifier 是因为条件修饰符会改变视图类型，
@@ -575,12 +677,14 @@ private struct HistoryContent: View {
 private struct HistorySearchable: ViewModifier {
     let enabled: Bool
     @Binding var text: String
+    @Binding var isPresented: Bool
     var focus: FocusState<Bool>.Binding
 
     func body(content: Content) -> some View {
         if enabled {
             content
                 .searchable(text: $text,
+                            isPresented: $isPresented,
                             placement: .navigationBarDrawer(displayMode: .always),
                             prompt: Text(String(localized: "Search history")))
                 .searchFocused(focus)

@@ -56,8 +56,9 @@ struct SettingsScreen: View {
         .navigationDestination(item: $route) { destination in
             switch destination {
             case .quickSave:
+                // iPad 上没有轻点背面这一段，`QuickSaveGuideScreen` 会把这个值收回默认段
                 QuickSaveGuideScreen(initialEntry: model.demoRoute == .settingsQuickSaveBackTap
-                                     ? .backTap : .actionButton)
+                                     ? .backTap : .defaultEntry)
             case .howToSave: HowToSaveScreen()
             case .allowPaste: AllowPasteGuideScreen()
             case .keyboard: KeyboardGuideScreen()
@@ -118,8 +119,12 @@ struct SettingsScreen: View {
             .settingsRow(leading: 58)
         } header: {
             Text(String(localized: "Sync"))
+                .settingsSectionHeader()
         } footer: {
-            Text(String(localized: "Sign in to the same Apple Account on your Mac and iPhone. Your clips travel through iCloud only, never through a third-party server."))
+            // iPad 上照写「iPhone」会让人以为这台设备不算数
+            Text(UIDevice.current.userInterfaceIdiom == .pad
+                 ? String(localized: "Sign in to the same Apple Account on your Mac and iPad. Your clips travel through iCloud only, never through a third-party server.")
+                 : String(localized: "Sign in to the same Apple Account on your Mac and iPhone. Your clips travel through iCloud only, never through a third-party server."))
         }
     }
 
@@ -174,7 +179,8 @@ struct SettingsScreen: View {
                 SettingsRowLabel(symbol: "bolt.fill",
                                  color: SettingsTint.bolt,
                                  title: String(localized: "Quick Save"),
-                                 detail: String(localized: "Action Button"),
+                                 // 右值跟着这一页默认打开的那段走：iPad 没有操作按钮，只剩控制中心
+                                 detail: QuickSaveGuideScreen.QuickSaveEntry.defaultEntry.title,
                                  showsDisclosure: true)
             }
             .settingsRow()
@@ -256,6 +262,7 @@ struct SettingsScreen: View {
             }
         } header: {
             Text(String(localized: "Clipboard"))
+                .settingsSectionHeader()
         } footer: {
             Text(String(localized: "With this off, Copyo won't read the clipboard when it opens — use the banner at the top of History to paste and save by hand."))
         }
@@ -287,6 +294,7 @@ struct SettingsScreen: View {
             }
         } header: {
             Text(String(localized: "System Search"))
+                .settingsSectionHeader()
         } footer: {
             Text(String(localized: "Off by default. Turn it on and your clips become searchable from the Home Screen, the Lock Screen and Siri Suggestions — including the verification codes, passwords and private messages that end up in a clipboard history. Turning it off deletes everything Copyo put in the index."))
         }

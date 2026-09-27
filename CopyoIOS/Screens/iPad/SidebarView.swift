@@ -242,7 +242,9 @@ struct SidebarView: View {
                 }
         }
         .buttonStyle(.plain)
-        .padding(.horizontal, SidebarMetrics.inset)
+        // 用 List 里选中底的外缘，不用标题 / 搜索框的 14：设计 3.14 所有侧栏行是同一套几何，
+        // 按 14 放的话设置行的蓝底左右各宽出约 10pt、齿轮也比上面的图标往左偏
+        .padding(.horizontal, SidebarMetrics.selectionInset)
         .padding(.bottom, 18)
         .padding(.top, 6)
         .background(CopyoTheme.sidebarBg)
@@ -286,6 +288,10 @@ struct SidebarView: View {
 private enum SidebarMetrics {
     /// 设计 3.14：侧栏左右内距 14。标题 / 搜索 / 底部设置这些不在 List 里的部件用它。
     static let inset: CGFloat = 14
+    /// List 行的选中底到侧栏边缘的距离：系统侧栏 cell 自己让出约 10pt，
+    /// 再加 `listRowBackground` 往里缩的 8pt，比 `inset` 多出约 10pt。
+    /// 底部设置行在 List 外面，用它才能跟上面的选中底对齐
+    static let selectionInset: CGFloat = 24
     /// 行内容的左右内距。系统侧栏自己还会再让出几点，18 之后图标正好落在设计的 24 上，
     /// 与搜索框里的放大镜对齐；用 List 默认内距会比设计右移十几点。
     static let rowInset: CGFloat = 18

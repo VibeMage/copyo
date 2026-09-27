@@ -11,20 +11,27 @@ private struct NewPinboardAlert: ViewModifier {
 
     @State private var name = ""
 
+    private var trimmedName: String {
+        name.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     func body(content: Content) -> some View {
         content
+            .alertBackdrop(isPresented)
             .alert(String(localized: "New Pinboard"), isPresented: $isPresented) {
                 TextField(String(localized: "Name"), text: $name)
                 Button(String(localized: "Cancel"), role: .cancel) { name = "" }
                 Button(String(localized: "Create")) {
-                    let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let trimmed = trimmedName
                     name = ""
-                    // 空名字直接当取消：Alert 的按钮没法可靠地禁用，不如什么都不建
+                    // 兜底：真正挡住空名字的是下面的 `.disabled`，这里防的是硬件键盘回车之类的漏网路径
                     guard !trimmed.isEmpty else { return }
                     onCreate(trimmed)
                 }
                 // 设计 03c 里「创建」是加粗的确认项，标成默认动作系统才会加粗
                 .keyboardShortcut(.defaultAction)
+                // 空名字时置灰：满色的「创建」点下去却什么都不建、也不说一声，用户会以为建好了
+                .disabled(trimmedName.isEmpty)
             } message: {
                 Text(String(localized: "It syncs to the Pinboard tags on your Mac."))
             }
@@ -43,8 +50,15 @@ private struct RenamePinboardAlert: ViewModifier {
 
     @State private var name = ""
 
+    /// 空名字或没改动都不算一次重命名，「重命名」按钮置灰
+    private var canRename: Bool {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !trimmed.isEmpty && trimmed != currentName
+    }
+
     func body(content: Content) -> some View {
         content
+            .alertBackdrop(isPresented)
             .alert(String(localized: "Rename Pinboard"), isPresented: $isPresented) {
                 TextField(String(localized: "Name"), text: $name)
                 Button(String(localized: "Cancel"), role: .cancel) { }
@@ -54,10 +68,30 @@ private struct RenamePinboardAlert: ViewModifier {
                     onRename(trimmed)
                 }
                 .keyboardShortcut(.defaultAction)
+                .disabled(!canRename)
             }
             .onChange(of: isPresented) { _, presented in
                 if presented { name = currentName }
             }
+    }
+}
+
+/// 设计 3.11：Alert 底层 `blur(6) opacity .7`，dim 由系统叠。
+/// 系统 Alert 只压暗、不模糊，所以宿主内容得自己糊一层；半径 0 / 不透明度 1 时两个修饰符都是恒等变换
+private struct AlertBackdrop: ViewModifier {
+    let isActive: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .blur(radius: isActive ? 6 : 0)
+            .opacity(isActive ? 0.7 : 1)
+            .animation(.easeOut(duration: 0.2), value: isActive)
+    }
+}
+
+private extension View {
+    func alertBackdrop(_ isActive: Bool) -> some View {
+        modifier(AlertBackdrop(isActive: isActive))
     }
 }
 

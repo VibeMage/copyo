@@ -53,31 +53,49 @@ struct PinboardListScreen: View {
 
     // MARK: - 列表
 
+    /// 用 plain 而不是 insetGrouped：iOS 26 的 insetGrouped 分组圆角约 26pt、没有 API 可改，
+    /// 设计 3.7 要的是 12。仍然留在 List 里是为了左右滑动作；分组卡片的形状与分隔线由
+    /// `PinboardGroupRowBackground` 按行在首 / 尾的位置自己画。
     private var list: some View {
-        List {
-            Section {
-                ForEach(sortedBoards) { board in
-                    row(for: board)
-                }
-            } footer: {
-                Text(String(localized: "Pinboards are shared with your Mac. Swiping a card right pins it to the first pinboard; long-press to pick another."))
-                    .font(CopyoTheme.Fonts.footnote)
-                    .foregroundStyle(CopyoTheme.labelSecondary)
+        let boards = sortedBoards
+        return List {
+            ForEach(Array(boards.enumerated()), id: \.element.id) { index, board in
+                row(for: board, isFirst: index == 0, isLast: index == boards.count - 1)
             }
+            // 脚注做成一行而不是 Section footer：plain 样式的 footer 会吸底悬浮
+            Text(String(localized: "Pinboards are shared with your Mac. Swiping a card right pins it to the first pinboard; long-press to pick another."))
+                .font(CopyoTheme.Fonts.footnote)
+                .foregroundStyle(CopyoTheme.labelSecondary)
+                .listRowInsets(EdgeInsets(top: 7,
+                                          leading: Self.groupInset + 16,
+                                          bottom: 0,
+                                          trailing: Self.groupInset + 16))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
-        .listStyle(.insetGrouped)
+        .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .contentMargins(.top, 8, for: .scrollContent)
     }
 
-    private func row(for board: Pinboard) -> some View {
+    /// 分组卡片离屏幕边的距离：设计 03 里卡片左缘与大标题「Pinboard」对齐，即页边 20
+    private static let groupInset: CGFloat = CopyoTheme.Metrics.pageInset
+
+    private func row(for board: Pinboard, isFirst: Bool, isLast: Bool) -> some View {
         Button {
             pushedBoard = board
         } label: {
             PinboardRow(board: board, isDefault: board.name == defaultPinboardName)
         }
         .buttonStyle(.plain)
-        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-        .listRowBackground(CopyoTheme.bgCard)
+        // 卡片外距（页边）+ 行内距 16
+        .listRowInsets(EdgeInsets(top: 0,
+                                  leading: Self.groupInset + 16,
+                                  bottom: 0,
+                                  trailing: Self.groupInset + 16))
+        .listRowSeparator(.hidden)
+        .listRowBackground(PinboardGroupRowBackground(isFirst: isFirst, isLast: isLast)
+            .padding(.horizontal, Self.groupInset))
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) {
                 boardPendingDeletion = board
@@ -118,7 +136,13 @@ struct PinboardListScreen: View {
                 .pickerStyle(.inline)
             } label: {
                 Image(systemName: "arrow.up.arrow.down")
+                    // 设计 03 的两颗圆钮是 accent 蓝字形压在透明玻璃上。iOS 26 的玻璃导航栏
+                    // 默认把工具栏项画成单色，得在字形上逐项点名要颜色。不用 borderedProminent（会把整颗钮填满蓝），
+                    // 也不给 Menu 挂 `.tint`（iPad 分栏里会让整个窗口白屏，见 `PinboardContentScreen`）
+                    // 点名的颜色会盖过禁用态的置灰，没有板时要自己退成三级灰
+                    .foregroundStyle(boards.isEmpty ? CopyoTheme.labelTertiary : CopyoTheme.accent)
             }
+            .accessibilityLabel(String(localized: "Sort By"))
             .disabled(boards.isEmpty)
         }
         // 设计 03 把排序与新建画成两个独立的玻璃圆钮；iOS 26 默认会把同侧按钮并进一个胶囊，
@@ -131,6 +155,7 @@ struct PinboardListScreen: View {
                 model.presentsNewPinboard = true
             } label: {
                 Image(systemName: "plus")
+                    .foregroundStyle(CopyoTheme.accent)
             }
             .accessibilityLabel(String(localized: "New Pinboard"))
         }
@@ -175,6 +200,30 @@ struct PinboardListScreen: View {
         default:
             break
         }
+    }
+}
+
+/// 设计 3.7 的分组卡片（radius 12、`bg.card`）拆到每一行的背景上：首行圆上两角、末行圆下两角，
+/// 非末行在底边画一条贯穿卡片的 .5pt 分隔线（设计稿里分隔线从卡片左缘画到右缘，不从文字起）。
+private struct PinboardGroupRowBackground: View {
+    let isFirst: Bool
+    let isLast: Bool
+
+    var body: some View {
+        let radius = CopyoTheme.Radius.group
+        UnevenRoundedRectangle(topLeadingRadius: isFirst ? radius : 0,
+                               bottomLeadingRadius: isLast ? radius : 0,
+                               bottomTrailingRadius: isLast ? radius : 0,
+                               topTrailingRadius: isFirst ? radius : 0,
+                               style: .continuous)
+            .fill(CopyoTheme.bgCard)
+            .overlay(alignment: .bottom) {
+                if !isLast {
+                    Rectangle()
+                        .fill(CopyoTheme.separator)
+                        .frame(height: 0.5)
+                }
+            }
     }
 }
 

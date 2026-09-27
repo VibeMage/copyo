@@ -22,10 +22,16 @@ final class ToastCenter {
         self.duration = duration
     }
 
-    func show(_ text: String, symbol: String = "checkmark.circle.fill") {
+    /// - Parameter sticky: 不自动收起。只给截图路由用（设计 01d 要拍的就是「已保存」这一帧，
+    ///   1.2s 后才截图的话提示早没了），真实链路一律走默认值。
+    func show(_ text: String, symbol: String = "checkmark.circle.fill", sticky: Bool = false) {
         dismissTask?.cancel()
         current = ToastMessage(text: text, symbol: symbol)
         announce(text)
+        guard !sticky else {
+            dismissTask = nil
+            return
+        }
         dismissTask = Task { [duration] in
             try? await Task.sleep(for: duration)
             guard !Task.isCancelled else { return }

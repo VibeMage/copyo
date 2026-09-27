@@ -13,7 +13,16 @@ struct OnboardingFlow: View {
     @AppStorage(IOSSettings.Key.cloudSyncEnabled, store: IOSSettings.defaults)
     private var cloudSyncEnabled = true
 
+    /// 本次启动建库时用的那个值。容器在 App 启动时就按开关建好了，引导页里再拨只能等下次打开才生效
+    /// （与设置页同一条限制），行上要把这件事说出来
+    @State private var cloudSyncAtLaunch = IOSSettings.cloudSyncEnabled
+
+    /// 底部安全区高度。设计 3.9 的底边距 50 是从屏幕物理底边量起的（含 Home 指示条），
+    /// 而 footer 本身已经坐在安全区之上——直接加 50 会整条上移 34pt
+    @State private var bottomSafeArea: CGFloat = 0
+
     @Environment(\.openURL) private var openURL
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     /// 40 的跳过按钮与 52 的 CTA 都不在样式表上，按各自 17pt 文字的 `.body` 缩。
     /// 这两条与页码点一起固定在 `TabView` 外面，放大档位下**必须**始终够得着——
@@ -29,22 +38,41 @@ struct OnboardingFlow: View {
 
     private var pages: [OnboardingPageContent] { OnboardingPageContent.all }
 
+    /// iPad（regular 宽度）上把三页与底栏收进一根手机宽的竖栏并在屏幕中间摆：
+    /// 设计只画了 440 × 956 的 iPhone，照原样铺满 13 寸屏会是插图挤在顶上 30%、
+    /// 中间空一大片、CTA 横跨整屏。「跳过」留在屏幕右上角，那是系统里这类按钮的惯常位置。
+    private var isRegularWidth: Bool { horizontalSizeClass == .regular }
+
     var body: some View {
         VStack(spacing: 0) {
             header
-            TabView(selection: $page) {
-                ForEach(Array(pages.enumerated()), id: \.offset) { index, content in
-                    OnboardingPageView(content: content,
-                                       cloudSyncEnabled: $cloudSyncEnabled,
-                                       onOpenSettings: openSystemSettings)
-                        .tag(index)
+            VStack(spacing: 0) {
+                TabView(selection: $page) {
+                    ForEach(Array(pages.enumerated()), id: \.offset) { index, content in
+                        OnboardingPageView(content: content,
+                                           cloudSyncChanged: cloudSyncEnabled != cloudSyncAtLaunch,
+                                           cloudSyncEnabled: $cloudSyncEnabled,
+                                           onOpenSettings: openSystemSettings)
+                            .tag(index)
+                    }
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                footer
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            footer
+            .frame(maxWidth: isRegularWidth ? Self.regularColumnWidth : .infinity,
+                   maxHeight: isRegularWidth ? Self.regularColumnHeight : .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .background(CopyoTheme.bgGrouped)
+        .onGeometryChange(for: CGFloat.self) { $0.safeAreaInsets.bottom } action: {
+            bottomSafeArea = $0
+        }
     }
+
+    /// 设计画布 440 × 956 去掉状态栏与「跳过」那一条后大约剩下的尺寸；
+    /// 屏幕比这矮（11 寸 iPad 横放）时 maxHeight 不起作用，照常撑满
+    private static let regularColumnWidth: CGFloat = 440
+    private static let regularColumnHeight: CGFloat = 820
 
     // MARK: - 顶部
 
@@ -95,8 +123,13 @@ struct OnboardingFlow: View {
             .buttonStyle(.plain)
         }
         .padding(.horizontal, CopyoTheme.Metrics.pageInset)
-        .padding(.bottom, 50)
+        // 带 Home 指示条的机型上安全区已占 34，只补剩下的 16；
+        // Home 键机型（安全区 0）与 iPad 中间那根竖栏也至少留 16，按钮不贴边
+        .padding(.bottom, max(Self.footerBottomFromEdge - bottomSafeArea, 16))
     }
+
+    /// 设计 3.9 `padding 0 20px 50px`：CTA 下沿到屏幕物理底边
+    private static let footerBottomFromEdge: CGFloat = 50
 
     // MARK: - 动作
 
@@ -123,6 +156,7 @@ struct OnboardingFlow: View {
 
 private struct OnboardingPageView: View {
     let content: OnboardingPageContent
+    let cloudSyncChanged: Bool
     @Binding var cloudSyncEnabled: Bool
     let onOpenSettings: () -> Void
 
@@ -132,21 +166,20 @@ private struct OnboardingPageView: View {
         // `.basedOnSize` 保证默认档内容装得下时不回弹，看起来仍是一张静态页。
         ScrollView {
             VStack(spacing: 0) {
-                // 中文的 05b 标题会折成两行，插图上下留白按设计原值（40 / 36）时
-                // 第三条说明行会被推出可视区（内容可滚动，但设计要求一屏看全）
                 OnboardingArtwork(kind: content.artwork)
-                    .padding(.top, content.rows.isEmpty ? 40 : 24)
-                    .padding(.bottom, content.rows.isEmpty ? 36 : 24)
+                    .padding(.top, 40)
+                    .padding(.bottom, 36)
 
+                // 设计是 28/34：`.title` 的自然行高已经是 34，不再叠行距
                 Text(content.title)
                     .font(.system(.title, weight: .bold))
-                    .lineSpacing(6)
                     .foregroundStyle(CopyoTheme.label)
                     .multilineTextAlignment(.center)
 
+                // 17/24：`.body` 自然行高约 20，`lineSpacing` 是叠在它上面的额外间距，只补 4
                 Text(content.body)
                     .font(.body)
-                    .lineSpacing(7)
+                    .lineSpacing(4)
                     .foregroundStyle(CopyoTheme.labelSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.top, 12)
@@ -155,11 +188,12 @@ private struct OnboardingPageView: View {
                     VStack(spacing: 10) {
                         ForEach(content.rows) { row in
                             OnboardingRow(row: row,
+                                          cloudSyncChanged: cloudSyncChanged,
                                           cloudSyncEnabled: $cloudSyncEnabled,
                                           onOpenSettings: onOpenSettings)
                         }
                     }
-                    .padding(.top, 20)
+                    .padding(.top, 28)
                     .padding(.bottom, 12)
                 }
             }
@@ -175,6 +209,7 @@ private struct OnboardingPageView: View {
 /// 砖是定尺装饰（已 `accessibilityHidden`），17pt 符号跟着放大会顶破 36 × 36，所以保持写死。
 private struct OnboardingRow: View {
     let row: OnboardingPageContent.Row
+    let cloudSyncChanged: Bool
     @Binding var cloudSyncEnabled: Bool
     let onOpenSettings: () -> Void
 
@@ -201,7 +236,7 @@ private struct OnboardingRow: View {
                 Text(row.title)
                     .font(.system(.subheadline, weight: .semibold))
                     .foregroundStyle(CopyoTheme.label)
-                Text(row.detail)
+                Text(detail)
                     .font(.footnote)
                     .foregroundStyle(CopyoTheme.labelSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -219,6 +254,9 @@ private struct OnboardingRow: View {
                     .labelsHidden()
                     .tint(CopyoTheme.switchOn)
                     .accessibilityLabel(row.title)
+                    // 开关与左边的说明是两个停留点，拨完之后旁白停在开关上，
+                    // 听不到说明行换成了「重新打开后生效」，所以在开关上再挂一遍
+                    .accessibilityHint(cloudSyncChanged ? detail : "")
             case .settingsButton:
                 Button(action: onOpenSettings) {
                     Text(String(localized: "Go to Settings"))
@@ -246,15 +284,26 @@ private struct OnboardingRow: View {
         .background(CopyoTheme.bgCard,
                     in: RoundedRectangle(cornerRadius: CopyoTheme.Radius.group, style: .continuous))
     }
+
+    /// iCloud 那一行在本次拨过开关后改说「重新打开后生效」：容器在启动时就按开关建好了，
+    /// 这次运行里历史照旧在同步（设置页同一个开关弹的是同一句提示）。
+    /// 引导页盖在根视图的轻提示上面，弹 toast 看不见，只能写在行上。
+    private var detail: String {
+        if row.accessory == .cloudToggle, cloudSyncChanged {
+            return String(localized: "Takes effect after you reopen Copyo")
+        }
+        return row.detail
+    }
 }
 
 // MARK: - 插图
 
-/// 180 × 180 白卡，卡上摆本页的符号（设计 3.9 / 05a–05c）。
+/// 180 × 180 白卡：上面一组红蓝错位套印色条，下面是本页的符号（设计 3.9 / 05a–05c）。
 ///
-/// 设计稿三页的 art 只有 accent 色的符号本身，没有红蓝错位色条——
-/// 品牌的红蓝套印按 design-spec 01b 是「全 App 唯一」的那一处（历史空态的插画），
-/// 引导页再画一次就不唯一了。
+/// 三页共用同一组色条（设计模板 left 44 / top 60，92 × 14，红压蓝各错开 3pt）。
+/// design-spec 01b 说的「全 App 唯一」约束的是正文界面；ios-plan 的品牌说明写明
+/// 红蓝错位「用于图标、空态和引导页的点缀」，引导页正是它该出现的地方。
+/// 符号 `.padding(.top, 34)` 就是给色条让出的位置。
 ///
 /// 卡与卡上的符号一律**不跟随**辅助功能字号：05a 的 34 / 20 / 31 三个符号是一幅
 /// 「Mac ←→ iPhone」的构图，各自按自己的字号放大会把箭头顶到机器身上，画面直接走形；
@@ -263,11 +312,16 @@ private struct OnboardingRow: View {
 private struct OnboardingArtwork: View {
     let kind: OnboardingPageContent.Artwork
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 44, style: .continuous)
                 .fill(CopyoTheme.bgCard)
                 .shadow(color: .black.opacity(0.12), radius: 20, y: 16)
+
+            brandBars
+                .frame(width: 180, height: 180, alignment: .topLeading)
 
             symbols
                 .padding(.top, 34)
@@ -276,12 +330,35 @@ private struct OnboardingArtwork: View {
         .accessibilityHidden(true)
     }
 
+    /// 红蓝套印。写法与关于页的 BrandMark、历史空态的插画一致：
+    /// 浅色 multiply 叠出深蓝，深色 screen 叠出粉色（设计 `t.blend`）
+    private var brandBars: some View {
+        ZStack {
+            Capsule()
+                .fill(CopyoTheme.Brand.red)
+                .frame(width: 92, height: 14)
+                .opacity(0.9)
+                .offset(x: -3, y: -3)
+            Capsule()
+                .fill(CopyoTheme.Brand.blue)
+                .frame(width: 92, height: 14)
+                .opacity(0.85)
+                .offset(x: 3, y: 3)
+                .blendMode(colorScheme == .dark ? .screen : .multiply)
+        }
+        .compositingGroup()
+        .padding(.leading, 44)
+        .padding(.top, 60)
+    }
+
     @ViewBuilder
     private var symbols: some View {
         switch kind {
         case .macAndPhone:
             HStack(spacing: 10) {
-                Image(systemName: "macbook")
+                // 设计画的是带底座的空心显示器，不是笔记本。`desktopcomputer`（卡片来源等处用的那个）
+                // 屏幕是实心的，放在这幅线性插图里比 iPhone 重一截，所以用描边的 `display`
+                Image(systemName: "display")
                     .font(.system(size: 34, weight: .light))
                 Image(systemName: "arrow.left.and.right")
                     .font(.system(size: 20, weight: .medium))
@@ -292,13 +369,15 @@ private struct OnboardingArtwork: View {
             .foregroundStyle(CopyoTheme.accent)
             .symbolRenderingMode(.monochrome)
         case .tray:
-            Image(systemName: "tray.and.arrow.down")
-                .font(.system(size: 54, weight: .light))
-                .symbolRenderingMode(.monochrome)
-                .foregroundStyle(CopyoTheme.accent)
+            // 设计的 64pt 托盘，网格线宽 1.5 → 64 × 1.5 / 24 = 4pt
+            TrayGlyph()
+                .stroke(CopyoTheme.accent,
+                        style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+                .frame(width: 64, height: 64)
         case .cloudCheck:
+            // 设计的云描边约 4pt（64pt、网格线宽 1.5），light 字重细得撑不起 180 的卡
             Image(systemName: "checkmark.icloud")
-                .font(.system(size: 50, weight: .light))
+                .font(.system(size: 50, weight: .medium))
                 .symbolRenderingMode(.monochrome)
                 .foregroundStyle(CopyoTheme.accent)
         }
@@ -334,6 +413,8 @@ struct OnboardingPageContent {
     var artwork: Artwork
     var rows: [Row] = []
 
+    private static var isPad: Bool { UIDevice.current.userInterfaceIdiom == .pad }
+
     static var all: [OnboardingPageContent] {
         [
             OnboardingPageContent(
@@ -343,20 +424,28 @@ struct OnboardingPageContent {
                 artwork: .macAndPhone
             ),
             OnboardingPageContent(
-                title: String(localized: "Three ways to save from this iPhone"),
-                body: String(localized: "iOS won't let apps read the clipboard in the background, so Copyo only saves at these three moments."),
+                // iPad 没有操作按钮也没有轻点背面（一键保存页在 iPad 上也只剩控制中心一段），
+                // 标题里的「iPhone」同样不成立——审核员拿 iPad 看一眼就会挑出来
+                title: isPad
+                    ? String(localized: "Three ways to save from this iPad")
+                    : String(localized: "Three ways to save from this iPhone"),
+                // 与 04c 的导语不是同一句：05b 的设计文案更短（没有「所以」「内容」），单开一个 key
+                body: String(localized: "iOS won't let apps read the clipboard in the background. Copyo only saves at these three moments."),
                 skipTitle: String(localized: "Skip"),
                 artwork: .tray,
                 rows: [
-                    Row(symbol: "doc.on.clipboard",
+                    // 三个砖里的符号都用描边款，与设计的线性图标一套（design-spec 05b：clipboard / share / bolt）
+                    Row(symbol: "list.clipboard",
                         title: String(localized: "When you open Copyo"),
                         detail: String(localized: "Reads the current clipboard")),
                     Row(symbol: "square.and.arrow.up",
                         title: String(localized: "Share sheet"),
                         detail: String(localized: "“Save to Copyo” in any app")),
-                    Row(symbol: "bolt.fill",
+                    Row(symbol: "bolt",
                         title: String(localized: "Quick Save"),
-                        detail: String(localized: "Action Button, Back Tap or Control Center")),
+                        detail: isPad
+                            ? String(localized: "Control Center")
+                            : String(localized: "Action Button, Back Tap or Control Center")),
                 ]
             ),
             OnboardingPageContent(
@@ -365,13 +454,14 @@ struct OnboardingPageContent {
                 skipTitle: String(localized: "Maybe Later"),
                 artwork: .cloudCheck,
                 rows: [
-                    Row(symbol: "icloud.fill",
+                    Row(symbol: "cloud",
                         title: String(localized: "iCloud Sync"),
                         detail: String(localized: "Share one history with your Mac"),
                         accessory: .cloudToggle),
-                    Row(symbol: "doc.on.clipboard",
+                    Row(symbol: "list.clipboard",
                         title: String(localized: "Allow Paste from Other Apps"),
-                        detail: String(localized: "Set it to Allow, no more prompts"),
+                        // 设计原文带着「在系统设置里」：只说「设为允许」的话用户不知道去哪设
+                        detail: String(localized: "Set it to Allow in Settings, no more prompts"),
                         accessory: .settingsButton),
                 ]
             ),

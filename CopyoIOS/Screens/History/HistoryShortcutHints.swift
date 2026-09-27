@@ -43,7 +43,8 @@ struct HistoryShortcutHints: View {
         .padding(.top, 8)
         .padding(.bottom, 22)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(CopyoTheme.bgGrouped.opacity(0.94))
+        // 提示条本身不画底：它后面的渐隐由 `HistoryScreen` 在网格外层统一铺
+        // （挂在这里的背景铺不进 `safeAreaInset` 下面那段 home indicator 区域，底边会露出一截卡片）
         .accessibilityHidden(true)
     }
 }
