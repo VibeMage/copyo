@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Copyo Support · 支持与帮助</title>
-<meta name="description" content="Support, FAQ and contact information for Copyo, the open-source clipboard manager for macOS.">
+<meta name="description" content="Support, FAQ and contact information for Copyo, the open-source clipboard manager for Mac, iPhone and iPad.">
 <meta name="theme-color" content="#0B0910">
 <meta property="og:title" content="Copyo Support">
-<meta property="og:description" content="Help, FAQ and how to reach us. Copyo is an open-source clipboard manager for macOS.">
+<meta property="og:description" content="Help, FAQ and how to reach us. Copyo is an open-source clipboard manager for Mac, iPhone and iPad.">
 <meta property="og:image" content="icon.png">
 <link rel="icon" href="icon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -100,7 +100,7 @@
     color: var(--muted);
     font-size: 17px;
   }
-  .store { margin: 24px 0 0; }
+  .store { margin: 24px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
   .store .btn { font-size: 15px; padding: 11px 20px; }
   .lang {
     display: inline-flex;
@@ -283,9 +283,10 @@
   </h1>
   <p class="tagline" data-lang="en">Everything you copied, one key away. Here's how to get the most out of Copyo, and how to reach us when something isn't right.</p>
   <p class="tagline" data-lang="zh">复制过的一切，一键即达。这里有Copyo的使用指南、常见问题，以及遇到问题时联系我们的方式。</p>
-  <p class="store"><a class="btn primary" href="https://github.com/VibeMage/copyo/releases"><span data-lang="en">Download the latest release</span><span data-lang="zh">下载最新版本</span></a></p>
-  <!-- Mac App Store 上架后换回 https://apps.apple.com/app/id6813955206 。
-       旧链接 id6807507103 指向已删除的应用记录，返回 404。 -->
+  <p class="store"><a class="btn primary" href="https://apps.apple.com/app/id6813955206"><span data-lang="en">Get it on the App Store</span><span data-lang="zh">在 App Store 获取</span></a>
+    <a class="btn" href="https://github.com/VibeMage/copyo/releases"><span data-lang="en">Mac direct download</span><span data-lang="zh">Mac 直接下载版</span></a></p>
+  <!-- 同一个 App Store 记录同时覆盖 Mac 与 iPhone / iPad。
+       旧链接 id6807507103 指向已删除的应用记录，返回 404，不要再用。 -->
   <div class="lang" role="group" aria-label="Language / 语言">
     <button type="button" data-set-lang="en" aria-pressed="true">English</button>
     <button type="button" data-set-lang="zh" aria-pressed="false">中文</button>
@@ -300,15 +301,15 @@
   <!-- ===================== English ===================== -->
   <section data-lang="en">
     <div class="facts">
-      <div class="fact"><b>Lives in the menu bar</b><span>No Dock icon, no main window. <kbd>⇧⌘V</kbd> opens the panel.</span></div>
-      <div class="fact"><b>Stays on your Mac</b><span>No account, no telemetry, no servers of our own.</span></div>
+      <div class="fact"><b>Mac, iPhone and iPad</b><span>A menu bar panel on Mac (<kbd>⇧⌘V</kbd>), a full app on iPhone and iPad.</span></div>
+      <div class="fact"><b>Stays with you</b><span>No account, no telemetry, no servers of our own. Sync goes through your own iCloud.</span></div>
       <div class="fact"><b>Open source</b><span>GPLv3 licensed. Read the code, file issues, send patches.</span></div>
     </div>
 
     <div class="card" id="contact">
       <div class="card-head red"><span class="dot"></span>Contact</div>
       <div class="card-body">
-        <p>Questions, bug reports, feature ideas: we read everything. Please include your macOS version and the app version from Settings → About. We usually reply within a few days.</p>
+        <p>Questions, bug reports, feature ideas: we read everything. Please include your macOS or iOS / iPadOS version, your device model, and the Copyo version (Settings → About on Mac; the About row at the bottom of Settings on iPhone and iPad). We usually reply within a few days.</p>
         <div class="actions">
           <a class="btn primary" href="mailto:iyn@live.com?subject=Copyo%20support">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
@@ -323,7 +324,7 @@
     </div>
 
     <div class="card" id="quick-start">
-      <div class="card-head blue"><span class="dot"></span>Quick start</div>
+      <div class="card-head blue"><span class="dot"></span>Quick start on Mac</div>
       <div class="card-body">
         <ol>
           <li>Copyo lives in the menu bar (the clipboard icon in the top-right corner). It has no Dock icon and no main window.</li>
@@ -336,7 +337,7 @@
     </div>
 
     <div class="card faq" id="faq">
-      <div class="card-head cream"><span class="dot"></span>FAQ</div>
+      <div class="card-head cream"><span class="dot"></span>Mac FAQ</div>
       <div class="card-body">
         <details>
           <summary>Pressing Return doesn't paste anything. Is that a bug?</summary>
@@ -356,7 +357,7 @@
         </details>
         <details>
           <summary>How does sync between my Macs work?</summary>
-          <p>Settings → Sync. You can either point Copyo at a folder you choose (for example a folder inside iCloud Drive or another synced drive), or use your own iCloud account. In both cases the data is stored with the provider you picked; it never passes through a server run by us.</p>
+          <p>Settings → Sync. You can either point Copyo at a folder you choose (for example a folder inside iCloud Drive or another synced drive), or use your own iCloud account. In both cases the data is stored with the provider you picked; it never passes through a server run by us. To sync with an iPhone or iPad, choose iCloud; see <a href="#iphone-faq">iPhone &amp; iPad FAQ</a>.</p>
         </details>
         <details>
           <summary>Something I copied doesn't appear in the history.</summary>
@@ -376,20 +377,69 @@
         </details>
       </div>
     </div>
+    <div class="card" id="iphone-ipad">
+      <div class="card-head blue"><span class="dot"></span>Quick start on iPhone &amp; iPad</div>
+      <div class="card-body">
+        <p>iOS doesn't let any app watch the clipboard in the background, so Copyo saves at moments you choose:</p>
+        <ol>
+          <li><strong>When you open Copyo.</strong> Every time you open or come back to Copyo, it reads the clipboard and saves anything new (Settings › Read Clipboard Automatically, on by default). The very first launch doesn't save what was already on the clipboard.</li>
+          <li><strong>From the share sheet.</strong> Select text, a link or an image in any app, tap Share, then choose Copyo. You can pin it to a Pinboard on the way in.</li>
+          <li><strong>Quick Save.</strong> After copying, press the Action Button (iPhone 15 Pro and later), tap the Copyo control in Control Center or on the Lock Screen, or double-tap the back of your iPhone (Back Tap). Copyo opens and saves the clipboard. Set it up in Copyo › Settings › Quick Save.</li>
+          <li><strong>From your Mac.</strong> With iCloud sync on at both ends, what you copy on your Mac arrives on its own.</li>
+        </ol>
+        <p>Tap a card to copy it back to the clipboard, then paste wherever you like. Swipe left to delete, swipe right to pin, or touch and hold for more.</p>
+      </div>
+    </div>
+
+    <div class="card faq" id="iphone-faq">
+      <div class="card-head cream"><span class="dot"></span>iPhone &amp; iPad FAQ</div>
+      <div class="card-body">
+        <details>
+          <summary>iOS asks “Allow Paste” every time I open Copyo.</summary>
+          <p>That's the iOS default. To stop it, open the Settings app › Apps › Copyo › <strong>Paste from Other Apps</strong> and choose <strong>Allow</strong>. The “Paste from Other Apps” row only shows up after Copyo has asked at least once, so if it isn't there yet, copy something, open Copyo, answer the prompt, then look again. Copyo › Settings › Allow Paste from Other Apps has a button that takes you straight there. iOS doesn't let Copyo read this setting, so Copyo can't show which option you picked.</p>
+          <p>If you tap “Don't Allow”, or turn off Read Clipboard Automatically, History shows a “New clipboard content” banner with the system Paste button, so you can still save by hand.</p>
+        </details>
+        <details>
+          <summary>How do I sync with my Mac?</summary>
+          <ol>
+            <li>Sign in to the same Apple Account on your Mac and your iPhone or iPad.</li>
+            <li>On the Mac, open Copyo Settings → Sync, choose <strong>iCloud</strong>, then restart Copyo (Settings offers a Restart Copyo button).</li>
+            <li>On iPhone and iPad, iCloud Sync is on by default. Copyo › Settings › Sync shows the current status.</li>
+          </ol>
+          <p>Shared Folder sync on the Mac doesn't reach iPhone or iPad; only iCloud does. Turning iCloud Sync on or off takes effect after you reopen Copyo.</p>
+        </details>
+        <details>
+          <summary>Why doesn't Copyo save in the background or paste for me, like on the Mac?</summary>
+          <p>iOS only lets an app read the clipboard while that app is on screen, and doesn't let one app type into another. No app can get around this. That's why Copyo saves when you open it, from the share sheet, or through Quick Save, and why pasting is up to you: tap a card to copy it, then paste as usual.</p>
+        </details>
+        <details>
+          <summary>Does Copyo skip passwords on iPhone and iPad?</summary>
+          <p>No. iOS doesn't tell apps which app copied something or whether a password manager marked it as concealed, so the Mac's concealed-content filter and ignore list don't exist on iOS. If a password or code ends up in History, swipe left on it to delete it. “Show Clips in System Search” is off by default, so clips stay out of Spotlight unless you turn it on.</p>
+        </details>
+        <details>
+          <summary>Where is my data stored, and how do I delete it?</summary>
+          <p>History is stored on your device. With iCloud Sync on (the default on iPhone and iPad), it's also kept in your own private iCloud database, which we can't read. Settings › Clear History deletes every clip that isn't pinned to a Pinboard; with sync on, deletions reach iCloud and your other devices too. Deleting the app removes the data on that device but not the iCloud copy. See the <a href="https://gist.github.com/VibeMage/d39d7165d762ecfd0f16f72ad1fc553e">privacy policy</a>.</p>
+        </details>
+        <details>
+          <summary>Something isn't working. What should I send?</summary>
+          <p>Email us or open a GitHub issue (see <a href="#contact">Contact</a>) with your iOS or iPadOS version, your device model, the Copyo version from the About row in Settings, what the Sync status in Settings says, and the steps that lead to the problem. Screenshots help.</p>
+        </details>
+      </div>
+    </div>
   </section>
 
   <!-- ===================== 中文 ===================== -->
   <section data-lang="zh" lang="zh-Hans">
     <div class="facts">
-      <div class="fact"><b>常驻菜单栏</b><span>没有 Dock 图标和主窗口，<kbd>⇧⌘V</kbd> 呼出面板。</span></div>
-      <div class="fact"><b>数据只在你的 Mac 上</b><span>无账号、无遥测，我们没有任何服务器。</span></div>
+      <div class="fact"><b>Mac、iPhone 和 iPad</b><span>Mac 上是菜单栏面板（<kbd>⇧⌘V</kbd>），iPhone 和 iPad 上是完整的 App。</span></div>
+      <div class="fact"><b>数据只在你手里</b><span>无账号、无遥测，我们没有任何服务器。同步只走你自己的 iCloud。</span></div>
       <div class="fact"><b>开源</b><span>GPLv3 许可证。欢迎阅读代码、提 Issue、发 PR。</span></div>
     </div>
 
     <div class="card">
       <div class="card-head red"><span class="dot"></span>联系我们</div>
       <div class="card-body">
-        <p>问题、Bug、功能建议都欢迎。请附上 macOS 版本，以及「设置 → 关于」里的应用版本号。通常几天内回复。</p>
+        <p>问题、Bug、功能建议都欢迎。请附上 macOS 或 iOS / iPadOS 版本、设备型号，以及 Copyo 的版本号（Mac 上在「设置 → 关于」；iPhone 和 iPad 上在「设置」最下方的「关于」一行）。通常几天内回复。</p>
         <div class="actions">
           <a class="btn primary" href="mailto:iyn@live.com?subject=Copyo%20%E6%94%AF%E6%8C%81">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
@@ -404,7 +454,7 @@
     </div>
 
     <div class="card">
-      <div class="card-head blue"><span class="dot"></span>快速上手</div>
+      <div class="card-head blue"><span class="dot"></span>Mac 快速上手</div>
       <div class="card-body">
         <ol>
           <li>Copyo 常驻菜单栏（右上角的剪贴板图标），没有 Dock 图标，也没有主窗口。</li>
@@ -417,7 +467,7 @@
     </div>
 
     <div class="card faq">
-      <div class="card-head cream"><span class="dot"></span>常见问题</div>
+      <div class="card-head cream"><span class="dot"></span>Mac 常见问题</div>
       <div class="card-body">
         <details>
           <summary>按回车没有粘贴任何内容，是不是坏了？</summary>
@@ -437,7 +487,7 @@
         </details>
         <details>
           <summary>多台 Mac 之间怎么同步？</summary>
-          <p>设置 → 同步。可以让 Copyo 使用你指定的文件夹（例如 iCloud Drive 或其他网盘里的文件夹），也可以使用你自己的 iCloud 账户。两种方式下数据都保存在你选择的服务商那里，不会经过我们的服务器。</p>
+          <p>设置 → 同步。可以让 Copyo 使用你指定的文件夹（例如 iCloud Drive 或其他网盘里的文件夹），也可以使用你自己的 iCloud 账户。两种方式下数据都保存在你选择的服务商那里，不会经过我们的服务器。要和 iPhone 或 iPad 同步，请选 iCloud，详见下方「iPhone 和 iPad 常见问题」。</p>
         </details>
         <details>
           <summary>有些复制的内容没有出现在历史里。</summary>
@@ -454,6 +504,55 @@
             <li>把Copyo移到废纸篓（App Store 版可在启动台中删除）。</li>
             <li>若也要删除历史记录，删除上面列出的数据目录。</li>
           </ol>
+        </details>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head blue"><span class="dot"></span>iPhone 和 iPad 快速上手</div>
+      <div class="card-body">
+        <p>iOS 不允许任何 App 在后台监听剪贴板，所以 Copyo 在你选定的时机保存：</p>
+        <ol>
+          <li><strong>打开 Copyo 时。</strong>每次打开或回到 Copyo，它都会读取剪贴板并保存新内容（设置 › 自动读取剪贴板，默认开启）。第一次启动时不会保存剪贴板里已有的内容。</li>
+          <li><strong>从分享面板。</strong>在任意 App 里选中文本、链接或图片，点「分享」，再选 Copyo。保存时还可以顺手固定到某个 Pinboard。</li>
+          <li><strong>一键保存。</strong>复制之后，按操作按钮（iPhone 15 Pro 及以后机型），点控制中心或锁屏上的 Copyo 控件，或者轻点两下 iPhone 背面（轻点背面）。Copyo 会打开并保存剪贴板。在 Copyo › 设置 › 一键保存 里设置。</li>
+          <li><strong>来自 Mac。</strong>两端都开启 iCloud 同步后，你在 Mac 上复制的内容会自己出现。</li>
+        </ol>
+        <p>轻点卡片即可把它复制回剪贴板，然后在任何地方粘贴。左滑删除，右滑固定，长按查看更多操作。</p>
+      </div>
+    </div>
+
+    <div class="card faq">
+      <div class="card-head cream"><span class="dot"></span>iPhone 和 iPad 常见问题</div>
+      <div class="card-body">
+        <details>
+          <summary>每次打开 Copyo，iOS 都会弹出「允许粘贴」。</summary>
+          <p>这是 iOS 的默认行为。要关掉它，打开「设置」App › App › Copyo › <strong>从其他 App 粘贴</strong>，选择<strong>允许</strong>。「从其他 App 粘贴」这一行只有在 Copyo 至少询问过一次之后才会出现：如果还看不到，先复制点东西、打开 Copyo、回应一次弹窗，再回去找。Copyo › 设置 › 允许从其他 App 粘贴 里有按钮可以直接跳过去。iOS 不允许 Copyo 读取这项设置，所以 Copyo 无法显示你选的是哪一项。</p>
+          <p>如果你点了「不允许」，或者关掉了「自动读取剪贴板」，历史页顶部会出现「新的剪贴板内容」横幅，上面有系统的「粘贴」按钮，仍然可以手动保存。</p>
+        </details>
+        <details>
+          <summary>怎么和 Mac 同步？</summary>
+          <ol>
+            <li>在 Mac 和 iPhone / iPad 上登录同一个 Apple 账户。</li>
+            <li>在 Mac 上打开 Copyo 设置 → 同步，选择 <strong>iCloud</strong>，然后重启 Copyo（设置页里有重启按钮）。</li>
+            <li>iPhone 和 iPad 上的 iCloud 同步默认开启，Copyo › 设置 › 同步 里可以看到当前状态。</li>
+          </ol>
+          <p>Mac 上的共享文件夹同步到不了 iPhone 和 iPad，只有 iCloud 可以。开关 iCloud 同步需要重新打开 Copyo 才会生效。</p>
+        </details>
+        <details>
+          <summary>为什么不能像 Mac 那样在后台保存、或者替我粘贴？</summary>
+          <p>iOS 只允许 App 在自己显示在屏幕上时读取剪贴板，也不允许一个 App 往另一个 App 里输入内容，任何 App 都绕不过去。所以 Copyo 在你打开它时、从分享面板、或通过一键保存来保存内容；粘贴则由你来完成：轻点卡片复制，然后照常粘贴。</p>
+        </details>
+        <details>
+          <summary>iPhone 和 iPad 上会跳过密码吗？</summary>
+          <p>不会。iOS 不会告诉 App 内容是哪个 App 复制的，也不会告诉它密码管理器是否把内容标记为隐藏，所以 Mac 上的隐藏内容过滤和忽略应用列表在 iOS 上并不存在。如果密码或验证码进了历史，左滑即可删除。「在系统搜索中显示条目」默认关闭，除非你打开它，条目不会出现在 Spotlight 里。</p>
+        </details>
+        <details>
+          <summary>数据存在哪里？怎么删除？</summary>
+          <p>历史保存在你的设备上。开启 iCloud 同步时（iPhone 和 iPad 上默认开启），还会保存在你自己的 iCloud 私有数据库里，我们读不到。设置 › 清空历史 会删除所有没有固定到 Pinboard 的条目；开启同步时，删除也会同步到 iCloud 和你的其他设备。删除 App 会清除该设备上的数据，但不会删除 iCloud 中的副本。详见<a href="https://gist.github.com/VibeMage/d39d7165d762ecfd0f16f72ad1fc553e">隐私政策</a>。</p>
+        </details>
+        <details>
+          <summary>遇到问题，应该提供哪些信息？</summary>
+          <p>发邮件或在 GitHub 提 Issue（见上方「联系我们」），附上 iOS 或 iPadOS 版本、设备型号、设置里「关于」一行显示的 Copyo 版本号、设置里同步状态显示的内容，以及出现问题的操作步骤。有截图更好。</p>
         </details>
       </div>
     </div>
