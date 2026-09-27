@@ -26,9 +26,9 @@ Copyo 是一款开源的 macOS 剪贴板管理工具：菜单栏常驻，`⇧⌘
 
 ## 安装
 
-Mac App Store 版本正在审核中，过审后这里会放上链接。
+Mac 版已在 [Mac App Store](https://apps.apple.com/app/id6813955206) 上架。
 
-目前请从 [Releases](https://github.com/VibeMage/copyo/releases) 下载 DMG，打开后把 Copyo
+也可以从 [Releases](https://github.com/VibeMage/copyo/releases) 下载 DMG，打开后把 Copyo
 拖进 Applications 即可。官方发布均已使用 Developer ID 签名并通过 Apple 公证——双击即可打开，
 仅首次有一次「从互联网下载的 App」标准确认弹窗。
 

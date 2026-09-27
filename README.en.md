@@ -26,9 +26,9 @@ Data lives on this Mac (`~/Library/Application Support/Copyo/`) and syncing is o
 
 ## Installation
 
-The Mac App Store build is in review. The link will go here once it is approved.
+Copyo is available on the [Mac App Store](https://apps.apple.com/app/id6813955206).
 
-For now, grab the DMG from [Releases](https://github.com/VibeMage/copyo/releases), open it and drag Copyo
+You can also grab the DMG from [Releases](https://github.com/VibeMage/copyo/releases), open it and drag Copyo
 into Applications. Official releases are signed with a Developer ID and notarized by Apple, so a double-click is all it takes —
 you only get the standard "app downloaded from the Internet" confirmation dialog the first time.
 
