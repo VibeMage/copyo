@@ -1102,3 +1102,21 @@ OTHER
 | 构建版本 1.1.0 (3) | ✅ 已上传、处理完成、选入版本页。命令行上传失败过一次：Xcode 账户凭据残缺（`missing Xcode-Username` → `App Store Connect access for “9A94W79V84” is required`，账户页只列出 Certificates 一项权限），改由维护者在 Organizer → Distribute App 上传，流程里重新登录即恢复。出口合规没有再问（Info.plist 已声明豁免） |
 | TestFlight | ✅ 内部群组 `Maintainer`（自动分发开），测试员 iyn@live.com |
 | 提交审核 | ⏳ 等构建处理完、TestFlight 真机验过 iCloud 同步之后 |
+
+### 上传与查询改用 App Store Connect API 密钥（2026-09-27 起）
+
+Xcode 账户凭据残缺时命令行上传一律失败（见上表），所以配了一把团队 API 密钥
+（`copyo-upload`，App 管理权限）。以后出包、上传、查处理状态都不需要打开 Xcode 或 Transporter：
+
+| 文件 | 内容 |
+| --- | --- |
+| `~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8` | 密钥本体，只能下载一次，丢了只能作废重建 |
+| `~/.appstoreconnect/copyo.env` | `ASC_KEY_ID` / `ASC_ISSUER_ID`。两个 ID 不是机密，但仓库是公开的，所以放仓库外 |
+
+```bash
+UPLOAD=1 ./scripts/build-appstore-ios.sh   # 递增构建号、出包、核验、上传
+./scripts/asc-builds.rb                    # 最近的 iOS 构建与处理状态（VALID = 可选入版本 / 可在 TestFlight 安装）
+```
+
+`altool --build-status` 需要上传时返回的 delivery ID，Transporter / Organizer 传的构建拿不到，
+所以查询走 REST API（`asc-builds.rb`，系统 Ruby + OpenSSL 签 ES256，不依赖第三方库）。

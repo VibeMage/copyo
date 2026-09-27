@@ -208,10 +208,16 @@ echo ""
 
 if [[ "${UPLOAD:-0}" == "1" ]]; then
   echo "==> 上传 App Store Connect"
-  # 上传需要凭据：Xcode 里登录过的账号不会被 altool 自动取用。
-  # 用 App Store Connect API 密钥（推荐，不会因为改密码失效）：
-  #   export ASC_KEY_ID=... ASC_ISSUER_ID=...
+  # 上传需要凭据：Xcode 里登录过的账号不会被 altool 自动取用（2026-09-27 实测，Xcode 账户凭据
+  # 残缺时 `-exportArchive` 的 upload 也会报「App Store Connect access … is required」）。
+  # 用 App Store Connect API 密钥（不会因为改密码或 Xcode 登录状态失效）：
   #   密钥放在 ~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8
+  #   两个 ID 写在 ~/.appstoreconnect/copyo.env（仓库是公开的，不进仓库），这里自动加载；
+  #   也可以直接 export ASC_KEY_ID=... ASC_ISSUER_ID=...
+  if [[ -z "${ASC_KEY_ID:-}" && -f "$HOME/.appstoreconnect/copyo.env" ]]; then
+    # shellcheck disable=SC1091
+    source "$HOME/.appstoreconnect/copyo.env"
+  fi
   if [[ -z "${ASC_KEY_ID:-}" || -z "${ASC_ISSUER_ID:-}" ]]; then
     echo "缺 ASC_KEY_ID / ASC_ISSUER_ID，无法上传。" >&2
     echo "也可以改用 Xcode → Organizer，或 Transporter 拖入：$IPA" >&2
@@ -221,7 +227,7 @@ if [[ "${UPLOAD:-0}" == "1" ]]; then
     --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
 else
   echo "上传方式（任选其一）："
-  echo "  1. UPLOAD=1 重跑本脚本（需要 ASC_KEY_ID / ASC_ISSUER_ID）"
+  echo "  1. UPLOAD=1 重跑本脚本（密钥见 ~/.appstoreconnect/copyo.env；只传不重新出包用 NO_BUMP=1）"
   echo "  2. Xcode → Window → Organizer，选刚产出的这次归档 → Distribute App"
   echo "  3. App Store 装 Transporter，把上面这个 .ipa 拖进去"
   echo ""
