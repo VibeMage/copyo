@@ -2,6 +2,7 @@ import CopyoCore
 import SwiftData
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 
 /// 采集通道 A：回到前台读一次剪贴板。
 ///
@@ -85,8 +86,8 @@ final class PasteboardCapture {
         for provider in itemProviders {
             if provider.canLoadObject(ofClass: UIImage.self),
                let image = await loadObject(UIImage.self, from: provider),
-               let png = image.pngData() {
-                return finish(save(imagePNG: png))
+               let prepared = ClipImagePreparer.prepare(image: image) {
+                return finish(save(imagePNG: prepared.png))
             }
             // 用 NSURL / NSString 而不是 URL / String：NSItemProviderReading 是 Objective-C 协议，
             // Swift 值类型只有桥接重载，泛型里对不上
@@ -123,24 +124,45 @@ final class PasteboardCapture {
             return finish(.empty)
         }
 
+        // 取值读到 nil = 用户在系统弹窗里点了「不允许」。这时**也要记账**：不记的话 changeCount
+        // 永远对不上，之后每回一次前台都会再读一次、再弹一次授权框，拒绝一次等于被纠缠到底。
+        // 横幅照样亮（`.needsBanner`），而横幅上的 UIPasteControl 不依赖 changeCount。
+        func denied() -> Outcome {
+            IOSSettings.lastPasteboardChangeCount = changeCount
+            return finish(.needsBanner)
+        }
+
         // 只有 URL 没有文本时才当链接读；Safari 之类两种表示都给，走文本路径由分类器判定
         if hasURLs && !hasStrings {
-            guard let url = pasteboard.url else { return finish(.needsBanner) }
+            guard let url = pasteboard.url else { return denied() }
             IOSSettings.lastPasteboardChangeCount = changeCount
             return finish(save(text: url.absoluteString, rtfData: nil))
         }
 
         if hasStrings {
-            guard let text = pasteboard.string else { return finish(.needsBanner) }
+            guard let text = pasteboard.string else { return denied() }
             IOSSettings.lastPasteboardChangeCount = changeCount
             let rtf = pasteboard.data(forPasteboardType: "public.rtf")
             return finish(save(text: text, rtfData: rtf))
         }
 
-        guard let image = pasteboard.image else { return finish(.needsBanner) }
+        // 图片先拿原始字节交给 ImageIO 缩到 2048 边长再转 PNG（与分享扩展同一条路）。
+        // 直接 `pasteboard.image` + `pngData()` 是在主线程上全尺寸解码再全尺寸编码，
+        // 一张 5K 截图就是几十 MB 内存加一次明显的卡顿，存进库里的也是全尺寸原图
+        // 先用 `types`（只是元数据，不触发授权框）挑出实际存在的那一种编码，只取一次值——
+        // 挨个 `data(forPasteboardType:)` 试过去，在「询问」模式下可能连弹好几次框
+        let encodedTypes = [UTType.png, .jpeg, .heic].map(\.identifier)
+        let prepared: ClipImagePreparer.Prepared?
+        if let type = pasteboard.types.first(where: encodedTypes.contains) {
+            guard let imageData = pasteboard.data(forPasteboardType: type) else { return denied() }
+            prepared = ClipImagePreparer.prepare(data: imageData)
+        } else {
+            guard let image = pasteboard.image else { return denied() }
+            prepared = ClipImagePreparer.prepare(image: image)
+        }
         IOSSettings.lastPasteboardChangeCount = changeCount
-        guard let png = image.pngData() else { return finish(.empty) }
-        return finish(save(imagePNG: png))
+        guard let prepared else { return finish(.empty) }
+        return finish(save(imagePNG: prepared.png))
     }
 
     /// 通道 A / C 的入库出口。Core Spotlight 索引挂在这里而不是 `ClipSaver`：

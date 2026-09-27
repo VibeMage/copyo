@@ -68,6 +68,14 @@ final class SyncStatusMonitor {
         }
     }
 
+    /// 截图 / 演示用：固定显示设计稿上的那一态，不查账号、不听事件（`cloudKitActive` 为假，
+    /// `start()` 与 `refreshAccountStatus()` 都会直接返回）。模拟器没登录 iCloud，
+    /// 不钉住的话每张截图右上角都是「未同步」，与设计 01 的「已同步」对不上
+    init(demoStatus: SyncStatus) {
+        cloudKitActive = false
+        status = demoStatus
+    }
+
     deinit {
         if let eventObserver {
             NotificationCenter.default.removeObserver(eventObserver)
@@ -138,16 +146,28 @@ enum CloudKitEntitlement {
     /// 必须先问过它：没有 entitlement 时 `CKContainer(identifier:)` 会直接抛 ObjC 异常终止进程，
     /// 而 SwiftData 反而会安安静静建出一个永远不同步的容器，光靠 catch 发现不了。
     ///
-    /// Mac 端 `CloudSyncStatus` 用的是 `SecTaskCopyValueForEntitlement`，**iOS SDK 没有这套 API**，
-    /// 所以这里改成读描述文件：签名过的 App（开发、TestFlight、App Store）都带 embedded.mobileprovision，
-    /// 未签名的模拟器构建没有——判成「没有 entitlement」正好是我们要的保守结果。
+    /// Mac 端 `CloudSyncStatus` 用的是 `SecTaskCopyValueForEntitlement`，**iOS SDK 没有这套 API**。
+    ///
+    /// **真机上一律为真，只有模拟器才读描述文件。** 原来的写法是真机也读 embedded.mobileprovision，
+    /// 前提是「签名过的 App 都带着它」——这对开发包和本地导出的 .ipa 成立，但 **App Store 与
+    /// TestFlight 分发前 Apple 会重签名并删掉这个文件**。于是审核员和全部用户装到的包里它恒为假，
+    /// iCloud 同步永远开不起来，设置页还显示「这份构建未签名」。本地能测到的包全都带着文件，
+    /// 所以这个缺陷在任何一次本地验证里都不会出现。
+    ///
+    /// 真机上判「有」是安全的：没签名的包装不上真机，而 iCloud 容器 entitlement 是写死在
+    /// `CopyoIOS.entitlements` 里、每个签名配置都带的（`scripts/build-appstore-ios.sh` 出包时逐项核验）。
+    /// 会崩的只有「未签名的模拟器构建」这一种情况，所以只在模拟器上保守地去问描述文件。
     static let isPresent: Bool = {
+        #if !targetEnvironment(simulator)
+        return true
+        #else
         guard let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
               let data = try? Data(contentsOf: url),
               let entitlements = profileEntitlements(from: data),
               let identifiers = entitlements["com.apple.developer.icloud-container-identifiers"] as? [String]
         else { return false }
         return identifiers.contains(CopyoStore.cloudKitContainerIdentifier)
+        #endif
     }()
 
     /// 描述文件是 CMS 签名包，里面裹着一段 XML plist。没有公开 API 能解，只能按标记切出来。

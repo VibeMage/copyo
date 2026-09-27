@@ -57,6 +57,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AB0000000000000000000058 /* Exceptions for "CopyoIOS" folder in "Copyo iOS" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AB0000000000000000000032 /* Copyo iOS */;
+		};
 		AB000000000000000000004C /* Exceptions for "CopyoShareExtension" folder in "CopyoShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -88,6 +95,9 @@
 		};
 		AB000000000000000000002B /* CopyoIOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AB0000000000000000000058 /* Exceptions for "CopyoIOS" folder in "Copyo iOS" target */,
+			);
 			path = CopyoIOS;
 			sourceTree = "<group>";
 		};
@@ -598,10 +608,12 @@
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CopyoIOS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. GNU GPLv3.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Copyo saves the image you choose to your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -633,10 +645,12 @@
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CopyoIOS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. GNU GPLv3.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Copyo saves the image you choose to your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -668,10 +682,12 @@
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CopyoIOS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Copyo Contributors. GNU GPLv3.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Copyo saves the image you choose to your photo library.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;

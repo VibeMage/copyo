@@ -135,8 +135,14 @@ final class AppModel {
         // 因为一键保存会在建库之后立刻走完整条保存链路）。
         WidgetRefresher.isSuspended = launch.useDemoData
         self.demoRoute = launch.demoRoute
-        self.syncStatus = SyncStatusMonitor(cloudKitActive: bootstrap.cloudKitActive,
-                                            offReason: bootstrap.offReason)
+        if launch.useDemoData {
+            // 设计 01 是「已同步」，01c（横幅）是「同步中」
+            self.syncStatus = SyncStatusMonitor(demoStatus: launch.demoRoute == .historyBanner
+                                                ? .syncing : .synced(Date(timeIntervalSinceNow: -120)))
+        } else {
+            self.syncStatus = SyncStatusMonitor(cloudKitActive: bootstrap.cloudKitActive,
+                                                offReason: bootstrap.offReason)
+        }
         self.capture = PasteboardCapture(context: bootstrap.container.mainContext)
 
         // history-empty 要的是「有样例库但一条都没有」，所以只建内存容器、不灌样例
@@ -512,6 +518,12 @@ final class AppModel {
 
     func completeOnboarding() {
         IOSSettings.onboardingCompleted = true
+        // 首次启动时引导盖在屏幕上，通道 A 的例行采集被门禁挡掉，「只记账不读取」那一步也就没做。
+        // 不在这里补记的话，用户看完引导出去复制的**第一条**会被当成「首次运行」只记账、不入库——
+        // 刚被告知「回到 Copyo 就会自动保存」，第一次试就失败。读 changeCount 不会弹授权框
+        if IOSSettings.lastPasteboardChangeCount == nil {
+            capture.markSeen()
+        }
         withAnimation(CopyoTheme.springAnimation) { showsOnboarding = false }
     }
 
