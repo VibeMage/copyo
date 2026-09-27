@@ -1,0 +1,87 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Save my clipboard to ${applicationName}": {
+      "localizations": {
+        "zh-Hans": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "保存剪贴板到 ${applicationName}",
+              "用 ${applicationName} 保存剪贴板"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Enregistrer mon presse-papiers dans ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Save clipboard with ${applicationName}": {
+      "localizations": {
+        "zh-Hans": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "${applicationName} 存剪贴板"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Enregistrer le presse-papiers avec ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Save this clip to ${applicationName}": {
+      "localizations": {
+        "zh-Hans": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "把这条存进 ${applicationName}"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Enregistrer cet élément dans ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "${applicationName} save clipboard": {
+      "localizations": {
+        "zh-Hans": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "${applicationName} 保存剪贴板"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "${applicationName} enregistrer le presse-papiers"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
