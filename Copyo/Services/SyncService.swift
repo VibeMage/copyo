@@ -56,12 +56,14 @@ final class SyncService {
         return fresh
     }
 
+    /// 上次同步成功的时间（timeIntervalSince1970），设置页用 @AppStorage 直接读。
+    /// 两种构建都记：直接分发版的同步页也收敛成「路径 + 状态行」（第八节第 16 条），要显示「已同步 · 3 分钟前」
+    static let lastSyncedAtKey = "syncLastSyncedAt"
+
 #if APPSTORE
     /// 沙盒里进程只能访问用户亲自选过的目录，路径字符串一律无效。
     /// 设置页用 NSOpenPanel 取得授权后存下安全作用域书签，这里再解析回 URL。
     static let bookmarkKey = "syncFolderBookmark"
-    /// 上次同步成功的时间（timeIntervalSince1970），设置页用 @AppStorage 直接读
-    static let lastSyncedAtKey = "syncLastSyncedAt"
     /// 上次同步失败的原因，空串表示没有失败
     static let lastErrorKey = "syncLastError"
 
@@ -108,6 +110,10 @@ final class SyncService {
         defaults.set(failure.rawValue, forKey: lastErrorKey)
     }
 #else
+    private static func recordSuccess() {
+        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: lastSyncedAtKey)
+    }
+
     /// 同步目录的父目录：默认 iCloud Drive。设置里填了自定义路径时，那个路径本身
     /// 就是同步目录（不再往下加一层 `Copyo/`），这种情况返回 nil。
     static var syncContainer: URL? {
@@ -217,9 +223,7 @@ final class SyncService {
         try? FileManager.default.createDirectory(at: assets, withIntermediateDirectories: true)
         exportSnapshot(to: root, assets: assets)
         importSnapshots(from: root, assets: assets)
-#if APPSTORE
         Self.recordSuccess()
-#endif
     }
 
     // MARK: - 快照格式
@@ -233,6 +237,9 @@ final class SyncService {
         var filePaths: [String]
         var sourceAppBundleID: String?
         var sourceAppName: String?
+        /// 来源色。1.1 及以前的快照没有这个字段（可选，旧快照照常解码）：那时经文件夹同步过来的条目
+        /// 来源色一律丢失，iOS 那边只能看到一墙灰（design-spec 7.4.7：Mac 是来源色的唯一生产者）
+        var sourceColorHex: String?
         var createdAt: Date
         var pinboardName: String?
     }
@@ -279,6 +286,7 @@ final class SyncService {
                             filePaths: item.filePaths,
                             sourceAppBundleID: item.sourceAppBundleID,
                             sourceAppName: item.sourceAppName,
+                            sourceColorHex: item.sourceColorHex,
                             createdAt: item.createdAt,
                             pinboardName: item.pinboard?.name)
         }
@@ -448,7 +456,9 @@ final class SyncService {
                             imageData: imageData,
                             filePaths: remote.filePaths,
                             sourceAppBundleID: remote.sourceAppBundleID,
-                            sourceAppName: remote.sourceAppName)
+                            sourceAppName: remote.sourceAppName,
+                            // 还在跑旧版本的 Mac 会写出烤死的回退色，导入时改写成 nil（第八节第 30 条）
+                            sourceColorHex: SourceColorMigration.normalized(remote.sourceColorHex))
         item.createdAt = remote.createdAt
         item.imageHash = remote.imageHash
         if let boardName = remote.pinboardName {

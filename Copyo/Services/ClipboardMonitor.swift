@@ -37,13 +37,13 @@ final class ClipboardMonitor {
         timer = nil
     }
 
-    /// PasteService 写回剪贴板后调用。直接把基线对齐到写入后的 changeCount，
-    /// 这样写入之后其他应用的真实复制仍会产生增量并被正常记录。
     /// 擦除前调用：让所有还在后台转码、尚未落库的采集作废
     func invalidatePendingCaptures() {
         captureGeneration &+= 1
     }
 
+    /// PasteService 写回剪贴板后调用。直接把基线对齐到写入后的 changeCount，
+    /// 这样写入之后其他应用的真实复制仍会产生增量并被正常记录。
     func ignoreNextChange() {
         lastChangeCount = NSPasteboard.general.changeCount
     }
@@ -61,6 +61,10 @@ final class ClipboardMonitor {
         let pb = NSPasteboard.general
         guard pb.changeCount != lastChangeCount else { return }
         lastChangeCount = pb.changeCount
+
+        // 「自动记录剪贴板」关着：基线照样对齐（上面那行），只是不入库——
+        // 再打开时不会把关掉期间的最后一次复制补录进来（设置 · 通用，Preferences.captureEnabledKey）
+        guard UserDefaults.standard.bool(forKey: Preferences.captureEnabledKey) else { return }
 
         let types = pb.types ?? []
         // 密码管理器等标记为「隐藏/瞬态」的内容不记录（剪贴板工具的行业约定）
@@ -80,8 +84,11 @@ final class ClipboardMonitor {
         let bundleID = sourceApp?.bundleIdentifier
         let appName = sourceApp?.localizedName
         // 来源色在采集这一刻算好存进条目：iOS 的沙盒里取不到别的 App 的图标，
-        // 卡片的淡染色只能靠 Mac 端同步过去的这个值
-        let colorHex = AppIconProvider.headerColor(forBundleID: bundleID).srgbHexString
+        // 卡片的淡染色只能靠 Mac 端同步过去的这个值。
+        // 取不到就存 nil，不烤回退色：两端显示时统一回退 #8E8E93（design-spec 第八节第 30 条、7.4.7 (a)）
+        // 传 bundleURL：来源 App 此刻正在运行，位置确定，不走 LaunchServices 查询与「找不到」负缓存
+        let colorHex = AppIconProvider.headerColor(forBundleID: bundleID,
+                                                   appURL: sourceApp?.bundleURL)?.srgbHexString
 
         if let urls = pb.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL],
            !urls.isEmpty {

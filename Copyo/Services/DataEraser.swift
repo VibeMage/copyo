@@ -193,7 +193,7 @@ enum DataEraser {
         defaults.set(true, forKey: justErasedKey)
                 defaults.set(true, forKey: pendingScrubKey)
         guard PasteService.relaunch(arguments: ["-showSettings",
-                                                "-settingsTab", String(SettingsTab.clipboard.rawValue)]) else {
+                                                "-settingsTab", String(SettingsTab.history.rawValue)]) else {
             // 标记留着不清：下次启动——用户自己退出再打开也算——照样把库文件清掉。
             // 这一步幂等，清掉反而等于把唯一的文件级清除永久取消。
             result.outcome = .relaunchFailed

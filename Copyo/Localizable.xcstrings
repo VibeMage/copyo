@@ -1,6 +1,23 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ isn’t working because another app is using it. Choose a different combination.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ne fonctionne pas, car une autre app l’utilise. Choisissez une autre combinaison."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 现在不起作用，它已被另一个 App 占用，请换一个组合"
+          }
+        }
+      }
+    },
     "%@ · %lld characters": {
       "extractionState": "manual",
       "localizations": {
@@ -135,6 +152,76 @@
         }
       }
     },
+    "%@, %@, %@, %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, from %2$@, %3$@, %4$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, depuis %2$@, %3$@, %4$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@，来自 %2$@，%3$@，%4$@"
+          }
+        }
+      }
+    },
+    "%lld characters": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld character"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld characters"
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld caractère"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld caractères"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 字"
+          }
+        }
+      }
+    },
     "%lld files": {
       "extractionState": "manual",
       "localizations": {
@@ -182,19 +269,147 @@
         }
       }
     },
-    "(no change)": {
+    "%lld more files": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 more file"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld more files"
+                }
+              }
+            }
+          }
+        },
         "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "(aucun changement)"
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 autre fichier"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld autres fichiers"
+                }
+              }
+            }
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "(无变化)"
+            "value": "另外 %lld 个文件"
+          }
+        }
+      }
+    },
+    "%lld results": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld result"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld results"
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld résultat"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld résultats"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 条结果"
+          }
+        }
+      }
+    },
+    "%lldd": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld j"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 天前"
+          }
+        }
+      }
+    },
+    "%lldh": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld h"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 小时前"
+          }
+        }
+      }
+    },
+    "%lldm": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 分钟前"
           }
         }
       }
@@ -284,6 +499,74 @@
         }
       }
     },
+    "Add": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加"
+          }
+        }
+      }
+    },
+    "Add App": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter une app"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加 App"
+          }
+        }
+      }
+    },
+    "After you copy, Copyo writes the item back to the system clipboard and hands focus back to the app you came from. You press ⌘V yourself — Copyo never pastes for you.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Après la copie, Copyo remet l’élément dans le presse-papiers du système et rend la main à l’app d’où vous venez. C’est vous qui appuyez sur ⌘V — Copyo ne colle jamais à votre place."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制后 Copyo 把内容写回系统剪贴板并把焦点交还给原来的 App，由你自己按 ⌘V —— Copyo 从不代你粘贴。"
+          }
+        }
+      }
+    },
+    "All": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部"
+          }
+        }
+      }
+    },
     "Always copy as plain text": {
       "extractionState": "manual",
       "localizations": {
@@ -301,19 +584,19 @@
         }
       }
     },
-    "An open-source clipboard manager for macOS.\nSync is off by default. Turn it on and your history goes only to your own iCloud or a folder you choose — never to a server of ours.": {
+    "Always on": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un gestionnaire de presse-papiers open source pour macOS.\nLa synchronisation est désactivée par défaut. Une fois activée, votre historique ne va que dans votre propre iCloud ou dans un dossier que vous choisissez — jamais sur un serveur qui nous appartient."
+            "value": "Toujours activé"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "开源的 macOS 剪贴板管理工具。\n同步默认关闭。开启后，历史也只会进入你自己的 iCloud 或你选定的文件夹——不会经过我们的服务器。"
+            "value": "始终开启"
           }
         }
       }
@@ -335,53 +618,70 @@
         }
       }
     },
-    "Anything you copy shows up here automatically": {
+    "Anything you copy shows up here. Copyo records it in the background — there is nothing you need to do.": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tout ce que vous copiez apparaît ici automatiquement"
+            "value": "Tout ce que vous copiez apparaît ici. Copyo l’enregistre en arrière-plan, vous n’avez rien à faire."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "复制任何内容后会自动出现在这里"
+            "value": "复制任何东西，它都会出现在这里。Copyo 在后台自动记录，不需要你做任何事。"
           }
         }
       }
     },
-    "Applies when you press Return. ⌥↩ always copies as plain text.": {
+    "Applies when you press ↩. ⇧↩ always copies as plain text.": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "S’applique lorsque vous appuyez sur Retour. ⌥↩ copie toujours en texte brut."
+            "value": "S’applique quand vous appuyez sur ↩. ⇧↩ copie toujours en texte brut."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按回车时生效。⌥↩ 始终以纯文本复制。"
+            "value": "按 ↩ 时生效。⇧↩ 始终以纯文本复制。"
           }
         }
       }
     },
-    "By default your clipboard history and Pinboards sync between your Macs through iCloud Drive (iCloud Drive/Copyo/). The data only ever passes through your own iCloud — Copyo never touches a third-party server. Deletions are not propagated across devices.": {
+    "Available": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Par défaut, votre historique du presse-papiers et vos Pinboards se synchronisent entre vos Mac via iCloud Drive (iCloud Drive/Copyo/). Les données ne passent que par votre propre iCloud : Copyo ne touche jamais à un serveur tiers. Les suppressions ne sont pas propagées entre les appareils."
+            "value": "Disponible"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "默认经由 iCloud Drive（iCloud Drive/Copyo/）在你的多台 Mac 之间同步剪贴板历史与 Pinboard。数据只经过你自己的 iCloud，Copyo 不接触任何第三方服务器。删除操作不跨设备传播。"
+            "value": "可用"
+          }
+        }
+      }
+    },
+    "Back in your app after copying, press ⌘V to paste": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Après la copie, revenez dans votre app et collez avec ⌘V"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制后回到原来的 App，按 ⌘V 粘贴"
           }
         }
       }
@@ -403,36 +703,53 @@
         }
       }
     },
-    "Changing the sync method takes effect after you restart Copyo.": {
+    "Can’t access this folder": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le changement de méthode de synchronisation prend effet après le redémarrage de Copyo."
+            "value": "Impossible d’accéder à ce dossier"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "更改同步方式后需要重启 Copyo 才会生效。"
+            "value": "无法访问这个文件夹"
           }
         }
       }
     },
-    "Checking iCloud status…": {
+    "Capture": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vérification de l’état iCloud…"
+            "value": "Capture"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "正在检查 iCloud 状态…"
+            "value": "捕获"
+          }
+        }
+      }
+    },
+    "Checking…": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vérification…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在检查…"
           }
         }
       }
@@ -454,19 +771,36 @@
         }
       }
     },
-    "Choose Sync Folder…": {
+    "Choose Again…": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choisir un dossier de synchronisation…"
+            "value": "Choisir à nouveau…"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "选择同步文件夹…"
+            "value": "重新选择…"
+          }
+        }
+      }
+    },
+    "Choose Folder…": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisir un dossier…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择文件夹…"
           }
         }
       }
@@ -501,6 +835,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "在下方选择同步文件夹后即可开启同步。"
+          }
+        }
+      }
+    },
+    "Choose the sync folder again": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez à nouveau le dossier de synchronisation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同步文件夹需要重新选择"
           }
         }
       }
@@ -551,41 +902,24 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "清空历史记录…"
+            "value": "清空历史…"
           }
         }
       }
     },
-    "Clear search / Close panel": {
+    "Click to change": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Effacer la recherche / Fermer le panneau"
+            "value": "Cliquez pour modifier"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "清除搜索 / 关闭面板"
-          }
-        }
-      }
-    },
-    "Click the shortcut to customize it. The default is ⇧⌘V.": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cliquez sur le raccourci pour le modifier. Par défaut : ⇧⌘V."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "点击快捷键可以自定义，默认 ⇧⌘V。"
+            "value": "点一下可以改"
           }
         }
       }
@@ -607,6 +941,40 @@
         }
       }
     },
+    "Close": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
+    "Close Panel": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermer le panneau"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭面板"
+          }
+        }
+      }
+    },
     "Color": {
       "extractionState": "manual",
       "localizations": {
@@ -620,6 +988,57 @@
           "stringUnit": {
             "state": "translated",
             "value": "颜色"
+          }
+        }
+      }
+    },
+    "Content from 1Password and Keychain is never recorded": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le contenu provenant de 1Password et du trousseau n’est jamais enregistré"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来自 1Password、钥匙串的内容不会被记录"
+          }
+        }
+      }
+    },
+    "Copied as plain text · press ⌘V to paste": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copié en texte brut · appuyez sur ⌘V pour coller"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已复制纯文本 · 按 ⌘V 粘贴"
+          }
+        }
+      }
+    },
+    "Copied · press ⌘V to paste": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copié · appuyez sur ⌘V pour coller"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已复制 · 按 ⌘V 粘贴"
           }
         }
       }
@@ -641,6 +1060,57 @@
         }
       }
     },
+    "Copy Card N Directly": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier directement la carte N"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直接复制第 N 张"
+          }
+        }
+      }
+    },
+    "Copy Selected Item": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier l’élément sélectionné"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制选中项"
+          }
+        }
+      }
+    },
+    "Copy Selected as Plain Text": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier en texte brut"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "纯文本复制"
+          }
+        }
+      }
+    },
     "Copy as Plain Text": {
       "extractionState": "manual",
       "localizations": {
@@ -653,58 +1123,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "以纯文本复制"
-          }
-        }
-      }
-    },
-    "Copy selected item": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copier l’élément sélectionné"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "复制选中内容"
-          }
-        }
-      }
-    },
-    "Copy selected item as plain text": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copier l’élément sélectionné en texte brut"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "以纯文本复制选中内容"
-          }
-        }
-      }
-    },
-    "Copyo Settings": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réglages de Copyo"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copyo 设置"
+            "value": "纯文本复制"
           }
         }
       }
@@ -828,53 +1247,36 @@
         }
       }
     },
-    "Copyo lives in the menu bar (the clipboard icon in the top-right corner).\n\n• Press %@ anytime to bring up the clipboard panel\n• Everything you copy is saved automatically — type to search\n• Select an item and press Return to put it back on the clipboard, then paste it with ⌘V\n• Open Settings by right-clicking the menu bar icon": {
+    "Copyo lives in the menu bar (the clipboard icon in the top-right corner).\n\n• Press %@ anytime to bring up the clipboard panel\n• Everything you copy is saved automatically — type to search\n• Pick an item and press Return to put it back on the clipboard, then paste it yourself with ⌘V. ⇧Return copies it as plain text\n• Open Settings from the gear in the panel, or by right-clicking the menu bar icon": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copyo réside dans la barre des menus (l’icône de presse-papiers en haut à droite).\n\n• Appuyez sur %@ à tout moment pour faire apparaître le panneau\n• Tout ce que vous copiez est enregistré automatiquement — saisissez pour rechercher\n• Sélectionnez un élément et appuyez sur Retour pour le replacer dans le presse-papiers, puis collez-le avec ⌘V\n• Ouvrez les réglages en cliquant avec le bouton droit sur l’icône de la barre des menus"
+            "value": "Copyo réside dans la barre des menus (l’icône de presse-papiers en haut à droite).\n\n• Appuyez sur %@ à tout moment pour faire apparaître le panneau\n• Tout ce que vous copiez est enregistré automatiquement — saisissez pour rechercher\n• Choisissez un élément et appuyez sur Retour pour le replacer dans le presse-papiers, puis collez-le vous-même avec ⌘V. ⇧Retour le copie en texte brut\n• Ouvrez les réglages depuis la roue dentée du panneau ou en cliquant avec le bouton droit sur l’icône de la barre des menus"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copyo 已在菜单栏常驻运行（右上角剪贴板图标）。\n\n• 按 %@ 随时呼出剪贴板面板\n• 复制过的内容会自动记录，输入即可搜索\n• 选中条目回车即可放回剪贴板，再按 ⌘V 粘贴\n• 右键菜单栏图标即可打开设置"
+            "value": "Copyo 已在菜单栏常驻运行（右上角剪贴板图标）。\n\n• 按 %@ 随时呼出剪贴板面板\n• 复制过的内容会自动记录，输入即可搜索\n• 选中条目按回车放回剪贴板，再由你自己按 ⌘V 粘贴；⇧回车以纯文本复制\n• 点击面板右上角的齿轮，或右键菜单栏图标，即可打开设置"
           }
         }
       }
     },
-    "Copyo lives in the menu bar (the clipboard icon in the top-right corner).\n\n• Press %@ anytime to bring up the clipboard panel\n• Everything you copy is saved automatically — type to search\n• Select an item and press Return to put it back on the clipboard, then paste it with ⌘V\n• Open Settings from the gear in the panel, or by right-clicking the menu bar icon": {
+    "Copyo records in the background and needs no permissions": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copyo réside dans la barre des menus (l’icône de presse-papiers en haut à droite).\n\n• Appuyez sur %@ à tout moment pour faire apparaître le panneau\n• Tout ce que vous copiez est enregistré automatiquement — saisissez pour rechercher\n• Sélectionnez un élément et appuyez sur Retour pour le replacer dans le presse-papiers, puis collez-le avec ⌘V\n• Ouvrez les réglages depuis la roue dentée du panneau ou en cliquant avec le bouton droit sur l’icône de la barre des menus"
+            "value": "Copyo enregistre en arrière-plan, sans aucune autorisation"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copyo 已在菜单栏常驻运行（右上角剪贴板图标）。\n\n• 按 %@ 随时呼出剪贴板面板\n• 复制过的内容会自动记录，输入即可搜索\n• 选中条目回车即可放回剪贴板，再按 ⌘V 粘贴\n• 点击面板右上角的齿轮，或右键菜单栏图标，即可打开设置"
-          }
-        }
-      }
-    },
-    "Copyo lost access to the sync folder. Choose it again below to resume syncing.": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copyo n’a plus accès au dossier de synchronisation. Choisissez-le à nouveau ci-dessous pour reprendre la synchronisation."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copyo 已失去对同步文件夹的访问权限。请在下方重新选择该文件夹以恢复同步。"
+            "value": "Copyo 在后台记录，不需要任何权限"
           }
         }
       }
@@ -913,23 +1315,6 @@
         }
       }
     },
-    "Could not determine the iCloud status": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossible de déterminer l’état iCloud"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法确定 iCloud 状态"
-          }
-        }
-      }
-    },
     "Create": {
       "extractionState": "manual",
       "localizations": {
@@ -947,19 +1332,53 @@
         }
       }
     },
-    "Custom Sync Folder (Optional)": {
+    "Create and Pin": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dossier de synchronisation personnalisé (facultatif)"
+            "value": "Créer et épingler"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "自定义同步文件夹（可选）"
+            "value": "创建并固定"
+          }
+        }
+      }
+    },
+    "Cut": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couper"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剪切"
+          }
+        }
+      }
+    },
+    "Cycle Through Filters": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passer d’un filtre à l’autre"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在筛选间循环"
           }
         }
       }
@@ -1049,36 +1468,87 @@
         }
       }
     },
-    "Delete selected item": {
+    "Delete Pinboard “%@”": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Supprimer l’élément sélectionné"
+            "value": "Supprimer le Pinboard « %@ »"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "删除选中内容"
+            "value": "删除 Pinboard「%@」"
           }
         }
       }
     },
-    "Enter any directory all of your devices can read and write (a company NAS, another cloud-sync folder, and so on) to use it instead of iCloud Drive.": {
+    "Don’t Record These Apps": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Indiquez n’importe quel répertoire accessible en lecture et en écriture depuis tous vos appareils (un NAS d’entreprise, un autre dossier de synchronisation cloud, etc.) pour l’utiliser à la place d’iCloud Drive."
+            "value": "Ne pas enregistrer ces apps"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "填入任意多台设备都能读写的目录（公司 NAS、网盘同步文件夹等）即可代替 iCloud Drive。"
+            "value": "不记录这些 App"
+          }
+        }
+      }
+    },
+    "Edit": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Édition"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑"
+          }
+        }
+      }
+    },
+    "Esc clears the search · press again to close": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échap efface la recherche · appuyez à nouveau pour fermer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esc 清空搜索 · 再按一次关闭面板"
+          }
+        }
+      }
+    },
+    "Esc to close": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échap pour fermer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esc 关闭"
           }
         }
       }
@@ -1096,6 +1566,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "这台 Mac 上的数据已全部删除。"
+          }
+        }
+      }
+    },
+    "Everything you’ve copied is here. Press %@ to get it back anytime.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout ce que vous avez copié est ici. Appuyez sur %@ pour le retrouver à tout moment."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制过的东西都在这里，按 %@ 随时取回。"
           }
         }
       }
@@ -1151,6 +1638,23 @@
         }
       }
     },
+    "Focus Search": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aller à la recherche"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聚焦搜索"
+          }
+        }
+      }
+    },
     "General": {
       "extractionState": "manual",
       "localizations": {
@@ -1164,6 +1668,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "通用"
+          }
+        }
+      }
+    },
+    "Global Shortcut": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raccourci global"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "唤出"
           }
         }
       }
@@ -1197,41 +1718,24 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "历史记录"
+            "value": "历史"
           }
         }
       }
     },
-    "History Limit": {
+    "Ignore password managers": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Limite de l’historique"
+            "value": "Ignorer les gestionnaires de mots de passe"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "历史记录上限"
-          }
-        }
-      }
-    },
-    "Ignored Apps": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apps ignorées"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "忽略的应用"
+            "value": "忽略密码管理器"
           }
         }
       }
@@ -1253,19 +1757,53 @@
         }
       }
     },
-    "Just type": {
+    "In the Panel": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saisir du texte"
+            "value": "Dans le panneau"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "直接输入"
+            "value": "面板内"
+          }
+        }
+      }
+    },
+    "Includes every Pinboard and everything pinned to it": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Y compris tous les Pinboards et tout ce qui y est épinglé"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "包括所有 Pinboard 与已固定的条目"
+          }
+        }
+      }
+    },
+    "Keep up to": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conserver jusqu’à"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最多保留"
           }
         }
       }
@@ -1287,53 +1825,36 @@
         }
       }
     },
-    "Last synced %@": {
+    "Last week": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dernière synchronisation : %@"
+            "value": "Semaine dernière"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "上次同步：%@"
+            "value": "上周"
           }
         }
       }
     },
-    "Launch at login": {
+    "Launch Copyo at login": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ouvrir à la session"
+            "value": "Ouvrir Copyo à l’ouverture de session"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "开机时自动启动"
-          }
-        }
-      }
-    },
-    "Leave empty to use iCloud Drive, e.g. ~/Shared/Copyo": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Laisser vide pour utiliser iCloud Drive, par exemple ~/Shared/Copyo"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "留空使用 iCloud Drive，如 ~/Shared/Copyo"
+            "value": "登录时启动 Copyo"
           }
         }
       }
@@ -1355,19 +1876,19 @@
         }
       }
     },
-    "Move between cards": {
+    "Mirrors your history straight to your iCloud. Deleting an entry removes it on every device.": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Naviguer entre les cartes"
+            "value": "Copie votre historique directement dans votre iCloud. Supprimer un élément le supprime sur tous vos appareils."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在卡片间移动"
+            "value": "直接镜像到你的 iCloud，删除会在所有设备生效。"
           }
         }
       }
@@ -1406,6 +1927,23 @@
         }
       }
     },
+    "New Pinboard Name": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom du nouveau Pinboard"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新 Pinboard 名称"
+          }
+        }
+      }
+    },
     "New Pinboard…": {
       "extractionState": "manual",
       "localizations": {
@@ -1423,19 +1961,19 @@
         }
       }
     },
-    "No clipboard history yet": {
+    "No apps added": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aucun historique pour l’instant"
+            "value": "Aucune app ajoutée"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还没有剪贴板记录"
+            "value": "还没有添加 App"
           }
         }
       }
@@ -1457,19 +1995,19 @@
         }
       }
     },
-    "No iCloud account is signed in on this Mac": {
+    "No sync folder selected": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aucun compte iCloud n’est connecté sur ce Mac"
+            "value": "Aucun dossier de synchronisation sélectionné"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "这台 Mac 未登录 iCloud 账号"
+            "value": "还没有选择同步文件夹"
           }
         }
       }
@@ -1491,6 +2029,57 @@
         }
       }
     },
+    "Not Signed In": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non connecté"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未登录"
+          }
+        }
+      }
+    },
+    "Not synced yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas encore synchronisé"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未同步"
+          }
+        }
+      }
+    },
+    "Nothing here yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien pour l’instant"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有内容"
+          }
+        }
+      }
+    },
     "Nothing matches “%@”": {
       "extractionState": "manual",
       "localizations": {
@@ -1504,6 +2093,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "没有匹配「%@」的内容"
+          }
+        }
+      }
+    },
+    "Nothing of this kind yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien de ce type pour l’instant"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这一类还没有内容"
           }
         }
       }
@@ -1525,6 +2131,23 @@
         }
       }
     },
+    "Nothing you copy in them goes into your history": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien de ce que vous y copiez n’entre dans l’historique"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从它们复制的内容不会进历史"
+          }
+        }
+      }
+    },
     "Off": {
       "extractionState": "manual",
       "localizations": {
@@ -1542,36 +2165,19 @@
         }
       }
     },
-    "One bundle ID per line (for example com.1password.1password). Copies made in these apps are never recorded. Content that password managers mark as concealed is always skipped.": {
+    "Only removes entries that aren’t pinned to a Pinboard": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un bundle ID par ligne (par exemple com.1password.1password). Ce qui est copié dans ces apps n’est jamais enregistré. Le contenu que les gestionnaires de mots de passe marquent comme masqué est toujours ignoré."
+            "value": "Supprime uniquement les éléments qui ne sont pas épinglés dans un Pinboard"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "每行一个 Bundle ID（如 com.1password.1password），来自这些应用的复制不会被记录。密码管理器标记为隐藏的内容始终自动跳过。"
-          }
-        }
-      }
-    },
-    "Open / Close panel": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ouvrir / Fermer le panneau"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "打开 / 关闭面板"
+            "value": "只清除没有固定到 Pinboard 的条目"
           }
         }
       }
@@ -1610,6 +2216,57 @@
         }
       }
     },
+    "Other Device": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autre appareil"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他设备"
+          }
+        }
+      }
+    },
+    "Paste": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coller"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "粘贴"
+          }
+        }
+      }
+    },
+    "Pin": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épingler"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "固定"
+          }
+        }
+      }
+    },
     "Pin to": {
       "extractionState": "manual",
       "localizations": {
@@ -1627,36 +2284,70 @@
         }
       }
     },
-    "Pin to Pinboard…": {
+    "Pin to Pinboard": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Épingler à un Pinboard…"
+            "value": "Épingler à un Pinboard"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "固定到 Pinboard…"
+            "value": "固定到 Pinboard"
           }
         }
       }
     },
-    "Pinboards keep the clips you use most within reach": {
+    "Pinboard": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les Pinboards gardent à portée de main les éléments que vous utilisez le plus"
+            "value": "Pinboard"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pinboard 用来固定常用的剪贴板内容"
+            "value": "Pinboard"
+          }
+        }
+      }
+    },
+    "Pinned": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Épinglé"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已固定"
+          }
+        }
+      }
+    },
+    "Press it anytime to bring up this panel": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appuyez dessus à tout moment pour afficher ce panneau"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "随时按下它唤出这个面板"
           }
         }
       }
@@ -1678,19 +2369,19 @@
         }
       }
     },
-    "Preview selected item (when search is empty)": {
+    "Preview": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Prévisualiser l’élément sélectionné (si la recherche est vide)"
+            "value": "Aperçu"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "预览选中内容（搜索框为空时）"
+            "value": "预览"
           }
         }
       }
@@ -1763,6 +2454,57 @@
         }
       }
     },
+    "Record clipboard automatically": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer le presse-papiers automatiquement"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动记录剪贴板"
+          }
+        }
+      }
+    },
+    "Redo": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rétablir"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重做"
+          }
+        }
+      }
+    },
+    "Remove Selected App": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retirer l’app sélectionnée"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除所选 App"
+          }
+        }
+      }
+    },
     "Reset": {
       "extractionState": "manual",
       "localizations": {
@@ -1814,6 +2556,57 @@
         }
       }
     },
+    "Restore Default Location": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rétablir l’emplacement par défaut"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复默认位置"
+          }
+        }
+      }
+    },
+    "Restricted": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restreint"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受限"
+          }
+        }
+      }
+    },
+    "Rich": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enrichi"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "富文本"
+          }
+        }
+      }
+    },
     "Rich Text": {
       "extractionState": "manual",
       "localizations": {
@@ -1831,6 +2624,40 @@
         }
       }
     },
+    "Right-click a card and choose Pin to Pinboard to keep the clips you use most here.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cliquez avec le bouton droit sur une carte et choisissez Épingler à un Pinboard pour garder ici ce que vous utilisez le plus."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在卡片上右键 → 固定到 Pinboard，常用的内容就会一直留在这里。"
+          }
+        }
+      }
+    },
+    "Saves your history as snapshots in a folder — iCloud Drive or any shared folder works. Deletions don’t sync to your other devices.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistre votre historique sous forme d’instantanés dans un dossier — iCloud Drive ou n’importe quel dossier partagé. Les suppressions ne sont pas synchronisées avec vos autres appareils."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把历史存成快照放进一个文件夹，iCloud Drive 或任意共享目录都行；删除不会同步到其他设备。"
+          }
+        }
+      }
+    },
     "Search": {
       "extractionState": "manual",
       "localizations": {
@@ -1844,6 +2671,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "搜索"
+          }
+        }
+      }
+    },
+    "Search History": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechercher dans l’historique"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索历史"
+          }
+        }
+      }
+    },
+    "Select All": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout sélectionner"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全选"
           }
         }
       }
@@ -1899,6 +2760,23 @@
         }
       }
     },
+    "Shared folder is in sync": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le dossier partagé est synchronisé"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共享文件夹已同步"
+          }
+        }
+      }
+    },
     "Shortcuts": {
       "extractionState": "manual",
       "localizations": {
@@ -1916,36 +2794,53 @@
         }
       }
     },
-    "Signed in to iCloud": {
+    "Show All History": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Connecté à iCloud"
+            "value": "Afficher tout l’historique"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "已登录 iCloud"
+            "value": "显示全部历史"
           }
         }
       }
     },
-    "Snapshot sync through a folder every device can reach. Deletions are not propagated: an entry you delete on one Mac stays on the others.": {
+    "Show Panel": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Synchronisation par instantanés via un dossier accessible à tous vos appareils. Les suppressions ne sont pas propagées : un élément supprimé sur un Mac reste présent sur les autres."
+            "value": "Afficher le panneau"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "通过一个所有设备都能读写的文件夹做快照同步。删除不会传播：在一台 Mac 上删掉的条目，在其他 Mac 上依然保留。"
+            "value": "唤出面板"
+          }
+        }
+      }
+    },
+    "Show icon in menu bar": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher l’icône dans la barre des menus"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在菜单栏显示图标"
           }
         }
       }
@@ -1963,6 +2858,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "空格"
+          }
+        }
+      }
+    },
+    "Startup": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Démarrage"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启动"
+          }
+        }
+      }
+    },
+    "Status": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "État"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态"
           }
         }
       }
@@ -2035,36 +2964,53 @@
         }
       }
     },
-    "Sync clipboard history": {
+    "Sync method changed — restart to apply": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Synchroniser l’historique"
+            "value": "Méthode de synchronisation modifiée — redémarrez pour l’appliquer"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "同步历史记录"
+            "value": "改了同步方式，重启后生效"
           }
         }
       }
     },
-    "Sync through your iCloud account. Every Mac signed in to the same Apple Account sees the same history, and deleting an entry removes it everywhere.": {
+    "Synced": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Synchronisation via votre compte iCloud. Chaque Mac connecté au même compte Apple voit le même historique, et la suppression d’un élément s’applique partout."
+            "value": "Synchronisé"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "通过你的 iCloud 账号同步。登录同一 Apple 账户的每台 Mac 看到同一份历史，删除某个条目也会在所有设备上生效。"
+            "value": "已同步"
+          }
+        }
+      }
+    },
+    "Temporarily Unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temporairement indisponible"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时不可用"
           }
         }
       }
@@ -2120,19 +3066,36 @@
         }
       }
     },
-    "The parent directory of the custom sync folder does not exist. Please check the path.": {
+    "The current card is pinned to it once it’s created": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le répertoire parent du dossier de synchronisation personnalisé n’existe pas. Vérifiez le chemin d’accès."
+            "value": "La carte actuelle y sera épinglée une fois créé"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "自定义同步文件夹的上级目录不存在，请检查路径。"
+            "value": "建好后把当前卡固定进去"
+          }
+        }
+      }
+    },
+    "The folder was moved or renamed, or Copyo lost permission to it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le dossier a été déplacé ou renommé, ou Copyo n’y a plus accès."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目录被移走、改名或授权失效。"
           }
         }
       }
@@ -2167,6 +3130,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "这台 Mac 以前用过 iCloud 同步。同步关着的时候 Copyo 碰不到 iCloud 上那份副本——把「同步」设为 iCloud、重新打开 Copyo 再删一次，才能把那份也删掉。"
+          }
+        }
+      }
+    },
+    "This Pinboard is empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce Pinboard est vide"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这个 Pinboard 还是空的"
+          }
+        }
+      }
+    },
+    "This combination is already used by another app. Restored to %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette combinaison est déjà utilisée par une autre app. Rétablie sur %@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这个组合已被另一个 App 占用，已恢复为 %@"
           }
         }
       }
@@ -2222,23 +3219,6 @@
         }
       }
     },
-    "This deletes every clipboard entry that isn’t pinned to a Pinboard. This action cannot be undone.": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tous les éléments du presse-papiers non épinglés à un Pinboard seront supprimés. Cette action est irréversible."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "将删除所有未固定到 Pinboard 的剪贴板记录，此操作不可撤销。"
-          }
-        }
-      }
-    },
     "Try It Now": {
       "extractionState": "manual",
       "localizations": {
@@ -2256,36 +3236,36 @@
         }
       }
     },
-    "Type to search": {
+    "Undo": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saisissez pour rechercher"
+            "value": "Annuler"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "输入即可搜索"
+            "value": "撤销"
           }
         }
       }
     },
-    "Unknown Source": {
+    "Unknown": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Source inconnue"
+            "value": "Inconnu"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "未知来源"
+            "value": "无法确定"
           }
         }
       }
@@ -2358,19 +3338,19 @@
         }
       }
     },
-    "Version %@": {
+    "Version": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Version %@"
+            "value": "Version"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "版本 %@"
+            "value": "版本"
           }
         }
       }
@@ -2409,19 +3389,19 @@
         }
       }
     },
-    "Your clipboard history and Pinboards sync between your Macs through the folder you chose. The data only ever passes through your own storage — Copyo never touches a third-party server. Deletions are not propagated across devices.": {
+    "When this is off, press %@ or open Copyo again in Finder to get back to Settings": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Votre historique du presse-papiers et vos Pinboards se synchronisent entre vos Mac via le dossier que vous avez choisi. Les données ne passent que par votre propre stockage : Copyo ne touche jamais à un serveur tiers. Les suppressions ne sont pas propagées entre les appareils."
+            "value": "Si cette option est désactivée, appuyez sur %@ ou rouvrez Copyo dans le Finder pour retrouver les réglages"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "经由你选定的文件夹在你的多台 Mac 之间同步剪贴板历史与 Pinboard。数据只经过你自己的存储，Copyo 不接触任何第三方服务器。删除操作不跨设备传播。"
+            "value": "关闭后可按 %@ 或在访达中再次打开 Copyo 找回设置"
           }
         }
       }
@@ -2443,6 +3423,23 @@
         }
       }
     },
+    "Your history lives only on this Mac and in the sync location you choose. Copyo collects no data.": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre historique reste uniquement sur ce Mac et à l’emplacement de synchronisation que vous choisissez. Copyo ne collecte aucune donnée."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的历史只存在这台 Mac 和你自己选的同步位置里，Copyo 不收集任何数据。"
+          }
+        }
+      }
+    },
     "iCloud Account": {
       "extractionState": "manual",
       "localizations": {
@@ -2455,58 +3452,41 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "iCloud 账号"
+            "value": "iCloud 账户"
           }
         }
       }
     },
-    "iCloud Drive is not enabled on this Mac. Turn it on in System Settings → click your name → iCloud, or point Copyo at a custom sync folder below.": {
+    "iCloud Drive is turned off on this Mac. Turn it on in System Settings, or choose another folder.": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iCloud Drive n’est pas activé sur ce Mac. Activez-le dans Réglages Système → cliquez sur votre nom → iCloud, ou indiquez à Copyo un dossier de synchronisation personnalisé ci-dessous."
+            "value": "iCloud Drive est désactivé sur ce Mac. Activez-le dans Réglages Système ou choisissez un autre dossier."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "此 Mac 未启用 iCloud Drive。可在 系统设置 → 点按你的姓名 → iCloud 中打开 iCloud Drive，或在下方指定一个自定义同步文件夹。"
+            "value": "这台 Mac 没有打开 iCloud Drive。请在系统设置里打开，或者另选一个文件夹。"
           }
         }
       }
     },
-    "iCloud is restricted on this Mac": {
+    "iCloud is in sync": {
       "extractionState": "manual",
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iCloud est restreint sur ce Mac"
+            "value": "iCloud est synchronisé"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "这台 Mac 上的 iCloud 受限"
-          }
-        }
-      }
-    },
-    "iCloud is temporarily unavailable": {
-      "extractionState": "manual",
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iCloud est temporairement indisponible"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iCloud 暂时不可用"
+            "value": "iCloud 已同步"
           }
         }
       }
@@ -2524,6 +3504,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法启动 iCloud 同步：%@"
+          }
+        }
+      }
+    },
+    "iCloud sync needs attention": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La synchronisation iCloud requiert votre attention"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 同步需要处理"
+          }
+        }
+      }
+    },
+    "now": {
+      "extractionState": "manual",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "< 1 min"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刚刚"
           }
         }
       }

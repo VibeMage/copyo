@@ -2,17 +2,17 @@
 
 [简体中文](README.md)
 
-Copyo is an open-source clipboard manager for macOS: it lives in the menu bar, `⇧⌘V` brings up a card panel at the bottom of the screen, and you search your history as you type.
+Copyo is an open-source clipboard manager for macOS: it lives in the menu bar, `⇧⌘V` brings up a floating card panel, and you search your history as you type.
 Data lives on this Mac (`~/Library/Application Support/Copyo/`) and syncing is off by default; there are no third-party SDKs, no analytics and no crash reporting, which makes it a fit for workplaces that do not allow third-party closed-source tools.
 
 ## Features
 
 - **Clipboard history**: records what you copy in the background — plain text, rich text, links, colors (`#RRGGBB`), images, files
-- **Slide-up panel**: press `⇧⌘V` and a card panel slides up from the bottom of the screen, showing your history as a horizontal flow of cards
+- **Floating panel**: press `⇧⌘V` and a glass panel floats up above the Dock, showing your history as a horizontal flow of cards, each tinted with its source app’s color
 - **Search as you type**: once the panel is open, just start typing to filter; searches content, file names and the source app
-- **Keyboard first**: `← →` to navigate, `↩` to copy and return to the previous app, `⌥↩` to copy as plain text, `Space` to preview, `⌘⌫` to delete, `Esc` to close
+- **Keyboard first**: `← →` to navigate, `⇥` to switch filters, `↩` to copy and return to the previous app, `⇧↩` to copy as plain text, `⌘1–9` to copy the Nth card, `Space` to preview, `⌘P` to pin, `⌘⌫` to delete, `Esc` to close
 - **Pinboards**: pin the clips you use often into groups of your own; history-limit cleanup never touches them
-- **Source app badge**: each card's header shows the icon and accent color of the app the clip came from (the average color of that app's icon)
+- **Source app badge**: each card shows a kind badge, the source app's icon and “source · time”; color clips are tinted with the color itself
 - **Drag and drop**: drag a card straight out into any app
 - **Privacy**: content that password managers and the like mark as Concealed/Transient is skipped automatically; you can also ignore specific apps by bundle ID
 - **Sync (optional, pick one of three)**: Off / Folder / iCloud. The folder option writes your history and Pinboards out as snapshots into iCloud Drive
@@ -21,7 +21,7 @@ Data lives on this Mac (`~/Library/Application Support/Copyo/`) and syncing is o
   Either way the data only ever passes through storage you own. Sync is off by default, so Copyo can stay completely offline in a corporate environment
 - **Custom shortcut**: `⇧⌘V` by default; record any key combination in Settings
 - **History limit**: 100/300/500/1000/unlimited; past the limit, the oldest unpinned entries are cleaned up automatically
-- **Launch at login**, plain-text mode and other settings
+- **Launch at login**, hiding the menu bar icon, pausing capture, plain-text mode and other settings
 - **Three languages**: English, Simplified Chinese and French, following the system language, built on a String Catalog
 
 ## Installation
@@ -117,10 +117,13 @@ Then rebuild to pick it up. The repository currently ships a programmatically dr
 | Open / close the panel | `⇧⌘V` (global, customizable in Settings) |
 | Move between cards | `←` `→` |
 | Copy the selection and return to the previous app | `↩` or double-click the card |
-| Copy as plain text | `⌥↩` |
-| Preview the selection | `Space` (when the search field is empty; while typing it inserts a space) |
+| Copy as plain text | `⇧↩` (the 1.1-era `⌥↩` still works in 1.2 and goes away in the next release) |
+| Copy the Nth card | `⌘1`–`⌘9` |
+| Cycle filters | `⇥` / `⇧⇥` |
+| Preview the selection | `Space` (when the search field is empty; while typing it inserts a space) or `⌘Y` |
+| Pin to a Pinboard / unpin | `⌘P` |
 | Search | just start typing |
-| Clear the search / close the panel | `Esc` |
+| Close the preview / clear the search / close the panel | `Esc` |
 
 ## Architecture
 
@@ -129,8 +132,8 @@ Copyo/
 ├── App/        app entry point, menu-bar residency (NSStatusItem)
 ├── Models/     SwiftData models: ClipItem, Pinboard
 ├── Services/   clipboard polling, writing back to the clipboard and returning focus to the previous app, global hotkey, iCloud sync, icon color extraction, thumbnail cache
-├── Panel/      the bottom slide-up panel (NSPanel + SwiftUI): card flow, search, preview
-└── Settings/   Settings window (General / Clipboard / Sync / Shortcuts / About)
+├── Panel/      the floating panel (NSPanel + SwiftUI): card flow, search, filters, the preview child window and the “Copied” toast
+└── Settings/   Settings window (General / Sync / Shortcuts / History / About)
 ```
 
 Implementation notes:

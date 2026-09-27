@@ -17,6 +17,21 @@ extension ClipItem {
         return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
     }
 
+    /// 卡片淡染与类型角标实际用的颜色 "#RRGGBB"（design-spec 7.4.2）：
+    /// 颜色条目取**剪贴内容本身**的颜色——一条颜色条目的身份就是那个颜色，拿来源 App 的色去染是错的；
+    /// 解析失败时退回来源色，按普通卡画（第八节第 31 条）。其余条目就是来源色。
+    /// nil 表示两者都没有，显示层统一回退 `source.local` #8E8E93（第 30 条）。
+    public var renderColorHex: String? {
+        if kind == .color {
+            let raw = (plainText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            if raw.range(of: "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$", options: .regularExpression) != nil {
+                // 带 alpha 的 #RRGGBBAA 只取前六位：淡染是按不透明色混的
+                return String(raw.prefix(7)).uppercased()
+            }
+        }
+        return sourceColorHex
+    }
+
     /// 正文看起来像代码或命令，界面据此改用等宽字体。只对纯文本 / 富文本判断。
     public var isCodeLike: Bool {
         guard kind == .text || kind == .richText, let text = plainText else { return false }

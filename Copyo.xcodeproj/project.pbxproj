@@ -85,6 +85,23 @@
 			);
 			target = AB0000000000000000000055 /* CopyoKeyboard */;
 		};
+		AB0000000000000000000060 /* Exceptions for "CopyoShared" folder in "Copyo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppGroup.swift,
+				ClipImagePreparer.swift,
+				ClipIngest.swift,
+				CopyClipIntent.swift,
+				CopyoShortcuts.swift,
+				SaveClipboardIntent.swift,
+				SaveContentIntent.swift,
+				Share/SharePreviewCard.swift,
+				Share/ShareView.swift,
+				SpotlightIndexer.swift,
+				WidgetRefresher.swift,
+			);
+			target = AB0000000000000000000006 /* Copyo */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -119,6 +136,9 @@
 		};
 		AB000000000000000000002E /* CopyoShared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AB0000000000000000000060 /* Exceptions for "CopyoShared" folder in "Copyo" target */,
+			);
 			path = CopyoShared;
 			sourceTree = "<group>";
 		};
@@ -218,6 +238,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				AB0000000000000000000001 /* Copyo */,
+				AB000000000000000000002E /* CopyoShared */,
 			);
 			name = Copyo;
 			packageProductDependencies = (
@@ -504,7 +525,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Copyo;
@@ -515,7 +536,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.vibemage.Copyo;
 				PRODUCT_NAME = Copyo;
 			};
@@ -531,7 +552,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -543,7 +564,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.vibemage.Copyo;
 				PRODUCT_NAME = Copyo;
 			};
@@ -576,7 +597,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 9A94W79V84;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -589,7 +610,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.vibemage.Copyo;
 				PRODUCT_NAME = Copyo;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APPSTORE $(inherited)";

@@ -19,6 +19,7 @@ struct ClipSnapshot: Identifiable, Hashable, Sendable {
     let body: String
     /// 「来源 · 时间」里的来源，本机条目已经填好「本机」
     let sourceName: String
+    /// 淡染与角标用的颜色。名字沿用旧的，但从条目灌入时存的是 `renderColorHex`（颜色条目取内容本身）
     let sourceColorHex: String?
     let createdAt: Date
     let isPinned: Bool
@@ -50,7 +51,8 @@ struct ClipSnapshot: Identifiable, Hashable, Sendable {
         self.id = id
         self.kind = item.kind
         self.title = item.displayTitle
-        self.sourceColorHex = item.sourceColorHex
+        // 存渲染色而不是来源色：颜色条目要用内容本身的颜色染（design-spec 7.4.2）
+        self.sourceColorHex = item.renderColorHex
         self.createdAt = item.createdAt
         self.isPinned = item.pinboard != nil
         self.isMono = item.isCodeLike
@@ -96,51 +98,11 @@ struct ClipSnapshot: Identifiable, Hashable, Sendable {
         title.isEmpty ? KindPresentation.label(kind) : title
     }
 
-    /// 「刚刚 / 3 分钟前 / 昨天 18:42」。
-    ///
-    /// **这是 `CopyoIOS/Model/ClipItem+Display.swift` 里 `relativeTime(reference:)` 的第二份实现**，
-    /// 本地化键（`now` / `%lldm` / `%lldh` / `%lldd` / `Last week`）与那边逐字相同。
-    /// 之所以只能重抄：那个扩展写在 `ClipItem` 上、文件属于 `CopyoIOS` target，小组件编译不到它。
-    /// **改档位口径时两处都要改**，只改一处的表现是同一条内容在应用里写「3 分钟前」、
-    /// 在小组件上写别的。该把它提到 `CopyoShared/` 去，只是那个文件不在本次改动范围内。
+    /// 「刚刚 / 3 分钟前 / 昨天 18:42」，口径见 `CopyoShared/UI/RelativeTime.swift`。
     ///
     /// 参数是 `reference` 而不是 `Date()`：小组件的每个时间线条目都带自己的时刻，
-    /// 渲染时必须按 `entry.date` 算，按「现在」算的话归档过的条目全会显示成生成时的那个字。
+    /// 渲染时必须按 `entry.date` 算。
     func relativeTime(at reference: Date) -> String {
-        let interval = reference.timeIntervalSince(createdAt)
-        if interval < 60 { return String(localized: "now") }
-        let calendar = Calendar.current
-        if calendar.isDate(createdAt, inSameDayAs: reference) {
-            let minutes = Int(interval / 60)
-            if minutes < 60 {
-                return String(format: String(localized: "%lldm"), minutes)
-            }
-            return String(format: String(localized: "%lldh"), minutes / 60)
-        }
-        if calendar.isDateInYesterday(createdAt) {
-            return Self.dateTimeFormatter.string(from: createdAt)
-        }
-        let days = calendar.dateComponents([.day],
-                                           from: calendar.startOfDay(for: createdAt),
-                                           to: calendar.startOfDay(for: reference)).day ?? 0
-        if days < 7 { return String(format: String(localized: "%lldd"), days) }
-        if days < 14 { return String(localized: "Last week") }
-        return Self.dateOnlyFormatter.string(from: createdAt)
+        RelativeTime.string(for: createdAt, reference: reference)
     }
-
-    private static let dateOnlyFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .none
-        return formatter
-    }()
-
-    private static let dateTimeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        // 「今天 / 昨天」交给系统按当前语言给，自己拼会在英文下变成错误的语序
-        formatter.doesRelativeDateFormatting = true
-        return formatter
-    }()
 }

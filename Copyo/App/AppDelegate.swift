@@ -20,8 +20,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// 不适合在「删除所有数据」的对话框里反复调用，所以启动时存下来。
     private(set) var storeURL: URL?
     private let hotkey = HotkeyManager()
+    /// 当前保存的全局快捷键有没有注册成功。启动时就失败的话，设置 · 快捷键页据此亮警示
+    private(set) var hotkeyRegistered = true
     private var statusItem: NSStatusItem!
     private var settingsController: SettingsWindowController?
+    private var legacyColorRewrite: DispatchWorkItem?
+    /// 上一次应用到状态项的可见性，见 updateStatusItemVisibility
+    private var appliedStatusItemVisibility: Bool?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         Self.shared = self
@@ -30,17 +35,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             "historyLimit": 500,
             "plainTextPaste": false,
         ])
+        Preferences.registerDefaults()
 
-        // 同步方式决定容器怎么建，必须在建库之前定下来（老配置的迁移也在这里发生）
-        let syncMode = SyncMode.migrateIfNeeded()
-        // 迁移之后立刻记「这份库镜像过 CloudKit」。「删除所有数据」靠它判断能不能删
-        // 库文件——删掉的同时也会删掉服务器变更令牌，而云端那份还在。
-        DataEraser.markMirroredIfNeeded()
-        // 上一次启动留下的 iCloud 错误到此为止，这一轮的真实结果在下面重新记录；
-        // 不清的话用户换回 iCloud 时会看到一条早就修好的旧错误
-        CloudSyncStatus.clearErrors()
+        let demo = MacDemoData.isEnabled
+        // 同步方式决定容器怎么建，必须在建库之前定下来（老配置的迁移也在这里发生）。
+        // 演示模式不同步，也不去动真实偏好里的同步状态
+        let syncMode = demo ? .off : SyncMode.migrateIfNeeded()
+        if !demo {
+            // 迁移之后立刻记「这份库镜像过 CloudKit」。「删除所有数据」靠它判断能不能删
+            // 库文件——删掉的同时也会删掉服务器变更令牌，而云端那份还在。
+            DataEraser.markMirroredIfNeeded()
+            // 上一次启动留下的 iCloud 错误到此为止，这一轮的真实结果在下面重新记录；
+            // 不清的话用户换回 iCloud 时会看到一条早就修好的旧错误
+            CloudSyncStatus.clearErrors()
+        }
 
         do {
+            // -demoData：内存容器 + 设计稿样例，绝不碰真实数据库（design-spec 7.5.13）
+            guard !demo else { throw DemoModeMarker() }
             let storeURL = try CopyoStore.defaultStoreURL()
             self.storeURL = storeURL
             // 「删除所有数据」的收尾：SQLite 不会把释放的页清零，行删掉了正文还能从文件里
@@ -74,10 +86,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 container = try CopyoStore.makeContainer(url: storeURL, cloudKit: false)
             }
         } catch {
-            // 数据库损坏等极端情况：退化为内存存储，保证应用可用
+            // 数据库损坏等极端情况：退化为内存存储，保证应用可用（-demoData 也走这里）
             let schema = Schema(CopyoSchema.models)
             let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             container = try! ModelContainer(for: schema, configurations: config)
+        }
+        if demo {
+            MacDemoData.populate(into: container.mainContext)
+        } else {
+            SourceColorMigration.runIfNeeded(context: container.mainContext)
         }
 
         monitor = ClipboardMonitor(context: container.mainContext)
@@ -86,22 +103,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         syncService = SyncService(context: container.mainContext)
 
         setupStatusItem()
+        MainMenu.install()
+        // 设置 · 通用里的「在菜单栏显示图标」随改随生效
+        NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.updateStatusItemVisibility() }
+        }
 
         hotkey.onHotkey = { [weak self] in
             Task { @MainActor in
                 self?.panelController.toggle()
             }
         }
-        hotkey.register(HotkeyConfig.load())
-        monitor.start()
-        syncService.updateActivation()
+        hotkeyRegistered = hotkey.register(HotkeyConfig.load())
+        // -demoData 是拍截图用的内存库：不采集真实剪贴板、不同步，否则真实内容会混进截图、
+        // 样例数据也可能被快照同步写到别的 Mac 上
+        if !demo {
+            monitor.start()
+            syncService.updateActivation()
+        }
 
-        if cloudKitActive {
+        if demo {
+            // 演示模式不改动本机的 APNs 注册状态
+        } else if cloudKitActive {
             // CloudKit 的远程变更靠静默推送下发。Copyo 是常驻菜单栏的应用，
             // 一开就是好几天，不注册推送的话别的设备改了什么只有下次启动才看得到。
             // 按 Apple 文档（Syncing a Core Data store with CloudKit），下行数据由系统
             // 在后台完成，应用不需要把 didReceiveRemoteNotification 转发给容器。
             NSApplication.shared.registerForRemoteNotifications()
+            observeRemoteChangesForLegacyColors()
         } else {
             // 这次会话不镜像到 CloudKit，就不该继续挂着推送注册。隐私政策里把 iCloud
             // 那一段的推送写成「iCloud 方式专有」，不撤销的话那句话是假的。
@@ -122,22 +151,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if ProcessInfo.processInfo.arguments.contains("-showPanel") {
             panelController.show()
         }
+#if DEBUG
+        DebugSnapshot.runIfRequested()
+#endif
 
         // 首次启动：LSUIElement 应用没有窗口也没有 Dock 图标，
-        // 不主动引导的话用户根本不知道快捷键的存在
-        if !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {
+        // 不主动引导的话用户根本不知道快捷键的存在（演示模式不弹，也不置真实的完成标记）
+        if !demo && !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {
             UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
             showWelcome()
         }
 
         // 「删除所有数据」会让应用自己退出再起来。LSUIElement 没有 Dock 图标也没有窗口，
         // 不给一句交代的话用户只看到菜单栏图标消失又出现，会以为崩了、然后再按一次。
-        if UserDefaults.standard.bool(forKey: DataEraser.justErasedKey) {
+        if !demo && UserDefaults.standard.bool(forKey: DataEraser.justErasedKey) {
             UserDefaults.standard.set(false, forKey: DataEraser.justErasedKey)
             let done = NSAlert()
             done.messageText = String(localized: "Everything on this Mac was deleted.")
             NSApp.activate(ignoringOtherApps: true)
             done.runModal()
+        }
+    }
+
+    /// iCloud 镜像异步导入的行不经过启动时那次迁移：新加入的 Mac 迟到的历史、还在跑旧版本的设备
+    /// 继续写出的行，都可能带着旧的烤死回退色（第八节第 30 条）。远端变更合并进来后去抖 2 秒再扫一遍。
+    private func observeRemoteChangesForLegacyColors() {
+        NotificationCenter.default.addObserver(forName: Notification.Name("NSPersistentStoreRemoteChangeNotification"),
+                                               object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.legacyColorRewrite?.cancel()
+                let work = DispatchWorkItem { [weak self] in
+                    guard let context = self?.container?.mainContext else { return }
+                    SourceColorMigration.rewriteLegacyRows(in: context)
+                }
+                self?.legacyColorRewrite = work
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: work)
+            }
         }
     }
 
@@ -159,30 +208,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return false
     }
 
+    /// 首启欢迎。完整的引导页顺延到 1.3（design-spec 第八节第 47 条），本轮只中文化并更新键位。
+    /// 两种构建风味的面板现在都有齿轮（第 15 条），文案不再分两套。
     private func showWelcome() {
         let alert = NSAlert()
         alert.messageText = String(localized: "Welcome to Copyo")
-#if APPSTORE
-        // 沙盒版的面板里有齿轮按钮，这里是唯一能告诉用户设置在哪的地方；
-        // 直接分发版只能靠右键菜单栏图标打开设置。
         alert.informativeText = String(localized: """
         Copyo lives in the menu bar (the clipboard icon in the top-right corner).
 
         • Press \(HotkeyConfig.load().displayString) anytime to bring up the clipboard panel
         • Everything you copy is saved automatically — type to search
-        • Select an item and press Return to put it back on the clipboard, then paste it with ⌘V
+        • Pick an item and press Return to put it back on the clipboard, then paste it yourself with ⌘V. ⇧Return copies it as plain text
         • Open Settings from the gear in the panel, or by right-clicking the menu bar icon
         """)
-#else
-        alert.informativeText = String(localized: """
-        Copyo lives in the menu bar (the clipboard icon in the top-right corner).
-
-        • Press \(HotkeyConfig.load().displayString) anytime to bring up the clipboard panel
-        • Everything you copy is saved automatically — type to search
-        • Select an item and press Return to put it back on the clipboard, then paste it with ⌘V
-        • Open Settings by right-clicking the menu bar icon
-        """)
-#endif
         alert.addButton(withTitle: String(localized: "Try It Now"))
         alert.addButton(withTitle: String(localized: "Got It"))
         NSApp.activate(ignoringOtherApps: true)
@@ -191,12 +229,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// 设置里改了快捷键后重新注册
-    func reloadHotkey() {
-        hotkey.register(HotkeyConfig.load())
+    /// 设置里改了快捷键后重新注册。返回 false 时调用方负责回滚到旧组合（第八节第 19 条）
+    @discardableResult
+    func reloadHotkey() -> Bool {
+        hotkeyRegistered = hotkey.register(HotkeyConfig.load())
+        return hotkeyRegistered
     }
 
     // MARK: - 菜单栏
+
+    /// 「在菜单栏显示图标」关掉时隐藏状态项（第八节第 11(a) 条）。入口还剩全局快捷键与
+    /// 「在访达里再次打开 Copyo」（→ applicationShouldHandleReopen → 面板 → 齿轮），不会被锁在门外。
+    ///
+    /// 不能拿 `statusItem.isVisible` 本身做比较：给它赋值时 AppKit 会把可见性写进偏好，
+    /// 并且在赋值完成**之前**就同步发出 `UserDefaults.didChangeNotification`——这时 isVisible 还是旧值，
+    /// 观察者会再赋一次，无限递归到栈溢出（自测实测，拨一下开关应用就崩）。所以比的是自己记下的上一次结果。
+    private func updateStatusItemVisibility() {
+        let visible = UserDefaults.standard.bool(forKey: Preferences.showMenuBarIconKey)
+        guard visible != appliedStatusItemVisibility else { return }
+        appliedStatusItemVisibility = visible
+        statusItem.isVisible = visible
+    }
 
     private func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -211,6 +264,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             button.target = self
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
+        updateStatusItemVisibility()
     }
 
     @objc private func statusItemClicked() {
@@ -235,15 +289,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
-        let clearItem = NSMenuItem(title: String(localized: "Clear History…"), action: #selector(clearHistory), keyEquivalent: "")
-        clearItem.target = self
-        menu.addItem(clearItem)
+        // 演示模式下不给这两项：「删除所有数据」要写真实偏好里的擦除标记、再不带 -demoData 地重启，
+        // 下次启动会把真实数据库删掉
+        if !MacDemoData.isEnabled {
+            let clearItem = NSMenuItem(title: String(localized: "Clear History…"), action: #selector(clearHistory), keyEquivalent: "")
+            clearItem.target = self
+            menu.addItem(clearItem)
 
-        let eraseItem = NSMenuItem(title: String(localized: "Delete All Data…"), action: #selector(deleteAllData), keyEquivalent: "")
-        eraseItem.target = self
-        menu.addItem(eraseItem)
+            let eraseItem = NSMenuItem(title: String(localized: "Delete All Data…"), action: #selector(deleteAllData), keyEquivalent: "")
+            eraseItem.target = self
+            menu.addItem(eraseItem)
+        }
 
-        let settingsItem = NSMenuItem(title: String(localized: "Settings…"), action: #selector(openSettings), keyEquivalent: ",")
+        let settingsItem = NSMenuItem(title: String(localized: "Settings…"), action: #selector(openSettings as () -> Void), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
 
@@ -282,10 +340,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func openSettings() {
+        openSettings(tab: nil)
+    }
+
+    /// 打开设置并停在指定页（面板顶栏的同步格点进来要直达「同步」）
+    func openSettings(tab: SettingsTab?) {
         if settingsController == nil {
             settingsController = SettingsWindowController(container: container)
         }
-        settingsController?.show()
+        settingsController?.show(tab: tab)
     }
 
     @objc private func clearHistory() {
@@ -297,21 +360,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.alertStyle = .warning
         NSApp.activate(ignoringOtherApps: true)
         guard alert.runModal() == .alertFirstButtonReturn else { return }
-
-        let context = container.mainContext
-        let descriptor = FetchDescriptor<ClipItem>(predicate: #Predicate { $0.pinboard == nil })
-        if let items = try? context.fetch(descriptor) {
-            for item in items {
-                context.delete(item)
-            }
-            try? context.save()
-        }
-        ThumbnailCache.removeAll()
+        // 菜单栏与设置页两个入口保留各自的原生确认形态，删除逻辑只有一份（第八节第 21 条、7.5.15）
+        HistoryClearing.clearUnpinned(in: container.mainContext)
     }
 
     /// 「删除所有数据」。设置页也调它——两条路必须是同一个流程，而且 SwiftUI 在一个
     /// alert 的动作里再弹第二个 alert 会被直接吞掉，失败时就什么都不显示。NSAlert 没这问题。
     @objc func deleteAllData() {
+        // 设置 · 历史页也走这里。演示模式下整条路都不能碰（理由同菜单栏那两项）
+        guard !MacDemoData.isEnabled else {
+            NSSound.beep()
+            return
+        }
         let alert = NSAlert()
         alert.messageText = String(localized: "Delete All Data?")
         alert.informativeText = DataEraser.confirmationMessage
@@ -375,3 +435,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         failed.runModal()
     }
 }
+
+/// `-demoData` 时跳过真实库的哨兵错误：落进下面那个内存容器分支
+private struct DemoModeMarker: Error {}

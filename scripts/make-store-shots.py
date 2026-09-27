@@ -11,18 +11,19 @@
 `-demoSearch <词>` 预置搜索词、`-demoPreview` 启动即开预览、
 `-showSettings -settingsTab <0-4>` 直接打开设置的某个标签页。
 
-演示数据要先灌进 `~/Library/Application Support/Copyo/Copyo.store`，别拿自己的真实剪贴板
-去拍——那会把私人内容发到 App Store 上。
+演示数据用 `-demoData`（1.2 起）：内存库 + design-spec 第六节的样例，不碰真实数据库，
+也不采集真实剪贴板、不同步。此前那条「先把演示数据灌进 `~/Library/Application Support/Copyo/Copyo.store`」
+的路已经退役（design-spec 7.5.13）——别拿自己的真实剪贴板去拍，那会把私人内容发到 App Store 上。
 
     APP=build/Build/Products/Debug/Copyo.app
     for lang in en zh-Hans; do
-      open $APP --args -AppleLanguages "($lang)" -forceDark -opaquePanel -showPanel
+      open $APP --args -demoData -AppleLanguages "($lang)" -forceDark -opaquePanel -showPanel
       sleep 6 && screencapture -x raw_01.png && pkill -x Copyo
-      # 02 加 -demoSearch Q3；03 加 -demoPreview；04 用 -showSettings -settingsTab 3
+      # 02 加 -demoSearch Q3；03 加 -demoPreview；04 用 -showSettings -settingsTab 2（1.2 起标签顺序为 通用/同步/快捷键/历史/关于）
     done
 
 然后把面板／设置窗口从整屏截图里裁出来，放进 CAPTURE_DIR：
-面板存 `ui_01_<lang>.png`（整条面板，带满宽），设置窗口存 `ui_04_<lang>.png`（带圆角透明）。
+面板存 `ui_01_<lang>.png`（整块浮动面板，1.2 起不再铺满屏宽），设置窗口存 `ui_04_<lang>.png`（带圆角透明）。
 
 ## 二、合成
 
