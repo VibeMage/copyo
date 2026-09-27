@@ -185,6 +185,14 @@ if [[ -d "$APP/PlugIns/CopyoKeyboard.appex" ]]; then
   exit 1
 fi
 
+# 隐私清单：iOS 上用到 UserDefaults 这类「需说明理由的 API」却没有 PrivacyInfo.xcprivacy，
+# ASC 会拒收（ITMS-91053）。macOS 不强制，所以 Mac 版一直没有，iOS 首版差点就这样带出去。
+# 主应用与每个扩展各自要一份——清单按 bundle 算，宿主的那份管不到 .appex
+for bundle in "$APP" "$APP"/PlugIns/*.appex; do
+  [[ -e "$bundle" ]] || continue
+  [[ -f "$bundle/PrivacyInfo.xcprivacy" ]] || fail "$(basename "$bundle") 缺 PrivacyInfo.xcprivacy"
+done
+
 # `|| true`：PlugIns 目录不存在时整条管道会非零退出，而 `set -e` 会就地终止——
 # 那等于因为「没有扩展」这件本身合法的事，把一次成功的核验判成失败
 EXTS=$(find "$APP/PlugIns" -maxdepth 1 -name "*.appex" 2>/dev/null | xargs -n1 basename 2>/dev/null | sort | tr '\n' ' ' || true)
@@ -192,6 +200,7 @@ echo "    版本        ${PKG_VERSION} (${PKG_BUILD})"
 echo "    签名        Apple Distribution"
 echo "    内嵌扩展    ${EXTS:-（无）}"
 echo "    entitlements App Group / iCloud / aps-environment=production ✓"
+echo "    隐私清单    主应用与全部扩展 ✓"
 
 echo ""
 ls -lh "$IPA"
