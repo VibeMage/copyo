@@ -1280,3 +1280,35 @@ POST 预约 → 按返回的分片 PUT → PATCH `uploaded: true` 带 MD5）。A
   卡片用每分钟刷新的 `TimelineView`，跨整分钟时一个写「12 分钟前」一个写「11 分钟前」，已改成同一个分钟时钟后重拍了 03。
 - 两个脚本都记了这批素材的指纹（截图原图 SHA-256，录屏精确时长与帧数），以后换素材会直接报错，提示重调裁切 / 剪点。
 
+
+## 二十八、Mac 1.2.1 (4) 上 TestFlight，版本页备好、暂不提审（2026-09-27）
+
+1.2.0 当天过审上架后，维护者决定 1.2.1 **先上 TestFlight 用几天，再提审**。
+
+### 出包与上传
+
+- 版本号在 main 上改成 `1.2.1 (4)`（Mac 三个配置；iOS 不动），再从 `origin/main` 新建干净 worktree，
+  `NO_BUMP=1 ./scripts/build-appstore.sh` 出包（构建号已经改好，不能让脚本再加一次）。
+- 现在的 `build-appstore.sh` 只出包、不上传，上传照第二十七节用 altool + API 密钥。
+- 构建 4 几分钟就处理完（`VALID`），内部测试自动可用（`IN_BETA_TESTING`）；TestFlight「测试内容」中英都写了。
+- ⚠️ **删出包用的 worktree 之前，先把 `build/Copyo.xcarchive` 复制进 `~/Library/Developer/Xcode/Archives/<日期>/`。**
+  这次忘了，`git worktree remove --force` 连同归档一起删掉，只从 DerivedData 的 `ArchiveIntermediates` 里找回了 dSYM
+  （UUID 与上传的二进制一致，放进了 Archives，Spotlight 能按 UUID 找到）。导出选项本来就是 `uploadSymbols = true`，Apple 那边也有符号。
+
+### 版本页（`PREPARE_FOR_SUBMISSION`，已挂构建 4，审核通过后自动发布）
+
+- 新建版本时，描述、关键词和**上一版的截图与视频**都会继承过来；截图与视频按版本各存一份，
+  删新版本页上的旧图不影响线上版本（用 `sourceFileChecksum` 逐张核过：1.2.0 仍是第一版，1.2.1 是第二版）。
+- 视频上传时带的海报时间码会在转码后被重置成 `00:00:05:01`，要等 `videoDeliveryState = COMPLETE` 之后再 PATCH 一次 `00:00:01:00`。
+- 新功能说明、审核备注、隐私政策里关于 1.2.1 的说法，都让独立的 agent 逐句对照代码核过一遍，改掉了几处说过头的地方：
+  - 冲突提示只在「录制新组合被拒」时保留原组合；启动时就冲突的，只在设置 › 快捷键里提示；
+  - 多文件拖拽只在 macOS 26 及以上生效；
+  - 录快捷键时每次读的是全部按键的状态（`keyState` + `flagsState`），只对按着 ⌘/⌥/⌃ 时按下的键做判断；
+    中途切走时还会多查一次；平时只接收自己窗口里的按键和自己的全局快捷键。
+- 审核备注 3997 字符：在「NEW IN 1.2.1」里如实写了录快捷键时轮询按键状态、不需要权限、不记录；
+  为了塞进 4000 字符，压缩了几处对审核员价值不大的措辞，「菜单栏图标隐藏时怎么打开」挪到了 OPENING 段末。
+- 隐私政策（`PRIVACY.md` 与商品页引用的 Gist）已加上「录制全局快捷键」一条并同步。
+
+### 提审时要做的
+
+版本页、构建、素材、文案都已就绪，维护者说提审时只需再建一个 `MAC_OS` 的 `reviewSubmission`、挂上 1.2.1 版本、提交。
