@@ -140,11 +140,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSApplication.shared.unregisterForRemoteNotifications()
         }
 
-        // 自动化/截图辅助：-forceDark 强制深色外观；-showSettings 直接打开设置窗口；
+        // 自动化/截图辅助：-forceDark / -forceLight 强制深色 / 浅色外观；-showSettings 直接打开设置窗口；
         // -showPanel 启动即拉起面板（拍商店截图时用，省得去模拟 ⇧⌘V——
         // 全局快捷键走 Carbon，模拟按键要给控制方开辅助功能权限）
         if ProcessInfo.processInfo.arguments.contains("-forceDark") {
             NSApp.appearance = NSAppearance(named: .darkAqua)
+        } else if ProcessInfo.processInfo.arguments.contains("-forceLight") {
+            NSApp.appearance = NSAppearance(named: .aqua)
         }
         if ProcessInfo.processInfo.arguments.contains("-showSettings") {
             openSettings()
