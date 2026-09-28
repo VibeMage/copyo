@@ -19,7 +19,10 @@ enum MacDemoData {
         guard (existing ?? 0) == 0 else { return }
 
         let english = isEnglish
-        let now = Date()
+        // 卡片与预览窗的参照时间都是「当前这一分钟的起点」（PanelRootView 的 TimelineView(.everyMinute)）。
+        // 按 Date() 往前推的话，进程启动后到下一个整分之前，每张卡都比设计稿少一分钟（「1 分钟前」而不是「2 分钟前」），
+        // 过了整分又跳回来——截图时刻不同，同一套稿子上的时间就不一样。所以演示数据也从这一分钟的起点往前推。
+        let now = Calendar.current.dateInterval(of: .minute, for: Date())?.start ?? Date()
 
         let boards = makeBoards(english: english)
         boards.forEach(context.insert)
@@ -263,11 +266,13 @@ enum MacDemoData {
     /// 2026-09-27 按维护者的意见换成清晰的真实图片；主体放在纵向中部，卡片里按 2.2:1 裁切后仍然完整。
     ///
     /// 条目里存的是 PNG 字节，不是资源名——所以得在灌数据那一刻按外观把对应那套画出来。
-    /// 截图是每种外观各起一次进程（`-forceDark`），不存在灌完再切外观的情况；AppDelegate 在灌数据之后才改
-    /// NSApp.appearance，所以这里自己也认 `-forceDark`。只画一次并缓存；1200 × 900 像素，预览浮层元信息行才像一张真截图。
+    /// 截图是每种外观各起一次进程（`-forceDark` / `-forceLight`），不存在灌完再切外观的情况；AppDelegate 在灌数据之后才改
+    /// NSApp.appearance，所以这里自己也认这两个参数，都没给时才跟随系统。只画一次并缓存；1200 × 900 像素，预览浮层元信息行才像一张真截图。
     private static let sampleImagePNG: Data = {
-        let dark = ProcessInfo.processInfo.arguments.contains("-forceDark")
-            || NSApp?.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        let arguments = ProcessInfo.processInfo.arguments
+        let dark = arguments.contains("-forceDark")
+            || (!arguments.contains("-forceLight")
+                && NSApp?.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua)
         let width = 1200, height = 900
         guard let image = NSImage(named: "DemoSampleImage"),
               let space = CGColorSpace(name: CGColorSpace.sRGB),

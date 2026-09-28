@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Copyo Support · 支持与帮助</title>
 <meta name="description" content="Support, FAQ and contact information for Copyo, the open-source clipboard manager for Mac, iPhone and iPad.">
-<meta name="theme-color" content="#0B0910">
+<meta name="theme-color" content="#F4F2ED">
 <meta property="og:title" content="Copyo Support">
 <meta property="og:description" content="Help, FAQ and how to reach us. Copyo is an open-source clipboard manager for Mac, iPhone and iPad.">
 <meta property="og:image" content="icon.png">
@@ -15,22 +15,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
 <style>
   :root {
-    color-scheme: dark;
-    --bg: #0B0910;
-    --panel: #141119;
-    --card: #1A1622;
-    --card-hover: #201B2A;
-    --line: rgba(255, 255, 255, 0.10);
-    --line-strong: rgba(255, 255, 255, 0.16);
-    --fg: #F7F3EA;
-    --muted: #A9A3B4;
-    --dim: #6F6980;
+    color-scheme: light;
+    --bg: #F4F2ED;
+    --panel: #EFECE5;
+    --card: #FCFBF8;
+    --card-hover: #EBE8E1;
+    --line: rgba(22, 22, 26, 0.12);
+    --line-strong: rgba(22, 22, 26, 0.22);
+    --fg: #16161A;
+    --muted: #6E6E76;
+    --dim: #63636B;
     --red: #FF2D55;
     --blue: #0A84FF;
     --ink: #16161A;
-    --cream: #F7F3EA;
+    --cream: #F4F2ED;
+    --link: #0068D6;
+    --link-hover: #005ABD;
     --radius: 12px;
-    --shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    --shadow: 0 8px 28px rgba(52, 49, 61, 0.08);
     --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
     --display: "Space Grotesk", var(--sans);
@@ -45,7 +47,12 @@
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
-  a { color: inherit; }
+  a { color: var(--link); text-underline-offset: 0.18em; }
+  a:hover { color: var(--link-hover); }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 3px;
+  }
   [hidden] { display: none !important; }
 
   /* ---------- Hero ---------- */
@@ -65,26 +72,25 @@
   }
   .hero::before {
     background:
-      radial-gradient(42% 55% at 16% 22%, rgba(255, 45, 85, 0.42), transparent 70%),
-      radial-gradient(40% 55% at 86% 34%, rgba(10, 132, 255, 0.40), transparent 70%),
-      radial-gradient(70% 60% at 50% 100%, rgba(11, 9, 16, 0.9), transparent 60%);
+      radial-gradient(42% 55% at 16% 22%, rgba(255, 45, 85, 0.10), transparent 70%),
+      radial-gradient(40% 55% at 86% 34%, rgba(10, 132, 255, 0.09), transparent 70%);
     filter: blur(24px);
   }
   .hero::after {
-    background: radial-gradient(60% 50% at 50% 30%, rgba(255, 255, 255, 0.04), transparent 70%);
+    background: radial-gradient(60% 50% at 50% 30%, rgba(244, 242, 237, 0.5), transparent 70%);
   }
   .icon {
     width: 112px; height: 112px;
     display: block; margin: 0 auto 22px;
     border-radius: 25px;
-    filter: drop-shadow(-4px -3px 18px rgba(255, 45, 85, 0.45)) drop-shadow(4px 3px 18px rgba(10, 132, 255, 0.45));
+    filter: drop-shadow(-4px -3px 18px rgba(255, 45, 85, 0.14)) drop-shadow(4px 3px 18px rgba(10, 132, 255, 0.14));
   }
   .wordmark {
     font: 700 clamp(48px, 8vw, 72px)/1 var(--display);
     letter-spacing: -0.045em;
-    color: var(--cream);
+    color: var(--ink);
     margin: 0;
-    text-shadow: -0.021em -0.017em 0 var(--red), 0.021em 0.017em 0 var(--blue);
+    text-shadow: -0.018em -0.014em 0 rgba(255, 45, 85, 0.65), 0.018em 0.014em 0 rgba(10, 132, 255, 0.65);
   }
   .wordmark small {
     display: block;
@@ -97,7 +103,7 @@
   .tagline {
     margin: 14px auto 0;
     max-width: 560px;
-    color: var(--muted);
+    color: var(--dim);
     font-size: 17px;
   }
   .store { margin: 24px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
@@ -108,9 +114,8 @@
     margin-top: 26px;
     padding: 4px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--bg);
     border: 1px solid var(--line);
-    backdrop-filter: blur(12px);
   }
   .lang button {
     appearance: none;
@@ -123,29 +128,31 @@
     cursor: pointer;
     transition: background .15s, color .15s;
   }
-  .lang button:hover { color: var(--fg); }
-  .lang button[aria-pressed="true"] { background: var(--cream); color: var(--ink); }
+  .lang button:hover { background: var(--card-hover); color: var(--fg); }
+  .lang button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 4px rgba(52, 49, 61, 0.10); }
 
   /* ---------- Panel strip ---------- */
   .strip {
     position: relative;
     margin: 12px 0 0;
-    background: var(--panel);
+    background: var(--bg);
   }
   .strip img {
     display: block;
     width: min(100%, 1040px);
     height: auto;
     margin: 0 auto;
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    /* The shot carries its own cream margin and shadow; fade only that margin
+       (40 / 2288 px wide, 36 / 740 px tall) so the panel itself stays whole. */
+    -webkit-mask-image:
+      linear-gradient(to right, transparent, #000 1.6%, #000 98.4%, transparent),
+      linear-gradient(transparent, #000 4.5%, #000 95.5%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent, #000 1.6%, #000 98.4%, transparent),
+      linear-gradient(transparent, #000 4.5%, #000 95.5%, transparent);
+    mask-composite: intersect;
   }
-  .strip::before, .strip::after {
-    content: "";
-    position: absolute; left: 0; right: 0; height: 40px; pointer-events: none;
-  }
-  .strip::before { top: 0; background: linear-gradient(var(--bg), transparent); }
-  .strip::after { bottom: 0; background: linear-gradient(transparent, var(--bg)); }
 
   /* ---------- Layout ---------- */
   main { max-width: 880px; margin: 0 auto; padding: 36px 20px 72px; }
@@ -158,7 +165,7 @@
   .fact {
     padding: 14px 16px;
     border-radius: var(--radius);
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--card);
     border: 1px solid var(--line);
   }
   .fact b { display: block; font-size: 14px; margin-bottom: 2px; }
@@ -176,12 +183,12 @@
     display: flex; align-items: center; gap: 10px;
     padding: 12px 18px;
     font-weight: 700; font-size: 15px;
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
   }
   .card-head .dot {
     width: 18px; height: 18px; border-radius: 6px; flex: none;
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--card);
     display: grid; place-items: center;
   }
   .card-head .dot::before {
@@ -189,9 +196,9 @@
     background: var(--ink);
     box-shadow: 0 -3px 0 var(--ink), 0 3px 0 var(--ink);
   }
-  .card-head.red { background: linear-gradient(180deg, #FF3F66, #E8264D); }
-  .card-head.blue { background: linear-gradient(180deg, #2A93FF, #0A78E6); }
-  .card-head.cream { background: linear-gradient(180deg, #FBF8F1, #EDE7DA); color: var(--ink); text-shadow: none; }
+  .card-head.red { background: linear-gradient(180deg, #FBE7E9, #F9DEE3); }
+  .card-head.blue { background: linear-gradient(180deg, #EAF2FA, #DFEAF5); }
+  .card-head.cream { background: linear-gradient(180deg, var(--cream), var(--panel)); }
   .card-body { padding: 18px 20px 20px; }
   .card-body p { margin: 0 0 12px; }
   .card-body p:last-child, .card-body ol:last-child, .card-body ul:last-child { margin-bottom: 0; }
@@ -208,19 +215,19 @@
     text-decoration: none;
     border: 1px solid var(--line-strong);
     color: var(--fg);
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--card);
     transition: background .15s, transform .15s;
   }
-  .btn:hover { background: rgba(255, 255, 255, 0.11); transform: translateY(-1px); }
-  .btn.primary { background: var(--cream); color: var(--ink); border-color: transparent; }
-  .btn.primary:hover { background: #fff; }
+  .btn:hover { background: var(--card-hover); color: var(--ink); transform: translateY(-1px); }
+  .btn.primary { background: var(--link); color: var(--cream); border-color: transparent; }
+  .btn.primary:hover { background: var(--link-hover); }
   .btn svg { width: 16px; height: 16px; flex: none; }
 
   kbd {
     display: inline-block;
     padding: 1px 7px;
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--panel);
     border: 1px solid var(--line-strong);
     color: var(--fg);
     font: 500 13px/1.6 var(--mono);
@@ -228,7 +235,9 @@
   }
   code {
     font: 14px var(--mono);
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--panel);
+    color: var(--ink);
+    overflow-wrap: anywhere;
     padding: 1px 6px;
     border-radius: 5px;
   }
@@ -262,8 +271,8 @@
     color: var(--dim); font-size: 13px;
     display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center;
   }
-  footer a { color: var(--muted); text-decoration: none; }
-  footer a:hover { color: var(--fg); }
+  footer a { color: var(--link); }
+  footer a:hover { color: var(--link-hover); }
 
   @media (max-width: 640px) {
     .hero { padding-top: 56px; }
@@ -294,7 +303,7 @@
 </header>
 
 <div class="strip" aria-hidden="true">
-  <img src="panel-strip.jpg" width="1600" height="313" alt="">
+  <img src="panel-strip.jpg" width="2288" height="740" alt="">
 </div>
 
 <main>
@@ -409,8 +418,8 @@
           <p>Shared Folder sync on the Mac doesn't reach iPhone or iPad; only iCloud does. Turning iCloud Sync on or off takes effect after you reopen Copyo.</p>
         </details>
         <details>
-          <summary>Why doesn't Copyo save in the background or paste for me, like on the Mac?</summary>
-          <p>iOS only lets an app read the clipboard while that app is on screen, and doesn't let one app type into another. No app can get around this. That's why Copyo saves when you open it, from the share sheet, or through Quick Save, and why pasting is up to you: tap a card to copy it, then paste as usual.</p>
+          <summary>Why doesn't Copyo save in the background like it does on the Mac?</summary>
+          <p>iOS only lets an app read the clipboard while that app is on screen, and doesn't let one app type into another. No app can get around this. That's why Copyo saves when you open it, from the share sheet, or through Quick Save, and why pasting is up to you: tap a card to copy it, then paste as usual. The Mac works the same way: Copyo copies, you paste.</p>
         </details>
         <details>
           <summary>Does Copyo skip passwords on iPhone and iPad?</summary>
@@ -539,8 +548,8 @@
           <p>Mac 上的共享文件夹同步到不了 iPhone 和 iPad，只有 iCloud 可以。开关 iCloud 同步需要重新打开 Copyo 才会生效。</p>
         </details>
         <details>
-          <summary>为什么不能像 Mac 那样在后台保存、或者替我粘贴？</summary>
-          <p>iOS 只允许 App 在自己显示在屏幕上时读取剪贴板，也不允许一个 App 往另一个 App 里输入内容，任何 App 都绕不过去。所以 Copyo 在你打开它时、从分享面板、或通过一键保存来保存内容；粘贴则由你来完成：轻点卡片复制，然后照常粘贴。</p>
+          <summary>为什么不能像 Mac 那样在后台保存？</summary>
+          <p>iOS 只允许 App 在自己显示在屏幕上时读取剪贴板，也不允许一个 App 往另一个 App 里输入内容，任何 App 都绕不过去。所以 Copyo 在你打开它时、从分享面板、或通过一键保存来保存内容；粘贴则由你来完成：轻点卡片复制，然后照常粘贴。Mac 上也一样：Copyo 负责复制，粘贴由你来。</p>
         </details>
         <details>
           <summary>iPhone 和 iPad 上会跳过密码吗？</summary>

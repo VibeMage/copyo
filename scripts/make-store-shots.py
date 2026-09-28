@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """用真实应用截图合成 Mac 1.2 中英双语商店截图。
 
-    python3 scripts/make-store-shots.py build.noindex/store-1.2.1/raw
+    python3 scripts/make-store-shots.py build.noindex/store-light/raw
     # 另生成两张照片预览备选，放入 out/alt/：
-    python3 scripts/make-store-shots.py build.noindex/store-1.2.1/raw --include-image-preview
+    python3 scripts/make-store-shots.py build.noindex/store-light/raw --include-image-preview
 
 默认输出十张 RGB PNG 到 <素材目录>/../out/screenshots/，并生成
 out/contact-sheet.png 与 out/screenshot-layout.json；不写入 art/store/。
 不带 --include-image-preview 时，清理 out/alt/ 中本脚本生成的两张
 03-preview-image-{zh,en}.png，并将布局记录的 alternatives 置空；其他文件保留。
+照片预览备选只供比较：它的标题栏在画面左侧，正好压在浅色舞台的红色侧光上，
+副标题对比度不到 WCAG AA，这版舞台下不能拿它上架。
 
-先校验十二张原图的 SHA-256，全部匹配后才写成品。更换素材后应先检查面板
+先校验十三张素材（含舞台）的 SHA-256，全部匹配后才写成品。更换素材后应先检查面板
 是否仍位于 PANEL_SOURCE、是否完整落在 SCENE_CROP / LAYOUTS 的裁切框内，
 必要时重新调整版式，再更新 EXPECTED_SOURCES；不要跳过校验直接套用旧裁切框。
 文件名与文案见 TEXT。拍摄使用 -demoData，保留 PNG 原有色彩配置。
@@ -20,7 +22,8 @@ out/contact-sheet.png 与 out/screenshot-layout.json；不写入 art/store/。
 带显示器 ICC 的素材先转换到 sRGB；嵌入固定 ICC，保证相同输入逐字节可复现。
 
 Copyo 复制后交还焦点，由用户按 Command-V；宣传文案不承诺自动粘贴。
-素材与版式要求见 build.noindex/store-1.2.1/BRIEF.md 和 BRIEF-fixes.md。
+浅色素材要求见 build.noindex/store-light/BRIEF.md；版式沿用
+build.noindex/store-1.2.1/BRIEF.md 和 BRIEF-fixes.md。
 """
 
 import argparse
@@ -37,10 +40,10 @@ REPO = Path(__file__).resolve().parent.parent
 ICON = REPO / "art" / "icon" / "icon-512.png"
 W, H = 2560, 1600
 SOURCE_SIZE = (3840, 2160)
-# 1.2.1 原图中的面板位于 (816, 1332)，尺寸为 2208×664px。
+# 角光原图中的面板位于 (816, 1330)，尺寸为 2208×664px；比上一轮上移 2px。
 # 四个主面板场景保持相同位置和约 1.0997 倍缩放，均裁取连续的 16:10 区域。
 SCENE_CROP = (756, 705, 3084, 2160)
-PANEL_SOURCE = (816, 1332, 3024, 1996)
+PANEL_SOURCE = (816, 1330, 3024, 1994)
 LAYOUTS = {
     "panel": dict(crop=SCENE_CROP, icon_size=176, icon_top=195,
                   head_top=425, sub_top=551, head_en=83, head_zh=79,
@@ -58,7 +61,8 @@ LAYOUTS = {
                      head_top=260, sub_top=370, head_en=80, head_zh=77,
                      sub_en=40, sub_zh=38, header_limit=440),
 }
-HEADLINE_COLOR, SUBTITLE_COLOR = (255, 255, 255), (190, 192, 197)
+BACKGROUND_COLOR = (244, 242, 237)
+HEADLINE_COLOR, SUBTITLE_COLOR = (22, 22, 26), (110, 110, 118)
 TEXT_MAX_WIDTH = W - 240
 # 独立设置窗口保留原始宽高比与系统阴影；与标题区一起下移 75px。
 SETTINGS_WIDTH, SETTINGS_TOP = 1340, 440
@@ -118,20 +122,21 @@ TEXT = {
 }
 
 
-# 十二张经人工核过裁切的 1.2.1 原图；换图后必须先复核版式，再更新对应指纹。
+# 十三张经人工核验的浅色素材（含舞台）；换图后必须先复核版式，再更新对应指纹。
 EXPECTED_SOURCES = {
-    "en-01-panel.png": "a5dcbdbe96c57c01e8bab96a0c7476c2fa1796da80f282b5648728785c968885",
-    "en-02-search.png": "79412434d2636216df59249a939bddd38252b9d6c0a2c8934deff05aa43d3ead",
-    "en-03-preview.png": "fa410a222ecd8c1963b3d75516aa9046940ee1a629d3b37f8f54ad9c102f39d6",
-    "en-03b-preview-image.png": "cd02831e6826111546ead8a4063ff4f807ae980409a77df27d5d395fd940e4e0",
-    "en-04-settings.png": "93f4f0b7843a0b518a178af3ade114cfb2f8989f07881bdd4d97d3baa320fa31",
-    "en-05-pinmenu.png": "494c4551d5285ece0ebee77b8486b4d9a91898873a0ebfe4328d3bd62565e9c6",
-    "zh-01-panel.png": "766d8547d15b17174126d4b49666b2e63fe2650ebe7ab7d6eaa021d35ed8a0c5",
-    "zh-02-search.png": "7f071a8da81ef7aa41a43902a2d28afe2c8758f12c0c9d2f41c09792585e231a",
-    "zh-03-preview.png": "ca55160d48406e137ba80c82b67b2ca6fdfc1d237105bcab8392bf53083f6b1a",
-    "zh-03b-preview-image.png": "d4ae2f5a15b600e508cb9fff1fb10592e8cf1be01ed3112b5a8879a98a67582e",
-    "zh-04-settings.png": "0ac5531537fa1e8616d24f2f24c718b12fb09144311501a02454fcdcf913b675",
-    "zh-05-pinmenu.png": "4ce671e3eabdec67c06d6570f9a10a84acc94b83ba43e1ac72ba97c324dc43e0",
+    "en-01-panel.png": "fc67855264fdcbb6d49724e9492ac4c84a2259df195bee52184e520c54b2f3d4",
+    "en-02-search.png": "806d4b06ddf03308c3e658101a8277e2678f6706889684f5a2cbf76ad5bdef61",
+    "en-03-preview.png": "a3db05d7282cda025934c895c058e98b4cffe12b872314ab6bd5523ae2181b38",
+    "en-03b-preview-image.png": "382cf0ef6fab294f703ee682c18cb11c992618f7c5013f9cc344bd61e2fae452",
+    "en-04-settings.png": "d485ea0cadf12b49101257d1f28bd9aa9b2ef940570b37939d21c0a021a9d10a",
+    "en-05-pinmenu.png": "a5d6b298c714588da3acb200df26d536c32276914c89908c26c16cd73bcb915f",
+    "zh-01-panel.png": "1eba95a72199a9ad5012178e15a66f3a17565ada41731fecfe8b6a5e972f6c24",
+    "zh-02-search.png": "6e576b656f7368761cfb1b2281b2749bec57ae0295d76bb6b70c2018da612568",
+    "zh-03-preview.png": "3d7170f8f999b84f0d574f5f58bd70adb505229f5433a02741ea2d3a7c85993c",
+    "zh-03b-preview-image.png": "b2930e3a0ef9c663fc4e888bbbb7be59384e6998d719ed4e43400e684e826803",
+    "zh-04-settings.png": "27e06a52cedbc5b4fdf3c2d393e07e4badd8a917538b5bf50398d2c3983978a2",
+    "zh-05-pinmenu.png": "ffff6855624492f4d8d9bb1680ea64a6fdfa76b9937b77ede6563a6769b76991",
+    "stage-plate-16x9.png": "d14519665697ab8131a20e1df33123320032fa1bfe3345c8d56316d6f937b0b4",
 }
 
 
@@ -321,7 +326,7 @@ def contact_sheet(paths, output):
     thumb_w, thumb_h, gap, label_h = 640, 400, 24, 42
     sheet = Image.new("RGB", (cols * thumb_w + (cols + 1) * gap,
                               rows * (thumb_h + label_h) + (rows + 1) * gap),
-                      (19, 21, 28))
+                      BACKGROUND_COLOR)
     draw = ImageDraw.Draw(sheet)
     label_font = sf_font(19, "Medium")
     for index, path in enumerate(paths):

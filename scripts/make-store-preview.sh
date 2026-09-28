@@ -10,8 +10,8 @@
 #   --language    默认 all
 #
 # 几个刻意的选择:
-# - 剪点是对着 1.2.1 那两段录屏逐段挑的（cut_plan 里的 case），只对那两段素材成立。
-#   每种语言都记着当时源片的精确时长和原始帧数，运行时必须同时完全匹配：换了素材要重挑剪点，
+# - 剪点是对着 store-light 的品牌角光浅色录屏逐段挑的（cut_plan 里的 case），只对这两段素材成立。
+#   每种语言都记着当时源片的精确时长和容器记录帧数（nb_frames），运行时必须同时完全匹配：换了素材要重挑剪点，
 #   不能拿旧剪点硬剪。所有语言都通过检查后才开始编码。
 # - 输出目录不能等于或位于输入目录、art/store/ 之内（解析符号链接、按同一 inode 判断），
 #   免得覆盖原始素材或已经入库的成品；除输出目录外不写任何地方。
@@ -94,30 +94,35 @@ for root in (pathlib.Path(p).resolve() for p in sys.argv[2:]):
         raise SystemExit(f"输出目录不能等于或位于 {root} 之内，收到 {output}")
 PY
 
-# 每种语言的剪点，格式为「开始秒:结束秒:取景」。先 fps=30，再以精确帧号抽样，
-# 在动画、拼音输入、照片切颜色、Pinboard 和复制提示处加密到 0.1 秒核对。
-# 只去掉静止停顿，操作和动画都保持 1 倍速；取景仅在预览打开前、关闭后硬切。
-# expected_source / expected_frames 是 ffprobe 读取的 1.2.1 源片精确时长与原始帧数。
-# 换景发生在选中图片卡后的静止段；预览关闭后先在远景停留，再切回近景。
+# 每段格式「CFR 开始帧:排他结束帧:取景」；这些是按真实 PTS 运行 fps=30 后的帧号，
+# 绝不是 VFR 原帧序号除以 60。原片用 ffprobe frame=pts_time / showinfo 逐帧核过。
+# 两段从 163/30=5.433333 秒开始，淡入前保留约 0.2 秒空舞台；只跳过静止停顿和
+# 已定位的瑕疵。每个剪点检查前后各 5 帧，所有操作、动画保持 1 倍速。
+# expected_source / expected_frames 是任务四源片的精确格式时长与容器记录帧数（nb_frames）。
 cut_plan() {
   case "$1" in
     zh)
-      # 上浮；四次切卡、四次筛选、完整拼音上屏；清空及走到图片卡；
-      # 照片预览；切到颜色预览；关闭预览；弹菜单；选 Pinboard、图钉、复制提示至淡出。
-      expected_source=39.716667
-      expected_frames=1420
-      ranges=('1.4:3.2:tight' '4.0:16.5:tight' '17.5:22.6:tight'
-              '22.6:24.6:wide' '25.5:26.7:wide' '27.7:29.0:wide'
-              '29.5:30.7:tight' '31.6:35.7:tight')
-      duration=29.2
+      # 淡入；四次切卡/筛选/完整拼音上屏；缩短搜索停顿；
+      # 清空搜索时原始 PTS 20.216667–20.433333 有蓝块，静止帧之间跳过 [20.2,20.6)。
+      # 图片停稳后 24.7 秒切宽景，关闭预览后 31.3 秒回紧景；结尾停在「已复制」完整显示的最后一帧
+      # （这次录屏里提示是一帧内消失的，没有淡出，留着空舞台尾巴像是闪没了）。
+      expected_source=46.020000
+      expected_frames=1437
+      ranges=('163:198:tight' '219:570:tight' '594:606:tight'
+              '618:741:tight' '741:792:wide' '828:870:wide'
+              '906:939:wide' '939:1122:tight')
+      duration=27.666666667
       ;;
     en)
-      expected_source=40.001667
-      expected_frames=1318
-      ranges=('1.4:3.2:tight' '4.0:15.4:tight' '16.1:21.4:tight'
-              '21.4:23.4:wide' '24.2:25.6:wide' '26.5:27.8:wide'
-              '28.2:29.5:tight' '30.2:34.4:tight')
-      duration=28.7
+      # 原生 PTS 5.883333 的输入法玻璃浮层在 fps 前显式排除，保留原时间戳。
+      # 第一处接点 CFR 176→177 对应干净原帧 5.866667→5.900000；不改变动作速度。
+      # 24.0 秒切宽景，30.5 秒回紧景；菜单选择、图钉；结尾同样停在「已复制」完整显示的最后一帧。
+      expected_source=45.991667
+      expected_frames=1465
+      ranges=('163:177:tight' '177:198:tight' '219:540:tight'
+              '564:720:tight' '720:768:wide' '804:846:wide'
+              '882:915:wide' '915:1099:tight')
+      duration=27.3
       ;;
   esac
 }
@@ -152,8 +157,8 @@ except (InvalidOperation, TypeError, ValueError):
 if not matched:
     raise SystemExit(
         f"源片不匹配：{source}\n"
-        f"实际时长 {duration} 秒、原始帧数 {frames}；"
-        f"预期精确时长 {expected_duration} 秒、原始帧数 {expected_frames}。\n"
+        f"实际时长 {duration} 秒、容器记录帧数（nb_frames） {frames}；"
+        f"预期精确时长 {expected_duration} 秒、容器记录帧数（nb_frames） {expected_frames}。\n"
         f"请先对着新录屏重新挑剪点，再更新 cut_plan 中 {lang} 的 "
         "ranges、duration、expected_source 与 expected_frames。")
 PY
@@ -172,11 +177,17 @@ render_preview() {
   # tight=2304×1296 at (768,864)：2208 px 面板成为 1840 px，左右各 40 px；旧版是约 1745 px。
   # wide=3072×1728 at (384,304)：为高照片预览留出完整高度；面板 1380 px，预览窗 900 px。
   # 照片预览顶部约 27 px、面板底部约 22 px 成片余量；打开/切卡/关闭动画的外沿均在取景内。
-  # 图片卡停稳后提前约 0.7–0.8 秒切 wide；关闭预览后在 wide 保留约 0.7 秒，再回 tight。
+  # 图片卡停稳后提前约 0.6–0.8 秒切 wide；关闭预览后在 wide 保留约 0.7 秒，再回 tight。
+  # 两种取景的右界分别为 3072、3456 px，排除源片 x≈3780 px 的鼠标指针。
   # 两次换景都在静止画面完成，没有推拉摇移或变速。
-  # 源片可变帧率，先统一到 30 fps，再以帧边界剪辑，保证每段原速且切点精确。
+  # 源片可变帧率；en 先剔除原始 PTS 坏帧，再统一到 30 fps，以帧边界剪辑保持原速。
   count="${#ranges[@]}"
-  graph="[0:v]fps=30,split=$count"
+  graph='[0:v]'
+  if [[ "$lang" == en ]]; then
+    # 用原始 PTS 明确剔除系统输入法浮层；不重置 PTS，fps 只作正常定帧，不变速。
+    graph+="select='not(between(t,5.875,5.895))',"
+  fi
+  graph+="fps=30,split=$count"
   for ((index=0; index<count; index++)); do graph+="[source$index]"; done
   graph+=';'
   labels=''
@@ -189,35 +200,36 @@ render_preview() {
       *) printf '未知取景：%s\n' "$framing" >&2; return 1 ;;
     esac
     label="segment$index"
-    graph+="[source$index]trim=start=$start:end=$end,setpts=PTS-STARTPTS,crop=$crop,scale=1920:1080:flags=lanczos,setsar=1[$label];"
+    graph+="[source$index]trim=start_frame=$start:end_frame=$end,setpts=PTS-STARTPTS,crop=$crop,scale=1920:1080:flags=lanczos,setsar=1[$label];"
     labels+="[$label]"
     index=$((index + 1))
   done
   graph+="${labels}concat=n=$count:v=1:a=0,format=yuv420p[video]"
 
   # 留下逐段源帧/成片帧映射。QA 抽帧按 n 精确取帧，不用 fps=1 结果反推时间标签。
-  python3 - "$OUTPUT_DIR/$lang-cut-plan.json" "$expected_source" "$expected_frames" "$duration" "${ranges[@]}" <<'PY'
+  python3 - "$OUTPUT_DIR/$lang-cut-plan.json" "$expected_source" "$expected_frames" "$duration" "$lang" "${ranges[@]}" <<'PY'
 import json
 import pathlib
 import sys
 from decimal import Decimal
 
-report, source_duration, source_frames, expected_duration, *ranges = sys.argv[1:]
+report, source_duration, source_frames, expected_duration, lang, *ranges = sys.argv[1:]
 segments, cursor = [], 0
 for part in ranges:
     start, end, framing = part.split(':')
-    first, last = Decimal(start) * 30, Decimal(end) * 30
-    assert first == int(first) and last == int(last), '剪点必须对齐 30 fps 的整数帧'
-    first, last = int(first), int(last)
+    first, last = int(start), int(end)
     assert 0 <= first < last <= Decimal(source_duration) * 30, '剪点必须位于源片时长内'
     crop = [2304, 1296, 768, 864] if framing == 'tight' else [3072, 1728, 384, 304]
     segments.append(dict(source_start_frame=first, source_end_frame_exclusive=last,
                          output_start_frame=cursor, output_end_frame_exclusive=cursor + last - first,
                          framing=framing, crop_whxy=crop))
     cursor += last - first
-assert cursor == Decimal(expected_duration) * 30, '分段帧数总和必须与成片时长一致'
+assert abs(Decimal(cursor) / 30 - Decimal(expected_duration)) < Decimal('0.000001'), '分段帧数总和必须与成片时长一致'
 pathlib.Path(report).write_text(json.dumps(dict(source_duration_seconds=source_duration,
     source_nb_frames=int(source_frames), fps=30, frame_count=cursor,
+    source_frame_numbering='CFR frames after timestamp-preserving native PTS exclusion and fps=30; not native VFR indexes',
+    excluded_native_pts_seconds=[[5.875, 5.895]] if lang == 'en' else [],
+    poster_output_frame=30, poster_source_cfr_frame=193,
     playback_speed=1, segments=segments), indent=2) + '\n')
 PY
 
@@ -234,7 +246,7 @@ PY
     -t "$duration" -shortest -movflags +faststart \
     -map_metadata -1 -map_chapters -1 "$destination"
 
-  # 成品第 30 帧（1.0 秒，源片 2.4 秒）面板已经完整浮起且静止，取这一帧做海报。
+  # 成品第 30 帧（1.0 秒，两种语言均为源 CFR 193 / 6.433333 秒）面板完整且静止。
   ffmpeg -hide_banner -loglevel error -nostdin -y \
     -i "$destination" -vf "select='eq(n,30)'" -frames:v 1 -update 1 -pix_fmt rgb24 "$poster"
 
